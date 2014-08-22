@@ -1,0 +1,9 @@
+# 在 trust.acl 不在 untrust.acl 中的 email 才可認證
+fuck@
+
+# 免費信箱，但是在 trust.acl 內的
+educities.edu.tw
+group.nctu.edu.tw
+cm1.hinet.net
+
+# 廣告商

@@ -1,0 +1,265 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                       <font color="#008000">★ 轉信常見問題 ★</font>
+
+  <a href='#1'>一、基礎設定</a>
+  <a href='#2'>二、常見問題 (FAQ)</a>
+
+
+    目前 MapleBBS 所使用的 innbbsd 程式是從 skhuang@csie.nctu.edu.tw 的
+  innbbsd 0.50beta-4 加上 leeym@cae.ce.ntu.edu.tw 的 NoCeM 0.8，所修改來
+  的，僅適用於 MapleBBS，無法適用其他 BBS 系統。
+
+  <a name='1'></a>
+  <font color="#000080"><u>一、基礎設定</u></font>
+
+  * 設定 src/innbbsd/innbbsconf.h
+
+    #define _NoCeM_                     /* No See Them 擋信機制 */
+    如果不想使用 NoCeM 擋信機制，請 #undef 這項。
+
+    #undef  _KEEP_CANCEL_               /* 保留 cancel 的文章於 deleted 板 */
+    如果想把 cancel 的文章都記錄下來，那麼請 #define 這項。
+
+
+  * 設定「轉文站台列表」 (innd/nodelist.bbs)
+
+    只有在這個檔案裡面的站台，才允許該站台連線至本站。
+
+
+  * 設定「轉文看板列表」 (innd/newsfeeds.bbs)
+
+    這個檔案裡面記載了所有要和別台交換文章的看板，其轉信的站台/群組/看板
+    對照列表。
+
+
+  * 設定「NoCeM擋文規則」 (innd/ncmperm.bbs)
+
+    NoCeM 擋信機制的控制，可以選擇是否接收 NoCeM notice 的砍文。
+
+
+  * 設定「廣告文名單」 (innd/spamrule.bbs)
+
+    滿足這個檔案裡面所列規則的文章，將被本站拒收。
+
+  <a name='2'></a>
+  <font color="#000080"><u>二、常見問題 (FAQ)</u></font>
+
+  (以下所有的 % 開頭的指令，都是以 bbs 身分在 /home/bbs 執行)
+
+
+  * 我要怎麼設定 nodelist.bbs？
+
+    1. nodelist.bbs 的格式如下：
+
+       WOLF            bbs.tnfsh.tn.edu.tw     IHAVE(7777)
+       ^^^^            ^^^^^^^^^^^^^^^^^^^     ^^^^^^^^^^^
+       node-name       host                    protocol(port)
+
+       這表示：本站將與 Wolf 站 (bbs.tnfsh.tn.edu.tw:7777) 做 IHAVE 轉信。
+
+    2. node-name 是該站的短名，隨便您命名。
+    3. host 是該站的 hostname，可以是 ip/fqdn，即使不是正解，像
+       xxx.twbbs.org 也是被接受的。
+    4. 目前支援的 protocol 有 IHAVE POST 二種，一般 BBS 使用 IHAVE，
+       news-server 使用 POST。
+    5. port 為對方開的連接埠，一般 BBS 使用 7777，news-server 使用 119。
+    6. 只有把對方站台的資訊加入 nodelist.bbs 以後，對方才可以 access 我們。
+
+
+  * 我要怎麼設定 newsfeeds.bbs？
+
+    1. newsfeeds.bbs 的格式如下：
+
+       Maple        nthu.cs.bbs.plan        <-> plan   big5
+       ^^^^^        ^^^^^^^^^^^^^^^^        ^^^ ^^^^^  ^^^^
+       node-name    newsgroup               way board  charset
+
+       這表示：本站的 plan 板與 Maple 站的 nthu.cs.bbs.plan 做雙向轉信，
+               編碼是 big5。
+
+    2. node-name 指定要和 nodelist.bbs 中哪個站台轉信。
+    3. 如果是和 BBS 轉信的話，那麼 newsgroup 可以隨便取名，只要二站都取相同
+       就可以了；如果是和 news-server 轉信的話，請和 news-server 取成相同。
+    4. way 向左 <- 表示轉出，向右 -> 表示轉進，雙向 <-> 表示轉出且轉進。
+    4. board 指定要和我們站上的哪個看板轉信。
+    5. charset 可指定 big5 或是 gb2312 或是 us-ascii 等各式各樣的編碼。
+
+
+  * 我要怎麼設定 ncmperm.bbs？
+
+    1. ncmperm.bbs 的格式如下：
+
+       news@news.math.nctu.edu.tw      power         ○
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^      ^^^^^         ^^
+       issuer                          type          perm
+
+       這表示：允許 news@news.math.nctu.edu.tw 的 power 砍信。
+
+    2. issuer 是發 NCM notice 者。
+    3. 同一個 issuer 可以發好幾個 type 的 NCM notice。
+    4. perm 如果是 ○，那麼就是允許這個 notice 砍信；perm 如果是 ╳，那麼
+       就不允許這個 notice 砍信。
+    5. 如果有新增的 NoCeM issuer/type 的話，程式會自動把 ncmperm.bbs 加入
+       ncmperm.bbs，預設是 perm ╳，如果站長要開啟接受這個 notice，要把
+       perm 改成 ○。
+
+
+  * 我要怎麼設定 spamrule.bbs？
+
+    1. ncmperm.bbs 的格式如下：
+
+       Maple        House        [來源] 包含 hinet.net
+       ^^^^^        ^^^^^         ^^^^       ^^^^^^^^^
+       path         board         type       detail
+
+       這表示：在 Maple 這個站轉來的文章中，若來源包含 hinet.net 將無法轉
+       信進入 House 板。
+
+    2. path 是這條規則適用於哪些站轉來的文章，也可以選擇所有站台。
+    3. board 是這條規則適用於哪些看板，也可以選擇所有看板。
+    4. type 是這條規則檢查哪一欄位。
+    5. detail 是這條規則的內容。
+
+
+  * 我可以跟哪些 news-server 轉信？
+
+    在此列出一些常見的 news-server：
+
+    1. 交通大學  netnews.nctu.edu.tw   POST(119)
+    2. 交大資科  news.cis.nctu.edu.tw  POST(119)
+    3. 交大應數  news.math.nctu.edu.tw POST(119)
+    4. 中山大學  news.nsysu.edu.tw     POST(119)
+    5. 中興大學  news.nchu.edu.tw      POST(119)
+    6. Hinet     news.hinet.net        POST(119)
+
+    然而這些 news-server 往往都有其存取限制，例如 Hinet 的伺服器僅限 Hinet
+    的用戶存取。
+
+    若您不知道貴單位專屬的 news-server，請恰計算機中心等相關單位。
+
+
+  * 我要怎麼得知哪個 newsgroup 是對應哪個討論區？
+
+    對於一般的大眾轉信板，在許多 news-server 上都有其對應的群組。一些常見
+    的 tw.bbs.* 群組對照表請參考這個網站：
+    http://www.csie.nctu.edu.tw/~cdsheen/pnews/index.php
+
+
+  * 我要怎麼得知 news-server 上有什麼 newsgroup？
+
+    % telnet news.cs.nthu.edu.tw 119 > file
+    list
+    quit
+
+    那麼在 file 這個檔案裡面就記錄了 bbs.cs.nthu.edu.tw 這個 news-server
+    上的所有 newsgroup 了。
+
+
+  * 如何一次抓許多篇文章？
+
+    bbslink 預設一次只抓 100 封信，如果要抓超過 100 封的話，請使用 -a
+    這個參數。
+    % innd/bbslink -a 500 -s site
+    其中 site 是記錄在 nodelist.bbs 裡的英文站名。
+
+
+  * 如果抓過去的文章？
+
+    如果您想收過去已經抓過的信，那麼請修改 newsfeeds.bbs 中的 high-number
+    (將這數字變小，至於要減小多少，取決於您要抓幾封過去的信)。
+
+    1. 首先執行以下，就會把這個站的所有群組之 high-number 更新。
+       % innd/bbslink -c -s site
+
+    2. 其次改 newsfeeds.bbs 中該群組的 high-number。
+       如果想抓一千封信，就把原來的數字減一千。
+
+    3. 然後執行以下，就會一次抓 1000 封。
+       % innd/bbslink -a 1000 -s site
+
+
+  * 如果想收其他站的連線砍信的話，怎麼做？
+
+    BBS 站對轉，將自動有連線砍信的功能，不需要另外設定。
+
+    若想抓 news-server 的連線砍信的話，那麼請在 newsfeeds.bbs 中加入
+
+    SiteA        control.cancel           -> junk   big5
+    SiteB        control.cancel           -> junk   big5
+
+    每個沒有被餵信的站台都要加入一次。
+
+
+  * 如果想收 NoCeM 的擋信機制，怎麼做？
+
+    首先您必須先找一個有 tw.bbs.admin 這個群組的 news-server，通常您收
+    tw.bbs.* 群組的那台都會有這個群組。
+
+    如果您已經被這台 news-server 餵信，那麼您什麼都不需要設定，只需要請該
+    news-server 將 tw.bbs.admin 主動餵給您即可。
+
+    如果您沒有被這台 news-server 餵信，那麼您要在 newsfeeds.bbs 加入
+
+    SiteA        tw.bbs.admin             -> junk   big5
+
+    其中 SiteA 就是有 tw.bbs.admin 這個群組的 news-server。
+
+
+  * 無法 BBS 站對轉？
+
+    大部分 BBS 對轉失敗的原因，都是因為對方沒有把您加入 nodelist.bbs，
+    請試著連對方 BBS 站的 innbbsd port，例如：
+    % telnet bbs.tnfsh.tn.edu.tw 7777
+    如果出現這樣的訊息：502 您不在本站的 nodelist.bbs 名單中，
+    那麼請對方的站長把您加入 nodelist.bbs。
+
+    甲站和乙站二個 BBS 站對轉，甲站上可以看到乙站的信，乙站上不能看到甲站的
+    信，那麼出問題的是甲站，不是乙站。
+
+    您也可以在 bbslink 加參數 -v，來秀出詳細的訊息，看是卡在哪裡。
+    % innd/bbslink -v
+
+
+  * 無法跟 news-server 抓信？
+
+    大部分和 news-server 轉信失敗的原因，都是因為您在那 news-server 沒有權
+    限，請試著連對方 news-server 的 innd port，例如：
+    % telnet news.cs.nthu.edu.tw 119
+    如果沒有出現 (posting ok) 的訊息，代表您沒有在那機器 post 的權限。
+
+    您也可以在 bbslink 加參數 -v，來秀出詳細的訊息，看是卡在哪裡。
+    % innd/bbslink -v
+
+
+  * 如果想 shutdown innbbsd 的話，怎麼做？
+
+    % kill `tail -1 run/innbbsd-7777.pid | awk '{print $$1}'`
+
+
+  * 如何把站上的舊信再送出去一次？
+
+    % bin/outgo 看板 起點 終點
+    看板就是要轉出的看板英文名。
+    起點、終點就是指定從第幾篇文章轉到第幾篇文章。
+    這樣就會把看板的文章再加到 innd/out.bntp，如此 bbslink 就會把信再送一
+    遍。
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>

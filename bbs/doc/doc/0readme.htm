@@ -1,0 +1,332 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                  <font color="#008000">MapleBBS at Microsoft Windows 2000/XP/2003</font>
+
+                                                      last update: 2006/12/24
+
+˙快速架站手冊
+  <a href='#1'>一、建立 BBS 帳號</a>
+  <a href='#2'>二、安裝 Cygwin</a>
+  <a href='#3'>三、下載 BBS 程式</a>
+  <a href='#4'>四、設定 crontab</a>
+  <a href='#5'>五、編譯 BBS 程式</a>
+  <a href='#6'>六、啟動 BBS</a>
+  <a href='#7'>七、第一次登入 BBS</a>
+
+˙常見問題
+  <a href='#21'>關站的步驟</a>
+  <a href='#22'>新增或修改程式</a>
+  <a href='#23'>改站名</a>
+  <a href='#24'>改其他程式</a>
+  <a href='#25'>不使用 bbs 這個帳號</a>
+  <a href='#26'>移除或備份 BBS</a>
+  <a href='#27'>移除或重灌 Cygwin</a>
+  <a href='#28'>無法連上 BBS</a>
+  <a href='#29'>BBS 開更多 port</a>
+  <a href='#30'>登入人數上限</a>
+  <a href='#31'>開機後自動開啟 BBS</a>
+  <a href='#32'>無法自動化處理</a>
+
+  <hr>
+
+  <a name='1'>
+  <font color="#000080"><u>一、建立 BBS 帳號</u></font>
+
+    控制台→使用者和密碼，新增一個使用者帳號是 bbs
+    其權限等級至少要是 Power Users 或 Administrators
+    然後改以 bbs 的帳號登入系統
+
+  <a name='2'></a>
+  <font color="#000080"><u>二、安裝 Cygwin</u></font>
+
+    <a href="http://processor.tfcis.org/~itoc/cygwin.exe">下載 http://processor.tfcis.org/~itoc/cygwin.exe</a>，並執行以解壓縮
+
+    執行解壓縮出來的 setup.exe 來安裝 Cygwin
+ 
+     (1) Cygwin Net Release Setup Program                                    下一步
+
+     (2) Choose A Download Source           選 Install from Local Directory  下一步
+
+     (3) Select Root Install Directory      Root Directory: C:\cygwin
+                                            Install For:    All Users
+                                            Text File Type: Unix             下一步
+
+     (4) Local Package Directory            指向剛才所解壓縮出來的目錄       下一步
+
+     (5) Select Packages
+
+         按右上角的 View 使 View 鍵右邊的字變成 Full
+         選取安裝所有的套件
+         (安裝的方法就是在那行的 Skip 按一下，使出現版本編號，
+          Bin? 欄會從 n/a 變成打Ｘ框框)
+
+         選完所有要安裝的套件以後，請按                                      下一步
+
+     (6) 等待安裝                                                            完成
+
+  <a name='3'></a>
+  <font color="#000080"><u>三、下載 BBS 程式</u></font>
+
+    連到 <a href="http://processor.tfcis.org/~itoc/">http://processor.tfcis.org/~itoc/</a> 這邊
+    下載 MapleBBS-3.10-20yymmdd-MSWin.exe 這個檔案 (其中 yymmdd 是日期流水號)
+
+    執行 MapleBBS-3.10-20yymmdd-MSWin.exe 來解壓縮
+    安裝目錄 (destination folder) 放在 C:\cygwin\home
+    解壓縮完會有個 C:\cygwin\home\bbs 的目錄
+    (亦即本說明檔案的路徑是在 C:\cygwin\home\bbs\doc\doc\0readme.htm)
+
+  <a name='4'></a>
+  <font color="#000080"><u>四、設定 crontab</u></font>
+
+    雙擊桌面上的 Cygwin 捷徑，進入 Cygwin 以後，打下列指令 (每行打完以後按 Enter)
+
+cygrunsrv -I Crontab -p /usr/sbin/cron -a -D
+crontab ~/doc/crontab
+
+    此時已經設定好 crontab，可以把 Cygwin 的視窗關閉
+
+  <a name='5'></a>
+  <font color="#000080"><u>五、編譯 BBS 程式</u></font>
+
+    雙擊桌面上的 Cygwin 捷徑，進入 Cygwin 以後，打下列指令 (每行打完以後按 Enter)
+
+cd ~/src
+make clean cygwin install
+
+    此時會跑出一堆訊息，請稍待一下
+    等到一切編譯都完成以後，可以把 Cygwin 的視窗關閉
+
+  <a name='6'></a>
+  <font color="#000080"><u>六、啟動 BBS</u></font>
+
+    雙擊桌面上的 Cygwin 捷徑，進入 Cygwin 以後，打下列指令 (每行打完以後按 Enter)
+
+~/etc/rc.local
+
+    此時會跑出一些訊息，請稍待一下，等到出來啟動完成的字樣
+    [註] 第一次啟動時，會出現「請檢查 xxxx，無法讀檔或是裡面有欄位不完整」，
+         這是因為還沒設定轉信，等架站成功以後於 BBS 上設好轉信，就不會再出現
+         此訊息了
+
+  <a name='7'></a>
+  <font color="#000080"><u>七、第一次登入 BBS</u></font>
+
+    您已經成功地啟動您的 BBS，試著 telnet 看看 (<a href='#28'>無法連線怎麼辦？</a>)
+
+    首先請 new 註冊一個新帳號 guest，密碼任意，重新以 guest 上站就不需要密碼
+    然後請 new 註冊一個新帳號 sysop，重新以 sysop 上站就可取得站長權限
+
+    在 (A)nnounce 裡面有一些站長指令的說明，請慢慢研究
+    如果還不夠，可以在許多界面裡按 h，裡面有更詳盡的介紹
+
+  <hr>
+
+  <a name='21'></a>
+  <font color="#000080"><u>關站的步驟</u></font>
+
+    如果要關站的話，請做以下二步驟。關站以後，正在線上的使用者將被
+    踢下線，且在您再度開站以前，將無法連上 BBS。
+
+    (1) 若是 Windows XP (含) 以上的版本：
+        請執行 C:\cygwin\home\bbs\killbbs.bat
+
+        若是 Windows 2000 (含) 以下的版本：
+        請按 Ctrl+Alt+Del 進入工作管理員，把以下
+        ipc-daemon2.exe bbsd.exe bguard.exe bhttpd.exe bmtad.exe
+        bnntpd.exe bpop3d.exe gemd.exe xchatd.exe innbbsd.exe
+        都結束處理程序 (同一個程式可能有數個程序，都要關閉)
+
+    (2) 進入 Cygwin 執行 cygrunsrv -E Crontab
+
+  <a name='22'></a>
+  <font color="#000080"><u>新增或修改程式</u></font>
+
+    如果您想要編輯程式 (文字檔) 的話，可以用 Cygwin 裡面的 vi 來編輯
+    或是 Windows 裡面的 Wordpad 開啟舊檔
+    您也可以自行安裝 UltraEdit，這是個界面很棒、很容易上手的軟體
+
+  <a name='23'></a>
+  <font color="#000080"><u>改站名</u></font>
+
+    如果要改站名的話，請
+    <a href='#22'>修改</a> ~/src/include/config.h 這個文字檔中
+    前面的 SCHOOLNAME BBSNAME MYIPADDR MYHOSTNAME SYSOPNICK 的值
+    您也可以順便看看 config.h 中的其他設定
+    改完<a href='#21'>關站</a>、<a href='#5'>編譯</a>、<a href='#6'>啟動</a>
+
+  <a name='24'></a>
+  <font color="#000080"><u>改其他程式</u></font>
+
+    由於所有的程式都是公開的，您可以完全自由地設定，例如
+    <a href='#22'>修改</a> ~/src/include/theme.h 這個文字檔，就可以改變站上的配色
+    改完<a href='#21'>關站</a>、<a href='#5'>編譯</a>、<a href='#6'>啟動</a>
+
+  <a name='25'></a>
+  <font color="#000080"><u>不使用 bbs 這個帳號</u></font>
+
+    可以不使用 bbs 這個帳號，而使用其他帳號
+    例如如果使用 Administrator 這帳號，那麼
+    C:\cygwin\home\bbs 就變成
+    C:\cygwin\home\Administrator
+    且 ~/src/include/config.h 裡面的
+    #define BBSHOME     "/home/bbs"               /* BBS 的家 */
+    #define BAKPATH     "/home/bbs/bak"           /* 備份檔的路徑 */
+    要對應修改成
+    #define BBSHOME     "/home/Administrator"     /* BBS 的家 */
+    #define BAKPATH     "/home/Administrator/bak" /* 備份檔的路徑 */
+
+  <a name='26'></a>
+  <font color="#000080"><u>移除或備份 BBS</u></font>
+
+    如果您想要移除 BBS 的話：
+    刪除 C:\cygwin\home\bbs 這整個目錄即可
+
+    如果您想要備份 BBS 的話：
+    複製(或者壓縮) C:\cygwin\home\bbs 這整個目錄即可
+
+  <a name='27'></a>
+  <font color="#000080"><u>移除或重灌 Cygwin</u></font>
+
+    如果您想要移除 Cygwin 的話：
+    刪除 C:\cygwin 這整個目錄即可 (注意：此步驟也會同時<a href='#26'>移除 BBS</a>)
+
+    如果您的 cygwin 灌爛了，想重灌的話：
+    先刪除 C:\cygwin 這整個目錄 (注意：此步驟也會同時<a href='#26'>移除 BBS</a>)
+    然後按<a href='#2'>前面的步驟</a>重新再做一次即可
+
+  <a name='28'></a>
+  <font color="#000080"><u>無法連上 BBS</u></font>
+
+    大部分連線失敗的原因主要是因為防火牆的原因，您必須關閉系統及防毒軟體的防火牆，
+    或是開放以下 port：23、25、70、79、80、110、119、3838、7777。
+
+    如果您自己可以連上自己的電腦，但是其他電腦無法連上您的電腦，那可能是因為您是
+    Private IP，只有在內部區域網路內的電腦才能連上您的電腦。
+
+  <a name='29'></a>
+  <font color="#000080"><u>BBS 開更多 port</u></font>
+
+    如果要將 BBS 開在 port 23 以外的其他 port，請
+    <a href='#22'>修改</a> ~/etc/rc.local 這個文字檔，在最後加入幾行
+
+~/bin/bbsd 3001
+~/bin/bbsd 3002
+~/bin/bbsd 3003
+
+    下次重開機以後即可開啟 port 3001、3002、3003 供登入 BBS。
+    您也可以選用其他的 port，只要注意不要和已有的服務衝突即可。
+
+  <a name='30'></a>
+  <font color="#000080"><u>登入人數上限</u></font>
+
+    由於 Cygwin 的<a href="http://archives.postgresql.org/pgsql-cygwin/2003-02/msg00142.php">限制</a>，所以架設在 Windows 下面的 BBS，目前只能支援 64 人同時上
+    同一個 port 的站 (簡單地說，就是只能有 64 人同時連 telnet 預設的 port 23)。
+    若您希望更高的人數上限，您就必須使用 Un*x 架站，或是<a href='#29'>開更多 port</a> 並請使用者連
+    結其他 port。
+
+  <a name='31'></a>
+  <font color="#000080"><u>開機後自動開啟 BBS</u></font>
+
+    雙擊桌面上的 Cygwin 捷徑，進入 Cygwin 以後，打這個指令 (打完以後按 Enter)
+
+cat ~/etc/rc.local >> ~/.bash_profile
+
+    再將 C:\cygwin\cygwin.bat 加到「開始」→「程式集」→「啟動」裡面，
+    以後每次開機或是啟動 Cygwin 時，就會開啟 BBS。
+
+  <a name='32'></a>
+  <font color="#000080"><u>無法自動化處理</u></font>
+
+    如果您是使用 Windows 98 或 Windows Server 2003 的話，將無法使用 crontab，此時
+    您可以使用「工作排程」跑批次檔搭配 script 來用。
+
+     (1.1) 建一個文字檔在 C:\cygwin\home\bbs\bbslink.bat，內容為
+
+REM 每小時對其他 BBS 及 news server 轉信五次
+@echo off
+C:
+chdir C:\cygwin\bin
+start /min bash --login -i ~/src/sh/bbslink.sh
+
+     (1.2) <a href='#22'>新增</a> ~/src/sh/bbslink.sh 這個文字檔，內容為
+
+#!/bin/sh
+/home/bbs/innd/bbslink
+
+     (1.3) 用 Windows 的「工作排程」跑 C:\cygwin\home\bbs\bbslink.bat，
+           從 2005/01/01 起，每天 從 上午 00:10 起每隔 12 分鐘 為時 24 小時
+
+     (2.1) 建一個文字檔在 C:\cygwin\home\bbs\hour.bat，內容為
+
+REM 每小時運行一次
+@echo off
+C:
+chdir C:\cygwin\bin
+start /min bash --login -i ~/src/sh/hour.sh
+
+     (2.2) <a href='#22'>新增</a> ~/src/sh/hour.sh 這個文字檔，內容為
+
+#!/bin/sh
+/home/bbs/bin/account
+/home/bbs/bin/camera
+/home/bbs/bin/poststat
+/home/bbs/bin/counter
+
+     (2.3) 用 Windows 的「工作排程」跑 C:\cygwin\home\bbs\hour.bat，
+           從 2005/01/01 起，每天 從 上午 00:01 起每隔 1 小時 為時 24 小時
+
+     (3.1) 建一個文字檔在 C:\cygwin\home\bbs\day.bat，內容為
+
+REM 每天運行一次
+@echo off
+C:
+chdir C:\cygwin\bin
+start /min bash --login -i ~/src/sh/day.sh
+
+     (3.2) <a href='#22'>新增</a> ~/src/sh/day.sh 這個文字檔，內容為
+
+#!/bin/sh
+/home/bbs/bin/topgem
+/home/bbs/bin/topsong
+/home/bbs/bin/topusr
+/home/bbs/bin/expire
+/home/bbs/bin/gem-index
+/home/bbs/bin/bquota
+
+     (3.3) 用 Windows 的「工作排程」跑 C:\cygwin\home\bbs\day.bat，
+           從 2005/01/01 起，每天 上午 03:29
+
+     (4.1) 建一個文字檔在 C:\cygwin\home\bbs\week.bat，內容為
+
+REM 每星期運行一次
+@echo off
+C:
+chdir C:\cygwin\bin
+start /min bash --login -i ~/src/sh/week.sh
+
+     (4.2) <a href='#22'>新增</a> ~/src/sh/week.sh 這個文字檔，內容為
+
+#!/bin/sh
+/home/bbs/bin/reaper
+
+     (4.3) 用 Windows 的「工作排程」跑 C:\cygwin\home\bbs\week.bat，
+           從 2005/01/01 起，每週的 星期三 上午 03:50
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>

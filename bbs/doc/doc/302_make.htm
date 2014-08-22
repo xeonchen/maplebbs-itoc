@@ -1,0 +1,122 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                       <font color="#008000">★ make 重編程式 ★</font>
+
+  <a href='#1'>一、基礎版</a>
+  <a href='#2'>二、進階版</a>
+
+
+    本文件是寫給要安裝 itoc 所維護的 bbs 程式版本所使用的，並不適用
+  其他 bbs 版本。
+
+    這篇是說明在改完程式以後，怎麼掛上新程式的方法。
+
+    [~bbs/src] -bbs- % abcdefg  表示是用 bbs 身分，在 ~bbs/src 執行 abcdefg
+    [~bbs/src] -root- # abcdefg  表示是用 root 身分，在 ~bbs/src 執行 abcdefg
+
+    假設作業系統是 freebsd，如果是 linux 就把 make freebsd 換成 make linux
+
+    把握進階版的原則，就可以盡量少 reboot，也不需要關 bbs 站。
+
+  <a name='1'></a>
+  <font color="#000080"><u>一、基礎版</u></font>
+
+   <font color="#FF0000">+如果是改了 *.c 的話</font>  (src/lib/*.c 除外)
+
+     [~bbs/src] -bbs- % make freebsd install
+     [anywhere] -root- # reboot 或 shutdown -r now
+
+   <font color="#FF0000">+如果是改了 src/lib/*.c 或 src/include/*.h 的話</font>
+
+     [~bbs/src] -bbs- % make clean freebsd install
+     [anywhere] -root- # reboot 或 shutdown -r now
+
+  <a name='2'></a>
+  <font color="#000080"><u>二、進階版</u></font>
+
+   <font color="#FF0000">+如果是改了 src/lib/*.c 的話</font>
+
+     把所有的人都踢下站，換新的程式
+
+     [~bbs/src] -bbs- % make clean freebsd install
+     [~bbs/src/sh] -bbs- % ./killbbs.sh
+     [~bbs/bin] -bbs- % ./account
+     [~bbs/bin] -bbs- % ./camera
+
+     倘若是 Linux 的話，請再執行
+
+     [anywhere] -bbs- % ipcrm shm 1998
+     [anywhere] -bbs- % ipcrm shm 2997
+     [anywhere] -bbs- % ipcrm shm 2999
+
+   <font color="#FF0000">+如果是改了 src/so/*.c src/game/*.c src/pip/*.c 的話</font>
+
+     以 so/xyz.c 為例，其他就換去那個目錄，做一樣的動作
+
+     [~bbs/src/so] -bbs- % make freebsd
+     [~bbs/src/so] -bbs- % cp xyz.so ~/bin/
+
+     若把 沒變動.so 也 install 到 ~/bin/ 會造成線上正在使用這
+     外掛功能的人可能斷線。
+
+   <font color="#FF0000">+如果是改了 src/util/*.c src/util/*/*.c 的話</font>
+
+     以 util/*.c 為例，其他就換去那個目錄，做一樣的動作
+
+     [~bbs/src/util] -bbs- % make freebsd install
+
+     若是改 account.c camera.c 還要多執行一步
+     [~bbs/bin] -bbs- % ./account           (倘若改的是 src/util/account.c)
+     [~bbs/bin] -bbs- % ./camera            (倘若改的是 src/util/camera.c)
+
+   <font color="#FF0000">+如果是改了 src/daemon/*.c src/innbbsd/*.c src/maple/*.c 的話</font>
+
+     以 daemon/xyz.c 為例，其他就換去那個目錄，做一樣的動作
+
+     [~bbs/src/daemon] -bbs- % make freebsd install update
+
+     若是沒有跑 inetd 或 xinetd，那麼還要多執行一步
+     [~bbs/bin] -root- # ./xyz             (倘若改的是 src/daemon/*.c)
+     [~bbs/innd] -bbs- % ./innbbsd         (倘若改的是 src/innbbsd/*.c)
+     [~bbs/bin] -root- # ./bbsd            (倘若改的是 src/maple/*.c)
+
+   <font color="#FF0000">+如果是改了 src/include/*.h</font>  (改變了 struct)
+
+     倘若有動到 struct.c 中的 struct ACCT UTMP UCACHE BCACHE FCACHE
+     其中的任何一項，(例如改 PAL_MAX 會動到 UTMP；改 MAXACTIVE 會動到 UCACHE)
+     都得踢掉站上所有使用者，並重開所有服務，乾脆 reboot 好了
+
+     [anywhere] -root- # reboot 或 shutdown -r now
+
+   <font color="#FF0000">+如果是改了 src/include/*.h</font>  (沒異動 struct)
+
+     倘若沒有動到 ACCT UTMP UCACHE BCACHE FCACHE，那麼就只要
+     看被改的那項被哪些程式 include 了，然後重編那些程式即可，
+     這樣可以省下很多時間。
+
+     例如 config.h:HOST_ALIASES 對應到 mail.c bmtad.c
+     那麼就等效上改了這 mail.c bmtad.c，所以要
+
+     [~bbs/src/maple] -bbs- % rm mail.o
+     [~bbs/src/maple] -bbs- % make freebsd install update
+     [~bbs/src/bmtad] -bbs- % rm bmtad.o
+     [~bbs/src/bmtad] -bbs- % make freebsd install update
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>

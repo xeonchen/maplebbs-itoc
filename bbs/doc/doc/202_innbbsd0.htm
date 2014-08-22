@@ -1,0 +1,89 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                       <font color="#008000">★ 轉信設定手冊 ★</font>
+
+  <a href='#0'>Ｏ、轉信基本設定</a>
+  <a href='#1'>一、和 news server 轉信</a>
+  <a href='#2'>二、和 bbs 對轉</a>
+
+
+    本文件是寫給要安裝 itoc 所維護的 bbs 程式版本所使用的，但也適用
+  大部分 bbs 版本。
+
+  <a name='0'></a>
+  <font color="#000080"><u>Ｏ、轉信基本設定</u></font>
+
+    0. 以下全部是用 bbs 的身分執行
+
+    1. crontab -e 加入這二行 (應該原本就有了)
+
+# 每小時對其他 BBS 及 news server 轉信五次
+10,22,34,46,58 * * * * innd/bbslink > /dev/null 2>&1
+
+  <a name='1'></a>
+  <font color="#000080"><u>一、和 news server 轉信</u></font>
+
+   範例：
+     news:   news.tfcis.org      POST(119)
+     group:  TFCIS.personal.itoc
+
+    1. 開個新板 [itoc]，特別注意的是，設定屬性 1 □ 不轉信出去
+
+    2. 編輯「轉文站台列表」，加入
+
+       TFCIS        news.tfcis.org          POST(119)
+
+    3. 編輯「轉文看板列表」，加入
+
+       TFCIS        TFCIS.personal.itoc     <-> itoc   big5
+
+    4. 完成
+
+    5. 如果信一直取不進來，此時可以上工作站手動執行
+       % innd/bbslink -v
+       看看錯誤訊息再作處理。
+
+  <a name='2'></a>
+  <font color="#000080"><u>二、和 bbs 對轉</u></font>
+
+   範例：
+     bbs.abc.com 站的 Math 板轉到自己站上的 Mathematics 板
+     (二站的板名可以不一樣)
+
+    1. 開個新板 [Mathematics]，特別注意的是，設定屬性 1 □ 不轉信出去
+
+    2. 首先二邊先要為這個轉信的看板取一個相同的 group 名字，
+       假設是 bbs.math   (group 名字二站要取一樣)
+
+    3. 編輯「轉文站台列表」，加入
+
+       ABC          bbs.abc.com             IHAVE(7777)
+
+    4. 編輯「轉文看板列表」，加入
+
+       ABC          bbs.math                <-> Mathematics   big5
+
+    5. 完成
+
+    6. 如果信一直送不出去，此時可以上工作站手動執行
+       % innd/bbslink -v
+       看看錯誤訊息再作處理。
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>

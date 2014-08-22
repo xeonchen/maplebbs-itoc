@@ -1,0 +1,197 @@
+Postfix Guide                                                    [MapleBBS]
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+                          MapleBBS Ver 3.10
+
+                             postfix FAQ
+
+             交大校園網路策進會 NCTUCCCA 林嘉軒 (DarkKiller)
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+* 改版記錄
+
+  2002/12/11
+  * 修改 Virtual 設定的問題。
+
+  2002/09/01
+  * 修改啟動 postfix 的方法。
+
+* Author & License:
+
+  gslin@ccca.nctu.edu.tw (gslin@informath.net, DarkKiller)
+
+  The license of this document is:
+
+  GNU Free Documentation License
+  Version 1.1, March 2000
+
+  http://www.gnu.org/licenses/fdl.txt
+
+* 參考文件：
+
+  http://www.postfix.org
+  /usr/local/etc/postfix/sample-*
+
+* 首先，我們先利用 ports 安裝 postfix：
+
+  cd /usr/ports/mail/postfix-current
+  make all install clean
+
+  他所問你的問題請選 Yes，讓他開 postfix 要用的帳號。
+
+* 安裝好以後，到 /usr/local/etc/postfix 下面修改 main.cf 的下列設定：
+
+  # 你的 hostname
+  myhostname = infomath.math.nctu.edu.tw
+
+  # 你的 domain
+  mydomain = math.nctu.edu.tw
+
+  # 當你這台機器有很多 domain name 要收的時候，你可以用這種這個設定把
+  # 這些 domain name 放到同一個檔案裡面，檔案的內容就是每一行放一個
+  # hostname。
+  mydestination = /usr/local/etc/postfix/local-host-names
+
+  # 關掉你的 vrfy 指令。
+  #
+  # 除非你知道這個東西是做什麼的，否則強烈建議你設定上去!
+  disable_vrfy_command = yes
+
+  # 你允許 relay 的 domains，通常是被設為 MX 才要設定上去。格式跟
+  # local-host-names 相同，都是一行一個 domain。
+  relay_domains = /usr/local/etc/postfix/relay-domains
+
+  # 這是設定 global 的 aliases，你可以把以前放在 /etc/mail/aliases 的檔
+  # 案直接 copy 過來以後，跑 postalias hash:/usr/local/etc/postfix/aliases。
+  alias_maps = hash:/usr/local/etc/postfix/aliases
+
+  # 如果你不想執行 postalias hash:/usr/local/etc/postfix/aliases 這麼長串
+  # 的指令，你可以設定下面這行，要設的跟 alias_maps 一樣。
+  #
+  # 設定完以後只要用 newaliases 或 sendmail -bi 就可以更新了。
+  alias_database = hash:/usr/local/etc/postfix/etc/aliases
+
+  # 以前 sendmail 用 /etc/mail/access 來控制 discard/reject/relay 以及其
+  # 他的設定。在 postfix 裡面，我們拆開對 HELO/MAIL FROM/RCPT TO/... 等等
+  # 作處理，我們僅介紹 relay 所需要用到對 RCPT TO 的控制，把下面這行：
+  #
+  # smtpd_recipient_restrictions = permit_mynetworks,check_relay_domains
+  #
+  # 修改成：
+  #
+  smtpd_recipient_restrictions = permit_mynetworks,hash:/usr/local/etc/postfix/rcptto-access,check_relay_domains
+
+  #
+  # 然後跑 postmap hash:/usr/local/etc/postfix/rcptto-access 即可。
+  #
+  # 更進階的用法請參考 /usr/loca/etc/postfix/sample-smtpd.cf 裡面的說明。
+
+* 現在，要設定讓 postfix 在開機的時候啟動起來。
+
+  另外在 /etc/rc.conf 設定：
+
+  sendmail_enable="YES"
+  sendmail_flags="-bd"
+  sendmail_outbound_enable="NO"
+  sendmail_submit_enable="NO"
+  sendmail_msp_queue_enable="NO"
+
+  然後把現在正在跑的 sendmail 砍掉：
+
+  killall -9 sendmail
+
+  把你的 postfix 跑起來：
+
+  sendmail -bd
+
+* 先從自己機器寄一封信到你這台機器，看看可不可以送到。如果可以的話，從
+  別台寄到你自己的機器看看! 有問題的話看看 /var/log/maillog 裡面有什麼
+  可以提供你自己 debug 的方法，找到的話，post 到 386BSD 板跟大家分享 :)
+
+  然後用自己機器寄信給自己看看，如果成功的話，寄到別台機器的帳號看看，
+  相同的，如果你遇到困難的話，你可以看看 /var/log/maillog 裡面的東西去
+  猜測問題的出處 :)
+
+* 接下來是說 BBS 的部分了，對於 BBS 而言，最主要就是 bbsmail、brdmail
+  以及 mailpost 要透過 sendmail (以前) 或是 postfix (現在) 把信件轉到
+  BBS 裡。
+
+  所以我們的做法是使用 canonical 把 username.bbs@deer.twbbs.org 轉成
+  username@bbsmail 以後，再用 transport 把要給 bbsmail 的文章都丟給
+  BBS 的 bbsmail 處理。
+
+  brdmail 的作法和 bbsmail 也是相同，把 brdname.brd@deer.twbbs.org
+  丟給 BBS 的 brdmail 處理。
+
+  mailpost 的作法和 bbsmail 也是相同，把 bbs@deer.twbbs.org 丟給 BBS 的
+  mailpost 處理。
+
+* 關閉 bmtad：
+
+  首先，你得先把 bmtad 的設定關掉：
+
+  a. 如果你用的是 inetd 的話，就把 /etc/inetd.conf 中 bmtad 註解起來：
+
+#smtp    stream  tcp     wait    bbs     /home/bbs/bin/bmtad     bmtad -i
+
+  b. 如果你用的是 xinetd 的話，就把 /etc/xinetd.d/smtp 給刪除。
+
+  c. 如果你用的是 standslone 的話，就把 /etc/rc.local 中 bmtad 註解起來：
+
+#/home/bbs/bin/bmta
+
+* 開始設定 BBS 部分：
+
+  以下是以 deer.twbbs.org 為例，請自己改成你的 hostname。
+
+  我們先在 main.cf 裡面新增兩項設定：
+
+  # virtual 的部分，我們用 pcre 來處理 ：
+  virtual_maps = pcre:/usr/local/etc/postfix/virtual
+
+  # transport 的部分，我們用 hash 來處理：
+  transport_maps = hash:/usr/local/etc/postfix/transport
+
+  我們先新增 /usr/local/etc/postfix/virtual：
+  (請依自己的 domain name 來改變)
+
+  /^bbs(reg)?@deer\.twbbs\.org(\.tw)?$/ bbs@mailpost.
+  /^(.+)\.bbs@deer\.twbbs\.org(\.tw)?$/ $1@bbsmail.
+  /^(.+)\.brd@deer\.twbbs\.org(\.tw)?$/ $1@brdmail.
+
+  然後再新增 /usr/local/etc/postfix/transport：
+
+  bbsmail bbsmail:
+  brdmail brdmail:
+  mailpost mailpost:
+
+  新增完以後，跑下面的命令讓它產生相關的設定：
+
+  postmap hash:/usr/local/etc/postfix/transport
+
+  然後我們要告訴 postfix，bbsmail、brdmail 以及 mailpost 這三個 mailer
+  到底是那三隻程式負責。
+
+  修改 /usr/local/etc/postfix/master.cf，加到最後面：
+
+  # 請注意，這是沒有換行的，請自行接上：(用 tab)
+  bbsmail   unix  -       n       n       -       -       pipe
+  flags=FR user=bbs argv=/home/bbs/bin/bbsmail $mailbox
+
+  # 這也是沒有換行的，也是用 tab 接上：
+  brdmail   unix  -       n       n       -       -       pipe
+  flags=FR user=bbs argv=/home/bbs/bin/brdmail $mailbox
+
+  # 這也是沒有換行的，也是用 tab 接上：
+  mailpost  unix  -       n       n       -       -       pipe
+  flags=FR user=bbs argv=/home/bbs/bin/mailpost
+
+  設定改完以後，請輸入下列指令，讓 postfix 去重新讀入設定：
+
+  postfix reload
+
+--
+                                 交大校園網路策進會 NCTUCCCA    林嘉軒
+                                 Gea-Suan Lin <gslin@ccca.nctu.edu.tw>

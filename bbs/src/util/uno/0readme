@@ -1,0 +1,22 @@
+  以下幾支程式是拿來解決 Maple3 userno 重覆問題的：
+                                                                                
+  collect_uno           從 usr/_/* 底下所有的 .ACCT 收集全站的 userno，記錄於 all_user_uno
+  conflict_uno          可以把 all_user_uno 的結果簡單分析，秀出重覆的 userno
+  fix_uno               重設所有人的 userno，並重建 pal/list.?/aloha/frienz/benz
+                                                                                
+  正確使用的順序：
+
+  1. 請先備份 usr/
+  2. 執行前先踢人關站
+
+  3. 執行 collect_uno
+  4. 執行 conflict_uno
+  5. 可以看到結果是否有編號重覆
+
+  6. 如果有編號重覆的話，執行 fix_uno
+
+  7. 再度執行 collect_uno
+  8. 再度執行 conflict_uno
+  9. 看看重整後的結果是否還有編號重覆
+
+ 10. 完成，重新開站

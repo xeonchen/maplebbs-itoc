@@ -1,0 +1,73 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                       <font color="#008000">★ SNAP→PACK 轉換手冊 ★</font>
+
+    本文件是寫給要安裝 itoc 所維護的 bbs 程式版本所使用的，並不適用
+  其他 bbs 版本。
+
+    目的是把原始的 Maple 3.10-SNAP 或 Maple 3.02 轉成 itoc 所維護的 
+  bbs 程式版本。
+
+──────────────────────────────────────
+
+  關站
+
+  這些保留舊站的 (直接移過來就可以通用了)
+  .BRD
+  .USR
+  brd/
+  gem/
+  innd/
+  log/
+  net/
+  usr/
+
+  這些rm掉舊站的(當然要備份)，從新版的cp過來
+  bak/     (舊站沒有這個目錄)
+  bin/
+  doc/
+  etc/
+  run/
+  src/
+  tmp/
+
+  以下這些程式裡面有一些站名/IP address的設定，改成自己的
+
+  src/include/config.h
+
+  在 src/ 下打 make os  (例如 make freebsd 或 make linux)
+
+  執行 bin/backupacct 備份所有使用者的 .ACCT
+
+  執行 src/util/tran/snap2usr 轉換使用者
+  (如果您的 struct ACCT 不是原來 MapleBBS-3.10-20000606-SNAP 的話，
+  要自己改 src/util/tran/snap2usr.c)
+
+  執行 src/util/tran/snap2brd 轉換 .BRD
+
+  開站
+
+  開站以後，會發現所有看板中文敘述的前四個字元被抓去當分類了，此時還得手動
+  為所有看板更改分類及中文敘述。
+
+  連上站以後會在開頭畫面以及動態看板看到「請告訴站長缺檔案 gem/@/xxxx」或
+  「請告訴站長檔案大小為零 gem/@/xxxx」的訊息，此時請從新版的抓過來複製。
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>

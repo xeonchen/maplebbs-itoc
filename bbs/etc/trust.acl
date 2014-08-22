@@ -1,0 +1,52 @@
+# 在 trust.acl 不在 untrust.acl 中的 email 才可認證
+# 教育機構
+.edu.tw
+
+# ISP
+.eranet.net             # 年代網路ISP
+ethome.net.tw           # 東森
+giga.net.tw             # 和信超網路
+.giga.net.tw            # 和信超網路
+.hinet.net              # HiNet
+.is.net.tw              # 英普達ISP
+.seed.net.tw            # SeedNet
+seed.net.tw             # SeedNet
+so-net.net.tw           # Sony Net
+.tisnet.net.tw          # 大同網路公司
+
+# 付費電子信箱
+mail2000.com.tw         # Mail2000
+
+# 公司行號
+acer.com.tw             # 宏碁電腦
+asus.com.tw             # 華碩電腦
+.chinatrust.com.tw      # 中國信託
+email.ots.com.tw        # 僑興資訊
+fpg.com.tw              # 台灣塑膠
+mail.mosel.com.tw       # 台灣茂矽
+mail.ttn.com.tw         # 台灣電訊
+.mustek.com.tw          # 鴻友科技
+mtk.com.tw              # 聯發科技
+mxic.com.tw             # 旺宏電子
+ppt.com.tw              # 全懋精密
+psitech.com.tw          # 慧盟資訊
+realtek.com.tw          # 瑞昱半導體
+silitek.com             # 光寶 LITEON 科技
+sunplus.com             # 凌陽科技
+tasc.com.tw             # 台亞天纜
+tsmc.com.tw             # 台灣積體電路
+umc.com                 # 聯華電子
+via.com.tw              # 威盛電子
+winbond.com.tw          # 華邦電子
+zyxel.com.tw            # 合勤科技
+
+# 組織或公家單位
+iii.org.tw              # 資策會
+itri.org.tw             # 工研院
+ndl.gov.tw              # 國家奈米實驗室
+srrc.gov.tw             # 同步輻射研究中心
+tcfst.org.tw            # 自強工業基金會
+
+# Disable
+#.gov.tw                # gov.tw 管理不善
+#.org.tw                # org.tw 可能有 freemail

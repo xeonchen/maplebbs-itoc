@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                       <font color="#008000">★ Crontab 設定手冊 ★</font>
+
+  <a href='#1'>一、設定 Crontab</a>
+
+
+    本文件是寫給要安裝 itoc 所維護的 bbs 程式版本所使用的，並不適用
+  其他 bbs 版本。
+
+  <a name='1'></a>
+  <font color="#000080"><u>一、設定 Crontab</u></font>
+
+    以 bbs 身分登入。
+
+  -bbs- % <font color="#0000FF">crontab -e</font>
+          加入以下數行。
+
+#!/bin/sh
+# minute hour monthday month weekday command
+
+# 每小時對其他 BBS 及 news server 轉信五次
+10,22,34,46,58 * * * * innd/bbslink > /dev/null 2>&1
+
+# 每小時作一次話題統計
+20 * * * * bin/poststat > /dev/null 2>&1
+
+# 每小時作一次歷史軌跡
+25 * * * * bin/counter > /dev/null 2>&1
+
+# 每小時作一次人次統計及開票 account (account要在每小時 1-5 分跑)
+1 * * * * bin/account > /dev/null 2>&1
+
+# 每小時更新一次動態看板(因為有點歌到動態看板，所以頻率高一些)
+6 * * * * bin/camera > /dev/null 2>&1
+
+# 氣象報告，每小時抓一次
+#1 * * * * src/sh/weather.sh > /dev/null 2>&1
+
+# 每天 3:50PM 轉換股市格式
+50 15 * * * bin/stock-open > /dev/null 2>&1
+
+# 每天 10:30AM 4:30PM 抓奇摩新聞
+30 10,16 * * * bin/enews-open > /dev/null 2>&1
+
+# 每天做一次排行榜統計
+28 3 * * * bin/topgem > /dev/null 2>&1
+30 3 * * * bin/topsong > /dev/null 2>&1
+32 3 * * * bin/topusr > /dev/null 2>&1
+
+# 每天根據 expire.conf 對看板文章作 expire
+29 3 * * * bin/expire > /dev/null 2>&1
+
+# 每天對精華區作索引檔，方便使用者搜尋
+40 3 * * * bin/gem-index > /dev/null 2>&1
+
+# 每天清理個人信箱
+0 4 * * * bin/bquota > /dev/null 2>&1
+
+# 每星期清理久未上站使用者，清出的 user 會被搬至 usr/@ 目錄下，請自行再刪除
+50 3 * * 3 bin/reaper > /dev/null 2>&1
+
+# bbs 備份，為降低 load，每週四天分散備份不同的目錄
+4 3 * * 2  bin/backupbrd > /dev/null 2>&1
+4 3 * * 3  bin/backupgem > /dev/null 2>&1
+4 3 * * 4  bin/backupusr > /dev/null 2>&1
+4 3 * * 5  bin/backupoth > /dev/null 2>&1
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>

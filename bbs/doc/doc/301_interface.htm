@@ -1,0 +1,198 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                       <font color="#008000">★ 改頭換面手冊 ★</font>
+
+  <a href='#1'>Tip01 各類畫面</a>
+  <a href='#2'>Tip02 head 的顏色</a>
+  <a href='#3'>Tip03 neck 的顏色</a>
+  <a href='#4'>Tip04 feet 的顏色</a>
+  <a href='#5'>Tip05 游標</a>
+  <a href='#6'>Tip06 選單的字眼及顏色</a>
+  <a href='#7'>Tip07 文章的 banner</a>
+  <a href='#8'>Tip08 使用者名單的顏色</a>
+  <a href='#9'>Tip09 看板列表未讀的符號</a>
+  <a href='#10'>Tip10 留言板</a>
+  <a href='#11'>Tip11 閱讀文章的前幾行</a>
+  <a href='#12'>Tip12 請按任意鍵繼續</a>
+
+
+    本文件是寫給要安裝 itoc 所維護的 bbs 程式版本所使用的，並不適用
+  其他 bbs 版本。
+
+    程式中的 \033 (八進位) 是指 ASCII-27 的按鍵，就是 KEY_ESC，就是
+  按 ^U 的那個控制碼。
+
+    當然，編修完程式以後，您都必須在 ~bbs/src/ 下執行
+  make clean freebsd install
+  (如果您的作業系統是 linux，就執行 make clean linux install)
+
+    這裡暫時先提十二個修改的地方就好了，其實還有很多可以改的地方，
+  只要善用 grep 就能找到很多東西了，亦即在 ~bbs/src/ 下執行
+  grep "keyword" */*.c
+
+    希望大家的 bbs 都能有自己獨特的風格。
+
+  <a name='1'></a>
+  <font color="#000080"><u>★ Tip01 各類畫面</u></font>
+
+    請進 主選單→(A)nnounce 裡面的各類畫面中，按 E 修改以下文章：
+    (或您也可以進工作站編修這些檔案)
+
+     1  ◇ 開頭畫面(０)         ~bbs/gem/@/@opening.0
+     2  ◇ 開頭畫面(一)         ~bbs/gem/@/@opening.1
+     3  ◇ 開頭畫面(二)         ~bbs/gem/@/@opening.2
+     4  ◇ 歡迎畫面             ~bbs/gem/@/@welcome
+     5  ◇ 再見畫面             ~bbs/gem/@/@goodbye
+
+    改完畫面以後，請執行 主選單→(0)Admin→(B)BSreset 1)動態看板
+    (或您也可以進工作站執行 ~bbs/bin/camera)
+
+  <a name='2'></a>
+  <font color="#000080"><u>★ Tip02 head 的顏色</u></font>
+
+<span style="background-color: #0000FF"><font color="#FFFFFF">【主功能表】</font>                    <font color="#FFFF00"> 與南共舞 </font>                    <font color="#FFFFFF">看板《尚未選定》</font>
+</span>
+    如果您希望 header 的顏色是可以亂數換來換去，請
+  修改 ~bbs/src/include/config.h
+
+#define COLOR_HEADER            /* lkchu.981201: 變換彩色標頭 */
+
+    如果您希望 header 的顏色是固定而不要換來換去，請 #undef COLOR_HEADER
+  並修改 ~bbs/src/maple/menu.c vs_head()
+
+  prints("\033[1;37;44m【%s】%s\033[33m%s\033[1;37;44m%s看板《%s》\033[m\n",
+    title, buf, mid, buf + len, currboard);
+
+  <a name='3'></a>
+  <font color="#000080"><u>★ Tip03 neck 的顏色</u></font>
+
+<span style="background-color: #0000FF">  <font color="#808080">編號   看  板       類別轉信 中   文   敘   述                 板    主</font>     
+</span>
+
+    修改 ~bbs/src/include/theme.h
+
+#define COLOR3          "\033[44m"      /* neck 的顏色 */
+
+  <a name='4'></a>
+  <font color="#000080"><u>★ Tip04 feet 的顏色</u></font>
+
+<span style="background-color: #0000FF"> <font color="#FFFF00">看板選擇</font> </span><span style="background-color: #CCFFFF"> (c)新文章 (vV)標記已讀未讀 (y)全部列出 (z)選訂 (A)全域搜尋 (S)排序 
+</span>
+    修改 ~bbs/src/include/theme.h
+
+#define COLOR1          "\033[1;33;44m" /* footer/feeter 的前段顏色 */
+#define COLOR2          "\033[0;30;47m" /* footer/feeter 的後段顏色 */
+
+  <a name='5'></a>
+  <font color="#000080"><u>★ Tip05 游標</u></font>
+
+    如果您不喜歡 &gt; 這種單調的游標，在之前有一篇 patch 有教您如何把
+  游標換成 → 之類的。
+
+  <a name='6'></a>
+  <font color="#000080"><u>★ Tip06 選單的字眼及顏色</u></font>
+
+                  &gt; (A)nnounce  ξ 精華公佈欄 ξ
+
+    選單這個請改 ~bbs/src/maple/menu.c
+
+  Gem, 0, M_GEM,
+  "Announce  ξ 精華公佈欄 ξ",
+
+    您可以改成任何您喜歡的字眼，要注意的是，某些中文字可能要加上 \，
+  例如 【功\課時段】。其他的選單也都可以如法泡製。也可以在裡面加上顏
+  色控制碼，例如：
+
+  Gem, 0, M_GEM,
+  "Announce  \033[1;36mξ\033[m 本站公佈欄 \033[1;36mξ\033[m",
+
+    如果您喜歡選單光棒，那麼，請修改 ~bbs/src/include/config.h
+
+#define CURSOR_BAR              /* itoc.010113: 選單光棒 */
+
+    如果您 #define 了 CURSOR_BAR，選單裡就不能有顏色控制碼。
+
+  <a name='7'></a>
+  <font color="#000080"><u>★ Tip07 文章的 banner</u></font>
+
+    修改 ~bbs/src/include/theme.h 的 EDIT_BANNER 及 MODIFY_BANNER
+    這是改 post 文章最後那行來源。
+
+  <a name='8'></a>
+  <font color="#000080"><u>★ Tip08 使用者名單的顏色</u></font>
+
+    修改 ~bbs/src/include/theme.h
+
+#define COLOR_NORMAL    "\033[m"        /* 一般使用者 */
+#define COLOR_BADPAL    "\033[1;31m"    /* 壞人 */
+#define COLOR_MYPAL     "\033[1;32m"    /* 我的朋友 */
+#define COLOR_OPAL      "\033[1;33m"    /* 與我為友 */
+#define COLOR_SELF      "\033[1;36m"    /* 自己 */
+#define COLOR_BOTHPAL   "\033[1;37m"    /* 互設好友 */
+
+  <a name='9'></a>
+  <font color="#000080"><u>★ Tip09 看板列表未讀的符號</u></font>
+
+    修改 ~bbs/src/include/theme.h
+
+#define ICON_UNREAD_BRD "\033[33mˇ"
+
+  <a name='10'></a>
+  <font color="#000080"><u>★ Tip10 留言板</u></font>
+
+    修改 ~bbs/src/maple/menu.c pad_draw()
+
+  str = pad.msg;
+  sprintf(str, "╭\033[30;47m╮ %s (%s)", cuser.userid, cuser.username);
+
+  for (cc = strlen(str); cc < 62; cc++)
+    str[cc] = ' ';
+
+  sprintf(str + cc,
+    "%s   \033[m\n"
+    "╭\033[30;47m╮ \033[%dm%-70s   \033[m\n"
+    "╭\033[30;47m╮ \033[%dm%-70s   \033[m\n"
+    "╭\033[30;47m╮ \033[%dm%-70s   \033[m\n",
+    Etime(&(pad.tpad)),
+    pcolors[color], buf[0],
+    pcolors[color], buf[1],
+    pcolors[color], buf[2]);
+
+  <a name='11'></a>
+  <font color="#000080"><u>★ Tip11 閱讀文章的前幾行</u></font>
+
+<span style="background-color: #808080"> <font color="#0000FF">作者</font> </span><span style="background-color: #0000FF"> <font color="#808080">itoc (啦啦啦啦)</font>                                     </span><span style="background-color: #808080"> 站內 </span><span style="background-color: #0000FF"> <font color="#808080">SYSOP</font>       
+</span><span style="background-color: #808080"> <font color="#0000FF">標題</font> </span><span style="background-color: #0000FF"> <font color="#808080">測試測試</font>                                                               
+</span><span style="background-color: #808080"> <font color="#0000FF">時間</font> </span><span style="background-color: #0000FF"> <font color="#808080">Sat May 25 13:16:20 2002</font>                                               
+</span>
+    修改 ~bbs/src/include/theme.h
+
+#define COLOR5          "\033[47;34m"   /* more 檔頭的標題顏色 */
+#define COLOR6          "\033[44;37m"   /* more 檔頭的內容顏色 */
+
+  <a name='12'></a>
+  <font color="#000080"><u>★ Tip12 請按任意鍵繼續</u></font>
+
+    修改 ~bbs/src/include/theme.h
+
+#define VMSG_NULL       "                                           " \
+                        "\033[1;36m ▏▎▍▌▋▊▉ 請按任意鍵繼續 ▉\033[m"
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>

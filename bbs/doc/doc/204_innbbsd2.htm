@@ -1,0 +1,56 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                       <font color="#008000">★ 多重轉信設定 ★</font>
+
+  <a href='#1'>一、轉入也轉出 (一般看板)</a>
+  <a href='#2'>二、只轉入不轉出</a>
+  <a href='#3'>三、只轉出不轉入</a>
+
+
+    本文件是寫給要安裝 itoc 所維護的 bbs 程式版本所使用的，並不適用
+  其他 bbs 版本。
+
+    以下設定都是改「轉文看板列表」。
+
+  <a name='1'></a>
+  <font color="#000080"><u>一、轉入也轉出 (一般看板)</u></font>
+
+   Example: tw.bbs.comp.386bsd -> [FreeBSD]
+            tw.bbs.comp.386bsd <- [FreeBSD]
+
+   bbsroute     tw.bbs.comp.386bsd      <-> FreeBSD  big5
+
+  <a name='2'></a>
+  <font color="#000080"><u>二、只轉入不轉出</u></font>
+
+   Example: tw.bbs.campus -> [campus]
+
+   bbsroute     tw.bbs.campus            -> campus  big5
+
+   (設定看板屬性 ■ 不轉信出去，就會只出現向右的箭頭)
+
+  <a name='3'></a>
+  <font color="#000080"><u>三、只轉出不轉入</u></font>
+
+   Example: tw.bbs.newgroups <- [newboards]
+
+   bbsroute     tw.bbs.newgroups        <-  newboards  big5
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>

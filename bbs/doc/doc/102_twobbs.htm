@@ -1,0 +1,394 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=big5">
+<meta http-equiv=Content-Language content=zh-tw>
+<title>MapleBBS 說明文件</title>
+</head>
+
+<body>
+
+<center><table><tr><td><pre>
+
+                       <font color="#008000">★ 一台主機上架二個 BBS 站 ★</font>
+
+  <a href='#1'>一、安裝作業系統</a>
+  <a href='#2'>二、下載 BBS 程式</a>
+  <a href='#3'>三、建立 BBS 帳號</a>
+  <a href='#4'>四、安裝 BBS</a>
+  <a href='#51'>五、設定 BBS 環境 -- （Ａ）如果有 inetd【FreeBSD】</a>
+  <a href='#52'>五、設定 BBS 環境 -- （Ｂ）如果有 xinetd【Linux】</a>
+  <a href='#53'>五、設定 BBS 環境 -- （Ｃ）如果沒有 inetd/xinetd</a>
+  <a href='#6'>六、其他設定</a>
+  <a href='#7'>七、享用您自己的 BBS</a>
+
+
+    本文件是寫給要安裝 itoc 所維護的 bbs 程式版本所使用的，並不適用
+  其他 bbs 版本。
+
+  <a name='1'></a>
+  <font color="#000080"><u>一、安裝作業系統</u></font>
+
+    我想這步驟，您應該已經完成了。
+
+  <a name='2'></a>
+  <font color="#000080"><u>二、下載 BBS 程式</u></font>
+
+    在 http://processor.tfcis.org/~itoc 可以找到最新的程式版本，應
+  該長得像 MapleBBS-3.10-20yymmdd-PACK.tgz 這樣的檔名。
+
+  <a name='3'>
+  <font color="#000080"><u>三、建立 BBS 帳號</u></font>
+
+    以 root 身分登入。
+
+  -root- # <font color="#FF00FF">vipw</font>
+           如果您是 FreeBSD 的話，在最後一行加上
+           bbs2:*:9998:98::0:0:BBS2 Administrator:/home/bbs2:/bin/tcsh
+           如果您是 Linux 的話，在最後一行加上
+           bbs2:x:9998:998:BBS2 Administrator:/home/bbs2:/bin/tcsh
+           (當然您也可以用 pw 或 useradd 的指令來完成相同的動作)
+
+  -root- # <font color="#FF00FF">joe /etc/group</font>
+           (假設編輯器是 joe，如果不是的話，請自行改變)
+           如果您是 FreeBSD 的話，在最後一行加上
+           bbs2:*:998:bbs2
+           如果您是 Linux 的話，在最後一行加上
+           bbs2:*:998:bbs2
+           (當然您也可以用 pw 或 groupadd 的指令來完成相同的動作)
+
+  -root- # <font color="#FF00FF">passwd bbs2</font>
+           輸入 bbs2 的密碼
+
+  -root- # <font color="#FF00FF">tar xvfz /tmp/MapleBBS-3.10-20yymmdd-PACK.tgz -C /tmp/</font>
+           <font color="#FF00FF">mv -f /tmp/bbs /home/bbs2</font>
+           假設您把 BBS 程式檔案放在 /tmp/
+
+  -root- # <font color="#FF00FF">chown -R bbs2:bbs2 /home/bbs2</font>
+
+  <a name='4'></a>
+  <font color="#000080"><u>四、安裝 BBS</u></font>
+
+    以 bbs2 身分登入。
+
+  -bbs2- % <font color="#0000FF">joe /home/bbs2/src/include/config.h</font>
+
+           (A) 修改 HOST_ALIASES，把您所有的 fqdn 都加進去
+
+#define HOST_ALIASES    {MYHOSTNAME, MYIPADDR, \
+                         "wolf.twbbs.org", "wolf.twbbs.org.tw", \
+                         NULL}
+
+           (B) 如果您是 FreeBSD 的話，改 BBSGID 為 98
+               如果您是 Linux 的話，改 BBSGID 為 998
+
+#define BBSGID          98                      /* Linux 請設為 998 */
+
+           (C) 修改 BBSHOME 及 BAKPATH
+
+#define BBSHOME         "/home/bbs2"            /* BBS 的家 */
+#define BAKPATH         "/home/bbs2/bak"        /* 備份檔的路徑 */
+
+           (D) 修改 port 及 shm/sem key，數字不要和已有的服務相衝
+
+#define MAX_BBSDPORT    1       /* bbsd 要開幾個 port，隨 BBSD_PORT 而變 */
+#define BBSD_PORT       {3023}  /* bbsd   所用的 port (bbsd.c) */
+#define BMTA_PORT       3025    /* SMTP   所用的 port (bmtad.c) */
+#define GEMD_PORT       3070    /* Gopher 所用的 port (gemd.c) */
+#define FINGER_PORT     3079    /* Finger 所用的 port (bguard.c) */
+#define POP3_PORT       3110    /* POP3   所用的 port (bpop3d.c) */
+#define BNNTP_PORT      3119    /* NNTP   所用的 port (bnntp.c) */
+#define CHAT_PORT       6838    /* 聊天室 所用的 port (chat.c xchatd.c) */
+#define INNBBS_PORT    10777    /* 轉信   所用的 port (channel.c) */
+
+#define BRDSHM_KEY     12997    /* 看板 */
+#define UTMPSHM_KEY    11998    /* 使用者 */
+#define FILMSHM_KEY    12999    /* 動態看板 */
+#define PIPSHM_KEY     14998    /* 電子雞對戰 */
+
+#define BSEM_KEY       12000    /* semaphore key */
+
+  -bbs- % <font color="#0000FF">joe /home/bbs2/src/include/dns.h</font>
+          如果您沒有 relay server 可幫您的 BBS 寄信的話，那麼請跳過這一步，
+          但您將可能無法對外寄信到某些站台。
+
+          如果您有 relay server 可幫您的 BBS 寄信的話，請將 HAVE_RELAY_SERVER
+          的 #undef 改成 #define，並改 RELAY_SERVER 的定義值。
+
+#define HAVE_RELAY_SERVER       /* 採用 relay server 來外寄信件 */
+
+#ifdef HAVE_RELAY_SERVER
+#define RELAY_SERVER    "mail.tnfsh.tn.edu.tw"  /* outbound mail server */
+#endif
+
+          例如在交通大學的站可以使用 "smtp.nctu.edu.tw"，而使用 HiNet ADSL 的
+          站可以使用 "msa.hinet.net"。
+
+  -bbs2- % <font color="#0000FF">joe /home/bbs2/bin/install.sh</font>
+           修改 schoolname bbsname ... msg_bmw 等數項，例如改成以下這樣
+           (請參考 install.sh 前面的註解，對名稱有些限制)
+
+schoolname="太陽星系"
+bbsname="火星樂園"
+bbsname2="MarsBBS"
+sysopnick="戰神馬斯"
+myipaddr="200.100.50.25"
+myhostname="solarmars.twbbs.org"
+msg_bmw="火球"
+
+          如果您是使用 Linux 的話，還要改
+
+ostype="linux"
+
+  -bbs2- % <font color="#0000FF">/home/bbs2/bin/install.sh</font>
+           您需要等待一段時間來完成編譯
+
+  -bbs2- % <font color="#0000FF">rm -f /home/bbs2/bin/install.sh</font>
+           sed 用過一次以後就沒用了，那就跟它說聲再見吧
+
+  -bbs2- % <font color="#0000FF">crontab /home/bbs2/doc/crontab</font>
+           把 doc/crontab 的內容加入 crontab
+
+  <a name='51'></a>
+  <font color="#000080"><u>五、設定 BBS 環境 -- （Ａ）如果有 inetd</u></font>
+
+    如果沒有 /etc/inetd.conf 這檔案，請跳到五（Ｂ），通常 FreeBSD 應該有
+  inetd 才對。
+
+    以 root 身分登入。
+
+  -root- # <font color="#FF00FF">joe /etc/inetd.conf</font>
+           加入以下數行
+#
+# MapleBBS2
+#
+telnet2 stream  tcp     wait    bbs2    /home/bbs2/bin/bbsd     bbsd -i
+smtp2   stream  tcp     wait    bbs2    /home/bbs2/bin/bmtad    bmtad -i
+gopher2 stream  tcp     wait    bbs2    /home/bbs2/bin/gemd     gemd -i
+finger2 stream  tcp     wait    bbs2    /home/bbs2/bin/bguard   bguard -i
+pop32   stream  tcp     wait    bbs2    /home/bbs2/bin/bpop3d   bpop3d -i
+nntp2   stream  tcp     wait    bbs2    /home/bbs2/bin/bnntpd   bnntpd -i
+http2   stream  tcp     wait    bbs2    /home/bbs2/bin/bhttpd   bhttpd -i
+xchat2  stream  tcp     wait    bbs2    /home/bbs2/bin/xchatd   xchatd -i
+bbsnntp2 stream tcp     wait    bbs2    /home/bbs2/innd/innbbsd innbbsd -i
+
+  -root- # <font color="#FF00FF">joe /etc/rc.d/rc.local</font>
+           加入以下數行
+
+#
+# MapleBBS2
+#
+su bbs2 -c '/home/bbs2/bin/camera'
+su bbs2 -c '/home/bbs2/bin/account'
+
+  <a name='52'></a>
+  <font color="#000080"><u>五、設定 BBS 環境 -- （Ｂ）如果有 xinetd</u></font>
+
+    如果沒有 /etc/xinetd.d/ 這目錄，請跳到五（Ｃ），通常 Linux 應該有
+  xinetd 才對。
+
+    以 root 身分登入。
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/telnet2</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service telnet2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bbsd
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/smtp2</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service smtp2
+{
+        disable         = no
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bmtad
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/gopher2</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service gopher2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/gemd
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/finger2</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service finger2
+{
+        disable         = no
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bguard
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/pop32</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service pop32
+{
+        disable         = no
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bpop3d
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/nntp2</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service nntp2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bnntpd
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/http2</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service http2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bhttpd
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/xchat2</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service xchat2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/xchatd
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/xinetd.d/bbsnntp2</font>
+           將這檔案改成此內容 (這檔案有可能原本是沒有任何文字的開新檔案)
+
+service bbsnntp2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/innd/innbbsd
+        server_args     = -i
+}
+
+  -root- # <font color="#FF00FF">joe /etc/rc.local</font>
+           加入以下數行
+
+#
+# MapleBBS2
+#
+su bbs2 -c '/home/bbs2/bin/camera'
+su bbs2 -c '/home/bbs2/bin/account'
+
+  <a name='53'></a>
+  <font color="#000080"><u>五、設定 BBS 環境 -- （Ｃ）如果沒有 inetd/xinetd</u></font>
+
+    沒 inetd 也沒 xinetd，改用 standalone 啟動
+
+    以 root 身分登入。
+
+  -root- # <font color="#FF00FF">joe /etc/rc.local</font>
+           加入以下數行
+
+#
+# MapleBBS2
+#
+/home/bbs2/bin/bbsd
+/home/bbs2/bin/bmtad
+/home/bbs2/bin/gemd
+/home/bbs2/bin/bguard
+/home/bbs2/bin/bpop3d
+/home/bbs2/bin/bnntpd
+/home/bbs2/bin/xchatd
+/home/bbs2/innd/innbbsd
+
+su bbs2 -c '/home/bbs2/bin/camera'
+su bbs2 -c '/home/bbs2/bin/account'
+
+  <a name='6'></a>
+  <font color="#000080"><u>六、其他設定</u></font>
+
+  以 root 身分登入。
+
+  -root- # <font color="#FF00FF">joe /etc/services</font>
+           加入以下數行
+
+# 第二個BBS
+telnet2        3023/tcp
+telnet2        3023/udp
+smtp           3025/tcp    mail         #Simple Mail Transfer
+smtp           3025/udp    mail         #Simple Mail Transfer
+gopher         3070/tcp
+gopher         3070/udp
+finger         3079/tcp
+finger         3079/udp
+pop3           3110/tcp    #Post Office Protocol - Version 3
+pop3           3110/udp    #Post Office Protocol - Version 3
+nntp           3119/tcp    usenet       #Network News Transfer Protocol
+nntp           3119/udp    usenet       #Network News Transfer Protocol
+xchat          6838/tcp
+xchat          6838/udp
+bbsnntp       10777/tcp    usenet       #Network News Transfer Protocol
+bbsnntp       10777/udp    usenet       #Network News Transfer Protocol
+xchat2         6838/tcp
+xchat2         6838/udp
+bbsnntp2      10777/tcp    usenet
+bbsnntp2      10777/udp    usenet
+
+  -root- # <font color="#FF00FF">reboot</font>
+           重開機吧
+
+  <a name='7'></a>
+  <font color="#000080"><u>七、享用您自己的 BBS</u></font>
+
+    您的 BBS2 應該已經架好了，試著 telnet 看看，那就這樣好好享用吧。
+
+--
+                                                    交大電子 杜宇軒
+                               E-Mail: <a href=mailto:itoc.bbs@bbs.tnfsh.tn.edu.tw>itoc.bbs@bbs.tnfsh.tn.edu.tw</a>
+                              WWW: <a href=http://processor.tfcis.org/~itoc>http://processor.tfcis.org/~itoc</a>
+
+</pre></td></tr></table>
+
+</body>
+</html>
