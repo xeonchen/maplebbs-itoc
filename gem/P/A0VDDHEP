@@ -1,0 +1,56 @@
+§@ªÌ: itoc (test) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¤å³¹µû¤À¥\¯à
+®É¶¡: Sun Aug 18 14:45:05 2002                          Updated: 2004/09/07
+
+  ¦ê±µ·j´Mµû¤À¤å³¹ªº¥\¯à
+
+: maple.p
+
+int XoXmark(XO *xo);
+int XoXlocal(XO *xo);
++ int XoXscore();
+
+: post.c:post_cb[]
+
+  'G', XoXmark,                 /* itoc.010325: ·j´M mark ¤å³¹ */
+  'L', XoXlocal,                /* itoc.010822: ·j´M¥»¦a¤å³¹ */
++#ifdef HAVE_SCORE
++ 'l', XoXscore,                /* itoc.020818: ·j´Mµû¤À¤å³¹ */
++#endif
+
+: xpost.c:XoXlocal() «á­±¥[¤J³o¤@¾ã¬q
+
+#ifdef HAVE_SCORE
+  /* --------------------------------------------------- */
+  /* ·j´M µû¤À                                           */
+  /* --------------------------------------------------- */
+
+
+static int                      /* 0:¤£º¡¨¬±ø¥ó  !=0:º¡¨¬±ø¥ó */
+filter_score(head, hdr)
+  HDR *head;    /* «Ý´úª« */
+  HDR *hdr;     /* ±ø¥ó */
+{
+  return (head->xmode & POST_SCORE);
+}
+
+
+int
+XoXscore(xo)
+  XO *xo;
+{
+  if (xz[XZ_XPOST - XO_ZONE].xo)        /* itoc.020308: ¤£±o²Ö¿n¶i¤J¤G¦¸ */
+  {
+    vmsg(MSG_XYDENY);
+    return XO_FOOT;
+  }
+
+  strcpy(xypostHintword, "\033[1;33m©Ò¦³³Qµû¤À¹L¤å³¹\033[m");
+  xypostHintauthor[0] = '\0';
+
+  return XoXpost(xo, NULL, filter_score);
+}
+#endif      /* HAVE_SCORE */
+
+--
+[1;32m¡¼ Origin: [33m°Ê¤O®Ö¤ß [37mxeon.tfcis.org  [31m¡¼ From: [36mitoc.Dorm-GD2.NCTU.edu.tw[m

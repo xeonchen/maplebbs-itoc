@@ -1,0 +1,65 @@
+µo«H¤H: LHD.bbs@YoMin.twbbs.org (§Ú­n¥¿±`¥Í¬¡) ¬ÝªO: plan
+¼Ð  ÃD: ¡º [¥\¯à] ¾ã¦æ¥ú´Î(8)¡Ðgem.c ºëµØ°Ï
+µo«H¯¸: ¹C¥Á¤§®a (Mon, 14 Jul 2003 22:15:33 +0800 (CST))  Updated: 2005/10/07
+
+: gem_item_bar() ¥[¦b gem_item() ¤§«á
+
+#ifdef HAVE_LIGHTBAR
+gem_item_bar(xo, mode)
+  XO *xo;
+  int mode;
+{
+  int num;
+  HDR *hdr;
+  int level;
+  int xmode, gtype;
+
+  hdr = (HDR *) xo_pool + xo->pos - xo->top;
+  num = xo->pos + 1;
+  level = xo->key;
+  /* ¡·¡¸¡¹¡º¡»¡¼¡½¡¾¡¿ : A1B7 ... */
+
+  xmode = hdr->xmode;
+  gtype = (char) 0xba;
+
+  /* ¥Ø¿ý¥Î¹ê¤ß¡A¤£¬O¥Ø¿ý¥ÎªÅ¤ß */
+  if (xmode & GEM_FOLDER)               /* ¤å³¹:¡º ¨÷©v:¡» */
+    gtype += 1;
+
+  if (hdr->xname[0] == '@')            /* ¸ê®Æ:¡¸ ¤ÀÃþ:¡¹ */
+    gtype -= 2;
+  else if (xmode & GEM_BOARD)           /*         ¬ÝªO:¡½ */
+    gtype += 2;
+
+  prints("%s%6d%c%c\241%c ", mode ? "\033[1;41m" : "\033[m",
+    num, xmode & GEM_RESTRICT ? ')' : ' ',
+    TagNum && !Tagger(hdr->chrono, num - 1, TAG_NIN) ? '*' : ' ', gtype);
+
+  gtype = gem_way;
+
+  if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT))
+    prints("%-67s%s", "<¸ê®Æ«O±K>", mode ? "\033[m" : "");
+         /* itoc.000319: ­­¨î¯Å¤å³¹«O±K */
+  else if (gtype == 0)
+    prints("%-67.64s%s", hdr->title, mode ? "\033[m" : "");
+  else
+    prints("%-46.45s%-13s%-8.8s%s", hdr->title,
+      (gtype == 1 ? hdr->xname : hdr->owner), hdr->date, mode ? "\033[m" : "");
+
+  return XO_NONE;
+}
+#endif
+
+: gem.c:gem_cb[]
+
+static KeyFunc gem_cb[] =
+{
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, gem_item_bar,
+#endif
+...
+
+--
+[m¢d¢e¢f¢g¢h¢f¢e¢d¢c¢b                [33m¢©  ¢¨      ¢i¢©¢¨¢i ¡´   [1;30mbbs.cis95.net[m
+[30;47m¢h¢f¢e¢c¢b¡Å¢d¢f¢g[0;35m   ©~µL©w©Òªº¶³   [33m¢ª¢i¢« ¢«¢ª ¢i¢ª¢«¢i ¡¶ ¢i¢h¢© [0;1m¹C¥Á¤§®a[m
+[1;34mÄÆ¦Û [31mxp.LHD.cis95.net                 [0;33m¢i   ¢©¢¨ ¢i    ¢i ¢i ¢i  ¢i¡Etwbbs¡Eorg[m

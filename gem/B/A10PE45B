@@ -1,0 +1,51 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [½Ð¯q]¦³¤H¥Ó½Ð¬ÝªO³s¸p®É¡A¦Û°Ê¦V¯¸ªø´£¥Ü
+®É¶¡: 2004/10/23 Sat 11:40:43                           Updated: 2004/10/23
+
+¡° ¤Þ­z¡mgpmm.bbs@bbs.wretch.cc (»È¦â)¡n¤§»Ê¨¥¡G
+>         ¦³¤H¥Ó½Ð¬ÝªO³s¸p®É¡A¦Û°Ê¦V¯¸ªø´£¥Ü
+>         §Ú·Q°µªº¹³¬OºëµØ°Ï¸Ìªº¡A
+>         [¥\¯à] menu.c ­Y¦³µù¥U³æ¡A¯¸ªøªºµe­±·|°{°Ê´£¥Ü
+
+  ¥u¬Ý³Ì«á¤@½g¬O§_¤w¸g¶}ªO
+  ­Y¬O³Ì«á¤@½g¤w¶}¡A¦Ó­Ë¼Æ²Ä¤G½g¥¼¶}¡A¨º»ò¤£·|°{°Ê
+
+: menu.c:vs_head()
+
+  else
+  {
+    if ((spc = strlen(mid)) > len)
+    {
+      spc = len;
+      memcpy(ttl, mid, spc);
+      mid = ttl;
+      mid[spc] = '\0';
+    }
+  }
+
++ if (HAS_PERM(PERM_ALLBOARD))
++ {
++   char *folder = "run/newbrd/"FN_DIR;
++   int num = rec_num(folder, sizeof(NBRD));
++   NBRD nbrd;
++
++   /* ¬Ý³Ì«á¤@½g¬O§_¤w¸g¶}ªO */
++   if (num > 0 && !rec_get(folder, &nbrd, sizeof(NBRD), num - 1) &&
++     !(nbrd.mode & NBRD_FINISH) && (nbrd.mode & NBRD_NEWBOARD))
++   {
++     mid = "\033[5;42m ¦³¤H¥Ó½Ð¬ÝªO \033[m";
++     spc = 14;
++   }
++ }
+
+  spc = 2 + len - spc;
+  len = 1 - spc & 1;
+  memset(buf, ' ', spc >>= 1);
+  buf[spc] = '\0';
+
+--
+  ³o·|¦Y I/O
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;43m¢¢[46mùñ[m [1mMo[30mdi[mfy: [1;35m2004/10/23 Sat 11:41:43[m

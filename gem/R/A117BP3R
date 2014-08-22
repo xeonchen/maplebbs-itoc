@@ -1,0 +1,42 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¯¸¤º: itoc
+¼ÐÃD: Re: ­­¨î¤£­­¦¸¼Æ³sÄò±À¤åªº°ÝÃD?
+®É¶¡: 2005/04/06 Wed 22:56:09                           Updated: 2005/04/07
+
+¡° ¤Þ­z¡mcomfan (Ãø¹L  ¶Ë¤ß)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¬O§_¥i¥H¥Î±À¤å¦©ª÷¹ô©Î»È¹ôªº¤è¦¡­­¨î¦P¤@­Óid³sÄò©Ê±À¤å¦æ¬°
+> ¨Ò¦p:±À¤å¤@¦¸  ¥²¶·ªá¶O1000­Ó³æ¦ìªºª÷¹ô
+
+: post.c:post_score()
+
++ if (HAS_STATUS(STATUS_COINLOCK))
++ {
++   vmsg(msg_coinlock);
++   return XO_FOOT;
++ }
+
++ if (cuser.money < 1000)
++ {
++   vmsg("­n 1000 »È¹ô¤~¯àµû¤À");
++   return XO_FOOT;
++ }
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
+  ...
+  ...
+
++ cuser.money -= 1000;
+
+  if (curraddscore)
+  {
+    currchrono = hdr->chrono;
+    rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono, addscore);
+    return XO_LOAD;
+  }
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

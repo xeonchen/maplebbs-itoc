@@ -1,0 +1,188 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] §ï bmtad ¥ÎÂà±H«H¨Ó mirror ªO
+®É¶¡: 2004/01/14 Wed 09:48:49                           Updated: 2005/05/14
+
+  ¥Ò¯¸¤£´£¨Ñ¥´¥]¬ÝªO/ºëµØ°Ïªº¥\¯à
+  ¦Ó¥B¥Ò¯¸ªø¤]¤£Ä@·N´£¨Ñ¬ÝªO/ºëµØ°ÏªºÀ£ÁYÀÉ
+  ³o®É­Ô¥i¥Hµy·L§ï¤@¤U bmtad §â¸ÓªO¾ã­Ó mirror ¦^¨Ó¦Û¤v¯¸
+
+  ©ÎªÌ¬O§Y¨Ï§A®³¨ì¥Ò¯¸ªºÀ£ÁYÀÉ
+  ¦ý¬O¦]¬°ª©¥»¤£¦X¡A¤S¤£ª¾¹D¦p¦óÂà´«ªº¸Ü
+
+: bmtad.c:change_hdr() ·s¼W¦¹¨ç¦¡©ó bbs_brd() ªº«e­±
+
+static void
+change_hdr(hdr, fpath)  /* ¥Ñ¤å³¹ªº²Ä¤T¦C¨Ó§ä¥X­ì©lµo¤å¤é´Á */
+  HDR *hdr;
+  char *fpath;
+{
+  char months[12][4] =
+  {
+    "jan", "feb", "mar", "apr", "may", "jun",
+    "jul", "aug", "sep", "oct", "nov", "dec"
+  };
+  time_t datevalue;
+  struct tm ptime;
+  char buf[ANSILINELEN], *ptr, *str;
+  FILE *fp;
+  int i;
+
+  if (fp = fopen(fpath, "r"))
+  {
+    if (fgets(buf, sizeof(buf), fp))
+    {
+      if (ptr1 = strchr(buf, '\n'))
+        ptr1 = '\0';
+
+      if (!strncmp(buf, STR_AUTHOR1 " ", LEN_AUTHOR1 + 1))
+        ptr1 = buf + LEN_AUTHOR1 + 1;
+      else if (!strncmp(buf, STR_AUTHOR2 " ", LEN_AUTHOR2 + 1))
+        ptr1 = buf + LEN_AUTHOR2 + 1;
+      else
+        ptr1 = NULL;
+
+      if (ptr1 && *ptr1)
+      {
+        ptr2 = strchr(ptr1 + 1, '@');
+        ptr3 = strchr(ptr1 + 1, '(');
+
+        if (ptr2 && (!ptr3 || ptr2 < ptr3))   /* ¦b¼ÊºÙ¸Ì­±ªº @ ¤£ºâ¬O email */
+        {
+          str_from(ptr1, hdr->owner, hdr->nick);
+          hdr->xmode |= POST_INCOME;     /* also MAIL_INCOME */
+        }
+        else if (ptr3)
+        {
+          ptr3[-1] = '\0';
+          str_ncpy(hdr->owner, ptr1, sizeof(hdr->owner));
+          if (ptr2 = strchr(ptr3 + 1, ')'))
+          {
+            *ptr2 = '\0';
+            str_ncpy(hdr->nick, ptr3 + 1, sizeof(hdr->nick));
+          }
+        }
+      }
+
+      if (fgets(buf, sizeof(buf), fp) &&
+        fgets(buf, sizeof(buf), fp) &&
+        strlen(buf) > 30 &&
+        (ptr = strchr(buf, ':')))
+      {
+        /* ­Y¥Ò¯¸¤å³¹®æ¦¡¤£¬O³o¼Ë¡A­n¥t¥~§ï */
+        /* ®É¶¡: Sun Apr 24 18:21:52 2005 */
+
+        ptr[9] = ptr[12] = ptr[15] = ptr[18] = ptr[21] = ptr[26] = '\0';
+
+        for (i = 0; i < 12; i++)
+        {
+          if (!str_ncmp(ptr + 6, months[i], 3))
+            break;
+        }
+
+        ptime.tm_sec = atoi(ptr + 19);
+        ptime.tm_min = atoi(ptr + 16);
+        ptime.tm_hour = atoi(ptr + 13);
+        ptime.tm_mday = atoi(ptr + 10);
+        ptime.tm_mon = i;
+        ptime.tm_year = atoi(ptr + 22) - 1900;
+        ptime.tm_isdst = 0;
+#ifndef CYGWIN
+        ptime.tm_zone = "CST";
+        ptime.tm_gmtoff = 0;
+#endif
+
+        datevalue = mktime(&ptime);
+        str_stamp(hdr->date, &datevalue);
+      }
+    }
+
+    fclose(fp);
+  }
+}
+
+: bmtad.c:bbs_brd() ¤£­n¥[¤JÂà±HªºÀÉÀY
+
+  if (method == 'A')
+  {
+    if (!*title)
+      sprintf(title, "¨Ó¦Û %.64s", author);
+
+-   sprintf(buf, "µo«H¤H: %.50s ¬ÝªO: %s\n¼Ð  ÃD: %.72s\nµo«H¯¸: %s\n\n",
+-     from, brdname, title, Btime(&hdr.chrono));
+
+-   write(fd, buf, strlen(buf));
+    write(fd, data, ap->data + ap->used - data);
+    close(fd);
+  }
+
+- hdr.xmode = POST_INCOME;
+  str_ncpy(hdr.owner, author, sizeof(hdr.owner));
+  str_ncpy(hdr.title, title, sizeof(hdr.title));
++ hdr_fpath(buf, folder, &hdr);
++ change_hdr(&hdr, buf);
+  rec_bot(folder, &hdr, sizeof(HDR));
+
+: bmtad.c
+
+  µM«á°µ³o½g patch
+  [­×¥¿] bmtad.c ±H«Hµ¹ºëµØ°Ï
+
+: bmtad.c:bbs_gem() ¤£­n¥[¤JÂà±HªºÀÉÀY
+
+  if (method == 'A')
+  {
+    if (!*title)
+      sprintf(title, "¨Ó¦Û %.64s", author);
+
+-   sprintf(buf, "µo«H¤H: %.50s ¬ÝªO: %s\n¼Ð  ÃD: %.72s\nµo«H¯¸: %s\n\n",
+-     from, brdname, title, Btime(&hdr.chrono));
+
+-   write(fd, buf, strlen(buf));
+    write(fd, data, ap->data + ap->used - data);
+    close(fd);
+  }
+
+: bmtad.c:mta_mailer() ¸õ¹L anti-spam ÀË¬d¡AÁ×§K¤@¦¸Âà±H¤Ó¦h³Q ban ¤F
+
+  /* --------------------------------------------------- */
+  /* check E-mail address for anti-spam first            */
+  /* --------------------------------------------------- */
+
++ #if 0
+
+  uptime = ap->uptime;
+
+  ...
+  ...
+
++ #endif
+
+  /* --------------------------------------------------- */
+  /* mail post                                           */
+  /* --------------------------------------------------- */
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  1. §ï§¹ bmtad.c ¥H«á¡A0Admin¡÷BBSreset¡÷«ü¦W¤Î¾×«H ­«¶} bmtad
+
+  2. mirror ¬ÝªO¤å³¹
+
+     µn¤J¥Ò¯¸¡A¶i¤J¸ÓªO¡A¥Î tag ¤@¦¸§â©Ò¦³¤å³¹ F Âà±H¨ì
+     brdname.brd@my.domain.name
+     (¦pªG¸Ó¯¸¤£´£¨Ñ tag¡A¨º´N¥u¦n¤@½g¤@½gÂà)
+
+  3. mirror ºëµØ°Ï¤å³¹
+
+     µn¤J¥Ò¯¸¡A¶i¤J¸ÓªOºëµØ°Ï¡A¥Î tag ¤@¦¸§â©Ò¦³¤å³¹ F Âà±H¨ì
+     brdname.gem@my.domain.name
+     (±_ª¬µ²ºc­n¦Û¤v¤@¼h¤@¼h¶i¥hÂà±H)
+
+     ºëµØ°Ï mirror ¦^¨Ó®É¡A±_ª¬µ²ºc·|®ø¥¢
+     ©Ò¥H¥i¥H¦b¨C mirror ¤@­Ó¥Ø¿ý¡A´N¦^¦Û¤vªº¯¸¦¬¿ý¤@­Ó¥Ø¿ý
+
+  4. ³o¼Ë´N¥i¥H¾ã­Ó mirror ¦^¨Ó¤F
+     mirror §¹¥H«á¡A°O±o§â bmtad.c §ï¦^­ì¨Óªº¼Ë¤l¡A¦A­«¶} bmtad
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

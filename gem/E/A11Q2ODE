@@ -1,0 +1,124 @@
+µo«H¤H: appleboy.bbs@bbs.freestudio.twbbs.org (¤p´cÅ]) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] BBS »P Coppermine Photo Gallery ±b¸¹¦P¨B
+µo«H¯¸: ºÖ§Q³Ð·N¤u§@«Ç (2005/12/16 Fri 04:06:15)          Updated: 2005/12/16
+
+­ì§@ªÌ¬O¡GTitan.bbs@KH.twbbs.org
+
+³o­Ó³¡¥÷ ¦]¬°¥Î¨ìMySQL¸ò php³¡¥÷ ©Ò¥H­×§ï½Ð¤p¤ß¤@ÂI
+
+¦Ó§Ú¬O¦b©³¤UªºÀô¹Ò­×§ï
+
+FreeBSD 6.0release
+apache 2.0.55
+mysql-server-5.0.16
+php5-5.1.1
+§Ú¥Î cpg 1.4.2 (stable)ª©
+
+¤W­±À³¸Ó¬O ¤ñ¸û·sªºÀô¹Ò¡A§Ú¤£´±½T©w¨ä¥L¥­¥x¡A¤£¹L§Ú·Q¤j­P¤W³£ok
+
+¥H¤U¬O­×§ï
+
+: login.php
+
+: §ä¨ì $cookie_warning = ''; ¦b«á­±¥[¤W
+
+function is_ok($string)  //rocet´£¨Ñ
+{
+  $flag = trim(preg_replace("/(^[+-])((.+))/", "\\1", $string));
+  if ($flag == "+")
+    return true;
+  else if ($flag == "-")
+    return false;
+}
+
+$socket = 0;  // socket ¶}±Ò§¹¦¨
+$user = 0;    // user ÀË¬d³q¹L
+$pass = 0;    // pass ÀË¬d³q¹L
+$ok = 0;      // socket/user/pass ³£¥¿½T
+$bbs_host = "" // ½Ð¶ñ¤W ¦Û¤v¬[³]ªºbbs Domain
+
+if (isset($HTTP_POST_VARS['submitted']))
+{
+  $fp = fsockopen($bbs_host, 110, $errno, $errstr, 30);
+  if (!$fp)
+  {
+    echo "$errstr ($errno)<br />\n";
+  }
+  else
+  {
+    if (is_ok(fgets($fp)))
+      $socket = 1;
+    else
+      echo "socket can't open";
+
+    fputs($fp, "user " . addslashes($HTTP_POST_VARS['username']) . "\r\n");
+    if (is_ok(fgets($fp)))
+      $user = 1;
+    fputs($fp, "pass " . addslashes($HTTP_POST_VARS['password']) . "\r\n");
+    if (is_ok(fgets($fp)))
+      $pass = 1;
+    fputs($fp, "quit\r\n");
+
+    if ($socket && $user && $pass)
+      $ok = 1;
+
+    $checkdata = cpg_db_query("SELECT user_id FROM {$CONFIG['TABLE_USERS']}
+      WHERE user_name = '" . addslashes($HTTP_POST_VARS['username']) . " '");
+
+    if (!(mysql_num_rows($checkdata)) && $ok == "1")
+    {
+      $checkvalue = cpg_db_query("SELECT user_id FROM {$CONFIG['TABLE_USERS']}
+        ORDER BY `user_id` DESC");
+      $count = mysql_fetch_array($checkvalue);
+      $newcount = $count['user_id'] + 1;
+
+      cpg_db_query("INSERT INTO {$CONFIG['TABLE_USERS']}
+        (`user_id`, `user_group`, `user_active`, `user_name`,
+         `user_password`, `user_lastvisit`, `user_regdate`,
+         `user_group_list`, `user_email`, `user_actkey`)
+        VALUES ('$newcount', '2', 'YES', '" .
+        addslashes($HTTP_POST_VARS['username']) . "',
+        '".addslashes(md5($HTTP_POST_VARS['password']))."',
+        NOW(), NOW() , '', '','')");
+    }
+
+    $result = cpg_db_query("SELECT user_password FROM {$CONFIG['TABLE_USERS']}
+      WHERE user_name = '" . addslashes($HTTP_POST_VARS['username']) . "'
+      AND user_active ='YES'");
+
+    $value = mysql_fetch_array($result);
+
+    $HTTP_POST_VARS['password'] = $value['user_password'];
+
+    fclose($fp);
+  }
+}
+
+: §ä¨ì $USER_DATA = $cpg_udb->login ³o¦æ ¦b©³¤U¤£»·³B
+
+- if ( $USER_DATA = $cpg_udb->login( addslashes($_POST['username']),
+-    addslashes($_POST['password']), isset($_POST['remember_me']) ) ) {
+
++ if ( ($USER_DATA = $cpg_udb->login( addslashes($_POST['username']),
++ addslashes($_POST['password']), isset($_POST['remember_me']) )) && $ok ==
++    "1") {
+
+¤W­± «Ü¦hphp ³£¸g¹LÂ_¦æ ©Ò¥H ½Ð¤p¤ß¥[¤W¥h ¦Ü¤Ö­nÀ´¤@ÂIÂIphp
+
+±b¸¹¦P¨B¡A¨º´N¤£»Ý­n­×§ï±K½Xªº¿ï¶µ¤F
+
+§ä¨ì³o¤@¦æ¡A¬ù308¦æ¥ª¥k  §â¤U­±³o¬q§R°£
+
+<input type="submit" name="change_pass"
+          value="{$lang_register_php['change_pass']}" class="button">
+
+©Î¬Oµù¸Ñ°_¨Ó¡A¦p¡G
+
+<!-- <input type="submit" name="change_pass" value="{$lan
+          value="{$lang_register_php['change_pass']}" class="button"> -->
+
+¦pªG¦³°ÝÃD ½Ð±H«H¸ò§Ú»¡
+
+--
+ [1;41m¡÷[44m¡õ[m O[1mri[30mgi[mn: [1;43m FreeBSD ´cÅ]¤u§@¯¸£»ºÖ§Q³Ð·N¤u§@«Ç [47m freestudio.twbbs.org [m
+ [1;45m¡ô[42m¡ö[m Au[1mt[30mho[mr: [1;33mappleboy[m ±q [1;34mFreeBSD.ee.CCU.edu.tw[m µoªí

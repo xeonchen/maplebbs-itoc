@@ -1,0 +1,268 @@
+µo«H¤H: Roger.bbs@no.bbs.che.nchu.edu.tw.spam («K·í«L) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¥¼»{ÃÒ¦¨¥\¨Ï¥ÎªÌ¤£¯àµn¤JCoppermine Photo Gallery(¼Ð·Ç.ACCT)
+µo«H¯¸: µ£¤Æ¤u§{ (2005/03/22 Tue 05:23:09)                Updated: 2005/03/22
+
+³o½g¤å³¹¬O°Ñ¦ÒTroyLee©MTitan«e½úªº¤å³¹
+©M¦Û¤v¹ïperlªº¤F¸Ñ­×§ï¦Ó¨Ó
+¥Î¤Fsuidperl
+¹ï¦w¥þ©Ê§@¤F¥[±j
+¦]¬°±Í¯¸ªº.ACCT¥¼´¿­×§ï¹L
+À³¸Ó¥i¥H¾A¥Î©ó¤j¦h¼Æªº¯¸¥x
+
+­ì²z¤W¬O«þ¨©¤@­Ó¨Ï¥ÎªÌªºÀÉ®×¨ì /tmp/.ACCT
+¸g¹Lphp¸ÑªR¨Ó½T©w¬O¤£¬O¦Xªkªº¨Ï¥ÎªÌ
+§Ú¬O¥Htvalid»{ÃÒ®É¶¡¨Ó°µ§PÂ_
+§PÂ_¤§«á§R°£ /tmp/.ACCT
+www user¤£¯à½Æ»s©Î§R°£bbs ownerªºÀÉ®×
+©Ò¥H»Ý­nsuidªºprogram
+
+
+¦pªG¤w¸g°µ¹LTitan«e½ú"[¥\¯à] bbs»PCoppermine Photo Gallery±b¸¹¦P¨B"
+ªº¨Ï¥ÎªÌ
+­×§ïlogin.php®É½Ð¥[¤J§Ú­×§ïªº³¡¤À§Y¥i
+
+­º¥ý½Ð½T©w§Aªºªº§@·~¨t²Î¦³¦w¸Ësuidperl
+¥Î³q±`¬O¦w¸Ë¦b /usr/bin/suidperl
+FreeBSD¨t²Î¦b¹w³]¬O¨S¦³¶}±Òsuidperl¥\¯àªº(§A¥i¥Hµø¤§¬°"«Ê¦L")
+¸Ñ°£«Ê¦L½Ð¿é¤J
+# chmod u+s /usr/bin/suidperl
+
+(http://www.freebsd.org/zh/FAQ/book.html#SUIDPERL)
+
+
+±µµÛ¬Operlµ{¦¡½X
+
+[m[36m: acct.pl ·s¼W¦¹µ{¦¡[m
+
+#!/usr/bin/suidperl -Tw
+
+use Getopt::Long;
+use File::Copy;
+use strict;
+my $copy;
+my $remove;
+my @id;
+GetOptions  ( "c=s"  => \$copy,
+              "r"    => \$remove );
+my $user = $copy;
+
+if ( $copy ) { @id = split //, $copy;
+      copy("/home/bbs/usr/$id[0]/$copy/.ACCT" ,"/tmp/.ACCT") or die "$!";}
+if ( $remove ) { unlink("/tmp/.ACCT") or die "$!";  }
+
+-----------------------
+
+­×§ï«á½Ð½T©w acct.pl ªºÅv­­¬°¥i°õ¦æ
+
+
+½Æ»s¸ÓÀÉ®×¨ì§Aªººô¸ô¬ÛÃ¯ªº¥Ø¿ý¤¤¡A¥Hcpg¬°¨Ò
+
+[1;33mcp acct.pl /usr/local/www/data/cpg/ [m
+
+[m±N¦¹acct.plªºowner§ï¬°bbs
+
+[1;33mchown bbs acct.pl[m
+
+¥[¤Wsuid
+
+[1;33mchmod u+s acct.pl[m
+
+
+¦b­×§ïlogin.php¤§«e
+½Ð¥ý¼g­Óphpºô­¶©ñ¦b¦Û¤vªººô¯¸¤W
+
+----------------------------
+<?
+$fp = fopen("/tmp/.ACCT", "r");
+$binary = fread($fp, 224);
+$acct = unpack("iuserno/a13userid/a14passwd/a20realname/a24username"
+            ."/Iuserlevel/Iufo/Csignature/x"
+            ."/cyear/cmonth/cday/csex/x3"
+            ."/imoney/igold/inumlogins/inumposts/inumemails"
+            ."/ifirstlogin/ilastlogin/itcheck/itvalid"
+            ."/a30lasthost/a60email", $binary);
+print_r($acct);
+
+?>
+--------------------------
+
+ÀH«K§ä­Óuserªº .ACCT½Æ»s¨ì /tmp¤U°µ´ú¸Õ
+µM«áÅª¨ú¸Óphpºô­¶
+¦L¥X¨Óªºµ²ªG¤¤
+¤@©w­n½T©w¨C­ÓÄæ¦ì³£¬O¥¿½Tªº¤~¯àÄ~Äò­×§ïlogin.php
+¤×¨ä¬OtvalidÄæ¦ì
+¥¼»{ÃÒªº¨Ï¥ÎªÌ  ¦¹Äæ¦ì¥²¶·¬O0
+¦pªG¶Q¯¸¥¼§ï¹L.ACCT
+¦L¥X¨Óªºµ²ªGÀ³¸Ó¬O¥¿±`ªº
+
+
+µM«á¬Ophpµ{¦¡½X
+§ïlogin.php
+
+[32m: login.php[m
+
+
+¦b$cookie_warning = '';³o¥y«á­±¥[¤W³o¬q
+
+- if (isset($HTTP_POST_VARS['submitted'])) {
+-     $results = db_query("SELECT user_id, user_name, user_password FROM
+-  {$CONFIG['TABLE_USERS']} WHERE user_name = '" . addslashes($HTTP_POST_VARS
+- ['username']) . "' AND BINARY user_password = '" . addslashes($HTTP_POST_VARS
+- ['password']) . "' AND user_active = 'YES'");
+
+function is_ok($string)  //rocet´£¨Ñ
+{
+  $flag = trim(preg_replace("/(^[+-])((.+))/", "\\1", $string));
+  if ($flag == "+")
+    return true;
+  else if ($flag == "-")
+    return false;
+}
+
+$socket = 0;  // socket ¶}±Ò§¹¦¨
+$user = 0;    // user ÀË¬d³q¹L
+$pass = 0;    // pass ÀË¬d³q¹L
+$ok = 0;      // socket/user/pass ³£¥¿½T
+
+if (isset($HTTP_POST_VARS['submitted']))
+{
+  [32m/* ¥H¤U¬O§Ú°µªº­×§ï  */[m
+
+  $name = addslashes($HTTP_POST_VARS[username]);
+  $cmd=sprintf("/usr/local/www/data/cpg/acct.pl --c=$name");
+               /* §ï¦¨¶Q¯¸¬ÛÃ¯ªº¥Ø¿ý  */
+  $fpa = popen($cmd,"w");
+  pclose($fpa);
+  if ( file_exists("/tmp/.ACCT"))
+  {
+  $fp = fopen("/tmp/.ACCT", "r");
+
+  flock($fp,LOCK_EX);
+  $binary = fread($fp, 224);
+  $acct = unpack("iuserno/a13userid/a14passwd/a20realname/a24username"
+            ."/Iuserlevel/Iufo/Csignature/x"
+            ."/cyear/cmonth/cday/csex/x3"
+            ."/imoney/igold/inumlogins/inumposts/inumemails"
+            ."/ifirstlogin/ilastlogin/itcheck/itvalid"
+            ."/a30lasthost/a60email", $binary);
+       /*  ¦¹³B¬° .ACCT µ²ºc  ½Ð½T©w¦C¦Lµ²ªG¥¿½T¤~¯à¨Ï¥Î  §_«h»Ý­n­×§ï */
+  flock($fp,LOCK_UN);
+  $cmd=sprintf("/usr/local/www/data/cpg/acct.pl --r");
+                /* §ï¦¨¶Q¯¸¬ÛÃ¯ªº¥Ø¿ý  */
+  $fpa = popen($cmd,"w");
+
+  pclose($fpa);
+
+  if ( $acct[tvalid] == 0 )
+  {
+        echo <<<EOT        /* ¦¹³B¬°»{ÃÒ¥¢±Ñºô­¶¡A¥i¦Û¦æ­×§ï */
+                  <P>
+                  <P>
+                  <CENTER><BR><BR>
+                  <font size="4" color="red"><b>
+                  ©êºp¡A§A¦bBBSªº±b¸¹©|¥¼³q¹L»{ÃÒ¡A
+                  ½Ð¨ì<A HREF="telnet://bbs.che.nchu.edu.tw">BBSµù¥U</A>
+                  «á¤~¥i¨Ï¥Î¬ÛÃ¯¥\¯à<b></font>
+                  <P><A HREF="http://bbs.che.nchu.edu.tw/photo/">¦^­º­¶</A>
+
+EOT;
+   die;
+  }
+
+   [32m/*  §Ú­×§ïªº³¡¤À  µ²§ô   */[m
+
+  $fp = fsockopen("localhost", 110, $errno, $errstr, 30);
+  if (!$fp)
+  {
+    echo "$errstr ($errno)<br />\n";
+  }
+  else
+  {
+    if (is_ok(fgets($fp)))
+      $socket = 1;
+    else
+      echo "socket can't open";
+
+    fputs($fp, "user " . addslashes($HTTP_POST_VARS['username']) . "\r\n");
+    if (is_ok(fgets($fp)))
+      $user = 1;
+    fputs($fp, "pass " . addslashes($HTTP_POST_VARS['password']) . "\r\n");
+    if (is_ok(fgets($fp)))
+      $pass = 1;
+    fputs($fp, "quit\r\n");
+
+    if ($socket && $user && $pass)
+      $ok = 1;
+
+    $checkdata = db_query("SELECT user_id FROM {$CONFIG['TABLE_USERS']}
+      WHERE user_name = '" . addslashes($HTTP_POST_VARS['username']) . " '");
+
+    if (!(mysql_num_rows($checkdata)) && $ok == "1")
+    {
+      $checkvalue = db_query("SELECT user_id FROM {$CONFIG['TABLE_USERS']}
+        ORDER BY `user_id` DESC");
+      $count = mysql_fetch_array($checkvalue);
+      $newcount = $count[0] + 1;
+
+      db_query("INSERT INTO {$CONFIG['TABLE_USERS']}
+        (`user_id`, `user_group`, `user_active`, `user_name`,
+         `user_password`, `user_lastvisit`, `user_regdate`,
+         `user_group_list`, `user_email`, `user_website`, `user_location`,
+         `user_interests`, `user_occupation`, `user_actkey`)
+        VALUES ('$newcount', '2', 'YES', '" .
+        addslashes($HTTP_POST_VARS['username']) . "', 'password',
+        '0000-00-00 00:00:00', NOW() , '', '','', '', '', '', '');");
+    }
+
+    $result = db_query("SELECT user_password FROM {$CONFIG['TABLE_USERS']}
+      WHERE user_name = '" . addslashes($HTTP_POST_VARS['username']) . "'
+      AND user_active ='YES'");
+
+    $value = mysql_fetch_array($result);
+
+    $HTTP_POST_VARS['password'] = $value['user_password'];
+
+    fclose($fp);
+  }
+
+  $results = db_query("SELECT user_id, user_name, user_password
+    FROM {$CONFIG['TABLE_USERS']}
+    WHERE user_name = '" . addslashes($HTTP_POST_VARS['username']) ."' AND
+    BINARY user_password = '" . addslashes($HTTP_POST_VARS['password']) . "'
+    AND user_active = 'YES'");
+
+¤W­±³o¬q¥[§¹¤§«á¡A§ï³o­Ó¦a¤è
+
+- if (mysql_num_rows($results)) {
++ if (mysql_num_rows($results) && $ok == "1") {
+
+
+[32m: profile.php[m
+
+¬JµM±b¸¹¦P¨B¡A¨º´N¤£»Ý­n­×§ï±K½Xªº¿ï¶µ¤F
+
+§ä¨ì³o¤@¦æ¡A¬ù240¦æ¥ª¥k
+
+<input type="submit" name="change_pass"
+          value="{$lang_register_php['change_pass']}" class="button">
+
+ª½±µ§R°£¡A©Î¬Oµù¸Ñ°_¨Ó¡A¦p¡G
+
+<!-- <input type="submit" name="change_pass" value="{$lan
+          value="{$lang_register_php['change_pass']}" class="button"> -->
+
+
+
+------------------
+
+
+¥H¤W¦b±Í¯¸´ú¸Õ¥¿±`
+¦pªG¦³§ó¦nªº¼gªk©Îµo²{¥ô¦óbug
+Åwªï´£¥X :)
+
+
+--
+[m       [1;33m¡´                                           [36mùï¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢wùñ[m
+[1;37m  ¡Ê    [;32;40m¢¨¢© [1;37m¡Ë[m[1;37m ¢~¢w [1;31mOrigin :[1;37m¡ó [33mµ£¤Æ¤u§{ [37m¡ó        [1;36;46mùø[1;33;46m bbs.che.nchu.edu.tw[1;36;46m  ùø[m
+[1;37m¡Ê[1;32m[;32;40m¢¨¢©¢¨[1;36;42m¢@[37m [32m [;32;40m¢©[m [1;37m ¢x   [1;35m2005/03/22 Tue 05:23:09 [1;36m      ùõ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢wù÷
+[;32;40m¢¨[1;42m  [1;42m  [36m¢­ [32m [;37;42m  [1;36m¢­[;32;40m¢©[m[1;37m¢x  [1;36m Roger ±q [37me2029.dorm.nchu.edu.tw [1;36mµoªí[m

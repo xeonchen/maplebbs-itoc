@@ -1,0 +1,34 @@
+§@ªÌ: itoc.bbs@processor.tfcis.org
+¼ÐÃD: Re: [°ÝÃD]¦p¦ó§ïµù¥U«á¥i¥H§ï¯u¹ê©m¦W©O
+®É¶¡: Thu Apr 17 21:43:28 2003                          Updated: 2004/04/06
+
+¡° ¤Þ­z¡mcwk7195.bbs@AT2.twbbs.org (³Í)¡n¤§»Ê¨¥¡G
+> ¦p¦ó§ïµù¥U«á¥i¥H§ï¯u¹ê©m¦W©O
+
+: bbsd.c:acct_apply()
+
+- /* itoc.010317: ´£¥Ü user ¥H«á±N¤£¯à§ï©m¦W */
+- vmsg("ª`·N¡G½Ð¿é¤J¯u¹ê©m¦W¡A¥»¯¸¤£´£¨Ñ­×§ï©m¦Wªº¥\\¯à");
+
+: acct.c:acct_setup()
+
++ i++;
++ str = x.realname;
++ do
++ {
++   vget(i, 0, "¯u¹ê©m¦W¡G", str, RNLEN + 1, GCARRY);
++ } while (strlen(str) < 4);
+
+  if (adm)
+  {
+-   /* itoc.010317: ¤£Åý user §ï©m¦W */
+-   i++;
+-   str = x.realname;
+-   do
+-   {
+-     vget(i, 0, "¯u¹ê©m¦W¡G", str, RNLEN + 1, GCARRY);
+-   } while (strlen(str) < 4);
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mitoc.dorm-gd2.nctu.edu.tw                [m

@@ -1,0 +1,78 @@
+µo«H¤H: chonsi.bbs@WithHeart.twbbs.org (¦B¶ô¤¤ªº¯P¤õ - ¦BµK), ¬ÝªO: plan
+¼Ð  ÃD: Re: °Ý¤@­ÓªÑ¥«ªº²Â°ÝÃD
+µo«H¯¸: ÀH¤ß§{ (Wed Jan  8 16:57:33 2003)
+
+: config.h
+
+#define BRDSHM_KEY      2997    /* 0x00000bb5 */    /* ¬ÝªO */
+#define UTMPSHM_KEY     1998    /* 0x000007ce */    /* ¨Ï¥ÎªÌ */
+#define FILMSHM_KEY     2999    /* 0x00000bb7 */    /* °ÊºA¬ÝªO */
+#define STOCKSHM_KEY    4999    /* 0x00001387 */    /* ªÑ¥« */
+#define PIPSHM_KEY      4998    /* 0x00001386 */    /* ¹q¤lÂû¹ï¾Ô */
+#define BSEM_KEY        2000    /* 0x000007d0 */    /* semaphore key */
+
+  ¦pªG­n²M°£ shm|sem ªº¸Ü¡A¥i°t¦X ipcs ¨Ï¥Î ipcrm
+
+  ²M±¼ BRDSHM¡A­n¦A«×°õ¦æ ~/bin/account ¨Ó­«·s¸ü¤J
+  ²M±¼ FILMSHM¡A­n¦A«×°õ¦æ ~/bin/camera ¨Ó­«·s¸ü¤J
+
+> ------------------------------------------------------- <
+
+: ¥H¤U¬O FreeBSD ªº¨Ï¥Î½d¨Ò
+
+% [1;33mipcs[m
+
+    Shared Memory:
+    T     ID     KEY        MODE       OWNER    GROUP
+    m  65536       1998 --rw-------      bbs      bbs
+    m  65537       2997 --rw-------      bbs      bbs
+    m  65538       2999 --rw-------      bbs      bbs
+    m  65539       4997 --rw-------      bbs      bbs
+    m  65540       4999 --rw-------      bbs      bbs
+    m  65541       4998 --rw-------      bbs      bbs
+    Semaphores:
+    T     ID     KEY        MODE       OWNER    GROUP
+    s  65536       2000 --rw-------      bbs      bbs
+
+% [1;33mipcrm -M 2997[m         // ­Y­n²M±¼ ¬ÝªO shm
+% [1;33mipcrm -M 1998[m         // ­Y­n²M±¼ ¨Ï¥ÎªÌ shm
+% [1;33mipcrm -M 2999[m         // ­Y­n²M±¼ °ÊºA¬ÝªO shm
+% [1;33mipcrm -M 4999[m         // ­Y­n²M±¼ ªÑ¥« shm
+% [1;33mipcrm -M 4998[m         // ­Y­n²M±¼ ¹q¤lÂû shm
+% [1;33mipcrm -M 2000[m         // ­Y­n²M±¼ semphores
+
+  ¦]¬° KEY ©T©w³£¬O 1998 2997 2999 4997 4998 4999
+  ©Ò¥H¦b FreeBSD ¤U¡A¨ä¹ê¤£»Ý­n ipcs¡A¥i¥Hª½±µ ipcrm -M key
+
+> ------------------------------------------------------- <
+
+: ¥H¤U¬O Linux ªº¨Ï¥Î½d¨Ò
+
+% [1;33mipcs[m
+
+    ------ Shared Memory Segments --------
+    key        shmid      owner      perms      bytes      nattch     status
+    0x00000bb7 131076     bbs       600        111312     4
+    0x00000bb5 163845     bbs       600        44808      4
+    0x000007ce 196614     bbs       600        297240     5
+    0x00001387 491531     bbs       600        9620       0
+    0x00001386 434272     bbs       600        1090       0
+    ------ Semaphore Arrays --------
+    key        semid      owner      perms      nsems      status
+    0x000007d0 229383     bbs       600        1
+
+  ¨ä¤¤ key ¥H HEX ¨Óªí¥Ü¡A¦b¥»¤å¤@¶}©lªºµù¸Ñ§Y¦³ HEX ªº¹ïÀ³
+
+% [1;33mipcrm shm 163845[m      // ­Y­n²M±¼ ¬ÝªO shm
+% [1;33mipcrm shm 196614[m      // ­Y­n²M±¼ ¨Ï¥ÎªÌ shm
+% [1;33mipcrm shm 131076[m      // ­Y­n²M±¼ °ÊºA¬ÝªO shm
+% [1;33mipcrm shm 491531[m      // ­Y­n²M±¼ ªÑ¥« shm
+% [1;33mipcrm shm 434272[m      // ­Y­n²M±¼ ¹q¤lÂû shm
+% [1;33mipcrm sem 229383[m      // ­Y­n²M±¼ semphores
+
+  ¦]¬° shmid ¤£©T©w¼Æ¦r
+  ©Ò¥H¦b Linux ¤U¡A»Ý­n°t¦X ipcs¡A¨Ó°õ¦æ ipcrm shm|sem id
+
+--
+    [1;36m¢~¢w¢w Origin ¢¡ [37mÀH¤ß§{ [33;45m chonsi.dorm8.nctu.edu.tw [36;40m ¡ã £\£]£^ ¢w¢w¢q[m
+    [1;36m¢q     Author ¢£ [32m192.168.53.1[m

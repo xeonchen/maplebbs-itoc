@@ -1,0 +1,153 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¢Û¢é¢ø¢ô¢í¡Ð¢ñ¢ü¢÷¢ë) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¥þ¯¸³ß¦n³]©w²Î­p¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/01/08 Thu 23:16:29)                Updated: 2004/01/08
+
+    ¥Ñ©ó¥»¯¸¦³«Ü¦h·s¼Wªºµ{¦¡³£©ñ¦b³ß¦n³]©wµ¹¨Ï¥ÎªÌ³]©w¡C
+
+    ©Ò¥H·Q­nÆ[¹î¤@¤U­þ­Ó¥\¯à¨Ï¥Î²v¦p¦ó¡A©Ò¥H¼g¤F³o­Ó¤pµ{¦¡¡C
+
+    ­pºâµ²ªG·|¿é¥X¨ì ~/gem/@-habit  ¥i¥H±q¢Ð¢Ð¢á¤W­±ª½±µÆ[¬Ý¡C
+
+    ¤U­±ªþ¤Wµ{¦¡½X¡A¥H¤Î¿é¥Xªºµe­±¡C
+
+    ·íµM¡Aµe­±¥i¥H¦Û¤v­×§ï¡®¤W¦â¡C
+
+==============================================================================
+
+: src/util/Makefile
+
+EXE =   ... [1;33mshowHabit[m
+
+: src/util/showHabit.c   ·s¼W¤U­±¾ã¤äµ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/showHabit.c  ( NTHU CS MapleBBS Ver 3.00 )       */
+/*-------------------------------------------------------*/
+/* target : Æ[¹î¥þ¯¸³ß¦n³]©w¨Ï¥Î±¡ªp                     */
+/* create : 04/01/08                                     */
+/* update :   /  /                                       */
+/* author : qazq.bbs@bbs.cs.nchu.edu.tw                  */
+/*-------------------------------------------------------*/
+
+#define _ADMIN_C_
+
+#include "bbs.h"
+
+#define OUTFILE_HABIT   BBSHOME"/gem/@/@-habit"
+
+static int habit[32] = {0};
+
+static void
+count_habit(flag)
+  unsigned flag;
+{
+  int i;
+  unsigned mask = 1 << 31;
+
+  for (i = 31; i >= 0; i--)
+  {
+    if (flag & mask)
+      habit[i]++;
+
+    flag <<= 1;
+  }
+}
+
+
+int
+main()
+{
+  int i, totaluser = 0;
+  char c, buf[30];
+  FILE *fp;
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    char buf[64];
+    struct dirent *de;
+    DIR *dirp;
+
+    sprintf(buf, BBSHOME "/usr/%c", c);
+    chdir(buf);
+
+    if (!(dirp = opendir(".")))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      ACCT acct;
+      int fd;
+      char *fname;
+
+      fname = de->d_name;
+      if (*fname <= ' ' || *fname == '.')
+        continue;
+
+      sprintf(buf, "%s/.ACCT", fname);
+      if ((fd = open(buf, O_RDONLY)) < 0)
+        continue;
+
+      read(fd, &acct, sizeof(ACCT));
+      close(fd);
+
+      count_habit(acct.ufo);
+      totaluser++;
+    }
+
+    closedir(dirp);
+  }
+
+  if (!(fp = fopen(OUTFILE_HABIT, "w")))
+    return;
+
+  fprintf(fp, "¥þ¯¸¤H¼Æ¡G%d\n\n", totaluser);
+
+  for (i = 0; i <= 31; i++)
+  {
+    sprintf(buf, "%s", ufo_tbl[i]);
+    if (!strcmp(buf, "«O¯d") || !ufo_tbl[i])
+      continue;
+
+    fprintf(fp, "Habit[%2d]  %s  ¶}±Ò¤H¼Æ¡G%-3d  Ãö³¬¤H¼Æ¡G%d\n",
+      i, ufo_tbl[i], habit[i], totaluser - habit[i]);
+  }
+
+  return 0;
+}
+
+==============================================================================
+
+¥þ¯¸¤H¼Æ¡G425
+
+Habit[ 1]  °ÊºA¬ÝªO        (¶}±Ò/Ãö³¬)  ¶}±Ò¤H¼Æ¡G412  Ãö³¬¤H¼Æ¡G13
+Habit[ 2]  ¬ÝªO¦CªíÅã¥Ü    (¤å³¹/½s¸¹)  ¶}±Ò¤H¼Æ¡G51   Ãö³¬¤H¼Æ¡G374
+Habit[ 3]  ¬ÝªO¦Cªí±Æ§Ç    (¦r¥À/¤ÀÃþ)  ¶}±Ò¤H¼Æ¡G149  Ãö³¬¤H¼Æ¡G276
+Habit[ 4]  ¶iªOµe­±        (Åã¥Ü/¸õ¹L)  ¶}±Ò¤H¼Æ¡G411  Ãö³¬¤H¼Æ¡G14
+Habit[ 5]  ¤å³¹½s¿è¾¹      (Â²¤Æ/§¹¾ã)  ¶}±Ò¤H¼Æ¡G9    Ãö³¬¤H¼Æ¡G416
+Habit[ 6]  ¶i/Â÷¯¸µe­±     (Â²¤Æ/§¹¾ã)  ¶}±Ò¤H¼Æ¡G100  Ãö³¬¤H¼Æ¡G325
+Habit[ 7]  ©I¥s¾¹          (¦n¤Í/©Ò¦³)  ¶}±Ò¤H¼Æ¡G16   Ãö³¬¤H¼Æ¡G409
+Habit[ 8]  ¼s¼½¤Ñ½u        (©Ú¦¬/±µ¦¬)  ¶}±Ò¤H¼Æ¡G9    Ãö³¬¤H¼Æ¡G416
+Habit[ 9]  »·Â÷¹ÐÄÛ        (¦wÀR/±µ¦¬)  ¶}±Ò¤H¼Æ¡G8    Ãö³¬¤H¼Æ¡G417
+Habit[10]  ¨Ï¥ÎªÌ¦W³æÅã¥Ü  (¦n¤Í/¥þ³¡)  ¶}±Ò¤H¼Æ¡G17   Ãö³¬¤H¼Æ¡G408
+Habit[11]  ±µ¨ü¤W¯¸³qª¾    (³qª¾/¨ú®ø)  ¶}±Ò¤H¼Æ¡G35   Ãö³¬¤H¼Æ¡G390
+Habit[12]  ¤W¯¸°e³qª¾/¨ó´M (¤£°e/³qª¾)  ¶}±Ò¤H¼Æ¡G24   Ãö³¬¤H¼Æ¡G401
+Habit[13]  ¤ô²y¦^ÅU¤¶­±    (§¹¾ã/¤W¦¸)  ¶}±Ò¤H¼Æ¡G292  Ãö³¬¤H¼Æ¡G133
+Habit[14]  ¤£Àx¦s¤ô²y¬ö¿ý  (§R°£/¿ï¾Ü)  ¶}±Ò¤H¼Æ¡G123  Ãö³¬¤H¼Æ¡G302
+Habit[15]  ¤£Àx¦s²á¤Ñ¬ö¿ý  (§R°£/¿ï¾Ü)  ¶}±Ò¤H¼Æ¡G17   Ãö³¬¤H¼Æ¡G408
+Habit[16]  ¤£¨Ï¥ÎÃ±¦WÀÉ    (¤£¥Î/¿ï¾Ü)  ¶}±Ò¤H¼Æ¡G359  Ãö³¬¤H¼Æ¡G66
+Habit[17]  Åã¥ÜÃ±¦WÀÉ      (Åã¥Ü/¤£¬Ý)  ¶}±Ò¤H¼Æ¡G45   Ãö³¬¤H¼Æ¡G380
+Habit[18]  ¤W¯¸ÂsÄý·s»D    (ÂsÄý/¤£­n)  ¶}±Ò¤H¼Æ¡G1    Ãö³¬¤H¼Æ¡G424
+Habit[19]  ¾ã¦æ¥ú´Î        (¥ú´Î/´¶³q)  ¶}±Ò¤H¼Æ¡G404  Ãö³¬¤H¼Æ¡G21
+Habit[20]  ¬ÝªO»¡©ú        (Åã¥Ü/ÁôÂÃ)  ¶}±Ò¤H¼Æ¡G417  Ãö³¬¤H¼Æ¡G8
+Habit[21]  Áô¨­¤W¯¸        (Áô¨­/²{¨­)  ¶}±Ò¤H¼Æ¡G1    Ãö³¬¤H¼Æ¡G424
+Habit[22]  ¦Û°Ê¸õ¨ì¥¼Åª¬ÝªO(¦Û°Ê/¤£¸õ)  ¶}±Ò¤H¼Æ¡G382  Ãö³¬¤H¼Æ¡G43
+Habit[24]  Ãa¤HÁôÂÃ        (ÁôÂÃ/Åã¥Ü)  ¶}±Ò¤H¼Æ¡G16   Ãö³¬¤H¼Æ¡G409
+Habit[27]  °ÊºAÁôÂÃ        (ÁôÂÃ/Åã¥Ü)  ¶}±Ò¤H¼Æ¡G6    Ãö³¬¤H¼Æ¡G419
+Habit[28]  Áô¨­³N          (Áô¨­/²{¨­)  ¶}±Ò¤H¼Æ¡G9    Ãö³¬¤H¼Æ¡G416
+Habit[30]  ¯¸ªø¤W¯¸¨Ó·½    (­­¨î/¥ô·N)  ¶}±Ò¤H¼Æ¡G0    Ãö³¬¤H¼Æ¡G425
+
+==============================================================================
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-137-35.HINET-IP.hinet.net [30mµoªí[m

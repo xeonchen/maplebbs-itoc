@@ -1,0 +1,76 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD] ¥Í¤é
+®É¶¡: 2004/01/11 Sun 15:14:23                           Updated: 2005/11/02
+
+¡° ¤Þ­z¡mvinnie (¤ß±¡)¡n¤§»Ê¨¥¡G
+> ¸ò¼f®Öµù¥U³æªº®É«á¤]­n¼f®Ö¥Í¤é
+> ³o­Ó­n«ç»ò¼g?
+
+: struct.h:RFORM
+
+typedef struct  /* µù¥Uªí³æ (Register From) 256 bytes */
+{
+  int userno;
+  time_t rtime;
+  char userid[IDLEN + 1];
+  char agent[IDLEN + 1];
+- char nouse[20];
++ char year[3];
++ char month[3];
++ char day[3];
++ char sex[3];
++ char nouse[8];
+  char career[50];
+  char address[60];
+  char phone[20];
+  char reply[72];
+}      RFORM;
+
+: user.c:u_register()
+
+-   getfield(5, 50, rform.career, "ªA°È³æ¦ì¡G", "¾Ç®Õ¨t¯Å©Î³æ¦ìÂ¾ºÙ");
+-   getfield(8, 60, rform.address, "¥Ø«e¦í§}¡G", "¥]¬A¹ì«Ç©ÎªùµP¸¹½X");
+-   getfield(11, 20, rform.phone, "³sµ¸¹q¸Ü¡G", "¥]¬Aªø³~¼·¸¹°Ï°ì½X");
++   getfield(5, 50, rform.career, "ªA°È³æ¦ì¡G", "¾Ç®Õ¨t¯Å©Î³æ¦ìÂ¾ºÙ");
++   getfield(7, 60, rform.address, "¥Ø«e¦í§}¡G", "¥]¬A¹ì«Ç©ÎªùµP¸¹½X");
++   getfield(9, 20, rform.phone, "³sµ¸¹q¸Ü¡G", "¥]¬Aªø³~¼·¸¹°Ï°ì½X");
++   getfield(11, 3, rform.year, "¥Í¤é¡G", "¥Á°ê¦~");
++   getfield(13, 3, rform.month, "¥Í¤é¡G", "¤ë");
++   getfield(15, 3, rform.day, "¥Í¤é¡G", "¤é");
++   getfield(17, 3, rform.sex, "©m§O¡G", "¨k/¤k");
+
+: admutil.c:scan_register_form()
+
+    prints("¥Ó½Ð¥N¸¹: %s (¥Ó½Ð®É¶¡¡G%s)\n", userid, Btime(&rform.rtime));
++   prints("¥Í¤é¡G%-2s/%-2s/%-2s  ©Ê§O¡G%s\n",
++     rform.year, rform.month, rform.day, rform.sex);
+    prints("ªA°È³æ¦ì: %s\n", rform.career);
+    prints("¥Ø«e¦í§}: %s\n", rform.address);
+    prints("³sµ¸¹q¸Ü: %s\n%s\n", rform.phone, msg_seperator);
+
+  ...
+  ...
+
+    case 'y':
+
+      /* ´£¤ÉÅv­­ */
+      sprintf(msg, "REG: %s:%s:%s:by %s",
+        rform.phone, rform.career, rform.address, agent);
+      justify_log(acct.userid, msg);
++     acct.year = atoi(rform.year);
++     acct.month = atoi(rform.month);
++     acct.day = atoi(rform.day);
++     acct.sex = strcmp(rform.sex, "¨k") ?
++       (strcmp(rform.sex, "¤k") ? 0 : 2) : 1;
+      time(&(acct.tvalid));
+      acct_setperm(&acct, PERM_VALID, 0);
++     utmp_admset(acct.userno, STATUS_DATALOCK);    /* ¯¸ªø»\¸ê®Æ */
+
+: run/rform ¤Î run/rform.log
+
+  §ï¤F struct RFORM ¥H«á
+  ÂÂªº run/rform ¤Î run/rform.log ´N¤£¯à¥Î¤F¡A­n§R°£
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

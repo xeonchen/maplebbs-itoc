@@ -1,0 +1,54 @@
+µo«H¤H: etnba.bbs@bbs.leader.edu.tw (´Á«Ý6/30), ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] bbsd.c ¶i¯¸µe­±§ï¦¨¤­­Ó¶]
+µo«H¯¸: »â¾ÉªÌ¤§®a (Tue Jul 16 08:52:46 2002)             Updated: 2006/01/24
+
+: src/include/struct.h
+: ·s¼W FILM_OPENING3 FILM_OPENING4
+: FILM_WELCOME «á¨Ó¥H«áªº¨ä¥L¼Æ¦r³£¥[¤G
+
+/* ----------------------------------------------------- */
+/* cache.c ¤¤¹B¥Îªº¸ê®Æµ²ºc                              */
+/* ----------------------------------------------------- */
+
+#define FILM_OPENING0   0       /* ¶}ÀYµe­±(¢¯) */
+#define FILM_OPENING1   1       /* ¶}ÀYµe­±(¢°) */
+#define FILM_OPENING2   2       /* ¶}ÀYµe­±(¢±) */
++ #define FILM_OPENING3   3     /* ¶}ÀYµe­±(¢²) */
++ #define FILM_OPENING4   4     /* ¶}ÀYµe­±(¢³) */
+
+  [1;44m// ³Ñ¤U«á­±ªº¼Æ¦r´N¨Ì§Ç¥[ 2 [m
+
+- #define FILM_GOODBYE    3       /* ¦A¨£µe­± */
++ #define FILM_GOODBYE    5       /* ¦A¨£µe­± */
+  ...
+  ...
+- #define FILM_MOVIE      16      /* °ÊºA¬ÝªO FILM_MOVIE ­n©ñ¦b³Ì«á­± */
++ #define FILM_MOVIE      18      /* °ÊºA¬ÝªO FILM_MOVIE ­n©ñ¦b³Ì«á­± */
+
+
+: src/util/camera.c
+
+static char *list[] =           /* src/include/struct.h */
+{
+  "opening.0",                  /* FILM_OPENING0 */
+  "opening.1",                  /* FILM_OPENING1 */
+  "opening.2",                  /* FILM_OPENING2 */
++ "opening.3",                  /* FILM_OPENING3 */
++ "opening.4",                  /* FILM_OPENING4 */
+  "goodbye",                    /* FILM_GOODBYE  */
+
+: src/util/camera.c:main()
+
+-   if (i >= FILM_OPENING0 && i <= FILM_OPENING2 && feast[0])
++   if (i >= FILM_OPENING0 && i <= FILM_OPENING4 && feast[0])
+    {
+      mirror(feast, 0);
+    }
+
+: src/maple/bbsd.c:tn_main()
+
+- film_out((ap_start % 3) + FILM_OPENING0, 3);  /* ¶Ã¼ÆÅã¥Ü¶}ÀYµe­± */
++ film_out((ap_start % 5) + FILM_OPENING0, 3);  /* ¶Ã¼ÆÅã¥Ü¶}ÀYµe­± */
+
+--
+[1;32m¡¼ Origin: [33m¥ß¼w»â¾ÉªÌ¤§®a [37mbbs.leader.edu.tw  [31m¡¼ From: [36m61-216-130-237.HINET-IP.[m

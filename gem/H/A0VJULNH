@@ -1,0 +1,25 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: itoc
+¼Ð  ÃD: [¥\¯à] talk.c ¨Ï¥ÎªÌ¿ï³æª½±µÂê©w»È¹õ¡®Áô§Î
+µo«H¯¸: ¤¤¿³¸ê¬ì (Sat, 19 Jul 2003 18:40:07 +0800 (CST))  Updated: 2003/07/19
+
+    ¨Ï¥ÎªÌ¦b¨Ï¥ÎªÌ¿ï³æ«ö 'I' ¥i¥H°¨¤WÂê©w»È¹õ¡A«öÁä¦Û­q
+
+: ulist.c:ulist_lock() ¥[¤J·s¨ç¦¡©ó ulist_ship() ¤U­±
+
+static int      /* qazq.030719: ¨Ï¥ÎªÌ¿ï³æ¥i¥Hª½±µ¶¢¸m */
+ulist_lock(xo)
+  XO *xo;
+{
+  utmp_mode(M_IDLE);
+  u_lock();
+  return ulist_init(xo);
+}
+
+: ulist.c:ulist_cb[]
+
+  'S', ulist_ship,
++ 'I', ulist_lock,      /* qazq.030719: ¨Ï¥ÎªÌ¿ï³æª½±µ¶¢¸m */
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-139-67.HINET-IP.hinet.net[m

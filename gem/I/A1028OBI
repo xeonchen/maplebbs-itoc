@@ -1,0 +1,25 @@
+§@ªÌ: itoc (¤Ó¶§ªá¨à~) ¬ÝªO: plan
+¼ÐÃD: [°ÝÃD] XO_* ªº·N«ä
+®É¶¡: Wed Dec 18 13:52:03 2002
+
+¡° ¤Þ­z¡mu891809@oz.nthu.edu.tw (lala)¡n¤§»Ê¨¥¡G
+> ¤£À´ XO_INIT¡BXO_LOAD¡B¡K ¨º¨Ç¬O¤°»ò·N«ä
+> ¤°»ò®É­Ô­n return ¤°»ò
+
+  return XO_NONE;  none      ¤°»ò¤]¤£°µ
+  return XO_INIT;  initial   ­«·s¸ü¤J¸ê®Æ¡A¨Ã­«Ã¸ 0~b_lines ¦C
+  return XO_LOAD;  load      ­«·s¸ü¤J¸ê®Æ¡A¨Ã­«Ã¸ 3~b_lines ¦C
+  return XO_HEAD;  head      ­«Ã¸ 0~b_lines ¦C
+  return XO_NECK;  neck      ­«Ã¸ 1~b_lines ¦C
+  return XO_BODY;  body      ­«Ã¸ 3~b_lines ¦C
+  return XO_FOOT;  foot      ­«Ã¸ b_lines ¦C
+  return XO_LAST;  last      ¦^¨ì¤W¤@­Ó XO  (¥Ø«e¨S¥Î¨ì)
+  return XO_QUIT;  quit      Â÷¶}
+
+  return XO_MOVE + 5;  move  ´å¼Ð²¾°Ê¨ì 5 ªº¦ì¸m
+         XO_WRAP       wrap  ±²°Ê («ö¡ô¨ì²Ä¤@µ§®É¬O§_­nÂ½¥h³Ì«á¤@­¶
+                                   «ö¡õ¨ì³Ì«á¤@µ§®É¬O§_­nÂ½¥h²Ä¤@­¶)
+  xo->pos = XO_TAIL;   tail  §â´å¼Ð©ñ¦b³Ì«á¤@µ§¸ê®Æ
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

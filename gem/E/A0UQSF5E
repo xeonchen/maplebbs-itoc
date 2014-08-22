@@ -1,0 +1,71 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] talk.c ²á¤Ñ®É³sÄò«ö¤G¦¸ Ctrl-C ¤~Â÷¶}
+®É¶¡: Sat Jul 20 01:10:36 2002                          Updated: 2002/10/17
+
+¡° ¤Þ­z¡mtbp.bbs@xeon.tfcis.org (tbp)¡n¤§»Ê¨¥¡G
+> ¨â¤H²á¤Ñ®É
+> ¦p¦ó­×§ï¤~¯àÅý²Ä¤@¦¸«ö^C¬°Äµ§i
+> ¦A«ö¤@¦¸^C¤~°h¥X©O
+
+: talk.c:talk_speak()
+
+static void
+talk_speak(fd)
+  int fd;
+{
+  talk_win mywin, itswin;
+  uschar data[80];
+  char buf[80];
+  int i, ch;
++ int ctrlc;
+
+  ...
+  ...
+
++ ctrlc = 0;        /* 1:¤W¤@Áä¬O Ctrl-C ©Î Ctrl-D */
+
+  for (;;)
+  {
+    ch = vkey();
+
++   if (ch == Ctrl('D') || ch == Ctrl('C'))
++   {
++     if (ctrlc)    /* ³sÄò«ö¤G¦¸ Ctrl-C ©Î Ctrl-D Â÷¶} */
++     {
++       break;
++     }
++     else          /* ²Ä¤@¦¸«ö Ctrl-C ©Î Ctrl-D */
++     {
++       ctrlc = 1;
++       continue;
++     }
++   }
++   else
++   {
++     ctrlc = 0;
++   }
+
+    ...
+    ...
+
+-   if (ch == Ctrl('D') || ch == Ctrl('C'))
+-     break;
+
+  ...
+  ...
+
+: theme.h
+
+#ifdef HAVE_GAME
+#define FOOTER_TALK     \
+COLOR1 " ¥æ½Í¼Ò¦¡ " COLOR2 " (^O)¹ï«³ (³sÄò¤G¦¸^C,^D)µ²§ô¥æ½Í (^T)©I¥s¾¹ (^Z)§Ö±¶¦Cªí (^G)¹Í¹Í  \033[m"
+#else
+#define FOOTER_TALK     \
+COLOR1 " ¥æ½Í¼Ò¦¡ " COLOR2 " (³sÄò¤G¦¸^C,^D)µ²§ô¥æ½Í (^T)©I¥s¾¹ (^Z)§Ö±¶¦Cªí (^G)¹Í¹Í (^Y)²M°£  \033[m"
+#endif
+
+--
+  À³¸Ó¬O³o¼Ë¡A¨S¸Õ¹L
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,70 @@
+§@ªÌ: itoc (cygreadline4.dll) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¬ü¤u¯¸ªø
+®É¶¡: 2004/05/11 Tue 19:03:58                           Updated: 2004/05/11
+
+¡° ¤Þ­z¡mfar (»·...)¡n¤§»Ê¨¥¡G
+>     ´N¬O±Í¯¸¦³³]¬ü¤u¯¸ªø³oºØÂ¾¦ì,´N¬O¥u¯à½s¿èetc/¤UªºÀÉ®×..
+>     §Ú­n¦p¦ó§ó§ïÅv­­Åý¤@¯ë¨Ï¥ÎªÌªºÅv­­¯à§ó§ï"¦UºØµe­±"¸ÌªºÀÉ®×©O?
+
+: perm.h  ÀH«K¿ï¤@­ÓªÅªºÄæ¦ì¡A¨Ò¦p PERM_9¡A§ï¦¨ PERM_ART
+
+- #define PERM_9          0x00000100
++ #define PERM_ART        0x00000100
+
+  ...
+  ...
+
+- #define STR_PERM        "bctpjm#x-------@PTCM--L*B#-RACBS"
++ #define STR_PERM        "bctpjm#xa------@PTCM--L*B#-RACBS"
+
+  ...
+  ...
+
+- "«O¯d",                       /* PERM_9 */
++ "¬ü¤uÁ`ºÞ",                   /* PERM_ART */
+
+: menu.c ÀH«K§ä¤@­Ó¿ï³æ¥[¤J¿ï¶µ
+
++ "bin/admutil.so:a_artfile", PERM_ART | PERM_SYSOP, - M_SYSTEM,
++ "Art        ¡m ¬ü¤uºÞ²z ¡n",
+
+: admutil.c:a_artfile() ·s¼W³o¨ç¦¡©ó a_regmerge() «á­±
+
+  desc[] ¤Î path[] ªº¶¶§Ç¬O¹ïÀ³ªº¡A¥i¥H¦Û¤v´«¡A³Ì¦h 18 ­ÓÀÉ®×
+  ÀÉ®×¸ô®|¥i¥H¬O¥ô·N¡A³q±`¬O gem/@/@* ¤Î etc/*
+  ¦pªG 18 ­Ó¤£°÷¡A¨º»ò´N¦A¥[¤@­Ó a_artfile2()¡A¨Ã¥[¤J menu.c ªº¿ï¶µ
+
+int
+a_artfile()
+{
+  static char *desc[] =
+  {
+    "¶}ÀYµe­±(¢¯)",
+    "¶}ÀYµe­±(¢°)",
+    "¶}ÀYµe­±(¢±)",
+    "Åwªïµe­±",
+    "¦A¨£µe­±",
+    "¥Í¤é·í¤Ñªº¤W¯¸µe­±",
+    "¤å³¹µoªíºõ»â",
+    "¼Ö³zÅwªïµe­±",
+    NULL
+  };
+
+  static char *path[] =
+  {
+    "gem/@/@opening.0",
+    "gem/@/@opening.1",
+    "gem/@/@opening.2",
+    "gem/@/@welcome",
+    "gem/@/@goodbye",
+    "gem/@/@birthday",
+    "gem/@/@post",
+    "etc/game/lottery.main",
+  };
+
+  x_file(M_XFILES, desc, path);
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

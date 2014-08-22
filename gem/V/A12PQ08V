@@ -1,0 +1,64 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ½ð°£¶¢¸m¨Ï¥ÎªÌ
+µo«H¯¸: µL¦W¤p¯¸ (2007/01/04 Thu 01:52:42)                Updated: 2007/01/04
+
+½ð°£¶¢¸m±¾¯¸¹L¤[ªº¨Ï¥ÎªÌ
+
+: src/maple/ulist.c ·s¼W ulist_kick_idle()
+
+static int
+ulist_kick_idle(xo)
+  XO *xo;
+{
+  int pos, max;
+#ifdef DETAIL_IDLETIME
+  time_t now;
+#endif
+  pid_t pid;
+  UTMP *up;
+  char tmp[64], buf[64];
+
+  if (HAS_PERM(PERM_ALLADMIN) && vans("½ð°£¶¢¸m(Y/N)¡H[N] ") == 'y')
+  {
+    pos = 0;
+    max = xo->max;
+#ifdef DETAIL_IDLETIME
+    time(&now);
+#endif
+    do
+    {
+      up = ulist_pool[pos];
+#ifdef DETAIL_IDLETIME
+      if (now - up->idle_time >= 1800) /* ¶¢¸m1800¬í(¤T¤Q¤ÀÄÁ) */
+#else
+      if (up->idle_time >= 30)  /* ¶¢¸m1800¬í(¤T¤Q¤ÀÄÁ) */
+#endif
+      {
+        pid = up->pid;
+
+        if ((kill(pid, SIGTERM) == -1) && (errno = ESRCH))
+        {
+          utmp_free(up);
+        }
+        else
+        {
+          sprintf(buf, "%s (%s)", up->userid, up->username);
+          blog("KICK", buf);
+          sprintf(tmp, "½ð°£[%s]¨Ï¥ÎªÌ", up->userid);
+          vmsg(tmp);
+        }
+      }
+    } while (++pos < max);
+    return ulist_init(xo);
+  }
+  return XO_NONE;
+}
+
+
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H¤£[37m134-208-34-179.ndhu.edu.tw[30m®ü[m

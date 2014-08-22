@@ -1,0 +1,58 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] ³]©w¬ÝªO°O¿ý­ì¦]
+µo«H¯¸: µL¦W¤p¯¸ (2006/07/18 Tue 22:37:30)                Updated: 2006/07/18
+
+[32m:/src/maple/acct.c:brd_edit()  ³]©w¬ÝªO»Ý¼g¤U­ì¦][m
+
++  char reason[64], rbuf[128];
+
+..
+..
+
+  case 'd':
+
+    if (vget(9, 0, msg_sure_ny, src, 3, LCECHO) != 'y')
+    {
+      vmsg(MSG_DEL_CANCEL);
+    }
+    else
+    {
+      bname = bhdr->brdname;
+      if (*bname)  /* itoc.000512: ¦P®É¬å°£¦P¤@­Ó¬ÝªO·|³y¦¨ºëµØ°Ï¡B¬ÝªO¥þ·´ */
+      {
++       if (vget(b_lines, 0, "§R°£­ì¦]¡G", reason, 50, DOECHO))
++       {
++         sprintf(rbuf, "§R°£[%s]¬ÝªO ­ì¦]: %s", bname, reason);
++         alog("§R°£¬ÝªO", rbuf); /* §R°£¬ÝªO¬ö¿ý­ì¦] 060718 guessi */
++       }
+
+        gem_fpath(src, bname, NULL);
+        f_rm(src);
+        f_rm(src + 4);
+
+..
+..
+
+  case 'e':
+
+    move(9, 0);
+    outs("ª½±µ«ö [Return] ¤£­×§ï¸Ó¶µ³]©w");
+
++   if (vget(b_lines, 0, "³]©w­ì¦]¡G", reason, 50, DOECHO))
++   {
++     sprintf(rbuf, "²§°Ê[%s]¬ÝªO ­ì¦]: %s", bhdr->brdname, reason);
++     alog("¬ÝªO²§°Ê", rbuf); /* ²§°Ê¬ÝªO¬ö¿ý­ì¦] 060718 guessi */
++   }
+
+    if (!brd_set(&newbh, 11))
+
+..
+..
+
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H[37m134-208-1-231.ee.ndhu.edu.tw[30m®ü[m

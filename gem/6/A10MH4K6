@@ -1,0 +1,93 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (:MM:) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¦p¦ó¦bµo¤å®É¡A¨¾¤î¥Î½Æ»s¶K¤WÁÈ¿ú
+µo«H¯¸: XEON (Thu, 15 May 2003 21:02:49 +0800 (CST))      Updated: 2004/04/10
+
+¡° ¤Þ­z¡mqazq (¤@¥­®ü©¤½u)¡n¤§»Ê¨¥¡G
+> ¦³¨S¦³¤°»ò¤èªk¥i¥H¤@­Ó¦r¤@­Ó¦r§PÂ_©O¡H
+
+¡° ªk¤@ ¶§¬K«¬
+
+: post.c:do_post()
+
+    else
+    {
++     if (wordsnum > spendtime * 3)
++     {
+        mode = BMIN(wordsnum, spendtime) / 10;    /* ¨C¤Q¦r/¬í ¤@¤¸ */
+        prints("³o¬O±zªº²Ä %d ½g¤å³¹¡A±o %d »È¡C", ++cuser.numposts, mode);
+        cuser.money += mode;
++     }
++     else
++       prints("½Ð¤£­n¨Ï¥Î copy-paste ªº¤èªk¨ÓÄF½Z¶O");
+    }
+
+¡° ªk¤G ¼É¤O«¬
+
+  ³o¤èªk¹ï·sª`­µ¿é¤Jªk¨ººØ¥´«Ü¦h¦A¤@¦¸¿é¤Jªº
+  ¤]·|§PÂ_¬° copy-paste :p
+
+: edit.c:vedit()
+
++ int copypaste;    /* 1: ¥Î copy-paste ªº */
+
+int             /* -1:¨ú®ø½s¿è 0:§¹¦¨½s¿è */
+vedit(fpath, ve_op)
+  char *fpath;
+  int ve_op;
+{
+  textline *vln, *tmp;
+  int cc, col, mode, margin, pos;
++ time_t now, lastype;
++ int typing;
+
++ typing = 0;
++ copypaste = 0;
++ time(&lastype);
+
+  /* --------------------------------------------------- */
+  /* ªì©l³]©w¡G¸ü¤JÀÉ®×¡B¤Þ¥Î¤å³¹¡B³]©w½s¿è¼Ò¦¡          */
+  /* --------------------------------------------------- */
+
+  ...
+  ...
+
+    cc = vkey();
+
+    if (isprint2(cc))
+    {
++     if (!copypaste)         /* copy paste ÀË¬d */
++     {
++       typing++;
++       if (typing == 5)      /* ¤@¬í³Ì¦h¿é¤J 5 ­Ó¦r */
++       {
++         typing = 0;
++         time(&now);
++         if (now == lastype)
++           copypaste = 1;
++         lastype = now;
++       }
++     }
+
+      ve_char(cc);
+    }
+
+: post.c:do_post
+
+    else
+    {
++     extern int copypaste;
++     if (!copypaste)
++     {
+        mode = BMIN(wordsnum, spendtime) / 10;    /* ¨C¤Q¦r/¤À ¤@¤¸ */
+        prints("³o¬O±zªº²Ä %d ½g¤å³¹¡A±o %d »È¡C", ++cuser.numposts, mode);
+        cuser.money += mode;
+        /* itoc.010408: ¨Ì¤å³¹ªø«×/©Ò¶O®É¶¡¨Ó¨M©w­nµ¹¦h¤Ö¿ú */
+        /* itoc.µù¸Ñ: ¿ú­nÃøÁÈ¡A¹ô¨î¤~·|¦³·N¸q */
++     }
++     else
++       prints("½Ð¤£­n¨Ï¥Î copy-paste ªº¤èªk¨ÓÄF½Z¶O");
+    }
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mitoc.Dorm-GD2.NCTU.edu.tw                [m

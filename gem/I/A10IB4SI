@@ -1,0 +1,49 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý²Ö¿n¤W¯¸®É¼Æ
+µo«H¯¸: Àº¤Ñ±^ (Sat, 01 Nov 2003 00:39:02 +0800 (CST))    Updated: 2005/10/29
+
+  §ï¤F ACCT Äæ¦ì­n transacct
+
+: struct.h: struct ACCT
+
+  time_t firstlogin;            /* ²Ä¤@¦¸¤W¯¸®É¶¡ */
+  time_t lastlogin;             /* ¤W¤@¦¸¤W¯¸®É¶¡ */
+  time_t tcheck;                /* ¤W¦¸ check «H½c/¦n¤Í¦W³æªº®É¶¡ */
+  time_t tvalid;                /* ³q¹L»{ÃÒªº®É¶¡ */
++ time_t staytime;              /* ±¾¯¸Á`®É¶¡ */
+
+: bbsd.c:u_exit()
+
+  utmp_free();                  /* ÄÀ©ñ UTMP shm */
+
+- diff = (time(&cuser.lastlogin) - ap_start) / 60;
++ diff = time(&cuser.lastlogin) - ap_start;
++ cuser.staytime += diff;
++ diff /= 60;
+  sprintf(fpath, "Stay: %d (%d)", diff, currpid);
+  blog(mode, fpath);
+
+: bbsd.c:tn_main()
+
+  tn_signals(); /* Thor.980806: ©ñ©ó tn_login«e, ¥H«K call in¤£·|³Q½ð */
+  tn_login();
+
+  /* BioStar.051029: ²Ö¿n¤W¯¸®É¼ÆÀ³±qµn¤J«á¤~­pºâ¡A¦Ó¤£¬O±q³s½u«Ø¥ß®É­Ô´N
+     ¶}©l­pºâ¡AÁ×§K¨Ï¥ÎªÌ¥ý¥Î¨¾¶¢¸mªº BBS ³nÅé¶}±Ò¼Æ¤Q­Ó©|¥¼µn¤Jªº³s½u¡A
+     ¥Ñ©ó©|¥¼µn¤J©Ò¥H¤£¨ü¦P¤@ID¦P®É¤W½u­­¨î¡A¦ý¬O¨C¤@­Ó³s½uªº²Ö¿n¤W¯¸®É¼Æ
+     ´N¤w¸g¶}©l­pºâ¡AµM«á¹L¤F´X¤Ñ«á¦b³v¤@µn¤J»Pµn¥X¡A´N¦³¤j¶q²Ö¿n¤W¯¸®É¼Æ */
++ time(&ap_start);
+
+  board_main();
+
+: acct.c:acct_show()
+
+  usr_fpath(buf, uid, fn_dir);
+  prints("  \033[32m­Ó¤H«H¥ó¡G\033[37m%d «Ê\n", rec_num(buf, sizeof(HDR)));
+
++ diff = u->staytime / 60;
++ prints("  \033[32m±¾¯¸®É¼Æ¡G\033[37m%d ®É %d ¤À\n", diff / 60 , diff % 60);
+
+--
+ [1;41m¢z[44m¢q[m Or[1mig[30min[m: [41m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;33mBioStar [30m±q [35m163.23.212.18 [30mµoªí[m

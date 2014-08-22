@@ -1,0 +1,65 @@
+µo«H¤H: weiyu.bbs@weiyu.twbbs.org (Andy) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¤¤¤å±b¸¹
+µo«H¯¸: ¤ýªÌ¤§®a (2005/06/28 Tue 11:42:49)                Updated: 2005/06/28
+
+³o½g¥D­n¬O§â¤§«eªºpatch¾ã²z¤@¤U
+¨Ã§â¤w¸gµo²{ªº°ÝÃD°µ­Ó­×¥¿
+
+­º¥ý¥ý¤â°Ê«Ø¥ß ~/usr/¤¤¤å ³o­Ó¥Ø¿ý
+(ÁöµM³o¼Ë¹ï¤¤¤åªº·j´M®Ä²v¨Ã¤£¦n¡A¤£¹L¦pªG³o¼Ëªº±b¸¹¤£¬O«Ü¦hªº¸ÜÀ³¸ÓÁÙ¦n)
+
+% mkdir ~/usr/¤¤¤å
+
+: lib/f_path.c: usr_fpath()
+
+#if 0
+  str_lower(buf, user);         /* lower case */
+#endif
+  /* Thor.981027: ¨¾¤î buffer overflow, ÁöµM SunOS 4.1.x¤WµL¦¹±¡ªp, ¥H«á¦A·Q¦n
+ªº§ïªk */
+  str_ncpy(buf, user, sizeof(buf));
+- str_lower(buf, buf);
++ str_lowest(buf, buf);
+
++ if (buf[0] & 0x80)
++ {
++   strcpy(fpath, "¤¤¤å");
++   fpath += 4;
++ }
++ else
++ {
+    *fpath++ = *buf;
++ }
+  mak_fpath(fpath, buf, fname);
+}
+
+: maple/bbsd.c : is_badid()
+: util/mailpost.c: is_badid()
+
+- if (!is_alpha(*userid))
++ if (!((*userid) & 0x80) && !is_alpha(*userid))
+    return 1;
+
+  ...
+  ...
+
+-   if (!is_alnum(ch))
++   if (!((*userid) & 0x80) && !is_alnum(ch))
+      return 1;
+
+--
+  ¤£¹Lµ{¦¡¦³¨Ç¦a¤èÁÙ¬O¼g sprintf(fpath, "usr/%c/%s/xxxx", *userid, userid);
+  ¨º»ò´N·|¥X¿ù¡A­n§ï¬° usr_fpath(fpath, userid, "xxxx");
+
+--
+                        [1;31m¤]³\¡A¤H³£·|¥Ç¿ù[m
+                        [1;31m¦ý¬O¯u¥¿­È±oª`·Nªº¬O[m
+                        [1;31m¥Ç¿ù«áªí²{ªººA«×[m
+
+                        [32m¦pªG¦³¤ß¥h³B²z¦Û¤vªº¿ù»~[m
+                        [32m¤S¦ó¥²®`©È¥Ç¿ù©O¡H[m
+
+--
+[1;34m¢~¢w¢w¢w¢w¢¡ ùá [35mweiyu.csie.net [34mùá [30m¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸[m
+[1;34m¢x[31m¤ý[32mªÌ[33m¤§[34m®a¢x ùá[36m weiyu  [33m¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸[m
+[1;34m¢¢¢w¢w¢w¢w¢£ ùá [37mµoªí©ó [36mweiyu.weiyu.csie.net  [30m¡¸¡¸¡¸¡¸¡¸¡¸¡¸[m

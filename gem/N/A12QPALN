@@ -1,0 +1,45 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: Re: [Ω–∞›] PO§ÂID≈‹¶‚
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2007/01/15 Mon 22:07:35)                Updated: 2007/01/15
+
+°∞ §ﬁ≠z°mFormose (πÔ©p±°≤`§£≈‹~~)°n§ßª ®•°G
+> Ω–∞›¶≥øÏ™kπ≥µL¶W§pØ∏®∫ºÀ
+> •ŒØS©w™∫ID PO§ÂÆ…
+> ID∑|≈‹∂¿¶‚∂‹
+
+: post.c:hdr_outs()
+
+#ifdef CHECK_ONLINE
+  UTMP *online;
+#endif
++ int ansi = 0;
+
+  ...
+  ...
+
+  mark = hdr->owner;
++ if (!strcmp(mark, "bbsFAQ"))    [1;44m /* ID ¶€≠q */ [m
++ {
++   outs("\033[1;33m");
++   ansi = 1;
++ }
+  len = IDLEN + 1;
+
+  ...
+  ...
+
+-#ifdef CHECK_ONLINE
+- if (online)
+-   outs(str_ransi);
+-#endif
+
++#ifdef CHECK_ONLINE
++ if (ansi || online)
++#else
++ if (ansi)
++#endif
++   outs(str_ransi);
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m218-168-185-244.dynamic.hi[m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

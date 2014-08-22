@@ -1,0 +1,51 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¾ã¦æ¥ú´Î(1)¡Ðpal.c ¦n¤Í¦W³æ
+µo«H¯¸: ¤¤¿³¸ê¬ì (Mon, 14 Jul 2003 16:17:49 +0800 (CST))  Updated: 2005/08/08
+
+: pal.c:pal_item1()  ¥[¦b pal_item() «á­±
+
+#ifdef HAVE_LIGHTBAR
+static int
+pal_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:¤W¥ú´Î  0:¥h¥ú´Î */
+{
+  PAL *pal;
+#ifdef CHECK_ONLINE
+  UTMP *online;
+#else
+  int online = 0;
+#endif
+
+  pal = (PAL *) xo_pool + xo->pos - xo->top;
+
+#ifdef CHECK_ONLINE
+  online = utmp_get(pal->userno, NULL);
+#endif
+
+  prints("%s%6d%c%-3s%s%-14s%s%-54s%s",
+    mode ? "\033[44m" : "",         //³o¸Ì¬O¥ú´ÎªºÃC¦â¡A¥i¥H¦Û¤v§ï¡C
+    xo->pos + 1, tag_char(pal->userno),
+    pal->ftype & PAL_BAD ? "¢æ" : "",
+    online ? "\033[33m" : "",
+    pal->userid,
+    online ? "\033[31m" : "",
+    pal->ship,
+    mode ? "\033[m" : "");
+
+  return XO_NONE;
+}
+#endif
+
+
+: pal.c:pal_cb[]
+
+KeyFunc pal_cb[] =
+{
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, pal_item_bar,
+#endif
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-136-210.HINET-IP.hinet.net[m

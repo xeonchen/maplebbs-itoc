@@ -1,0 +1,118 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¯¸¤º: itoc
+¼ÐÃD: Re: ½Ð°Ýrpg«_ÀIªÌªº±Æ¦æº]À³¸Ó«ç»ò°µ©O???
+®É¶¡: 2004/10/27 Wed 10:42:33                           Updated: 2004/10/27
+
+¡° ¤Þ­z¡mcomfan (Ãø¹L  ¶Ë¤ß)¡n¤§»Ê¨¥¡G
+> ¨q¥X¯¸¤W¥þ³¡¦³°Ñ¥[RPGªº¨Ï¥ÎªÌªº¦Cªí¸ê°T
+> ¡i«_ÀIªÌ¤½·|¡j
+> ¨Ï¥ÎªÌ¥N¸¹   ÀY»Î       ¸gÅç­È  µ¥¯Å Åé¤O Å]ªk ¾Ô¤O ª÷¹ô
+> allure       «L«È       88956   9    100  100  100  0
+> leechan      ¿W©tªÌ     6767    6    100  100  100  0
+> ½Ð°Ý¤@¤U  ¨º­Óµ¥¯Å¦pªG·Q­n±Æ§Ç  ¥Ñµ¥¯Å¸û°ªªº©¹¤U±Æµ¥¯Å¸û§Cªº©ñ¦b¸û°ªªÌªº¤U¤è
+
+  ±o¥ý°µºëµØ°Ï³o½g
+  [¥\¯à] RPG ±Æ¦æº]
+
+  ¦b (A)nnounce ¸Ì­±·s¼W¸ê®Æ¡A¸ô®|¬° allrpg
+
+: toprpg.c
+
+#define OUTFILE_RPGMAXHP BBSHOME"/gem/@/@-rpgmaxhp"
+#define OUTFILE_RPGSTR   BBSHOME"/gem/@/@-rpgstr"
++ #define OUTFILE_ALLRPG BBSHOME"/gem/@/@allrpg"
+
+: topusr.c
+
++ typedef struct
++ {
++   char userid[IDLEN + 1];
++   char usertitle[12];
++   int level;
++   int maxhp;
++ }      DATA2;
+
+static DATA topmaxhp[TOPNUM];
+static DATA topstr[TOPNUM];
++ static DATA2 alluserrpg[20000];    [1;44m// °²³]¯¸¤W¤£¶W¹L 20000 ­Ó id [m
++ static int allusernum = 0;
+
+static int
+sort_compare(p1, p2)
+  const void *p1;
+  const void *p2;
+{
+  DATA *a1, *a2;
+
+  a1 = (DATA *) p1;
+  a2 = (DATA *) p2;
+
+  return (a2->num - a1->num);
+}
+
+
++ static int
++ sort2_compare(p1, p2)
++   const void *p1;
++   const void *p2;
++ {
++   DATA2 *a1, *a2;
++
++   a1 = (DATA2 *) p1;
++   a2 = (DATA2 *) p2;
++   return (a2->level - a1->level);
++ }
+
+
+: topusr.c:topusr()
+
+  sprintf(fpath, "%s/"FN_RPG, acct->userid);
+  if ((fd = open(fpath, O_RDONLY)) < 0)
+    return;
+  read(fd, &rpg, sizeof(RPG));
+  close(fd);
+
++ strcpy(alluserrpg[allusernum].userid, acct->userid);
++ strcpy(alluserrpg[allusernum].usertitle, rpg.usertitl);
++ alluserrpg[allusernum].level = rpg.level;
++ alluserrpg[allusernum].maxhp = rpg.maxhp;
++ allusernum++;
+
+: toprpg.c:main()
+
+  char c;
+  int year, month, day;
+  time_t now;
+  struct tm *ptime;
++ int i;
++ FILE *fpall;
+
+  ...
+  ...
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    ...
+    ...
+  }
+
++ qsort(alluserrpg, allusernum, sizeof(DATA2), sort2_compare);
++
++ if (fpall = fopen(OUTFILE_ALLRPG, "w"))
++ {
++   fprintf(fpall, "\033[1;44m¡i«_ÀIªÌ¤½·|¡j\033[m\n");
++   fprintf(fpall, "\033[30;47m%-13s%-11s%-5s%-5s \033[m\n",
++     "¨Ï¥ÎªÌ¥N¸¹", "ÀY»Î", "µ¥¯Å", "¦å");
++
++   for (i = 0; i < allusernum; i++)
++   {
++     fprintf(fpall, "%-13s%-11.11s%5d%5d\n",
++       alluserrpg[i].userid, alluserrpg[i].usertitle,
++       alluserrpg[i].level, alluserrpg[i].maxhp);
++   }
++
++   fclose(fpall);
++ }
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

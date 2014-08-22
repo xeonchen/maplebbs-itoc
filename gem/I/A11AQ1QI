@@ -1,0 +1,154 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (Åx¦Ï¥¤Âà°é°é) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¬ÝªO¤H®ð¡BÂsÄý®É¶¡¡BCP±Æ¦æ»P²Î­p~1
+µo«H¯¸: ¤ë¤U©]·Q (Sat, 16 Aug 2003 10:04:49 +0800 (CST))  Updated: 2005/06/13
+
+  ³o­Ó´»°²­Í§¹¦¨ªº¤j¤uµ{¡C
+
+
+  ¨s·¥ª©¥»ªº¬ÝªO¤H®ð¡BÂsÄý®É¶¡¡BCP±Æ¦æº]¡A¤À¨C¤é¡B¨C¶g¡B¨C¤ë¡B¦~«×¤@¦@¤Q¤G¶µ
+
+  ±Æ¦æ¡A¥B¦Û°ÊÃ¸»sºë¬üªºª½¤è¹Ï¡Ay¶b¨Ãªþ¤Wdegree(degree·|¦Û°Ê­pºâ)¡A¨C­ÓªO¦³¤Q
+
+  ¤G­Óª½¤è¹Ï¡A¨Ì·Ó¨C¤é(24Hr)¡B¥»¶g¨C¤é(¬P´Á¤@~¤é)¡A¥»¤ë¨C¤é(1~31¤é)¡B¥»¦~¨C¤ë
+
+  (1~12¤ë)¡A¥æ¤e·f°t¬ÝªO¤H®ð¡BÂsÄý®É¶¡¡BCP±Æ¦æº]²Î­p¡C
+
+  ¬Û«HÀ³¸Ó¤£·|¦³¥ô¦ó¨ä¥LBBSª©¥»µ{¦¡¦³³oµ¥ª±·N¡C
+
+  0. ¥ý°Ñ·ÓºëµØ°Ï³o½g­×§ï¡C
+     [¥\¯à] board.c ¬ÝªOÂsÄý®É¶¡
+
+  1. Âà´« .BRD ¤Î struct BRD¡A½Ð¦b¸Ì­±¶ë¤K­ÓÄæ¦ì
+
+  int daymantime;               /* ¨C¤ÑÂsÄý¤H¦¸ */
+  int weekmantime;              /* ¨C¶gÂsÄý¤H¦¸ */
+  int monthmantime;             /* ¨C¤ëÂsÄý¤H¦¸ */
+  long int yearmantime;         /* ¨C¦~ÂsÄý¤H¦¸ */
+
+  time_t daytime;               /* ¨C¤ÑÂsÄýªºÁ`®É¶¡ */
+  time_t weektime;              /* ¨C¶gÂsÄýªºÁ`®É¶¡ */
+  int monthtime;                /* ¨C¤ëÂsÄýªºÁ`®É¶¡(¤p®É©Î¤À) */
+  int yeartime;                 /* ¨C¦~ÂsÄýªºÁ`®É¶¡(¤p®É©Î¤À) */
+
+  ¤@¤f®ð¼É¼W¦n´X­Óbyte
+
+  2. BCACHE ¸Ì·s¼W¤G­ÓÄæ¦ì
+
+  time_t totalvisit[MAXBOARD];     /* ¦UªO±q¤W¦¸­«¶}¥H¨Ó²Ö­pÂsÄý®É¶¡ */
++ long int hr_mantime[MAXBOARD];
++ long int hr_time[MAXBOARD];
+
+  hr_mantime[MAXBOARD]¡Bhr_time[MAXBOARD]³o¨â­ÓªF¦è¡A­pºâ·í¤é²Ö¿n¤H¦¸©Ò¥Î¡A
+
+  hr_time[MAXBOARD]§ïªk:
+
+  bshm->totalvisit[bno] += time(0) - now;
++ bshm->hr_time[bno] += time(0) - now;  /* ¦h¸É³o¤@¦æ§Y¥i */
+
+  hr_mantime[MAXBOARD]§ïªk:
+
+  bshm->mantime[bno]++;
++ bshm->hr_mantime[bno]++; /* ¦h¸É³o¤@¦æ§Y¥i */
+
+  3. Announce¸Ì¥Î^p + d·s¼W¸ê®Æ¡AÀÉ¦W¦U¬°
+
+    -daymantime       ¬Q¤é¬ÝªO¤H®ð±Æ¦æ
+    -weekmantime      ¤W¶g¬ÝªO¤H®ð±Æ¦æ
+    -moonmantime      «e¤ë¬ÝªO¤H®ð±Æ¦æ
+    -yearmantime      ¦~«×¬ÝªO¤H®ð±Æ¦æ
+
+    -daytime          ¬Q¤é¬ÝªO¨Ï¥Î®É¶¡±Æ¦æ
+    -weektime         ¤W¶g¬ÝªO¨Ï¥Î®É¶¡±Æ¦æ
+    -moontime         «e¤ë¬ÝªO¨Ï¥Î®É¶¡±Æ¦æ
+    -yeartime         ¦~«×¬ÝªO®É¥Î®É¶¡±Æ¦æ
+
+    -dcp              ¬Q¤é¬ÝªO¨Ï¥ÎCP±Æ¦æ
+    -wcp              ¤W¶g¬ÝªO¨Ï¥ÎCP±Æ¦æ
+    -mcp              «e¤ë¬ÝªO¨Ï¥ÎCP±Æ¦æ
+    -ycp              ¦~«×¬ÝªO®É¥ÎCP±Æ¦æ
+
+  4. crontab -e¥[¤W
+
+    /* ¬ÝªO¤H®ð¡BÂsÄý®É¶¡±Æ¦æº] */
+
+    30 0 * * * bin/topbrd > /dev/null 2>&1
+    5 * * * * bin/brdcounter > /dev/null 2>&1
+
+  5. ­×§ïpost.c
+
+     §ïpost_cb[]
+
++    'l', post_count,
+
+     ·s¼Wpost_count()
+
+
+static int
+post_count(xo)
+  XO *xo;
+{
+  char *fname, fpath[64];
+  BRD *brd;
+
+  switch (vans("¡·¬ÝªO²Î­p¡G¥»¤é[1~3]¡B¥»¶g[4~6]¡B¥»¤ë[7~9]¡B¥»¦~[A~C]¡H"))
+  {
+  case '1':
+    fname = "hr_mantime";
+    break;
+
+  case '2':
+    fname = "hr_time";
+    break;
+
+  case '3':
+    fname = "hr_cp";
+    break;
+
+  case '4':
+    fname = "week_mantime";
+    break;
+
+  case '5':
+    fname = "week_time";
+    break;
+
+  case '6':
+    fname = "week_cp";
+    break;
+
+  case '7':
+    fname = "day_mantime";
+    break;
+
+  case '8':
+    fname = "day_time";
+    break;
+
+  case '9':
+    fname = "day_cp";
+    break;
+
+  case 'a':
+    fname = "mon_mantime";
+    break;
+
+  case 'b':
+    fname = "mon_time";
+    break;
+
+  case 'c':
+    fname = "mon_cp";
+    break;
+
+  default:
+    return XO_FOOT;
+  }
+
+  brd = bshm->bcache + currbno;
+  brd_fpath(fpath, brd->brdname, fname);
+  more(fpath, NULL);
+  return post_head(xo);
+}
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

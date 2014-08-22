@@ -1,0 +1,80 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¨Ï¿ï³æ³Ì«á¤@¦æ feeter ªº®É¶¡¤@ª½¦b¶]
+®É¶¡: Wed Jun 12 02:22:11 2002                          Updated: 2005/05/28
+
+¡° ¤Þ­z¡mtandrian.bbs@ntcb.twbbs.org.tw (¤Û°ìÅ]«°«á¯ª)¡n¤§»Ê¨¥¡G
+> §Ú·Q­nÅý¥ª¤U¨¤ªº®É¶¡¤@ª½¶]~~!!
+> ¤£ª¾¹D§Ú³oÂI¤l¥i¦æ¶Ü?
+
+: menu.c:status_foot()
+
+  int ufo;
+  time_t now;
++ struct tm *ptime;
++ struct timeval tv = {1, 0};
+
+  ...
+  ...
+
+  if (now > uptime)     /* ¹L¤F¤l©]­n§ó·s¥Í¤éºX¼Ð */
+  {
+-   struct tm *ptime;
+
+  ...
+  ...
+
+- ufo = (now - (uptime - 86400)) / 60;  /* ­É¥Î ufo ¨Ó°µ®É¶¡(¤À) */
+
+- sprintf(feeter, COLOR1 " %8.8s %02d:%02d " COLOR2
+-   " ¤H¼Æ %-4d §Ú¬O %-12s %s [©I¥s]%-9s  ",
+-   fshm->today, ufo / 60, ufo % 60,
+-   total_user, cuser.userid, coinmsg, flagmsg);
+- outf(feeter);
+
++ while (1)
++ {
++   now++;
++   ptime = localtime(&now);
++
++   [1;44m// ª©­±¥i¦Û¦æ½Õ¾ã [m
++   sprintf(feeter, COLOR1 " %8.8s %02d:%02d:%02d " COLOR2
++     " ¤H: %-4d §Ú¬O %-12s %s [©I]%-9s  ",
++     fshm->today, ptime->tm_hour, ptime->tm_min, ptime->tm_sec,
++     total_user, cuser.userid, coinmsg, flagmsg);
++
++   outz(feeter);
++   refresh();
++
++   ufo = 1;
++   if (select(1, (fd_set *) &ufo, NULL, NULL, &tv) > 0)
++     return vkey();
++ }
+}
+
+: menu.c:movie() ³Ì«á¤@¦æªº status_foot() ®³±¼
+
+  if ((bbsmode <= M_XMENU) && (cuser.ufo & UFO_MOVIE))
+    film_out(FILM_MOVIE, MENU_XNOTE);
+
+- status_foot();
+
+: menu.c:menu() ³Ì«á cmd = vkey(); ´«¦¨ cmd = status_foot();
+
+#else
+      move(MENU_XPOS + cc, MENU_YPOS + 1);
+#endif
+    }
+
+menu_key:
+
+-   cmd = vkey();
++   cmd = status_foot();
+  }
+}
+
+--
+  ¨ä¹ê®É¶¡ÀRºA¦n..°ÊºA¼Æ¬í¨ä¹ê¨S¤°»ò¥Î
+  ¦ý¬O­n¥I¥X¨C¬í§ó·s¤@¦¸ feeter ªº¥N»ù
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

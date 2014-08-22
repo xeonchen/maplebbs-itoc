@@ -1,0 +1,971 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (Åx¦Ï¥¤Âà°é°é) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¬ÝªO¤H®ð¡BÂsÄý®É¶¡¡BCP±Æ¦æ»P²Î­p~3
+µo«H¯¸: ¤ë¤U©]·Q (Sat, 16 Aug 2003 10:08:45 +0800 (CST))  Updated: 2005/05/19
+
+  util/¤U·s¼W³o°¦topbrd.c
+
+
+/*-------------------------------------------------------*/
+/* util/topbrd.c         (MapleBBS Ver 3.10 )            */
+/*-------------------------------------------------------*/
+/* target : ¬ÝªO¤H®ð¡BÂsÄý®É¶¡±Æ¦æ¡B¦U¬ÝªOªº²Î­p¹Ï       */
+/* create : 03/07/22                                     */
+/* modify : 03/08/16 (¬ÝªO²Î­p¹Ï)                        */
+/* author : amaki.bbs@luna.twbbs.org                     */
+/*-------------------------------------------------------*/
+
+#include  "bbs.h"
+
+#undef    ADJUST    /* amaki.030816: ²Ä¤@¦¸¨Ï¥Î³o¥\¯à®É­n¥´¶}Âk¹s¤G¶i¦ìÀÉ */
+#define   DEBUG     /* amaki.030816: DEBUG®É¥i¥HÁ×§KÂk¹s */
+
+static BCACHE *bshm;
+
+#define DAY_MANTIME     "gem/@/@-daymantime"
+#define WEEK_MANTIME    "gem/@/@-weekmantime"
+#define MONTH_MANTIME   "gem/@/@-moonmantime"
+#define YEAR_MANTIME    "gem/@/@-yearmantime"
+
+#define DAY_TIME         "gem/@/@-daytime"
+#define WEEK_TIME        "gem/@/@-weektime"
+#define MONTH_TIME       "gem/@/@-moontime"
+#define YEAR_TIME        "gem/@/@-yeartime"
+
+#define DAY_CP           "gem/@/@-dcp"
+#define WEEK_CP          "gem/@/@-wcp"
+#define MONTH_CP         "gem/@/@-mcp"
+#define YEAR_CP          "gem/@/@-ycp"
+
+typedef struct
+{
+  int d_mantime[31];
+  int w_mantime[7];
+  int m_mantime[12];
+  int hr_mantime[24];
+
+  long int d_time[31];
+  long int w_time[7];
+  long int m_time[12];
+  long int hr_time[24];
+
+  int d_cp[31];
+  int w_cp[7];
+  int m_cp[12];
+  int hr_cp[24];
+} DATA;
+
+
+typedef struct
+{
+  char bname[BNLEN + 1];
+  char btitle[BTLEN + 1];
+  long int num;
+} BDATA;
+
+
+typedef struct
+{
+  int year;
+  int yday;
+  int mon;
+  int mday;
+  int wday;
+} DATE;
+
+
+static BDATA *d_mantime, *w_mantime, *m_mantime, *y_mantime, *d_time, *w_time, *m_time, *y_time, *d_cp, *w_cp, *m_cp, *y_cp;
+
+static int d_data[31], w_data[7], m_data[12];
+
+
+/* quick sort function  */
+static void
+quick_sort_sub(left, right, data)
+  int left;
+  int right;
+  BDATA *data;
+{
+  int left_index = left;
+  int right_index = right;
+  long int pivot = (data + (left + right) / 2)->num;
+  long int temp;
+  char btemp[BNLEN + 1], btmp[BTLEN + 1];
+
+  while (left_index <= right_index)
+  {
+    for (; (data + left_index)->num < pivot; left_index++)
+      ;
+    for (; (data + right_index)->num > pivot; right_index--)
+      ;
+
+
+    if (left_index <= right_index)
+    {
+      temp = (data + left_index)->num;
+      strcpy(btemp, (data + left_index)->bname);
+      strcpy(btmp, (data + left_index)->btitle);
+      (data + left_index)->num = (data + right_index)->num;
+      strcpy((data + left_index)->bname, (data + right_index)->bname);
+      strcpy((data + left_index)->btitle, (data + right_index)->btitle);
+      (data + right_index)->num = temp;
+      strcpy((data + right_index)->bname, btemp);
+      strcpy((data + right_index)->btitle, btmp);
+
+      left_index++;
+      right_index--;
+    }
+  }
+
+  if (right_index > left)
+    quick_sort_sub(left, right_index, data);
+  if (left_index < right)
+    quick_sort_sub(left_index, right, data);
+}
+
+
+static void
+day_draw(brd, now, yester, fn_name, t_deg, key)
+  BRD *brd;
+  DATE *now, *yester;
+  char *fn_name, *t_deg;
+  int key;
+{
+  int max = 0, unit, deg, res, i = 0, j = 0;
+  FILE *fp;
+  HDR post;
+  char fpath[64], folder[64], buf[80];
+  char *block[11] =
+  {
+    "  ", "¡Ä", "¢b", "¢c", "¢d", "¢e", "¢f", "¢g", "¢h", "¢i", "¢i"
+  };
+
+  while (i < yester->mday + 1)
+  {
+    if (d_data[i] > max)
+      max = d_data[i];
+    i++;
+  }
+
+  brd_fpath(fpath, brd->brdname, fn_name);
+  fp = fopen(fpath, "w");
+
+  if (max > 17)
+    unit = (max % 18) ? (max / 18) + 1 : max / 18;
+  else
+    unit = 1;
+
+  if (key == 1)
+    fprintf(fp, "\033[1m%-12s\033[mªO%2d¤ë¨C¤é¤H¦¸²Î­p¹Ï(²Ö­p\033[1;33m%d\033[m¤H¦¸)\n", brd->brdname, yester->mon, brd->monthmantime);
+  else if (key == 2)
+    fprintf(fp, "\033[1m%-12s\033[mªO%2d¤ë¨C¤é¨Ï¥Î®É¶¡²Î­p¹Ï(²Ö­p\033[1;33m%d\033[m¤À)\n", brd->brdname, yester->mon, brd->monthmantime);
+  else if (key == 3)
+    fprintf(fp, "\033[1m%-12s\033[mªO%2d¤ë¨C¤éCP²Î­p¹Ï(¥Ø«e¥þ¤ë¥÷¥­§¡CP = \033[1;33m%d\033[m¤ÀÄÁ)\n", brd->brdname, yester->mon, (brd->monthmantime > 0) ? brd->monthtime / brd->monthmantime : 0);
+
+  i = 0;
+  for (j = 0; j < 19; j++)
+  {
+    deg = (unit != 1) ? (unit / 2) + unit * (18 - j) : unit + unit * (18 - j);
+    fprintf(fp, "\033[1;36m%8d\033[37m¢t\033[m", deg);
+
+    for (i = 0; i < yester->mday; i++)
+    {
+      if (d_data[i] > unit * (18 - j))
+      {
+        if (((d_data[i] - unit * (18 - j)) / unit) >= 1)
+          fprintf(fp, "\033[1;34m%2s\033[m", block[10]);
+        else
+        {
+          res = ((d_data[i] - unit * (18 - j)) * 10)/ unit;
+          fprintf(fp, "\033[1;34m%2s\033[m", block[res]);
+        }
+      }
+      else if ((d_data[i] > unit * (17 - j)) && (d_data[i] <= unit * (18 - j)))
+        fprintf(fp, "\033[1;33m%2d\033[m", d_data[i]);
+      else
+        fprintf(fp, "  ");
+    }
+
+    fprintf(fp, "\033[m\n");
+  }
+
+  fprintf(fp, "       \033[1;36m0\033[37m¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t\n");
+  fprintf(fp, "%-6s¤é´Á \033[1;32m1   3   5   7   9  11  13  15  17  19  21  23  25  27  29  31\033[m\n", t_deg);
+  fprintf(fp, "             \033[1;32m2   4   6   8  10  12  14  16  18  20  22  24  26  28  30\033[m");
+  fclose(fp);
+
+  /* amaki.030815: ½Æ»s¤@¥÷¨ìrec_boardªO¥h */
+  if (now->mday == 1)
+  {
+    brd_fpath(folder, "rec_board", FN_DIR);
+    hdr_stamp(folder, HDR_COPY, &post, fpath);
+    strcpy(post.owner, "sysop");
+
+    if (key == 1)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d¤ë¤H®ð²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, yester->mon);
+    else if (key == 2)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d¤ë¨Ï¥Î®É¶¡²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, yester->mon);
+    else if (key == 3)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d¤ëCP²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, yester->mon);
+
+    strcpy(post.title, buf);
+    if (brd->battr & BRD_NOSTAT)
+      post.xmode |= POST_RESTRICT;
+    rec_add(folder, &post, sizeof(post));
+  }
+}
+
+
+static void
+week_draw(brd, now, yester, old, fn_name, t_deg, key)
+  BRD *brd;
+  DATE *now, *yester, *old;
+  char *fn_name, *t_deg;
+  int key;
+{
+  int max = 0, unit, deg, res, wday, i = 0, j = 0;
+  FILE *fp;
+  HDR post;
+  char fpath[64], folder[64], buf[80];
+  char *block[11] =
+  {
+    "  ", "¡Ä", "¢b", "¢c", "¢d", "¢e", "¢f", "¢g", "¢h", "¢i", "¢i"
+  };
+
+  wday = (yester->wday != 0) ? yester->wday : 7;
+
+  for (i = 0; i < wday; i++)
+  {
+    if (w_data[i] > max)
+      max = w_data[i];
+  }
+
+  brd_fpath(fpath, brd->brdname, fn_name);
+  fp = fopen(fpath, "w");
+
+  if (max > 18)
+    unit = (max % 19) ? (max / 19) + 1 : max / 19;
+  else
+    unit = 1;
+
+  if (key == 1)
+    fprintf(fp, "\033[1m%-12s\033[mªO¥»¶g¨C¤é¤H¦¸²Î­p¹Ï(²Ö­p\033[1;33m%d\033[m¤H¦¸)\n", brd->brdname, brd->weekmantime);
+  else if (key == 2)
+    fprintf(fp, "\033[1m%-12s\033[mªO¥»¶g¨C¤é¨Ï¥Î®É¶¡²Î­p¹Ï(²Ö­p\033[1;33m%d\033[m¬í)\n", brd->brdname, brd->weektime);
+  else if (key == 3)
+    fprintf(fp, "\033[1m%-12s\033[mªO¥»¶g¨C¤éCP²Î­p¹Ï(¥Ø«e¥þ¶g¥­§¡CP = \033[1;33m%d\033[m¬í)\n", brd->brdname, (brd->weekmantime > 0) ? brd->weektime / brd->weekmantime : 0);
+
+  for (j = 0; j < 20; j++)
+  {
+    deg = (unit != 1) ? (unit / 2) + unit * (19 - j) : unit + unit * (19 - j);
+    fprintf(fp, "\033[1;36m%8d\033[37m¢t\033[m", deg);
+
+    for (i = 0; i < wday; i++)
+    {
+      if (w_data[i] > unit * (19 - j))
+      {
+        if (((w_data[i] - unit * (19 - j)) / unit) >= 1)
+          fprintf(fp, "\033[1;34m%7s\033[m", block[10]);
+        else
+        {
+          res = ((w_data[i] - unit * (19 - j)) * 10)/ unit;
+          fprintf(fp, "\033[1;34m%7s\033[m", block[res]);
+        }
+      }
+      else if ((w_data[i] > unit * (18 - j)) && (w_data[i] <= unit * (19 - j)))
+        fprintf(fp, "\033[1;33m%7d\033[m", w_data[i]);
+      else
+        fprintf(fp, "       ");
+    }
+
+    fprintf(fp, "\n");
+  }
+
+  fprintf(fp, "       \033[1;36m0\033[37m¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t\n");
+  fprintf(fp, "%-6s  ¬P´Á  \033[1;32m ¤@     ¤G     ¤T     ¥|     ¤­     ¤»     ¤é\033[m\n",  t_deg);
+  fclose(fp);
+
+  if (now->wday == 1)
+  {
+    brd_fpath(folder, "rec_board", FN_DIR);
+    hdr_stamp(folder, HDR_COPY, &post, fpath);
+    strcpy(post.owner, "sysop");
+
+    if (key == 1)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d/%d~%d%d¤H®ð²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, old->mon, old->mday, yester->mon, yester->mday);
+    else if (key == 2)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d/%d~%d%d¨Ï¥Î®É¶¡²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, old->mon, old->mday, yester->mon, yester->mday);
+    else if (key == 3)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d/%d~%d%d CP²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, old->mon, old->mday, yester->mon, yester->mday);
+
+    strcpy(post.title, buf);
+    if (brd->battr & BRD_NOSTAT)
+      post.xmode |= POST_RESTRICT;
+    rec_add(folder, &post, sizeof(post));
+  }
+}
+
+
+static void
+mon_draw(brd, now, yester, fn_name, t_deg, key)
+  BRD *brd;
+  DATE *now, *yester;
+  char *fn_name, *t_deg;
+  int key;
+{
+  int max = 0, unit, deg, res, i = 0, j = 0;
+  FILE *fp;
+  HDR post;
+  char fpath[64], folder[64], buf[80];
+  char *block[11] =
+  {
+    "  ", "¡Ä", "¢b", "¢c", "¢d", "¢e", "¢f", "¢g", "¢h", "¢i", "¢i"
+  };
+
+  for (i = 0; i < yester->mon; i++)
+  {
+    if (m_data[i] > max)
+      max = m_data[i];
+  }
+
+  brd_fpath(fpath, brd->brdname, fn_name);
+  fp = fopen(fpath, "w");
+
+  if (max > 18)
+    unit = (max % 19) ? (max / 19) + 1 : max / 19;
+  else
+    unit = 1;
+
+  if (key == 1)
+    fprintf(fp, "\033[1m%-12s\033[mªO¥»¦~¨C¤ë¤H¦¸²Î­p¹Ï(²Ö­p\033[1;33m%d\033[m¤H¦¸)\n", brd->brdname, brd->yearmantime);
+  else if (key == 2)
+    fprintf(fp, "\033[1m%-12s\033[mªO¥»¦~¨C¤ë¨Ï¥Î®É¶¡²Î­p¹Ï(²Ö­p\033[1;33m%d\033[m¤ÀÄÁ)\n", brd->brdname, brd->yeartime);
+  else if (key == 3)
+    fprintf(fp, "\033[1m%-12s\033[mªO¥»¦~¨C¤ë¤H¦¸²Î­p¹Ï(¥Ø«e¥þ¦~¥­§¡CP = \033[1;33m%d\033[m¤ÀÄÁ)\n", brd->brdname, (brd->yearmantime > 0) ? brd->yeartime / brd->yearmantime : 0);
+
+  for (j = 0; j < 20; j++)
+  {
+    deg = (unit != 1) ? (unit / 2) + unit * (19 - j) : unit + unit * (19 - j);
+    fprintf(fp, "\033[1;36m%7d\033[37m¢t\033[m", deg);
+
+    for (i = 0; i < yester->mon; i++)
+    {
+      if (m_data[i] > unit * (19 - j))
+      {
+        if (((m_data[i] - unit * (19 - j)) / unit) >= 1)
+          fprintf(fp, "\033[1;34m%5s\033[m", block[10]);
+        else
+        {
+          res = ((m_data[i] - unit * (19 - j)) * 10)/ unit;
+          fprintf(fp, "\033[1;34m%5s\033[m", block[res]);
+        }
+      }
+      else if ((m_data[i] > unit * (18 - j)) && (m_data[i] <= unit * (19 - j)))
+        fprintf(fp, "\033[1;33m%5d\033[m", m_data[i]);
+      else
+        fprintf(fp, "     ");
+    }
+
+    fprintf(fp, "\n");
+  }
+
+  fprintf(fp, "      \033[1;36m0\033[37m¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t\n");
+  fprintf(fp, "%-6s ¤ë¥÷  \033[1;32m1    2    3    4    5    6    7    8    9    10    11    12\033[m\n", t_deg);
+  fclose(fp);
+
+  /* amaki.030815: ½Æ»s¤@¥÷¨ìrec_boardªO¥h */
+  if (now->yday == 1)
+  {
+    brd_fpath(folder, "rec_board", FN_DIR);
+    hdr_stamp(folder, HDR_COPY, &post, fpath);
+    strcpy(post.owner, "sysop");
+
+    if (key == 1)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d¦~¤H®ð²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, yester->year);
+    else if (key == 2)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d¦~¨Ï¥Î®É¶¡²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, yester->year);
+    else if (key == 3)
+      sprintf(buf, "[%d ¤ë %d ¤é] %-12sªO%d¦~CP²Î­p", yester->mon, yester->mday, (brd->battr & BRD_NOSTAT) ? "¡³¡³¡³¡³" : brd->brdname, yester->year);
+
+    strcpy(post.title, buf);
+    if (brd->battr & BRD_NOSTAT)
+      post.xmode |= POST_RESTRICT;
+    rec_add(folder, &post, sizeof(post));
+  }
+}
+
+
+static void
+data_draw(data, brd, now, yester, old)
+  DATA *data;
+  BRD *brd;
+  DATE *now, *yester, *old;
+{
+  int wday, max, i = 0;
+
+  /*----------------------*/
+  /*  ³B²z¨C¤Ñ²Î­p¹Ï      */
+  /*----------------------*/
+
+  for (i = 0; i < yester->mday; i++)
+  {
+    d_data[i] = data->d_mantime[i];
+  }
+  day_draw(brd, now, yester, "day_mantime", "(¤H¦¸)", 1);
+
+  max = 0;
+  for (i = 0; i < yester->mday; i++)
+  {
+    if (data->d_time[i] > max)
+      max = data->d_time[i];
+  }
+
+  if (max > 5999)
+  {
+    for (i = 0; i < yester->mday; i++)
+    {
+      d_data[i] = data->d_time[i] / 3600;
+    }
+    day_draw(brd, now, yester, "day_time", "(¤p®É)", 2);
+  }
+  else if (max > 99)
+  {
+    for (i = 0; i < yester->mday; i++)
+    {
+      d_data[i] = data->d_time[i] / 60;
+    }
+    day_draw(brd, now, yester, "day_time", "(¤À)", 2);
+  }
+  else
+  {
+    for (i = 0; i < yester->mday; i++)
+    {
+      d_data[i] = data->d_time[i] / 60;
+    }
+    day_draw(brd, now, yester, "day_time", "(¬í)", 2);
+  }
+
+  max = 0;
+  for (i = 0; i < yester->mday; i++)
+  {
+    if (data->d_cp[i] > max)
+      max = data->d_cp[i];
+  }
+
+  if (max > 5999)
+  {
+    for (i = 0; i < yester->mday; i++)
+    {
+      d_data[i] = data->d_cp[i];
+    }
+    day_draw(brd, now, yester, "day_cp", "(¤p®É)", 3);
+  }
+  else if (max > 99)
+  {
+    for (i = 0; i < yester->mday; i++)
+    {
+      d_data[i] = data->d_cp[i] / 60;
+    }
+    day_draw(brd, now, yester, "day_cp", "(¤À)", 3);
+  }
+  else
+  {
+    for (i = 0; i < yester->mday; i++)
+    {
+      d_data[i] = data->d_cp[i];
+    }
+    day_draw(brd, now, yester, "day_cp", "(¬í)", 3);
+  }
+
+  /*--------------------------*/
+  /*  ³B²z¥»¶g¤H¦¸²Î­p¹Ï      */
+  /*--------------------------*/
+
+  wday = (yester->wday != 0) ? yester->wday : 7;
+
+  for (i = 0; i < wday; i++)
+  {
+    w_data[i] = data->w_mantime[i];
+  }
+  week_draw(brd, now, yester, old, "week_mantime", "(¤H¦¸)", 1);
+
+  for (i = 0; i < wday; i++)
+  {
+    w_data[i] = data->w_time[i];
+  }
+  week_draw(brd, now, yester, old, "week_time", "(¬í)", 2);
+
+  for (i = 0; i < wday; i++)
+  {
+    w_data[i] = data->w_cp[i];
+  }
+  week_draw(brd, now, yester, old, "week_cp", "(¬í)", 3);
+
+  /*--------------------------*/
+  /*  ³B²z¥»¦~¨C¤ë²Î­p¹Ï      */
+  /*--------------------------*/
+
+  if (now->mday == 1)
+  {
+    for (i = 0; i < yester->mon; i++)
+    {
+      m_data[i] = data->m_mantime[i];
+    }
+    mon_draw(brd, now, yester, "mon_mantime", "(¤H¦¸)", 1);
+
+    for (i = 0; i < yester->mon; i++)
+    {
+      m_data[i] = data->m_time[i];
+    }
+    mon_draw(brd, now, yester, "mon_time", "(¤À)", 2);
+
+    for (i = 0; i < yester->mon; i++)
+    {
+      m_data[i] = data->m_cp[i];
+    }
+    mon_draw(brd, now, yester, "mon_cp", "(¤À)", 3);
+  }
+}
+
+
+static void
+data_feed(brd, now, yester, old)
+  BRD *brd;
+  DATE *now, *yester, *old;
+{
+  DATA data;
+  int fd, wday, i;
+  char fpath[80];
+
+  brd_fpath(fpath, brd->brdname, "bdata");
+  fd = open(fpath, O_RDWR | O_CREAT, 0600);
+  lseek(fd, (off_t) (sizeof(DATA) * 0), SEEK_SET);
+  read(fd, &data, sizeof(DATA));
+
+#ifdef ADJUST
+  for (i = 0; i < 7; i++)
+  {
+    data.w_mantime[i] = 0;
+    data.w_time[i] = 0;
+    data.w_cp[i] = 0;
+  }
+
+  for (i = 0; i < 31; i++)
+  {
+    data.d_mantime[i] = 0;
+    data.d_time[i] = 0;
+    data.d_cp[i] = 0;
+  }
+
+  for (i = 0; i < 12; i++)
+  {
+    data.m_mantime[i] = 0;
+    data.m_time[i] = 0;
+    data.m_cp[i] = 0;
+  }
+
+  for (i = 0; i < 24; i++)
+  {
+    data.hr_mantime[i] = 0;
+    data.hr_time[i] = 0;
+    data.hr_cp[i] = 0;
+  }
+#endif
+
+  wday = (yester->wday != 0) ? yester->wday - 1 : 6;
+
+  data.d_mantime[yester->mday - 1] = brd->daymantime;
+  data.w_mantime[wday] = brd->daymantime;
+  data.m_mantime[yester->mon - 1] = brd->monthmantime;
+
+  data.d_time[yester->mday - 1] = brd->daytime;
+  data.w_time[wday] = brd->daytime;
+  data.m_time[yester->mon - 1] = brd->monthtime;
+
+  data.d_cp[yester->mday - 1] = (brd->daymantime > 0) ? brd->daytime / brd->daymantime : 0;
+  data.w_cp[wday] = (brd->daymantime > 0) ? brd->daytime / brd->daymantime : 0;
+  data.m_cp[yester->mon - 1] = (brd->monthmantime > 0) ? brd->monthtime / brd->monthmantime : 0;
+
+  data_draw(&data, brd, now, yester, old);
+
+  if (now->wday == 1)
+  {
+    i = 0;
+    do
+    {
+      data.w_mantime[i] = 0;
+      data.w_time[i] = 0;
+      data.w_cp[i] = 0;
+    } while (i++ < 7);
+  }
+
+  if (now->mday == 1)
+  {
+    i = 0;
+    do
+    {
+      data.d_mantime[i] = 0;
+      data.d_time[i] = 0;
+      data.d_cp[i] = 0;
+    } while (i++ < 31);
+  }
+
+  if (now->yday == 1)
+  {
+    i = 0;
+    do
+    {
+      data.m_mantime[i] = 0;
+      data.m_time[i] = 0;
+      data.m_cp[i] = 0;
+    } while (i++ < 12);
+  }
+
+  lseek(fd, (off_t) (sizeof(DATA) * 0), SEEK_SET);
+  write(fd, &data, sizeof(DATA));
+  close(fd);
+}
+
+
+static void
+y_feed(newbrd, bptr, y_mantime, y_time, i, key)
+  BRD *newbrd, *bptr;
+  BDATA *y_mantime, *y_time;
+  int i, key;
+{
+  if (key == 0)
+  {
+    newbrd->yearmantime = 0;
+    newbrd->yeartime = 0;
+  }
+
+  if (!(bptr->battr & BRD_NOSTAT))
+  {
+    (y_mantime + i)->num = bptr->yearmantime;
+    strcpy((y_mantime + i)->bname, bptr->brdname);
+    strcpy((y_mantime + i)->btitle, bptr->title);
+
+    (y_time + i)->num = bptr->yeartime;
+    strcpy((y_time + i)->bname, bptr->brdname);
+    strcpy((y_time + i)->btitle, bptr->title);
+
+    (y_cp + i)->num = (bptr->yearmantime > 0) ? bptr->yeartime / bptr->yearmantime : 0;
+    strcpy((y_cp + i)->bname, bptr->brdname);
+    strcpy((y_cp + i)->btitle, bptr->title);
+  }
+}
+
+
+static void
+m_feed(newbrd, bptr, m_mantime, m_time, i)
+  BRD *newbrd, *bptr;
+  BDATA *m_mantime, *m_time;
+  int i;
+{
+  newbrd->monthmantime = 0;
+  newbrd->monthtime = 0;
+
+  if (!(bptr->battr & BRD_NOSTAT))
+  {
+    (m_mantime + i)->num = bptr->monthmantime;
+    strcpy((m_mantime + i)->bname, bptr->brdname);
+    strcpy((m_mantime + i)->btitle, bptr->title);
+
+    (m_time + i)->num = bptr->monthtime;
+    strcpy((m_time + i)->bname, bptr->brdname);
+    strcpy((m_time + i)->btitle, bptr->title);
+
+    (m_cp + i)->num = (bptr->monthmantime > 0) ? bptr->monthtime / bptr->monthmantime : 0;
+    strcpy((m_cp + i)->bname, bptr->brdname);
+    strcpy((m_cp + i)->btitle, bptr->title);
+  }
+}
+
+
+static void
+w_feed(newbrd, bptr, w_mantime, w_time, i)
+  BRD *newbrd, *bptr;
+  BDATA *w_mantime, *w_time;
+  int i;
+{
+  newbrd->weekmantime = 0;
+  newbrd->weektime = 0;
+
+  if (!(bptr->battr & BRD_NOSTAT))
+  {
+    (w_mantime + i)->num = bptr->weekmantime;
+    strcpy((w_mantime + i)->bname, bptr->brdname);
+    strcpy((w_mantime + i)->btitle, bptr->title);
+
+    (w_time + i)->num = bptr->weektime;
+    strcpy((w_time + i)->bname, bptr->brdname);
+    strcpy((w_time + i)->btitle, bptr->title);
+
+    (w_cp + i)->num = (bptr->weekmantime > 0) ? bptr->weektime / bptr->weekmantime : 0;
+    strcpy((w_cp + i)->bname, bptr->brdname);
+    strcpy((w_cp + i)->btitle, bptr->title);
+  }
+}
+
+
+static void
+d_feed(newbrd, d_mantime, d_time, i)
+  BRD *newbrd;
+  BDATA *d_mantime, *d_time;
+  int i;
+{
+  if (!(newbrd->battr & BRD_NOSTAT))
+  {
+    (d_mantime + i)->num = bshm->mantime[i];
+    strcpy((d_mantime + i)->bname, newbrd->brdname);
+    strcpy((d_mantime + i)->btitle, newbrd->title);
+
+    (d_time + i)->num = bshm->totalvisit[i];
+    strcpy((d_time + i)->bname, newbrd->brdname);
+    strcpy((d_time + i)->btitle, newbrd->title);
+
+    (d_cp + i)->num = (bshm->mantime[i] > 0) ? bshm->totalvisit[i] / bshm->mantime[i] : 0;
+    strcpy((d_cp + i)->bname, newbrd->brdname);
+    strcpy((d_cp + i)->btitle, newbrd->title);
+  }
+
+#ifdef DEBUG
+  newbrd->daymantime = bshm->mantime[i];
+  newbrd->weekmantime += bshm->mantime[i];
+  newbrd->monthmantime += bshm->mantime[i];
+  newbrd->yearmantime += bshm->mantime[i];
+  bshm->mantime[i] = 0;
+
+  newbrd->daytime = bshm->totalvisit[i];
+  newbrd->weektime += bshm->totalvisit[i];
+  newbrd->monthtime += (bshm->totalvisit[i] / 60);
+  newbrd->yeartime += (bshm->totalvisit[i] / 60);
+  bshm->totalvisit[i] = 0;
+#endif
+}
+
+
+static int
+record(fpath, msg, unit, data, mon, mday, key)
+  char *fpath, *msg, *unit;
+  BDATA *data;
+  int mon, mday, key;
+{
+  int i = 0, j = 1;
+  char folder[64], buf[80];
+  HDR post;
+  FILE *fp;
+
+  i = bshm->number - 1;
+
+  if (!(fp = fopen(fpath, "w")))
+    return -1;
+
+  fprintf(fp, "\033[1;3%d;47m%*s%*s", key, 41 + strlen(msg) / 2, msg, 41 - strlen(msg) / 2, "\033[m\n");
+  fprintf(fp, "\033[1;37;4%dm¡i±Æ  ¦W¡j  ¡i¬Ý    ªO¡j    ¡iª©                      ¦W¡j  %-18s\033[m\n", key, unit);
+
+  while(i >= 0)
+  {
+    if (*(data + i)->bname == '\0')
+    {
+      i--;
+      continue;
+    }
+    if (j <= 5)
+    {
+      char dbuf[8];
+
+      sprintf(dbuf, "%d.", j);
+      fprintf(fp, "  \033[1;37m%-11s%-16s%-33s%-16d\033[m\n", dbuf, (data + i)->bname, (data + i)->btitle, (data + i)->num);
+    }
+    else if (j <= 10)
+    {
+      char dbuf[8];
+
+      sprintf(dbuf, "%d.", j);
+      fprintf(fp, "  \033[1;33m%-11s%-16s%-33s%-16d\033[m\n", dbuf, (data + i)->bname, (data + i)->btitle, (data + i)->num);
+    }
+    else
+    {
+      char dbuf[8];
+
+      sprintf(dbuf, "%d.", j);
+      fprintf(fp, "  %-11s%-16s%-33s%-16d\n", dbuf, (data + i)->bname, (data + i)->btitle, (data + i)->num);
+    }
+
+    if ((data + i)->num != (data + i - 1)->num)
+      j++;
+    else
+      ;
+
+    i--;
+  }
+  fclose(fp);
+
+  /* amaki.030729: ½Æ»s¤@¥÷¨ìrecordªO¥h */
+  brd_fpath(folder, BN_RECORD, FN_DIR);
+  hdr_stamp(folder, HDR_COPY, &post, fpath);
+  strcpy(post.owner, "sysop");
+  sprintf(buf, "[%d ¤ë %d ¤é] %s", mon, mday, msg);
+  strcpy(post.title, buf);
+  rec_add(folder, &post, sizeof(post));
+}
+
+
+int
+main()
+{
+  int fd, i;
+  BRD newbrd, bptr;
+  DATE now, yester, old;
+  time_t time_now;
+  struct tm *t;
+  char MSG[64];
+
+  chdir(BBSHOME);
+
+  time(&time_now);
+  t = localtime(&time_now);
+  now.year = t->tm_year;
+  now.yday = t->tm_yday;
+  now.mon = t->tm_mon + 1;
+  now.mday = t->tm_mday;
+  now.wday = t->tm_wday;
+
+  /* amaki.030729: §â®É¶¡©¹¦^¼·¨ì«e¤@¤Ñ¡A¤è«K¨Ï¥Î */
+  time(&time_now);
+  time_now -= 10000;
+  t = localtime(&time_now);
+  yester.year = t->tm_year;
+  yester.yday = t->tm_yday;
+  yester.mon = t->tm_mon + 1;
+  yester.mday = t->tm_mday;
+  yester.wday = t->tm_wday;
+
+
+  /* amaki.030729: §â®É¶¡©¹¦^¼·¤@­Ó¬P´Á¡A¤è«K¨Ï¥Î */
+  time(&time_now);
+  time_now -= 604800;
+  t = localtime(&time_now);
+  old.mon = t->tm_mon + 1;
+  old.mday = t->tm_mday;
+
+  bshm = shm_new(BRDSHM_KEY, sizeof(BCACHE));
+
+  /* amaki.030721: ¬°¤FÅý¨º°¦ºtºâªkªºsort§ó¦³®Ä²v©Ò³]­p:p */
+
+  d_mantime = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+  d_time = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+  d_cp = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+
+  /* amaki.030721: ¤£·Q®ö¶OªÅ¶¡ */
+  if (now.wday == 1)
+  {
+    w_mantime = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+    w_time = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+    w_cp = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+  }
+
+  if (now.mday == 1)
+  {
+    m_mantime = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+    m_time = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+    m_cp = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+    y_mantime = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+    y_time = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+    y_cp = (BDATA *) malloc(bshm->number * sizeof(BDATA));
+  }
+
+  i = 0;
+  fd = open(FN_BRD, O_RDWR | O_CREAT, 0600);
+  while (i < bshm->number)
+  {
+    lseek(fd, (off_t) (sizeof(BRD) * i), SEEK_SET);
+    read(fd, &newbrd, sizeof(BRD));
+
+    d_feed(&newbrd, d_mantime, d_time, i);
+
+    memcpy(&bptr, &newbrd, sizeof(BRD));
+
+    /* amaki.030730: ¶}±Ò¬ÝªO¥Ø¿ý¤Uªºbdata */
+    data_feed(&bptr, &now, &yester, &old);
+
+    if (now.wday == 1)
+      w_feed(&newbrd, &bptr, w_mantime, w_time, i);
+    if (now.mday == 1)
+    {
+      m_feed(&newbrd, &bptr, m_mantime, m_time, i);
+      y_feed(&newbrd, &bptr, y_mantime, y_time, i, now.yday);
+    }
+
+    memcpy(bshm->bcache + i, &newbrd, sizeof(BRD));
+    lseek(fd, (off_t) (sizeof(BRD) * i), SEEK_SET);
+    write(fd, &newbrd, sizeof(BRD));
+    i++;
+  }
+  close(fd);
+
+  quick_sort_sub(0, bshm->number - 1, d_mantime);
+  quick_sort_sub(0, bshm->number - 1, d_time);
+  quick_sort_sub(0, bshm->number - 1, d_cp);
+  sprintf(MSG, "%d¤ë%d¤é¬ÝªOÂsÄý¤H®ð±Æ¦æ", yester.mon, yester.mday);
+  record(DAY_MANTIME, MSG, "¡i¤H    ¦¸¡j", d_mantime, yester.mon, yester.mday, 4);
+  sprintf(MSG, "%d¤ë%d¤é¬ÝªO¨Ï¥Î®É¶¡±Æ¦æ", yester.mon, yester.mday);
+  record(DAY_TIME, MSG, "¡i®É¶¡(¬í)¡j", d_time, yester.mon, yester.mday, 4);
+  sprintf(MSG, "%d¤ë%d¤é¬ÝªO¥­§¡¨Ï¥ÎCP±Æ¦æ", yester.mon, yester.mday);
+  record(DAY_CP, MSG, "¡i®É¶¡(¬í)/¤H¦¸¡j", d_cp, yester.mon, yester.mday, 4);
+  free(d_mantime);
+  free(d_time);
+  free(d_cp);
+
+  if (now.wday == 1)
+  {
+    quick_sort_sub(0, bshm->number - 1, w_mantime);
+    quick_sort_sub(0, bshm->number - 1, w_time);
+    quick_sort_sub(0, bshm->number - 1, w_cp);
+    sprintf(MSG, "¤W¶g¬ÝªOÂsÄý¤H®ð±Æ¦æ[%d/%d ¡ã %d/%d]", old.mon, old.mday, yester.mon, yester.mday);
+    record(WEEK_MANTIME, MSG, "¡i¤H    ¦¸¡j", w_mantime, yester.mon, yester.mday, 3);
+    sprintf(MSG, "¤W¶g¬ÝªO¨Ï¥Î®É¶¡±Æ¦æ[%d/%d ¡ã %d/%d]", old.mon, old.mday, yester.mon, yester.mday);
+    record(WEEK_TIME, MSG, "¡i®É¶¡(¬í)¡j", w_time, yester.mon, yester.mday, 3);
+    sprintf(MSG, "¤W¶g¬ÝªO¨Ï¥ÎCP±Æ¦æ[%d/%d ¡ã %d/%d]", old.mon, old.mday, yester.mon, yester.mday);
+    record(WEEK_CP, MSG, "¡i®É¶¡(¬í)/¤H¦¸¡j", w_cp, yester.mon, yester.mday, 3);
+    free(w_mantime);
+    free(w_time);
+    free(w_cp);
+  }
+
+  if (now.mday == 1)
+  {
+    quick_sort_sub(0, bshm->number - 1, m_mantime);
+    quick_sort_sub(0, bshm->number - 1, m_time);
+    quick_sort_sub(0, bshm->number - 1, m_cp);
+
+    sprintf(MSG, "%d¤ë¥÷¬ÝªOÂsÄý¤H®ð±Æ¦æ", yester.mon);
+    record(MONTH_MANTIME, MSG, "¡i¤H    ¦¸¡j", m_mantime, yester.mon, yester.mday, 2);
+    sprintf(MSG, "%d¤ë¥÷¬ÝªO¨Ï¥Î®É¶¡±Æ¦æ", yester.mon);
+    record(MONTH_TIME, MSG, "¡i®É¶¡(¤À)¡j",m_time, yester.mon, yester.mday, 2);
+    sprintf(MSG, "%d¤ë¥÷¬ÝªO¥­§¡¨Ï¥ÎCP±Æ¦æ", yester.mon);
+    record(MONTH_CP, MSG, "¡i®É¶¡(¤À)/¤H¦¸¡j", m_mantime, yester.mon, yester.mday, 2);
+    free(m_mantime);
+    free(m_time);
+    free(m_cp);
+
+    quick_sort_sub(0, bshm->number - 1, y_mantime);
+    quick_sort_sub(0, bshm->number - 1, y_time);
+    quick_sort_sub(0, bshm->number - 1, y_cp);
+
+    sprintf(MSG, "%d¦~¬ÝªOÂsÄý¤H®ð±Æ¦æ(²Ö­p%d­Ó¤ë)", (now.yday != 0) ? now.year + 1900 : yester.year + 1900, yester.mon);
+    record(YEAR_MANTIME, MSG, "¡i¤H    ¦¸¡j", y_mantime, yester.mon, yester.mday, 1);
+    sprintf(MSG, "%d¦~¬ÝªO¨Ï¥Î®É¶¡±Æ¦æ(²Ö­p%d­Ó¤ë)", (now.yday != 0) ? now.year + 1900 : yester.year + 1900, yester.mon);
+    record(YEAR_TIME, MSG, "¡i®É¶¡(¤À)¡j", y_time, yester.mday, yester.mday, 1);
+    sprintf(MSG, "%d¦~¬ÝªO¥­§¡¨Ï¥ÎCP±Æ¦æ(%d­Ó¤ë¥­§¡)", (now.yday != 0) ? now.year + 1900 : yester.year + 1900, yester.mon);
+    record(YEAR_CP, MSG, "¡i®É¶¡(¤À)/¤H¦¸¡j", y_cp, yester.mon, yester.mday, 1);
+    free(y_mantime);
+    free(y_time);
+    free(y_cp);
+  }
+
+  return 0;
+}
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

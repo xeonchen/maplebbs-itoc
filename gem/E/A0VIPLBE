@@ -1,0 +1,49 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] µøµ¡«¬ªº Y/N
+®É¶¡: Sun Aug  3 17:25:15 2003                          Updated: 2003/08/02
+
+  §â vans() ¤¤ Y/N ªº°ÝÃD´«¦¨µøµ¡«¬ªº
+
+: visio.c:vans()   §ï¦¨³o¼Ë
+
+int
+vans(prompt)
+  char *prompt;
+{
+  char ans[3];
+
+#ifdef POPUP_ANSWER
+  int len;
+  char buf[80], *str, *menu[4];
+
+  /* itoc.010812.µù¸Ñ: ·|¦Û°Ê´«¦¨¤p¼gªº */
+
+  if (str = (char *) strrchr(prompt, '['))
+  {
+    if (str[-6] == 'Y' && str[-4] == 'N' && (str[1] == 'Y' || str[1] == 'N'))
+    {
+      strcpy(buf, prompt);
+      len = str - prompt;
+      str = buf + len;
+      *str = '\0';
+      str[2] = str[1];
+      menu[0] = str + 1;
+      menu[1] = "Yes  ¬O";
+      menu[2] = "No   §_";
+      menu[3] = NULL;
+      return pans((b_lines-4) >> 1, 20, len > 32 ? "½T»{(Y/N)¡H" : buf, menu);
+    }
+  }
+#endif
+
+  return vget(b_lines, 0, prompt, ans, sizeof(ans), LCECHO);
+}
+
+: ¦³¨Ç Y/N ªº°ÝÃD¤£¾A¦X§ï¬°µøµ¡«¬ªº¡A¨Ò¦p acct_setup()
+: ¨º»ò´N§â (Y/N) §ï¬° (y/n)
+
+-   if (vans("­×§ï¸ê®Æ(Y/N)¡H[N] ") != 'y')
++   if (vans("­×§ï¸ê®Æ(y/n)¡H[N] ") != 'y')
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

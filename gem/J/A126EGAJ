@@ -1,0 +1,34 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] Â÷¯¸µe­±³B²z
+µo«H¯¸: µL¦W¤p¯¸ (2006/05/11 Thu 16:24:18)                Updated: 2006/05/14
+
+[32m:/src/maple/menu.c:goodbye()[m
+
+..
+..
+
+#ifdef LOG_BMW
+  bmw_log();            /* lkchu.981201: ¤ô²y°O¿ý³B²z */
+#endif
+
+  if (!(cuser.ufo & UFO_MOTD))   /* itoc.000407: Â÷¯¸µe­±¤@¨ÖÂ²¤Æ */
+  {
+   clear();
+    prints("¿Ë·Rªº \033[32m%s(%s)\033[m¡A§O§Ñ¤F¦A«×¥úÁ{¡i %s ¡j\n"
+      "¥H¤U¬O±z¦b¯¸¤ºªºµù¥U¸ê®Æ¡G\n",
+      cuser.userid, cuser.username, str_site);
+    acct_show(&cuser, 0);
+    vmsg(NULL);
+  }
+
+  u_exit("EXIT ");
+[1;33m+[m clear();      /* guessi.060404: Â÷¶}«e¥ý²M±¼µe­±¡AÁ×§K´Ý¯d­Ó¤H¸ê®Æ */
+[1;33m+[m refresh();
+  exit(0); /* ¤ô²y°O¿ý¡B­Ó¤H¸ê®ÆÅã¥Ü ¤@¨Ö²M±¼ Á×§Kµe­±´Ý¯d :) */
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î[37m61-231-196-164.dynamic.hinet.net[30m®ü[m

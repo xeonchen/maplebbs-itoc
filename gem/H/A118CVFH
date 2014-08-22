@@ -1,0 +1,85 @@
+µo«H¤H: rainphiz.bbs@cpu.tfcis.org (¡@) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¦p¦ó¼W¥[§Ö³tÂ÷¯¸¼öÁä
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/05/15 Sun 05:11:41)                Updated: 2005/06/23
+
+¡° ¤Þ­z¡mSmaller.bbs@kfking.com (¸t½å¤§¤ß¤Z¤H¤§Åé)¡n¤§»Ê¨¥¡G
+> ¹³¬OWD¨t²Îªºctrl+q
+> ¥i¥H§Ö³tÂ÷¯¸
+> ·P®¦
+
+: maple.p
+
+/* xover.c */
++ int quick_exit(void);
+
+: xover.c:quick_exit()      ¦b every_Z() «e­±·s¼W¦¹¨ç¥Ü
+
+int
+quick_exit()
+{
+  outz("½T©w­nÂ÷¯¸(Y/N)¡H[N] ");
+  if (vkey() == 'y')
+  {
+    vmsg("ÁÂÁÂ¥úÁ{, °O±o±`¨Ó³á¡I");
+    u_exit("EXIT ");
+    exit(0);
+  }
+
+  return XO_FOOT;
+}
+
+: menu.c:menu()       ¿ï³æ«ö ^Q §Ö³tÂ÷¯¸
+
+    case Ctrl('U'):
+      every_U(0);
+      goto every_key;
++   case Ctrl('Q'):
++     quick_exit();
++     goto every_key;
+
+: xover.c:xover()     ¤¶­±«ö ^Q §Ö³tÂ÷¯¸¡A¥u¦³¨S³Q«ü©w¬° Query ®É¤~¦³¥Î
+
+    else if (cmd == Ctrl('U'))
+    {
+      cmd = every_U(zone);
+    }
++   else if ((cmd == Ctrl('Q')) &&
++     (zone != XZ_BMW) && (zone != XZ_GEM) && (zone != XZ_MBOX) &&
++     (zone != XZ_PAL) && (zone != XZ_ULIST) &&
++     (zone != XZ_POST) && (zone != XZ_XPOST) &&
++     (zone != XZ_VOTE))
++   {
++     cmd = quick_exit();
++   }
+
+> -------------------------------------------------------------------------- <
+
+  Åý ^Z ¼W¥[­ÓÂ÷¯¸¿ï¶µ
+
+: xover.c
+
+#ifdef MY_FAVORITE
+- #define MSG_ZONE_SWITCH "§Ö³t¤Á´«¡G... (U)¨Ï¥ÎªÌ (W)¤ô²y¡G"
++ #define MSG_ZONE_SWITCH "§Ö³t¤Á´«¡G... (U)¨Ï¥ÎªÌ (W)¤ô²y (Q)Â÷¯¸¡G"
+#else
+- #define MSG_ZONE_SWITCH "§Ö³t¤Á´«¡G... (U)¨Ï¥ÎªÌ (W)¤ô²y¡G"
++ #define MSG_ZONE_SWITCH "§Ö³t¤Á´«¡G... (U)¨Ï¥ÎªÌ (W)¤ô²y (Q)Â÷¯¸¡G"
+#endif
+
+: xover.c:every_Z()
+
+  case 'w':
+    if (HAS_PERM(PERM_BASIC))
+      cmd = XZ_BMW;
+    break;
++  case 'q':
++    cmd = quick_exit();
++    break;
+
+--
+  §Ú­Ë¬OÄ±±o³o¥\¯àÅý client ¨Ó¹ê²{§Y¥i
+  ¨Ò¦p PCMan ªº Alt+W ©Î¬O KKman ªº Ctrl+Del
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mrainphiz [30m±q [31madsl-220-229-60-4.NH.sparqnet.net [30mµoªí[m

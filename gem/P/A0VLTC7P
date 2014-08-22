@@ -1,0 +1,515 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: itoc
+¼Ð  ÃD: [°ÝÃD] ¬P®y¨k¤k°t¹ï...  §ï¤£¥X¨Ó...  Q_Q
+µo«H¯¸: Àº¤Ñ±^ (Sun, 20 Jul 2003 04:04:39 +0800 (CST))    Updated: 2003/07/20
+
+: menu.c ¾A·íªº¿ï³æ¥[¤J
+
++  "bin/horoscope.so:x_astro", 0, - M_XMODE,
++  "Astro      ¡i §Úªº¬P®y ¡j",
+
++  "bin/horoscope.so:x_pair", 0, - M_XMODE,
++  "Pair       ¡i ¬P®y°t¹ï ¡j",
+
+: src/so/Makefile
+
+SO =    admutil.so bank.so chat.so help.so vote.so xyz.so [1;33mhoroscope.so[m \
+
+: etc/horoscope
+
+  «Ø³o¥Ø¿ý etc/horoscope
+  etc/horoscope/ ¤UÁÙ­n¦³¤T­ÓÀÉ®×  day.hint moon.dat venus.dat
+  ©ñ¦b http://cpu.twbbs.org/horoscope/
+
+: src/so/horoscope.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* horoscope.c  ( NTHU CS MapleBBS Ver 3.10 )            */
+/*-------------------------------------------------------*/
+/* target : ¬P®y¨k¤k°t¹ï                                 */
+/* create : 03/07/20                                     */
+/* update :   /  /                                       */
+/* author : BioStar.bbs@micro.bio.ncue.edu.tw            */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+struct birth
+{
+  int yy;    /* ¥X¥Í¦è¤¸¦~ */
+  int mm;    /* ¥X¥Í¤ë */
+  int dd;    /* ¥X¥Í¤é */
+};
+
+struct h_set
+{
+  int s;     /* ¤Ó¶§¬P®y */
+  int m;     /* ¤ë«G¬P®y */
+  int v;     /* ª÷¬P¬P®y */
+};
+
+
+static char name[12][5] =
+{
+  "¨d¦Ï", "ª÷¤û", "Âù¤l",
+  "¥¨ÃÉ", "·à¤l", "³B¤k",
+  "¤Ñ¯¯", "¤ÑÃÈ", "®g¤â",
+  "¼¯½~", "¤ô²~", "Âù³½"
+};
+
+
+static char *said[21] =
+{
+  "°Ú~~~°Ú~~~µ¹§Ú¤@ªM§Ñ±¡¤ô~~~",
+  "­ü~~~¤U¤@­Ó±¡¤H·|§ó¦n¡I",
+  "·R±¡¬O¨¯­W¦Ó¨S¦³¥N»ùªº....",
+  "­ü...¥Î«á¤Ñªº§V¤O¨Ó¸É¥ý¤Ñ¤£¨¬Åo¡H",
+  "§Aª¾¹D¤H©w³Ó¤Ñªº¹D²z¶Ü¡H",
+  "©Ò¦³ªº¦¨´N³£¬O¾a¤E¤Q¤E¤Àªº§V¤Oªº¡I",
+  "·R±¡¨S¦³¤Ñ¯¯¡I»´­«¥þ¬Ý¦Û¤v¡I",
+  "¦hµ¹¥L¤@¨ÇÃöÃh..·|«Ü¦³À°§Uªº..",
+  "§A­Ìªº·P±¡­n¾a¤¬¬Ûªº¥]®e¡I",
+  "¤Q¦~­×±o¦P²î´ç...­n¦n¦n¬Ã±¤¡I",
+  "·P±¡¬O¨S¦³²z¥Ñªº..³ßÅw´N°l§a¡I",
+  "¶â....¦³ªÅ¥X¥h¬ù­Ó·|¤@©w¤£¿ù¡I",
+  "¶â...°µ­Ó·R¥i¥H¼W¶i¤p­Ç¤fªº·P±¡®@¡I",
+  "§A­Ì·P±¡·|»P¤é­Ñ¼W®@¡I",
+  "¨þ¨þ...§A­Ì´N¬O®e©ö¤¬¬Û§l¤Þ~~",
+  "¶â..§A­Ì´N¬O³o»ò®e©ö´N¬Û·R¤F~~~",
+  "¹³§A­Ì³o»ò¬Û°t¹ê¦b¬O¤£®e©ö.....",
+  "§A­ÌªºÅÊ·R·|¬O«D±`²¢»eªº®@~~~",
+  "¤Ñ°Ú¡I§A­Ì¯u¬O¤Ñ³y¦a³]ªº¤@¹ï¡I",
+  "³£¬Û°t¨ì³oºØµ{«×¤F..¦³¨S¦³¦Ò¼{µ²±B¡H",
+  "¨þ¨þ...§A­Ì¬O³o¯¸°ß¤@¥X²{º¡¤Àªº±¡«Q¡I"
+};
+
+
+/* ----------------------------------------------------- */
+/* ¤Ó¶§¬P®y                                              */
+/* ----------------------------------------------------- */
+
+
+static int
+SunHoro(Sa)
+  struct birth *Sa;
+{
+  int Mm[12] = {20, 19, 21, 20, 21, 22, 23, 23, 23, 24, 23, 22};
+
+  if (Sa->dd - Mm[Sa->mm - 1] >= 0)
+    return (Sa->mm + 9) % 12;
+  else
+    return (Sa->mm + 8) % 12;
+}
+
+
+/* ----------------------------------------------------- */
+/* ª÷¬P¬P®y                                              */
+/* ----------------------------------------------------- */
+
+
+static int              /* 1:¸Ó¦~¶|¦~ */
+Lunar(year)
+  int year;
+{
+  if (year % 400 == 0)
+    return 1;
+
+  if (year % 100 == 0)
+    return 0;
+
+  if (year % 4 == 0)
+    return 1;
+
+  return 0;
+}
+
+
+static int
+MonthTotalDay(Sa)
+  struct birth *Sa;
+{
+  int MD[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+  return MD[Sa->mm - 1] + (Lunar(Sa->yy) && Sa->mm > 2);
+}
+
+
+static int
+DayNumber(Sa)           /* ¶Çµ¹µ²ºc birth, ¶Ç¦^¸Ó¤Ñ¬°²Ä´X¤Ñ */
+  struct birth *Sa;
+{
+  int i;
+  int TotalDay = 0;
+
+  for (i = 1929; i < Sa->yy; i++)         /* ±q StartDay(1929) ºâ°_  */
+  {
+    if (i < Sa->yy)
+    {
+      TotalDay = TotalDay + 365;
+      if (Lunar(i))
+        TotalDay++;
+    }
+  }
+
+  TotalDay += MonthTotalDay(Sa);
+  TotalDay += Sa->dd;
+
+  return TotalDay;
+}
+
+
+static int
+VenusHoro(Sa)
+  struct birth *Sa;
+{
+  int rc;
+  FILE *fp;
+  struct birth Venusx;
+  uschar VMon, VDay, VHr, VMin;
+  char Venus, buf[120];
+
+  if (!(fp = fopen("etc/horoscope/venus.dat", "r")))
+    return 0;
+
+  do
+  {
+    if (!fgets(buf, sizeof(buf), fp))
+      break;
+  } while (atoi(buf + 1) > Sa->yy);
+
+  while (fgets(buf, 12, fp))
+  {
+    if (*buf == '!')
+    {
+      Venus = buf[9];
+      buf[9] = '\0';
+      VMin = atoi(buf + 7);
+      buf[7] = '\0';
+      VHr = atoi(buf + 5);
+      buf[5] = '\0';
+      VDay = atoi(buf + 3);
+      buf[3] = '\0';
+      VMon = atoi(buf + 1);
+      buf[1] = '\0';
+      Venusx.yy = Sa->yy;
+      Venusx.mm = VMon;
+      Venusx.dd = VDay;
+
+      if (DayNumber(&Venusx) <= DayNumber(Sa))
+      {
+        rc = Venus >= 'A' ? Venus - 'A' + 9 : Venus - '1';
+        break;
+      }
+    }
+  }
+
+  fclose(fp);
+
+  return rc % 12;
+}
+
+
+/* ----------------------------------------------------- */
+/* ¤ë«G¬P®y                                              */
+/* ----------------------------------------------------- */
+
+
+static int
+MoonAddingDay(Day)
+  int Day;
+{
+  int x[31] =
+  {
+    0, 1, 1, 1, 2, 2, 3,
+    3, 4, 4, 5, 5, 5, 6,
+    6, 7, 7, 8, 8, 9, 9,
+    10, 10, 10, 11, 11, 12, 12,
+    1, 1, 2
+  };
+
+  return x[Day - 1];
+}
+
+
+static int
+MoonHoro(Sa)
+  struct birth *Sa;
+{
+  int rc, j;
+  FILE *fp;
+  char Month, MoonBase, MoonMon;
+  char buf[60], *ptr;
+
+  Month = Sa->mm > 9 ? Sa->mm - 10 + 'A' : Sa->mm + '0';
+
+  if (!(fp = fopen("etc/horoscope/moon.dat", "r")))
+    return 0;
+
+  j = 1929;
+  while (j <= Sa->yy)
+  {
+    fgets(buf, 60, fp);
+    j++;
+  }
+
+  fclose(fp);
+
+  ptr = buf + 5;
+
+  while (*ptr == '!' && *ptr)
+  {
+    MoonMon = *(ptr + 1);
+    MoonBase = *(ptr + 2);
+
+    if (Month == MoonMon)
+    {
+      rc = ((MoonBase - 'A') + 12) % 12 + MoonAddingDay(Sa->dd);
+      break;
+    }
+
+    ptr += 3;
+  }
+
+  return rc % 12;
+}
+
+
+/* ----------------------------------------------------- */
+/* ¥Dµ{¦¡                                                */
+/* ----------------------------------------------------- */
+
+
+static int
+day_hint()
+{
+  int j, Day;
+  FILE *fp;
+  char msg[150];
+  int MD[12] = {0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335};
+
+  if (!(fp = fopen("etc/horoscope/day.hint", "r")))
+    return 0;
+
+  fgets(msg, 150, fp);
+  Day = MD[cuser.month - 1] + cuser.day - 1;
+
+  j = 0;
+  while (j < Day)
+  {
+    if (!fgets(msg, 150, fp))
+      break;
+
+    if (*msg == '#')
+      j++;
+  }
+
+  outs("     \033[1;36m¦b¤µ¤Ñ¥X¥Íªº§A¡G\033[m \n");
+
+  for (j = 0; j < 4 && fgets(msg, 150, fp); j++)
+    prints(" \033[1;37m%s\033[m", msg);
+
+  fclose(fp);
+}
+
+
+static int
+TogetherRule(x, y)      /* ºâ¥X³t°tµ{«×¡A¶Ç¦^ 0~100 */
+  struct h_set *x;
+  struct h_set *y;
+{
+  int score;
+
+  /* ¤½¦¡ÀH«K¼gªº */
+
+  score = (y->s - x->s) * 12 + (y->m - x->m) * 6 + (y->v - x->v) * 3;
+  if (score < 0)
+    score = -score;
+
+  return score % 101;
+}
+
+
+static void
+ask_birth(row, b)
+  int row;
+  struct birth *b;
+{
+  int year, month, day;
+  char buf[80];
+  int mmday[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+  year = b->yy;
+  month = b->mm;
+  day = b->dd;
+
+  row++;
+  do
+  {
+    sprintf(buf, "¥Í¤é¡Ð¥Á°ê %02d ¦~¡G", year);
+    if (vget(row, 0, buf, buf, 3, DOECHO))
+      year = atoi(buf);
+  } while (year < 40 || year > 90);
+  year += 1911;
+  mmday[1] = Lunar(year) ? 29 : 28;
+
+  row++;
+  do
+  {
+    sprintf(buf, "¥Í¤é¡Ð %02d ¤ë¡G", month);
+    if (vget(row, 0, buf, buf, 3, DOECHO))
+      month = atoi(buf);
+  } while (month < 1 || month > 12);
+
+  row++;
+  do
+  {
+    sprintf(buf, "¥Í¤é¡Ð %02d ¤é¡G", day);
+    if (vget(row, 0, buf, buf, 3, DOECHO))
+      day = atoi(buf);
+  } while (day < 1 || day > mmday[month - 1]);
+
+  b->yy = year;
+  b->mm = month;
+  b->dd = day;
+}
+
+
+static void
+get_hset(row, x, b)
+  int row;
+  struct h_set *x;
+  struct birth *b;
+{
+  char buf[3];
+
+  x->s = SunHoro(b);
+  x->m = MoonHoro(b);
+  x->v = VenusHoro(b);
+
+  move(row++, 0);
+  outs("1)¤Ó¶§ 2)¤ë«G 3)ª÷¬P");
+
+  while (1)
+  {
+    move(row, 0);
+    prints(" [%s] [%s] [%s]", name[x->s], name[x->m], name[x->v]);
+
+    switch (vget(row + 1, 0, "[1-3]·L½Õ [Q]½T©w¡G", buf, 3, LCECHO))
+    {
+    case '1':
+      x->s = (x->s + 1) % 12;
+      break;
+    case '2':
+      x->m = (x->m + 1) % 12;
+      break;
+    case '3':
+      x->v = (x->v + 1) % 12;
+      break;
+    case 'q':
+      return;
+    }
+  }
+}
+
+
+int
+x_astro()
+{
+  int Sun, Moon, Venus;
+  struct birth User;
+
+  User.mm = cuser.month;
+  User.dd = cuser.day;
+  User.yy = cuser.year + 1911;
+
+  Sun = SunHoro(&User);
+  Moon = MoonHoro(&User);
+  Venus = VenusHoro(&User);
+
+  vs_bar("§Úªº¬P®y");
+
+  move(8, 0);
+
+  prints("     ¸Ü»¡¹©¹©¤j¦Wªº \033[1;36m%s\033[m ¸g¹L¤@¦¸´­¦W¥@¬Éªº\n"
+    "     \033[1;32;44m" BBSNAME "¤§®È«á¡A¤j®a¬ÒºÙ¥L¥s°µ \033[1;33m%s\033[m\n"
+    "     ¥L¥X¥Í©ó\033[30;43m¥Á°ê %d ¦~ %d ¤ë %d ¤é\033[m\n",
+    cuser.userid, cuser.username, User.yy - 1911, User.mm, User.dd);
+
+  prints("     ¥D®_¥Lªº­Ó©Êªº¤Ó¶§¬P®y¬O \033[1;33;41m%s®y\033[m\n"
+    "     ¦Ó¼vÅT¥Lªº¥»¯à¦æ¬°ªº¤ë«G¬P®y¬O \033[1;33;45m%s®y\033[m\n"
+    "     ¥H¤Î¼vÅT­Ó¤H§l¤Þ¤O»P¾AÀ³¤Oªºª÷¬P¬P®y¬° \033[1;33;44m%s®y \033[m\n",
+    name[Sun], name[Moon], name[Venus]);
+
+  day_hint();
+
+  vmsg(NULL);
+
+  return 0;
+}
+
+
+int
+x_pair()
+{
+  int i, score;
+  struct h_set hu, hp;
+  struct birth User, Pair;
+
+  vs_bar("¬P®y°t¹ï");
+
+  move(2, 0);
+  outs("°t¹ïªÌ¡G");
+  User.yy = cuser.year;
+  User.mm = cuser.month;
+  User.dd = cuser.day;
+  ask_birth(2, &User);
+  get_hset(7, &hu, &User);
+
+  move(12, 0);
+  outs("³Q°t¹ïªÌ¡G");
+  Pair.yy = 0;
+  Pair.mm = 0;
+  Pair.dd = 0;
+  ask_birth(12, &Pair);
+  get_hset(17, &hp, &Pair);
+
+  move(2, 0);
+  clrtobot();
+
+  move(6, 0);
+
+  prints("  ID             \033[1;36m%15s\033[m        The one you love\n",
+    cuser.userid);
+  prints("  ¼ÊºÙ           \033[1;33m%15s\033[m                ¤ß·Rªº¤H\n",
+    cuser.username);
+  prints("  ¥Í¤é          ¥Á°ê%2d¦~%2d¤ë%2d¤é\033[m"
+    "        ¥Á°ê%2d¦~%2d¤ë%2d¤é\n",
+    User.yy - 1911, User.mm, User.dd,
+    Pair.yy - 1911, Pair.mm, Pair.dd);
+
+  prints("  ¤Ó¶§¬P®y                \033[1;33;41m%s®y\033[m"
+    "                  %s®y\n",
+    name[hu.s], name[hp.s]);
+  prints("  ¤ë«G¬P®y                \033[1;33;45m%s®y\033[m"
+    "                  %s®y\n",
+    name[hu.m], name[hp.m]);
+  prints("  ª÷¬P¬P®y                \033[1;33;44m%s®y\033[m"
+    "                  %s®y\n",
+    name[hu.v], name[hp.v]);
+
+  score = TogetherRule(&hu, &hp);
+  outs("\n  \033[1;34mÁ` ±o ¤À¡G\033[46m");
+  for (i = score / 2; i > 0; i--)   /* ¨C 2 ¤À 1 ®æ */
+    outc(' ');
+  prints("\033[40;37m %d/100\033[m\n", score);
+  prints("\n  \033[1m" SYSOPNICK "µ¹§A­Ìªºµû»y¡G\033[33m%s\033[m",
+    said[score / 5]);
+
+  vmsg(NULL);
+
+  return 0;
+}
+
+--
+[1;31m|[33m Origin [31m| [;37;42m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m163.23.212.99[m

@@ -1,0 +1,292 @@
+§@ªÌ: itoc (cygreadline4.dll) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¦h­«Âà«H
+®É¶¡: 2004/04/29 Thu 16:27:21                           Updated: 2005/04/24
+
+  ¦h­«Âà«H¡A³]©w¤èªk¦p¤U
+  ¨ä¤¤ bbsroute1 ©M bbsroute2 ¥i¥H¬O¬Û¦P©Î¤£¦P¯¸¥x
+
+  1) Example: tw.bbs.campus.nctu + nctu.talk -> [nctu]
+              tw.bbs.campus.nctu + nctu.talk <- [nctu]
+
+     bbsroute1    tw.bbs.campus.nctu               <-> nctu          big5
+     bbsroute2    nctu.talk                        <-> nctu          big5
+
+  2) Example: tw.bbs.test + csie.test -> [test]
+                            csie.test <- [test]
+
+     bbsroute1    tw.bbs.test                       -> test          big5
+     bbsroute2    csie.test                        <-> test          big5
+
+  3) Example: tw.bbs.sci.law -> [law1] + [law2]
+              tw.bbs.sci.law <- [law1] + [law2]
+
+     bbsroute     tw.bbs.sci.law                   <-> law1          big5
+     bbsroute     tw.bbs.sci.law                   <-> law2          big5
+
+  4) Example: tw.bbs.literal.book -> [book1]
+              tw.bbs.literal.book <- [book2]
+
+     bbsroute     tw.bbs.literal.book               -> book1         big5
+     bbsroute     tw.bbs.literal.book              <-  book2         big5
+
+  ¨ä¾lÃþ¦ü¡A¤Ï¥¿´N¬O¦b newsfeeds.bbs ¸Ì¼g«Ü¦h¦æ
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¦]¬°¬ÝªOÄÝ©Êªº BRD_NOTRAN ·|¹ï©Ò¦³ newsgroup °µ§ïÅÜ
+  ©Ò¥H­n·s¼W¤@­Ó¤£Âà¥XªºÄÝ©Ê¡A¹ï³æ¤@ newsgroup °µ±±¨î
+
+: struct.h
+
+#define INN_NOINCOME    0x0001
++ #define INN_NOOUTGO    0x0002
+
+: innbbs.c:nf_item()
+
+    brd = bshm->bcache + bno;
+-   outgo = brd->battr & BRD_NOTRAN ? ' ' : '<';
++   outgo = brd->battr & BRD_NOTRAN || nf->xmode & INN_NOOUTGO ? ' ' : '<';
+    income = nf->xmode & INN_NOINCOME ? ' ': '>';
+
+: innbbs.c:nf_query()
+
+    brd = bshm->bcache + rc;
+-   outgo = brd->battr & BRD_NOTRAN ? "\033[1;33m¤£Âà¥X\033[m"  : "Âà¥X";
++   outgo = brd->battr & BRD_NOTRAN || nf->xmode & INN_NOOUTGO ?
++     "\033[1;33m¤£Âà¥X\033[m"  : "Âà¥X";
+    income = nf->xmode & INN_NOINCOME ? "¥B\033[1;33m¤£Âà¶i\033[m" : "¥BÂà¶i";
+
+: innbbs.c:nf_add()
+
+    nf.xmode = (vans("¬O§_Âà¶i(Y/N)¡H[Y] ") == 'n') ? INN_NOINCOME : 0;
++   nf.xmode |= (vans("¬O§_Âà¥X(Y/N)¡H[Y] ") == 'n') ? INN_NOOUTGO : 0;
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ®³±¼ NEWSFEEDS2
+  NEWSFEEDS ¤]¤£»Ý­n±Æ§Ç
+
+: bbslib.h
+
+/* bbslib.c */
+extern int NFCOUNT;
+extern newsfeeds_t *NEWSFEEDS;
+- extern newsfeeds_t *NEWSFEEDS_B;
+- extern newsfeeds_t *NEWSFEEDS_G;
+- extern int nf_bygroupcmp();
+- extern int nf_byboardcmp();
+
+: bbslib.c:readnffile()
+
+int NFCOUNT;
+newsfeeds_t *NEWSFEEDS = NULL;
+- newsfeeds_t *NEWSFEEDS_B = NULL;
+- newsfeeds_t *NEWSFEEDS_G = NULL;
+
+- int
+- nf_bygroupcmp(a, b)
+-  newsfeeds_t *a, *b;
+-{
+-  return str_cmp(a->newsgroup, b->newsgroup);
+-}
+
+
+- int
+- nf_byboardcmp(a, b)
+-  newsfeeds_t *a, *b;
+-{
+-  return str_cmp(a->board, b->board);
+-}
+
+
+static int              /* 0:success  -1:fail */
+readnffile()
+{
+  ...
+  ...
+
+
+- /* ¥t¥~·Ç³Æ¤G¥÷¬Û¦Pªº¸ê°T¡A¦ý¬O±Æ§Ç¤èªk¤£¦P */
+- NEWSFEEDS_B = !NEWSFEEDS_B ? (newsfeeds_t *) malloc(size) :
+-   (newsfeeds_t *) realloc(NEWSFEEDS_B, size);
+- memcpy(NEWSFEEDS_B, NEWSFEEDS, size);
+- NEWSFEEDS_G = !NEWSFEEDS_G ? (newsfeeds_t *) malloc(size) : (newsfeeds_t *) realloc(NEWSFEEDS_G, size);
+- memcpy(NEWSFEEDS_G, NEWSFEEDS, size);
+
+  NFCOUNT = size / sizeof(newsfeeds_t);
+- if (NFCOUNT > 1)
+- {
+-   /* NEWSFEEDS[] ¤£ÅÜ°Ê¡A¹w³]¨Ì¯¸¥x¦WºÙ±Æ§Ç */
+
+-   /* ±N NEWSFEEDS_B[] ¨Ì board ±Æ§Ç¡A¨º»ò¦b search_newsfeeds_byboard() ... */
+-   qsort(NEWSFEEDS_B, NFCOUNT, sizeof(newsfeeds_t), nf_byboardcmp);
+
+-   /* ±N NEWSFEEDS_G[] ¨Ì group ±Æ§Ç¡A¨º»ò¦b search_newsfeeds_bygroup() ... */
+-   qsort(NEWSFEEDS_G, NFCOUNT, sizeof(newsfeeds_t), nf_bygroupcmp);
+- }
+
+  return 0;
+}
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¤¹³\¤@­Ó newsgroup Âà¶i«Ü¦hªO
+
+: rec_article.c:search_newsfeeds_bygroup() §ï¦¨³o¼Ë
+
+#ifndef _NoCeM_
+static
+#endif
+newsfeeds_t *
+search_newsfeeds_bygroup(newsgroup, pos)
+  char *newsgroup;
+  int *pos;         /* ±q²Ä pos µ§¶}©l©¹¤U§ä */
+{
+  newsfeeds_t *find;
+  int i;
+
+  for (i = *pos; i < NFCOUNT; i++)
+  {
+    find = NEWSFEEDS + i;
+    if (!strcmp(find->newsgroup, newsgroup) && !(find->xmode & INN_NOINCOME))
+    {
+      *pos = i + 1;
+      return find;
+    }
+  }
+  return NULL;
+}
+
+: nocem.c:readNCMbody()
+
+static int
+readNCMbody(line)
+  char *line;
+{
+  char buf[LINELEN], *group;
++ int pos = 0;
+
+  ...
+  ...
+
+- if (search_newsfeeds_bygroup(group))
++ if (search_newsfeeds_bygroup(group, &pos))  /* nocem ¥u·|²MÂà¤Jªº²Ä¤@­ÓªO */
+    strcpy(SPAMMID[num_spammid++], SPAMMID_NOW);
+
+: rec_article.c:receive_article()
+: ¦¹³B¦³­Ó°²³]¬O·í newsfeeds.bbs ­n¨D¦P¤@­Ó newsgroup ­nÂà¶i¦h­ÓªO®É
+: ³o¨ÇªO³£¬O¥Î¦P¼Ëªº charset
+
+  newsfeeds_t *nf;
+  char myaddr[128], mynick[128], mysubject[128], myfrom[128], mydate[80];
+  char poolx[256];
+  char *group;
+  int firstboard = 1;
++ int pos;
+
+  /* try to split newsgroups into separate group */
+  for (group = strtok(GROUP, ","); group; group = strtok(NULL, ","))
+  {
+-   if (!(nf = search_newsfeeds_bygroup(group)))
+-     continue;
++   pos = 0;
++   while (nf = search_newsfeeds_bygroup(group, &pos))
++   {
+      if (firstboard)     /* opus: ²Ä¤@­ÓªO¤~»Ý­n³B²z */
+      {
+        ...
+        ...
+        if (is_spam(myaddr, mynick))
+        {
+#ifdef _KEEP_CANCEL_
+          bbspost_add(BN_DELETED, myaddr, mynick);
+#endif
+-         break;
++         return 0;
+        }
+        firstboard = 0;
+      }
+
+      bbspost_add(nf->board, myaddr, mynick);
++   }           /* while nf1,nf2,... */
+  }             /* for board1,board2,... */
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¤¹³\¤@­ÓªOÂà¥X«Ü¦h newsgroup
+
+: bbslink.c:search_newsfeeds_byboard() §ï¦¨³o¼Ë
+
+static newsfeeds_t *
+search_newsfeeds_byboard(board, pos)
+  char *board;
+  int *pos;
+{
+  newsfeeds_t *find;
+  int i;
+
+  for (i = *pos; i < NFCOUNT; i++)
+  {
+    find = NEWSFEEDS + i;
+    if (!strcmp(find->board, board) && !(find->xmode & INN_NOOUTGO))
+    {
+      *pos = i + 1;
+      return find;
+    }
+  }
+  return NULL;
+}
+
+: bbslink.c:deal_sover()
+
+  newsfeeds_t *nf;
+  nodelist_t *nl;
+  soverview_t sover;
+  struct stat st;
+  time_t mtime;
+  char buf[80];
+  char *board, *filename;
++ int pos;
+
+  board = sover->board;
+
+- if (!(nf = search_newsfeeds_byboard(board)))
+- {
+-   bbslog("<bbslink> :Warn: %s ¦¹ªO¤£¦b newsfeeds.bbs ¤¤\n", board);
+-   DEBUG(("¢w¡÷:Warn: %s ¦¹ªO¤£¦b newsfeeds.bbs ¤¤\n", board));
+-   return;
+- }
+
++ pos = 0;
++ while (nf = search_newsfeeds_byboard(board, &pos))
++ {
+    if (!(nl = search_nodelist_bynode(nf->path)))
+-     return;
++     continue;
+
+    filename = bntp->xname;
+    memset(&sover, 0, sizeof(soverview_t));
+
+    ...
+    ...
+
+-     sprintf(sover.msgid, "%s$%s@" MYHOSTNAME, filename, board);
++     /* ¤£¦Pªº newsgroup ­n¦³¤£¦Pªº msgid */
++     sprintf(sover.msgid, "%d%s$%s@" MYHOSTNAME, pos, filename, board);
+
+      ...
+      ...
+
+-     sprintf(buf, "%s$%s@" MYHOSTNAME, filename, board);
++     /* ¤£¦Pªº newsgroup ­n¦³¤£¦Pªº msgid */
++     sprintf(buf, "%d%s$%s@" MYHOSTNAME, pos, filename, board);
+
+    ...
+    ...
+
+    queuefeed(nl, textline);
++ }
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

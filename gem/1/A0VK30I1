@@ -1,0 +1,95 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¶i¶¥°Î¦Wµo¤å¥\¯à¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Tue, 19 Aug 2003 04:44:06 +0800 (CST))  Updated: 2003/08/19
+
+    1) ¥ý¸ß°Ý­n¤£­n°Î¦Wµo¤å¡A¹w³]¬°[Y]¨Ï¥Î°Î¦Wµo¤å¡C
+
+       ¥´[N]ªº¸Ü¡Aª½±µ¥H¦Û¤vªº¢×¢Òµo¤å¡C
+
+
+    2) ¦Û©w¢×¢Òªº®É­Ô¡A¦pªG¬°¦Û¤vªº¢×¢Ò¡A¨º»ò´N¤£°Î¦Wµo¤å¡]«á­±¤£¥['.'¡^
+
+       ¦pªG¦Û©wªº¢×¢Ò¤w¸g¦³¤Hµù¥U¡A¨º»ò¥X²{°T®§¨Ã¥B­n¨D­«·s¿é¤J¡C
+
+
+    3) ½T©w¦Û©wªº¢×¢Ò¨S¦³¤H¨Ï¥Î«á¡A¤è¥iµo¤å¦¨¥\¡C
+
+
+
+    ­×§ï¤U­±ªºµ{¦¡¡A¦]¬°¦³¨Çµ{¦¡½X¤Óªø¡A¦b¢Ð¢Ð¢áÅã¥Üªº®É­Ô·|¾É­PÂ_¦æ¡C
+
+    ©Ò¥H§Ú§â¤Óªøªºµ{¦¡½X¤À¦¨¨â¦æ¡A­×§ïªº®É­Ô¥i¦Û¦æ±µ¦^¡C
+
+
+==============================================================================
+
+: src/maple/edit.c:ve_header()
+
+
+  if (curredit & EDIT_MAIL)
+  {
+    fprintf(fp, "%s %s (%s)\n", str_author1, cuser.userid, cuser.username);
+  }
+  else
+  {
+#ifdef HAVE_ANONYMOUS
+    if (currbattr & BRD_ANONYMOUS)
+    {
++     if (vans("­n°Î¦Wµoªí¤å³¹¶Ü(Y/N)¡H[Y] ") != 'n')   /* ¹w³]§ï¬°°Î¦Wµoªí */
++     {
++       do
++       {
++         if (!vget(b_lines, 0, "½Ð¿é¤J§A·Q¥ÎªºID¡A¤]¥iª½±µ«ö[Enter]¡G",
++                anonymousid, IDLEN, DOECHO))
++         {
++           strcpy(anonymousid, STR_ANONYMOUS);/* «öEnter¡A°Î¦WID´N¥Î¹w³]ªº */
++           curredit |= EDIT_ANONYMOUS;
++           break;
++         }
++         else if (!strcmp(anonymousid, cuser.userid))  /* ¦Û©w°Î¦WID */
++         {                     /* ©M¦Û¤vªºID¤@¼Ë¡A¤£°Î¦Wµo¤å */
++           curredit |= EDIT_ANONYMOUS;
++           break;
++         }
++         else
++         {
++           char fpath[64];
++           usr_fpath(fpath, anonymousid, NULL);
++           if (dashd(fpath))               /* ÀË¬d³o­ÓID¦³¨S¦³µù¥U */
++           {
++             vmsg("³o­Ó¢×¢Ò¦³¤H¥Î¤F³á¡I´«¤@­Ó§a¡C"); //°T®§¤º®e¥i¦Û¤v§ó§ï
++           }
++           else                    /* ²×©ó¥i¥H¥Î¦Û¤v·Q­nªºIDµo¤å¤F:P */
++           {
++             strcat(anonymousid, ".");/* ­Y¬O¦Û©wID¡A­n¦b«á­±¥[­Ó . ªí¥Ü¤£¦P*/
++             curredit |= EDIT_ANONYMOUS;
++             break;
++           }
++         }
++
++       } while (1);
++
++     }
++   }
+
+-     if (!vget(b_lines, 0, "½Ð¿é¤J§A·Q¥ÎªºID¡A¤]¥iª½±µ«ö[Enter]"
+-            "¡A©Î¬O«ö[r]¥Î¯u¦W¡G", anonymousid, IDLEN, DOECHO))
+-     {                                         /* ¯d 1 byte ¥[ "." */
+-       strcpy(anonymousid, STR_ANONYMOUS);
+-       curredit |= EDIT_ANONYMOUS;
+-     }
+-     else if (strcmp(anonymousid, "r"))
+-     {
+-       strcat(anonymousid, ".");    /* ­Y¬O¦Û©wID¡A­n¦b«á­±¥[­Ó . ªí¥Ü¤£¦P */
+-       curredit |= EDIT_ANONYMOUS;
+-     }
+-   }
+#endif
+
+    if (!(currbattr & BRD_NOSTAT))  /* ¬ÝªO¤£¯Ç¤J²Î­p */
+    {
+      /* ²£¥Í²Î­p¸ê®Æ */
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m bbs.cs.nchu.edu.tw [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-251-115.HINET-IP.hinet.net [30mµoªí[m

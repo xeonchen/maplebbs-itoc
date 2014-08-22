@@ -1,0 +1,41 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]Ãö©óCross-Post
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/05/10 Mon 18:21:15)                Updated: 2005/04/28
+
+¡° ¤Þ­z¡mpoit.bbs@bbs.kh.usc.edu.tw (©I~~~~)¡n¤§»Ê¨¥¡G
+> ¨º¦pªG¨Ï¥ÎªÌ¬O¤@­Ó¤@­Óª©
+> ºCºCªºpo¤å³¹
+> ¨t²Î·|¤£·|¤]·|¶i¦æCross-Post°»´ú©O
+
+: post.c:do_post()
+
+  if (vedit(fpath, 1) < 0)
+  {
+    unlink(fpath);
+    vmsg(msg_cancel);
+    return XO_HEAD;
+  }
+
++#ifdef HAVE_DETECT_CROSSPOST
++ if (check_crosspost(fpath, currbno))
++ {
++   unlink(fpath);
++   return XO_HEAD;
++ }
++#endif
+
+: config.h
+: ¤§©Ò¥H­n±q 3 §ï¦¨ 4 ªº­ì¦]¬OÂà¿ý®É·|¥X²{Äµ»y
+: ¡u½Ð¬D¿ï¾A·íªº¬ÝªO¡A¤Á¤ÅÂà¿ý¶W¹L¤TªO¡v
+: user Ä±±o³oÀ³¸Ó¬O ­ìpost*1+Âà¿ý*3¡A©Ò¥H¦³ 4 ½gªºÃB«×
+
+- #define MAX_CROSS_POST          3       /* cross post ³Ì¤j¼Æ¶q(½g) */
++ #define MAX_CROSS_POST          4       /* cross post ³Ì¤j¼Æ¶q(½g) */
+
+--
+  À³¸Ó­n§âÀË¬dª½±µ¼g¦b edit.c:words_check() ¸Ì­±
+  ª½±µ®³°O¾ÐÅéÀ³¸Óªº¨Ó¥Î¡A³o¼Ë¤~¥i¥H¤Ö¶}¤@¦¸ÀÉ®×
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

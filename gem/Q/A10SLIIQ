@@ -1,0 +1,49 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¥Î¤èªk¤G¸m©³®É¡A¦p¦óª½±µ Post ¦¨¸m©³¤å......
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/12/23 Thu 20:18:36)                Updated: 2006/02/10
+
+¡° ¤Þ­z¡mBioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶)¡n¤§»Ê¨¥¡G
+> ¤£ª¾¹D¥Î¤èªk¤G¡]¤]´N¬O¥Ø«e¼Ð·Çª©©Ò¥Îªº¤èªk¡^¡A
+> ¥i¤£¥i¥H¤£¥²¥ý Post ¥X¤@½g¤@¯ë¤å³¹¤~¯à¥h¸m©³¡A
+> ¦Ó¯à°÷¦b½s¿è§¹¦¨«á¡Aª½±µ save ¦¨¸m©³¤å³¹¡H
+
+: modes.h
+
+#define EDIT_RESTRICT   0x20    /* ¥[±K¦sÀÉ */
++ #define EDIT_BOTTOM   0x40    /* ¸m©³¦sÀÉ */
+
+: edit.c:ve_filer()
+
+  «e­±ªº menu2~4 ¥[¤@­Ó¿ï¶µ "Bottom   ¸m©³¦sÀÉ",
+  «e­±ªº msg2~4  ¥[¤@­Ó¿ï¶µ (B)¸m©³
+  ...
+
+
++ case 'b':
++  if (ve_op < 0)
++    return VE_FOOTER;
++  if ((bbsmode == M_POST) && (bbstate & STAT_BOARD))   /* ªO¥Dµo¤å */
++    curredit |= EDIT_BOTTOM;
++  else if (HAS_PERM(PERM_INTERNET) && !(currbattr & BRD_NOTRAN))
++    curredit |= EDIT_OUTGO;                            /* §_«hµø¬° save */
++  break;
+
+  case 'r':
+    tbf_read();
+    return VE_REDRAW;
+
+: post.c:do_post()
+
++ if (curredit & EDIT_BOTTOM)
++ {
++   hdr.xmode |= POST_BOTTOM;
++   rec_add(folder, &hdr, sizeof(HDR));
++ }
++ else
+    rec_bot(folder, &hdr, sizeof(HDR));
+  btime_update(currbno);
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

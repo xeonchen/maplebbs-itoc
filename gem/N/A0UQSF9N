@@ -1,0 +1,99 @@
+§@ªÌ: itoc (¤£¤Óµo®i¹êÅç«Ç) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¦h¼Ë»y¨tÀÉ©Î¨Ï¥ÎªÌ¦Û©wtheme
+®É¶¡: Thu Sep  5 11:09:56 2002                          Updated: 2005/04/30
+
+¡° ¤Þ­z¡mLinuxBoy (-TMA-1-)¡n¤§»Ê¨¥¡G
+>   ¤p§Ì¯¸¤W¨Ï¥ÎªÌ³Ìªñ´£¥X¤@­Ó°ÝÃD..
+>   ¤p§Ì·Q¨ìªº°µªk¬O±N©Ò¦³¤å¦rªº³¡¥÷³q³q¥t¥~¼g¶i¤@­ÓÀÉ®×¸Ì­±¡AµM«á
+>   ¨Ì·Ó¨Ï¥ÎªÌ­Ó¤Hªº³]©w¸ü¤J¡C
+
+: global.h
+
+- #undef  VAR
+- #undef  INI
+
+: theme.h
+
+  ´N§â #define xxx §ï¦¨ VAR char *xxx INI()¡A¨Ò¦p
+
+- #define FEETER_CLASS    COLOR1 "  ¬ÝªO¿ï¾Ü  " COLOR2 " (c)·s¤å³¹ ..."
++ VAR char *FEETER_CLASS  INI(COLOR1 "  ¬ÝªO¿ï¾Ü  " COLOR2 " (c)·s¤å³¹ ...");
+
+- #define FEETER_ULIST    COLOR1 "  ºô¤Í¦Cªí  " COLOR2 " (f)¦n¤Í  ..."
++ VAR char *FEETER_ULIST  INI(COLOR1 "  ºô¤Í¦Cªí  " COLOR2 " (f)¦n¤Í  ...");
+
+  ©Ò¦³ªº NECKER_* FOOTER_* FEETER_* VMSG_NULL ICON_* TOKEN_* ³£­n§ï
+
+: src/include/theme.1 ·s¼W¦¹ÀÉ®×
+
+  ´N¬O§â­è¤~¦³§ïªº¡A¨Ì§Ç³q³q¼g¦b³o¸Ì­±¡A¤@­Ó¤@¦æ
+  ¦b³oÀÉ®×¸Ì­±¼gªº¥i¥H¸ò­è¤~§ïªº¤å¦r¬O¤£¤@¼Ëªº (¤]´N¬O¥t¥~¤@­Ó§G´º¥DÃD)
+
+"\033[1;37;44m  ¿ï¾Ü¬ÝªO  \033[0;30;47m c:·s¤å³¹ vV:¤wÅª¥¼Åª ....\033[m"
+"\033[1;37;44m  ºô¤Íª¬ªp  \033[0;30;47m f:¦n¤Í t:²á¤Ñ  ....\033[m"
+
+: src/include/theme.2 ·s¼W¦¹ÀÉ®×
+
+  ©M src/include/theme.1 ¤@¼Ëªº®æ¦¡¡A¥i¥H³y¥t¥~¤@®MÃC¦â¡B¤å¦rªº§G´º¥DÃD
+
+: bbsd.c:load_theme() ·s¼W¦¹¨ç¦¡©ó tn_login() «e­±
+
+#define MAX_MSG 500         /* °²³]¥þ³¡µ{¦¡¦³ 500 ­Ó message */
+#define LOAD_THEME(x, i)    if (all_msg[i][0]) x = all_msg[i]
+
+static void
+load_theme()        /* ¸ü¤J»y¨tÀÉ */
+{
+  int i;
+  char *fpath, ans[3];
+  FILE *fp;
+  static char all_msg[MAX_MSG][80];
+
+  /* ¿ï¾Ü»y¨tÀÉ */
+  switch (vget(b_lines, 0, "¨Ï¥Î­þ¤@®M§G´º¥DÃD(1-2)¡H ", ans, 3, DOECHO))
+  {
+  case '1':
+    fpath = "src/include/theme.1";
+    break;
+  case '2':
+    fpath = "src/include/theme.2";
+    break;
+  default:
+    return;
+  }
+
+  /* ¸ü¤J»y¨tÀÉ */
+  if (fp = fopen(fpath, "r"))
+  {
+    for (i = 0; i < MAX_MSG; i++)
+    {
+      if (!fgets(all_msg[i], sizeof(all_msg[i]), fp))
+        break;
+    }
+    fclose(fp);
+  }
+
+  [1;44m// §â«e­±¦³§ïªº¥þ³¡¨Ì§Ç¼g¦b¤U¨Ó¡A[m
+  [1;44m// 0´N¬OÅª»y¨tÀÉªº²Ä¤@¦æ¡A1´N¬OÅª»y¨tÀÉªº²Ä¤G¦æ¡A¨Ì¦¹Ãþ±À [m
+  /* §â©Ò¦³ªº msg ³£«ü¦V all_msg[][] */
+  LOAD_THEME(FEETER_CLASS, 0);
+  LOAD_THEME(FEETER_ULIST, 1);
+  ...
+  ...
+}
+
+: bbsd.c:tn_login()
+
+  multi = login_user(buf);
++ load_theme();
+
+
+---
+
+  ³o¼Ëªº¸Ü¡Aµ{¦¡¥i¥H§ï«Ü¤Ö¡A´N¥u­n§ï theme.h ¤Î bbsd.c:load_theme()
+  ©M½s­× theme.1 theme.2 theme.3 µ¥»y¨tÀÉ
+
+  global.h ¤]¥i¥H¤ñ·Ó¿ì²z
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32m140.113.128.124[37m µoªí[m

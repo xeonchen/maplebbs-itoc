@@ -1,0 +1,32 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (·¦­·¼s³õ..ÁÙ´¹µØ«°«¨) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¡i°ÝÃD¡j¦n¤Íªº¬ÛÃö°ÝÃD
+µo«H¯¸: °Ê¤O®Ö¤ß (Fri, 19 Sep 2003 17:39:02 +0800 (CST))  Updated: 2004/10/02
+
+¡° ¤Þ­z¡monline (¥u¦b¤W½u®É·R§A)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¦p¦ó­­¨î¡A©Ò¦³¨Ï¥ÎªÌ±Nguest¥[¤J¦n¤Í©O?
+
+: pal.c:pal_add()
+
+  if (userno == cuser.userno)   /* lkchu.981201: ªB¤Í¦W³æ¤£¥i¥[¦Û¤v */
+  {
+    vmsg("¦Û¤v¤£¶·¥[¤JªB¤Í¦W³æ¤¤");
+    return XO_HEAD;
+  }
++ else if (!str_cmp(acct.userid, STR_GUEST))
++ {
++   vmsg("¸ô¤H¤£¯à¥[¤JªB¤Í¦W³æ");
++   return XO_HEAD;
++ }
+
+: talk.c:ulist_makepal()
+
+    userno = up->userno;
+    if (userno > 0 && (userno != cuser.userno) &&
+-     !is_mygood(userno) && !is_mybad(userno))
++     !is_mygood(userno) && !is_mybad(userno) &&
++     str_cmp(up->userid, STR_GUEST))
+    {
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m ¥x«n¤@¤¤£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

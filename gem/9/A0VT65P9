@@ -1,0 +1,40 @@
+µo«H¤H: SnowWolf.bbs@xeon.tfcis.org (ÀR©]) ¬ÝªO: plan
+¼Ð  ÃD: [¤å¥ó] ¤j´I¯Î
+µo«H¯¸: °Ê¤O®Ö¤ß (Fri, 08 Aug 2003 22:24:43 +0800 (CST))  Updated: 2003/08/08
+
+¶Ç»¡¤¤ªº¤j´I¯Î½u¤W¹CÀ¸,
+¦n¤[¥H«eªºªF¦è¤F....,
+­ì¥»¥H¬°¬O¬Õ¤ë»PÁc¬P©Î¬O¤p³½ªºµµ¦âªá¶é¤¤ªº¤j´I¯Î,
+©Ò¥H¦Û¤v¸ÕµÛ§ï¤F,§ï§¹«áµo²{¦Û¤v§Ë¿ù¤F¥Õ¦£¤@³õ-.-|||
+¤U­±¬O¹CÀ¸¶i¦æªºµe­±,·Qª±ª±¬Ýªº¸Ü¥i¥H¨ì¤Ñªø¦a¤[¯¸ª±ª±¬Ý....
+§Ú¥u¦³§ï¨ì¤j­P¤W¥i¥Hª±¨S¸Ô²Ó¸Õ¹L....-.-
+¦Ó¥B¥u¤¹³\¤@®à¶i¦æ¹CÀ¸¨S¿ìªkÅÜ¦¨¥]´[¤¹³\«Ü¦h¤H¦P®Éª±
+anyway,¤U­±¬O§ïªk...
+
+: ¼W¥[¤U­±´X­ÓÀÉ®×¨ì ~/etc/game/
+
+chance   fate   map       rich.welcome
+display  fee    rich.help
+
+: config.h
+
++ #define  HAVE_RICH          /* ´£¨Ñ¤j´I¯Î¥\¯à */
+
+: menu.c ¾A·í¦a¤è¼W¥[
+
++#ifdef HAVE_RICH
++  "bin/rich.so:main_rich", PERM_GAME, - M_GAME,
++  "Rich       ¤j´I¯Î",
++#endif
+
+: game/Makefile:
+
+SO =    .... [1;33mrich.so[m
+
+: ©ó game/ ¤U¼W¥[ rich.c ³o¤äµ{¦¡
+
+  ¼W¥[ rich.c ³o¤äµ{¦¡
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m     [31m°[1mÊ¤[0;31mO®[1mÖ¤[0;31mß [1mprocessor.tfcis.org    [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[ [1m    218-172-173-190.hinet-ip.hinet  [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

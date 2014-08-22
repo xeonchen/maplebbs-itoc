@@ -1,0 +1,71 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¬ÝªO³Â¦N
+®É¶¡: 2004/02/07 Sat 12:49:14                           Updated: 2005/03/23
+
+  ­n¥ý°µ "pal.c ³Â¦N¦W³æ" ³o½g patch
+
+  ³Q³]¬ÝªO³Â¦Nªº¨Ï¥ÎªÌ¥i¥H¬Ý¥[±K¤å³¹/§â¬ÝªO¥´¥]
+
+: maple.p
+
+int is_bgood(BPAL *bpal);
+int is_bbad(BPAL *bpal);
++ int is_bmate(BPAL *bpal);
+
+: pal.c:is_bmate() ¥[¦b is_bgood() «e­±
+
+int
+is_bmate(bpal)              /*  1: §Ú¬O¸ÓªOªº³Â¦N */
+  BPAL *bpal;
+{
+  return belong_pal(bpal->pal_spool, bpal->pal_max, cuser.userno | MATE_MASK);
+}
+
+: board.c:Ben_Perm()
+
+  else if (ulevel & PERM_ALLBOARD)
+    bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT | BRD_M_BIT;
+
++ /* itoc.040207: ¬ÝªO³Â¦N­«·s§PÂ_ */
++ else if (is_bmate(bpal))
++   bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_M_BIT;
+
+: boarc.c:XoPost()
+
+-   if (bits & BRD_M_BIT)
++   if ((bits & BRD_M_BIT) && (bits & BRD_X_BIT))
+    bbstate |= (STAT_BM | STAT_BOARD | STAT_POST);
++   else if (bits & BRD_M_BIT)
++     bbstate |= (STAT_BM | STAT_POST);
+    else if (bits & BRD_X_BIT)
+      bbstate |= (STAT_BOARD | STAT_POST);
+    else if (bits & BRD_W_BIT)
+      bbstate |= STAT_POST;
+
+: account.c:init_bpal()
+
+            do
+            {
+-             *userno++ = (up->ftype & PAL_BAD) ? -(up->userno) : up->userno;
++             *userno++ = (up->ftype & PAL_BAD) ? -(up->userno) :
++               (up->ftype & PAL_MATE) ? (up->userno | MATE_MASK) :
++               up->userno;
+              up++;
+            } while (--c);
+
+: post.c:post_refuse()
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
+- if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
++ /* ¬ÝªO³Â¦N¤£¯à¥[¸Ñ±KªO¤Wªº¤å³¹ */
++ if (!strcmp(hdr->owner, cuser.userid) ||
++   ((bbstate & STAT_BM) && (bbstate & STAT_BOARD)))
+  {
+    hdr->xmode ^= POST_RESTRICT;
+    currchrono = hdr->chrono;
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

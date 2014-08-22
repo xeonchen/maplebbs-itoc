@@ -1,0 +1,41 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¨Ï¥ÎªÌ¸ê®Æ
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/07 Thu 01:42:04)                Updated: 2004/10/07
+
+¡° ¤Þ­z¡mimd.bbs@wretch.twbbs.org (ºN¯Á¤¤)¡n¤§»Ê¨¥¡G
+> ¦³¨S¦³¤èªk¥i¥H¦b¨Ï¥ÎªÌ¿é¤J¦Û¤vªº©m¦W®É
+> ¶i¦æÀË¬d
+> ´N¹³¨Ï¥ÎªÌ¥Ó½Ð±b¸¹®É
+> ¦pªG·Q¥Ó½ÐID¦b¤£¶®¦W³æ¤¤
+> ´N­n¨D¨Ï¥ÎªÌ§ó§ï
+
+: global.h
+
+#define FN_ETC_BADID    "etc/badid"             /* ¤£¶®¦W³æ(©Úµ´µù¥Uid) */
++ #define FN_ETC_BADNAME  "etc/badname"         /* ¤£¶®¦W³æ(©Úµ´µù¥Uname) */
+
+: admutil.c:a_xfile()
+
+    "¤£¶®¦W³æ",
++   "¤£¶®©m¦W¦W³æ",
+    "¯¸°È¦W³æ",
+
+    ...
+
+
+    FN_ETC_BADID,
++   FN_ETC_BADNAME,
+    FN_ETC_SYSOP,
+
+: bbsd.c:acct_apply()
+
+  do
+  {
+    vget(21, 0, "¯u¹ê©m¦W¡G", cuser.realname, RNLEN + 1, DOECHO);
+- } while (strlen(cuser.realname) < 4);
++ } while (strlen(cuser.realname) < 4||belong(FN_ETC_BADNAME,cuser.realname));
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

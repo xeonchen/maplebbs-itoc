@@ -1,0 +1,80 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] ¯¸°È¦æ¬°¬ö¿ý -¬d¬Ý¨Ï¥ÎªÌ¸ê®Æ
+µo«H¯¸: µL¦W¤p¯¸ (2006/07/08 Sat 21:20:11)                Updated: 2005/07/08
+
+¡° ¤Þ­z¡myenning (»ñ·s¹q¬ã93ªÀªø)¡n¤§»Ê¨¥¡G
+> ¦UÁ`ºÞÆ[¬Ý¨Ï¥ÎªÌ¸ê®Æ®É»Ý­n¿é¤JÆ[¬Ý­ì¦]
+> ¨Ã¥B¨t²Î·|¦Û°Ê²£¥Í¬ö¿ýÀÉ©ólogª©
+
+¥Ø«eºëµØ°Ï©Ò°µ­×¥¿ ¦b¬d¬Ý¸ê®Æ«á¤~¿é¤J²z¥Ñ
+
+¤]´N¬O¥i¥H¥ý¬Ý¨ì¸ê®Æ ¤~¨M©w­n¿é¤J¤°»ò²z¥Ñ
+
+¥H¤U­×¥¿: ¥ý¸ß°Ý²z¥Ñ ¨M©w¬O§_Åã¥Üuser¸ê®Æ
+
+·íµM... ­Y²z¥Ñ¿é¤JªÅ¥Õ ¨SªkÁ×§K :(
+
+
+[32m:/src/maple/acct.c:acct_setup()[m
+
+void
+acct_setup(u, adm)
+  ACCT *u;
+  int adm;
+{
+  ACCT x;
+  int i, num;
+  char *str, buf[80], pass[PSWDLEN + 1];
++ char reason[64];
+
+- acct_show(u, adm);
+
++ if (adm == 1)
++ {
++   clrtobot();
++   move(12, 0);
++   prints("½Ð¿é¤J¬d¨Ï¥ÎªÌ[%s]¸ê®Æ²z¥Ñ¡A©Î«ö[Enter]Â÷¶}¬d¸ß", u->userid);
++   if (vget(14, 0, "½Ð¿é¤J²z¥Ñ¡G", reason, 64, DOECHO))
++   {
++     move(3, 0); /* acct_show¤w§@clrtobot() ¬G¦b¦¹µL²MªÅ°Ê§@ */
++     acct_show(u, adm);
++     sprintf(buf, "¬d¬Ý¨Ï¥ÎªÌ[%s]¸ê®Æ ²z¥Ñ: %s", u->userid, reason);
++     alog("³]©w±b¸¹", buf);  /* ¬ö¿ý¯¸°È¦æ¬° 060708 guessi */
++   }
++   else /* ­Yenter¸õ¥X «h²MªÅµe­± */
++   {
++     move(3, 0);
++     clrtobot();
++     return;
++   }
++ }
++ else
++   acct_show(u, adm); /* ¥D¿ï³æ -> (U)ser -> (I)nfo ¨Ï¥Î */
+
+  memcpy(&x, u, sizeof(ACCT));
+
+  if (adm)
+  {
+    adm = vans("³]©w 1)¸ê®Æ 2)Åv­­ Q)¨ú®ø [Q] ");
+    if (adm == '2')
+      goto set_perm;
+
+    if (adm != '1')
++   {
++     move(3, 0);
++     clrtobot();
+      return;
++   } /* µ²§ô²MªÅµe­± */
+  }
+  else
+  {
+    if (vans("­×§ï¸ê®Æ(y/N) ") != 'y')
+      return;
+
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H[37m134-208-1-226.ee.ndhu.edu.tw[30m®ü[m

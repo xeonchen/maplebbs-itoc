@@ -1,0 +1,98 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¡¯¿W¤@µL¤G¡¯) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¦n¤Í¦W¤ùÀÉ¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/08/09 Mon 14:05:44)                Updated: 2004/10/07
+
+¡° ¤Þ­z¡mmdfh.bbs@processor.tfcis.org (´cÅ]ÄÒ)¡n¤§»Ê¨¥¡G
+> ¤£ª¾¹D¦³¨S¦³¿ìªk°µ¥X³o¼ËªºªF¦è
+> ¨Ï¥ÎªÌ«ØÄ³ªº ._.
+> ¦W¤ùÀÉ¤À¦¨¨âºØ¡A¦b«öENTER¬d¸ß®É¥i¥H¿ï¾Ü ¤@¯ë¦W¤ùÀÉ  ©M  ¦n¤Í¦W¤ùÀÉ
+> ¦pªG¹ï¤è¦³¥[¤J§A¬°¦n¤Í ´N¥i¥H¬Ý¨ì ¦n¤Í¦W¤ùÀÉªº¿ï¶µ
+
+: global.h
+
+/* ----------------------------------------------------- */
+/* ­Ó¤H¥Ø¿ýÀÉ¦W³]©w                                      */
+/* ----------------------------------------------------- */
+
+
+#define FN_ACCT     ".ACCT"     /* User account */
+#define FN_BRH      ".BRH"      /* board reading history */
+#define FN_CZH      ".CZH"      /* class zap history */
+
+#define FN_PLANS    "plans"     /* ­pµeÀÉ */
++ #define FN_GOODPLANS    "GoodPlans" /* ¦n¤Í¦W¤ùÀÉ */    [1;44m // ÀÉ¦W¦Û¤v§ï [m
+
+
+: acct.c:u_xfile()
+
+  static char *desc[] =
+  {
+    "¤W¯¸¦aÂI³]©wÀÉ",
+    "¦W¤ùÀÉ",
++   "¦n¤Í¦W¤ùÀÉ",
+
+  ......
+  ......
+
+  static char *path[] =
+  {
+    "acl",
+    "plans",
++   FN_GOODPLANS,
+
+: maple.p
+
++ int is_hisgood(UTMP *up, char *userid);
+
+: pal.c:is_hisgood() ·s¼W¦¹¨ç¦¡¦b is_ogood() «á­±
+
+int
+is_hisgood(up, userid)
+  UTMP *up;
+  char *userid;
+{
+  int max;
+  char fpath[64];
+  int pool[PAL_MAX];
+
+  if (up)
+    return is_ogood(up);
+
+  usr_fpath(fpath, userid, fn_pal);
+  max = image_pal(fpath, pool);
+
+  return belong_pal(pool, max, cuser.userno);
+}
+
+: talk.c:do_query()
+
++ if (is_hispal(up, userid) && vans("¬O§_¬Ý¦n¤Í±MÄÝ¦W¤ù(Y/N)¡H[N] ") == 'y')
++   showgoodplans(userid);
++ else
+    showplans(userid);
+  vmsg(NULL);
+}
+
+: talk.c:showgoodplans()  ·s¼W¾ã¤ä¨ç¦¡¦b showplans() ¤U­±
+
+static void
+showgoodplans(userid)
+  char *userid;
+{
+  int i;
+  FILE *fp;
+  char buf[ANSILINELEN];
+
+  usr_fpath(buf, userid, FN_GOODPLANS);
+  if (fp = fopen(buf, "r"))
+  {
+    i = MAXQUERYLINES;
+    while (i-- && fgets(buf, sizeof(buf), fp))
+      outx(buf);
+    fclose(fp);
+  }
+}
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m218-170-129-23.dynamic.hinet.net [30mµoªí[m

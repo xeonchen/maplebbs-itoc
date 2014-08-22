@@ -1,0 +1,66 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: Re: [∂¢≤·]•[±K§Â≥π≈„•‹•ºæ\≈™
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2006/07/05 Wed 12:31:53)                Updated: 2005/07/05
+
+  ¨›™O¶C™Ì™∫•º≈™øO•—≥Ã´·§@Ωg•i≈™™∫(´D•[±K)§Â≥π¨Oß_§w≈™®M©w
+
+: board.c:class_item()
+
+  brh_get(brd->bstamp, bno);
+- str1 = brh_unread(brd->blast) ? ICON_UNREAD_BRD : ICON_READ_BRD;
++ str1 = brh_unread(find_blast(brd)) ? ICON_UNREAD_BRD : ICON_READ_BRD;
+
+: board.c:check_blast() ∑sºW¶π®Á¶°¶b class_item() ´e≠±
+
+#ifdef ENHANCED_VISIT
+static time_t
+find_blast(brd)
+  BRD *brd;
+{
+#ifdef ENHANCED_BSHM_UPDATE
+  int fd, fsize;
+  char folder[64];
+  struct stat st;
+  time_t blast;
+
+  blast = 0;
+  brd_fpath(folder, brd->brdname, fn_dir);
+  if ((fd = open(folder, O_RDONLY)) >= 0)
+  {
+    if (!fstat(fd, &st) && (fsize = st.st_size) >= sizeof(HDR))
+    {
+      HDR hdr;
+
+      /* itoc.020829: ß‰≥Ã´·§@Ωg•º≥Q•[±K°B§£¨O∏m©≥™∫ HDR */
+      while ((fsize -= sizeof(HDR)) >= 0)
+      {
+        lseek(fd, fsize, SEEK_SET);
+        read(fd, &hdr, sizeof(HDR));
+        if (!(hdr.xmode & POST_BOTTOM))
+        {
+#ifdef HAVE_REFUSEMARK
+          if (!(hdr.xmode & POST_RESTRICT) ||
+            !strcmp(hdr.owner, cuser.userid) ||
+            is_bm(brd->BM, cuser.userid))
+#endif
+            break;
+        }
+      }
+      blast = hdr.chrono;
+    }
+    else
+    {
+      blast = 0;
+    }
+    close(fd);
+  }
+  return blast;
+#else
+  return brd->blast;
+#endif
+}
+#endif
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m61-216-224-95.dynamic.hine[m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

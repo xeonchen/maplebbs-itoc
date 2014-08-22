@@ -1,0 +1,41 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¶Ã¼ÆÅã¥Ü¯¸¤W¨Ï¥ÎªÌ
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/02/17 Tue 01:11:08)                Updated: 2004/02/17
+
+¡° ¤Þ­z¡mJianmin.bbs@whshs.cs.nccu.edu.tw (Jianmin)¡n¤§»Ê¨¥¡G
+> ¦pªG»¡­n¥Î¶Ã¼Æ¨ú¥X¯¸¤W(µù¥U)¨Ï¥ÎªÌÅã¥Ü
+
+: acct.c:random_choose_userid() ·s¼W¦¹¨ç¦¡
+
+static ACCT *
+random_choose_userid()
+{
+  int num;
+  char userid[IDLEN + 1];
+  SCHEMA schema;
+  static ACCT acct;
+
+  num = rec_num(FN_SCHEMA, sizeof(SCHEMA));
+
+  while (1)
+  {
+    rec_get(FN_SCHEMA, &schema, sizeof(SCHEMA), rand() % num);
+    str_ncpy(userid, schema.userid, IDLEN + 1); /* schema.userid ¤£¥]¬A '\0' */
+
+    if (acct_load(&acct, userid) >= 0)
+      return &acct;
+  }
+}
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ACCT *acct;
+
+  acct = random_choose_userid();
+
+  // ª©­±¦Û©w
+  prints("%s ¤W¯¸ %d ¦¸", acct->userid, acct->numlogins);
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

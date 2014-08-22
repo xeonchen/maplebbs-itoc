@@ -1,0 +1,29 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (¬Ý¤FÃD¥Ø´Nª¾¹D¸Ó©ñ±ó) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] °Î¦WªOªº°ÝÃD
+µo«H¯¸: °Ê¤O®Ö¤ß (Tue, 19 Aug 2003 09:54:52 +0800 (CST))  Updated: 2003/08/19
+
+¡° ¤Þ­z¡mgokui (gokui)¡n¤§»Ê¨¥¡G
+> ©Ò¥H·Q½Ð°Ý¤@¤U¡A­n«ç»ò§â°Î¦W¹w³]­È§ï¦¨¨Ï¥Î¯u¦W
+
+-     if (!vget(b_lines, 0, "½Ð¿é¤J§A·Q¥ÎªºID¡A¤]¥iª½±µ«ö[Enter]"
+-            "¡A©Î¬O«ö[r]¥Î¯u¦W¡G", anonymousid, IDLEN, DOECHO))
+-     {                                         /* ¯d 1 byte ¥[ "." */
+-       strcpy(anonymousid, STR_ANONYMOUS);
+-       curredit |= EDIT_ANONYMOUS;
+-     }
+-     else if (strcmp(anonymousid, "r"))
+-     {
+-       strcat(anonymousid, ".");    /* ­Y¬O¦Û©wID¡A­n¦b«á­±¥[­Ó . ªí¥Ü¤£¦P */
+-       curredit |= EDIT_ANONYMOUS;
+-     }
+
++     if (vget(b_lines, 0, "½Ð¿é¤J§A·Q¥ÎªºID¡A¤]¥iª½±µ«ö[Enter]¨Ï¥Î¯u¦W¡G",
++       anonymousid, IDLEN, DOECHO))        /* ¯d 1 byte ¥[ "." */
++     {
++       strcat(anonymousid, ".");    /* ­Y¬O¦Û©wID¡A­n¦b«á­±¥[­Ó . ªí¥Ü¤£¦P */
++       curredit |= EDIT_ANONYMOUS;
++     }
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m     [31m°[1mÊ¤[0;31mO®[1mÖ¤[0;31mß [1mprocessor.tfcis.org    [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[ [1m    itoc.dorm11.nctu.edu.tw         [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

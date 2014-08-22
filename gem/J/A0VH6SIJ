@@ -1,0 +1,49 @@
+§@ªÌ: itoc (ºñ¥¨¤H¦n«È¡H) ¬ÝªO: itoc
+¼ÐÃD: [¥\¯à] ¾ã¦æ¥ú´Î(9)¡Ðaloha.c ¤W¯¸³qª¾¦W³æ
+®É¶¡: Tue Jul 15 10:50:07 2003                          Updated: 2005/08/08
+
+: aloha.c:aloha_item_bar()  ¥[¦b aloha_item() «á­±
+
+#ifdef HAVE_LIGHTBAR
+static int
+aloha_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:¤W¥ú´Î  0:¥h¥ú´Î */
+{
+  ALOHA *aloha;
+#ifdef CHECK_ONLINE
+  UTMP *online;
+#else
+  int online = 0;
+#endif
+
+  aloha = (ALOHA *) xo_pool + xo->pos - xo->top;
+
+#ifdef CHECK_ONLINE
+  online = utmp_get(aloha->userno, NULL);
+#endif
+
+  prints("%s%6d%c   %s%-14s%s%54s%s",
+    mode ? "\033[44m" : "",         //³o¸Ì¬O¥ú´ÎªºÃC¦â¡A¥i¥H¦Û¤v§ï
+    xo->pos + 1, tag_char(aloha->userno),
+    online ? "\033[33m" : "",
+    aloha->userid, "",
+    online ? "\033[37m" : "",
+    mode ? "\033[m" : "");
+
+  return XO_NONE;
+}
+#endif
+
+: aloha.c:aloha_cb[]
+
+static KeyFunc aloha_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, aloha_item_bar,
+#endif
+...
+
+--
+[1;31m|[33m Origin [31m| [0;45m MapleBBS-itoc °Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+[1;31m|[35m Author [31m| [36mitoc.dorm11.nctu.edu.tw[m

@@ -1,0 +1,71 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý~»{ÃÒ¦³¿ìªk¼W¥[³o­Ó¥\¯à¶Ü?
+µo«H¯¸: °Ê¤O®Ö¤ß (2003/12/24 Wed 11:27:51)                Updated: 2005/04/29
+
+¡° ¤Þ­z¡msbs (SBS)¡n¤§»Ê¨¥¡G
+> ¦b¥ÎColaªº®É­Ô¡A¦³¤@­Ó¥\¯à´N¬O·í¯¸ªø¼f®Ö
+> §¹µù¥U³æ«á¡A·|¦Û°Ê±N¤º®ePO¦b¤@­ÓªO¤W¡A
+> ¼ÐÃD·|µù©ú[½T»{¦¨¥\]or[½T»{¥¢±Ñ]
+> ¦P®É¨º½g¤å³¹´N·|¥X²{¨Ï¥ÎªÌµù¥Uªº¤º®e¡B
+> ¥Ñ½Ö¼f®Ö¡B®É¶¡µ¥¡C
+> ³o¼Ëªº¦n³B¬O·í¦³¹ê²ß¯¸ªø¦b³B²z®É¡A
+> §A¥i¥H¬Ý¨º­ÓªO´Nª¾¹D¥L¦³¨S¦³¶Ã»{ÃÒ
+
+  ¥ý°µºëµØ°Ï³o½g
+  [¥\¯à] post.c µo¤å¨ì¬ÝªO
+
+: admutil.c ·s¼W¥H¤U¨ç¦¡¦b scan_register_form() «e­±
+
+static void
+log_register(rform, pass)
+  RFORM *rform;
+  int pass;
+{
+  char fpath[64], title[TTLEN + 1];
+  FILE *fp;
+
+  sprintf(fpath, "tmp/log_register.%s", cuser.userid);   /* ¼È¦sÀÉ */
+  if (fp = fopen(fpath, "w"))
+  {
+    sprintf(title, "¯¸ªø %s ¼f®Ö %s ªºµù¥U³æ%s³q¹L",
+      cuser.userid, rform->userid, pass ? "" : "¤£");
+
+    /* ¤å³¹ÀÉÀY */
+    fprintf(fp, "%s %s (%s) %s %s\n",
+      str_author1, cuser.userid, cuser.username,
+      str_post2, BN_SECURITY);
+    fprintf(fp, "¼ÐÃD: %s\n®É¶¡: %s\n\n", title, Now());
+
+    /* ¤å³¹¤º®e */
+    fprintf(fp, "%s\n\n", title);
+    fprintf(fp, "¥Ó½Ð¥N¸¹: %s (¥Ó½Ð®É¶¡¡G%s)\n",
+      rform->userid, Btime(&(rform->rtime)));
+    fprintf(fp, "ªA°È³æ¦ì: %s\n", rform->career);
+    fprintf(fp, "¥Ø«e¦í§}: %s\n", rform->address);
+    fprintf(fp, "³sµ¸¹q¸Ü: %s\n", rform->phone);
+
+    fclose(fp);
+
+    add_post(BN_SECURITY, fpath, title);
+    unlink(fpath);
+  }
+}
+
+: admutil.c:scan_register_form()
+
+    case 'y':
+
++     log_register(&rform, 1);
+      /* ´£¤ÉÅv­­ */
+
+    ...
+    ...
+
+    case 'n':
+
++     log_register(&rform, 0);
+      move(9, 0);
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mpc512-2.ee.nctu.edu.tw [30mµoªí[m

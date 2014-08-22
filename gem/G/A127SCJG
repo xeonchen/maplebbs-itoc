@@ -1,0 +1,124 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [°ÝÃD] ±±¨î½X¥h°£
+µo«H¯¸: µL¦W¤p¯¸ (2006/05/30 Tue 17:16:50)                Updated: 2006/06/01
+
+·Q°µ¤@­Ó¥\¯à "¾\Åª®É"¤Á´«Åã¥Ü¦³µL±±¨î½X
+
+¥H¤U¬O§Ú§ïªº¤º®e ³Â·Ð¦U¦ì«ü±Ð ÁÂÁÂ <(_ _)>
+
+
+
+[32m:/src/include/ufo.h[m
+
++  #define UFO_NOANSI      BFLAG(22)     /* more()¥h°£ÃC¦â */
+..
+..
++  "¾\\Åª¤å¦rÃC¦â   (¥h°£/«O¯d)",        /* UFO_NOANSI */
+
+[32m:/src/maple/more.c[m
+
+static uschar *fimage;
+static uschar *fend;
+static uschar *foff;
+
++ static int noansi;
+
+
+[32m:/src/maple/more.c:more()[m
+
++ noansi = (footer == FOOTER_POST || footer == FOOTER_MAILER);
+
+  clear();
+
+
+[32m:/src/maple/more.c:outs_line()[m
+
++ if (noansi)
++ {
++   ansi = 0;
++   str_ansi(str, str, ANSILINELEN);
++   outx(str);
++   return;
++ }
+
+  ch1 = str[0];
+  ch2 = str[1];
+
+
+[32m:/src/maple/more.c:outs_header()[m
+
++ char linebuf[ANSILINELEN]; /* UFO_NOANSI */
+
+..
+..
+
+    if ((ptr = strstr(word, str_post1)) || (ptr = strstr(word, str_post2)))
+    {
+      ptr[-1] = ptr[4] = '\0';
+-     prints(" .... ");
++     sprintf(linebuf, " .... ");
+    }
+    else
+    {
+      /* ¤Ö¬ÝªO³oÄæ */
+-     prints(" .... ");
++     sprintf(linebuf, " .... ");
+    }
++   outs_line(linebuf);
+    return;
+  }
+
+..
+..
+
+      /* ¨ä¥LÀÉÀY³£¥u¦³¤@Äæ */
+      word = str + header_len;
+-     prints(" .... ");
++     sprintf(linebuf, " .... ");
++     outs_line(linebuf);
+
+
+[32m:/src/maple/more.c:outs_footer()[m
+
+-     outs(buf);
++     outs_line(buf);
+
+
+[32m:/src/maple/more.c:more()[m
+
+      if (footer != (char *) -1)
+-       outf(footer);
++       outs_line(footer);
+
+
+¥H¤U¬O°µ«öÁä¤Á´«ªº³]©w
+
+[32m:/src/maple/more.c:more()[m
+
++   else if (key == 'W')
++   {
++     cuser.ufo ^= UFO_NOANSI;
+
++     /* ·|¸õ¦^line 1 */
++     if (lino <= b_lines)      /* ¤w¸g¦b³Ì¶}©l¤F */
++       shift = 0;
++     else
++       shift = -PAGE_SCROLL - 1;
++   }
+
+    else if (key == 'h')
+    {
+
+[32m:/src/maple/post.c:post_browse()[m
+
++   case 'W':
++     cuser.ufo ^= UFO_NOANSI;
++     more(fpath, FOOTER_POST);
++     goto re_key;      /* ·|¸õ¦^line 1 */
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î [37m61-231-196-70.dynamic.hinet.net[30m®ü[m

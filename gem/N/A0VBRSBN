@@ -1,0 +1,133 @@
+§@ªÌ: itoc (¾C¹C¦b¤@«×ªÅ¶¡) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¨Ã¦C¥DÃD
+®É¶¡: Sun May 11 14:36:05 2003                          Updated: 2003/05/11
+
+  ©Ò¿×¨Ã¦C¥DÃD´N¬O±N¤å³¹¨Ì¼ÐÃD±Æ§Ç
+  «ö K ¶i¤J¨Ã¦C¥DÃD¡A¦b¸Ì­±¥i¥H¥Î QA|? ¨Ó·j´M
+
+: post.c
+
+static int post_head();
++ static int do_thread();
+
+: post.c:post_cb[]
+
++  'K', do_thread,              /* itoc.030511: ¨Ã¦C¥DÃD¼Ò¦¡ */
+
+: post.c ³Ì«á­±¥[¤J¥H¤U³o¾ã¬q
+
+/*-------------------------------------------------------*/
+/* ¨Ã¦C¥DÃD                                              */
+/*-------------------------------------------------------*/
+
+
+static int
+thread_cmp(a, b)
+  HDR *a;
+  HDR *b;
+{
+  int k;
+  char *titleA, *titleB;
+
+  titleA = str_ttl(a->title);
+  titleB = str_ttl(b->title);
+
+  /* ¼ÐÃD/®É¶¡¥æ¤e¤ñ¹ï */
+  k = strcmp(titleA, titleB);
+  return k ? k : (a->chrono - b->chrono);
+}
+
+
+static int
+thread_main()
+{
+  int fd, size, max;
+  HDR *thread;
+  char folder[64], fpath[64];
+  struct stat st1, st2;
+
+  brd_fpath(folder, currboard, fn_dir);
+
+  if (stat(folder, &st1) == -1)
+    return -1;
+
+  brd_fpath(fpath, currboard, ".THREAD");
+
+  if (stat(fpath, &st2) != -1)  /* ¤w¦³ .THREAD ÀÉ */
+  {
+    if (st2.st_mtime >= st1.st_mtime)
+    {
+      /* ­Y¤w¦³ .THREAD ¥B¬O¥Ñ³Ì·sªº .DIR °µ¥X¨Óªº¡A¨º»ò´N¤£­«ÂÐ²£¥Í¤@­Ó */
+      return st2.st_size / sizeof(HDR);
+    }
+    unlink(fpath);  /* ¬å±¼ÂÂªº¡A­«·s²£¥Í */
+  }
+
+  /* ²£¥Í .THREAD ÀÉ */
+  if ((fd = open(folder, O_RDONLY)) >= 0)
+  {
+    size = st1.st_size;
+    thread = (HDR *) malloc(size);
+    read(fd, thread, size);
+    close(fd);
+    max = size / sizeof(HDR);
+    if (max > 1)
+      qsort(thread, max, sizeof(HDR), thread_cmp);
+    rec_add(fpath, thread, size);
+    free(thread);
+    return max;
+  }
+
+  return -1;
+}
+
+
+static KeyFunc thread_cb[] =
+{
+  XO_INIT, post_init,
+  XO_LOAD, post_load,
+  XO_HEAD, post_head,
+  XO_BODY, post_body,
+
+  'r', post_browse,
+  'y', post_reply,
+  Ctrl('P'), post_add,
+  Ctrl('Q'), xo_uquery,
+  Ctrl('O'), xo_usetup,
+
+  'h', post_help
+};
+
+
+static int
+do_thread(xo)
+  XO *xo;
+{
+  int max;
+  char fpath[64];
+  XO *xt;
+
+  outz("¡¹ ¨t²Î³B²z¼ÐÃD¤¤¡A½Ðµy­Ô \033[5m...\033[m");
+  refresh();
+
+  if ((max = thread_main()) <= 0)
+  {
+    vmsg("µo¥Í¤£©ú¿ù»~¡A½Ð³ø§i¯¸ªø");
+    return XO_FOOT;
+  }
+
+  brd_fpath(fpath, currboard, ".THREAD");
+  xz[XZ_POST - XO_ZONE].xo = xt = xo_new(fpath);
+  xz[XZ_POST - XO_ZONE].cb = thread_cb;   /* ­­¨î¦b thread ¸Ì­±¥i¥H¥Îªº«ü¥O */
+  xo->pos = 0;
+  xo->key = XZ_POST;
+  xover(XZ_POST);
+  free(xt);
+
+  xz[XZ_POST - XO_ZONE].cb = post_cb;     /* «ì´_­ì¥»¥i¥H¥Îªº«ü¥O */
+
+  return post_load(xo);
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,107 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¦¬«H¦^±ø
+®É¶¡: 2006/04/09 Sun 03:38:14                           Updated: 2006/04/10
+
+¡° ¤Þ­z¡meddieoboe (EDDIE)¡n¤§»Ê¨¥¡G
+> bbsmail¬O§_¯à¼g¥X¹³¬Ooutlook¨ººØ¦¬«H¦^±ø
+
+: hdr.h
+
+- #define MAIL_5          0x00000010
++ #define MAIL_DSN        0x00000010  /* Delivery Status Notification */
+
+: global.h
+
+#define FN_ETC_EXPIRE   "etc/expire.conf"
++ #define FN_ETC_RECEIPT   "etc/receipt"
+
+: etc/receipt ·s¼W¦¹ÀÉ®×
+
+  §Ú¤w¸g¦¬¨ì³o«Ê«H¤F
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+: bbsmail.c:mail2bbs()
+
+  int fd;
+  FILE *fp;
++ int notification = 0;
+
+  ...
+  ...
+
+    else if (!memcmp(buf, "Content-Transfer-Encoding: ", 27))
+    {
+      mm_getencode(buf + 27, &decode);
+    }
++   else if (!memcmp(buf, "Disposition-Notification-To: ", 29))
++   {
++     notification = 1;
++   }
++   else if (!memcmp(buf, "Return-Receipt-To: ", 19))
++   {
++     notification = 1;
++   }
+
+  ...
+  ...
+
+  fd = hdr_stamp(folder, 0, &hdr, buf);
+  hdr.xmode = MAIL_INCOME;
++ if (notification)
++   hdr.xmode |= MAIL_DSN;
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+: bmtad.c:struct Agent
+
+  int letter;
++ int notification;
+
+: bmtad.c:mta_mailer()
+
+  mode = ap->mode;
+  data = ap->data + 1;
++ ap->notification = 0;
+
+  ...
+  ...
+
+    else
+    {
++     if (!str_ncmp(data, "Disposition-Notification-To:", 28) ||
++       !str_ncmp(data, "Return-Receipt-To:", 18))
++       ap->notification = 1;
+
+      /* skip this line */
+      for (;;)
+      {
+
+: bmtad.c:bbs_mail()
+
+  hdr.xmode = MAIL_INCOME;
++ if (ap->notification)
++   hdr.xmode |= MAIL_DSN;
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+: mail.c:mbox_browse()
+
+    if (nmode == 0 && !(xmode & MAIL_READ))
+    {
++     if (xmode & MAIL_DSN &&
++       vans("¹ï¤è­n¨DÅª¨ú¦^±ø¡A­n¦^¶Ü(Y/N)¡H[Y] ") != 'n')
++     {
++       char title[80];
++       sprintf(title, "Åª¨ú: %.64s", str_ttl(hdr->title));
++       bsmtp(FN_ETC_RECEIPT, title, hdr->owner, 0);
++     }
+      hdr->xmode = xmode | MAIL_READ;
+      rec_put(dir, hdr, sizeof(HDR), pos, NULL);
+    }
+
+--
+  ÀH«K¼g¼gªº¡A¨S¸Õ¹L :p
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

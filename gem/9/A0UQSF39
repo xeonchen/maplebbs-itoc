@@ -1,0 +1,56 @@
+§@ªÌ: itoc (¤£¤Óµo®i¹êÅç«Ç) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ´£¿ôªA°È
+®É¶¡: Wed Sep  4 10:52:15 2002                          Updated: 2006/04/17
+
+  NPC ªº¥\¯à¤ÓµL²á¡A¨º§ï¤@¤U
+  ´N¥i¥HÅÜ´£¿ôªA°È (­n§ï¦¨¥bÂI³ø®É¤]¬O¥i¥H)
+
+: maple.p
+
+int bmw_send(UTMP *callee, BMW *bmw);
++ void bmw_alarm(void);
+
+: bmw.c:bmw_alarm() ·s¼W³o¨ç¦¡©ó bmw_send() «á­±
+
+void
+bmw_alarm()
+{
+  static time_t alarm = 0;
+  time_t now;
+
+  time(&now);
+  if (now > alarm)
+  {
+    if (alarm)      /* ¤W¯¸«áªº²Ä¤@¦¸¤£ºâ */
+    {
+      BMW bmw;
+      char *msg[2] = {"¯¸°_¨Ó°Ê°ÊÃi¸y§a", "¹q¸£¥´¤Ó¦h¤£¦n³á"};
+
+      strcpy(bmw.msg, msg[now % 2]);
+      bmw.caller = cutmp;
+      bmw.sender = 0;                  /* ¤£¥i¦^ÂÐ */
+      bmw.recver = cuser.userno;
+      strcpy(bmw.userid, "¦Û°Ê³ø®É");
+      bmw_send(cutmp, &bmw);
+    }
+
+    alarm = now + 30 * 60;  /* ¨C 30 ¤À alarm ¤@¦¸ */
+  }
+}
+
+: visio.c:outf()
+
+void
+outf(str)
+  uschar *str;
+{
++ bmw_alarm();
+  outz(str);
+  prints("%*s\033[m", d_cols, "");
+}
+
+
+  ©ñ¦b outf()¡A¦pªG¨Ï¥ÎªÌ idle ®É¡A¨º»ò´N¤£´£¿ô
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

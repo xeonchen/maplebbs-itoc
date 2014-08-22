@@ -1,0 +1,46 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: ·Q½Ð±Ð¤j¤jÃö©ó¹CÀ¸ªº°ÝÃD
+®É¶¡: 2005/05/01 Sun 17:43:41                           Updated: 2005/05/01
+
+¡° ¤Þ­z¡mPon (¸I¡ã)¡n¤§»Ê¨¥¡G
+>     ¹ï¤F¡ã·Q½Ð°Ý¤@¤U¤j¤j¦³¿ìªk¬ö¿ý¨Ï¥ÎªÌª±¹CÀ¸ªº log ¶Ü @@?
+>     ¦]¬°¦³µo²{¯¸¤W¤@¨Çª÷¹ô¯S§O¦hªº¡A¦ü¥G³£¬O§Q¥Î³nÅé±¾¯¸¬~¿ú
+>     ½ð¤U¥h¹L´X¬í¤S¦Û°Ê³s¤W¨Ó¤F \___/
+>     ¦ý¬O«o¨S¦³®Ú¾Ú¯à°÷ªv¥L­Ì¡A
+>     ©Ò¥H·Q½Ð°Ý¤@¤U¤j¤j¦³¨S¦³¼g¹L³o¼Ëªºµ{¦¡ @@?
+
+  ³ÌÂ²³æªº¼gªk¡A¤£¥hºÞ¹CÀ¸ªººØÃþ
+
+: acct.c:addmoney()
+
+void
+addmoney(addend)
+  int addend;
+{
+  if (addend < (INT_MAX - cuser.money)) /* Á×§K·¸¦ì */
+    cuser.money += addend;
+  else
+    cuser.money = INT_MAX;
++ if (bbsmode == M_GAME)
++ {
++   char buf[256];
++   sprintf("[%s] %s ª±¹CÀ¸ÁÈ¤F %d »È\n", Now(), cuser.userid, addend);
++   f_cat("run/gamelog", buf);
++ }
+}
+
+: account.c:main()
+
+    sprintf(title, "%s¤å³¹½g¼Æ²Î­p", date);
+    keeplog(FN_RUN_POST_LOG, BN_SECURITY, title, 2);
+
++   sprintf(title, "%s¹CÀ¸ÁÈ¿ú°O¿ý", date);
++   keeplog("run/gamelog", BN_SECURITY, title, 2);
+
+--
+  ¦pªG·Qª¾¹D¦b­þ­Ó¹CÀ¸ÁÈ¿úªº¡A´N±o¦b addmoney() ¥[¤@­Ó°Ñ¼Æ
+  µM«á§ï *.c ªº addmoney(xx); ÅÜ¦¨ addmoney(xx, "ºØÃþ");
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

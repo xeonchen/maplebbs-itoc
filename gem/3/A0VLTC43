@@ -1,0 +1,389 @@
+µo«H¤H: verit.bbs@bbs.yzu.edu.tw (BBS ¯¸ªø¤j·|), ¬ÝªO: installbbs
+¼Ð  ÃD: [WindTop]BBS¦r«¬²£¥Í¾¹
+µo«H¯¸: ¤¸´¼¤j¾Ç­·¤§¶ð (Tue Sep  9 19:57:26 2003)         Updated: 2003/09/10
+
+: menu.c ¾A·íªº¿ï³æ¥[¤J
+
+  "bin/font.so:main_font", 0, - M_XMODE,
+  "OFont      ¡ñ ¦r«¬²£¥Í ¡ð",
+
+: run/font
+
+  «Ø¥ß¦¹¥Ø¿ý
+
+: run/font/help ·s¼W¦¹ÀÉ®×
+
+1. §ë½Z¦r«¬®æ¦¡¦p¤U :
+
+ùÝùÞùù¢¡
+ùàùáùùùâ
+ùãùå  ¢¢
+ùÝùÞùù¢¡
+ùàùáùù¢¡
+ùãùäùù¢£
+¢~ùÞùù¢¡
+ùàùâ
+¢¢ùäùù¢£
+ùÝùÞùù¢¡
+ùàùâ  ùø
+ùãùäùù¢£
+..... ¨Ì¦¹Ãþ±À¡A±q¢Ï¨ì¢è ¡ã
+
+2. ¦r«¬¨S¦³ªø¡B¼eªº­­¨î¡C
+
+3. ¦r«¬¤£¯à¦³±±¨î½X¡C
+
+4. ºÉ¶q©Ò¦³¦rÅé²Î¤@¤j¤p¡C
+
+: src/so/Makeifle
+
+SO =    .... [1;33mfont.so[m
+
+: src/so/font.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* font.c       ( YZU_CSE WindTop BBS )                  */
+/*-------------------------------------------------------*/
+/* author : verit.bbs@bbs.yzu.edu.tw                     */
+/* target : bbs ¦r«¬²£¥Í¾¹                               */
+/* create : 03/09/08                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+#define DEF_PATH    "run/font/"
+
+extern XZ xz[];
+extern char xo_pool[];
+
+static int font_add();
+
+typedef struct
+{
+  char name[32];
+  char fpath[16];
+  char author[32];
+  int height;
+  int width;
+  char tmp[40];
+}      FONT;
+
+
+static void
+font_item(num, font)
+  int num;
+  FONT *font;
+{
+  prints("%6d     %-32s%-s\n", num, font->name, font->author);
+}
+
+
+static int
+font_body(xo)
+  XO *xo;
+{
+  FONT *font;
+  int num, max, tail;
+
+  move(3, 0);
+  clrtobot();
+  max = xo->max;
+  if (max <= 0)
+  {
+    if (vans("­n·s¼W¸ê®Æ¶Ü(Y/N)¡H[N] ") == 'y')
+      return font_add(xo);
+    return XO_QUIT;
+  }
+
+  font = (FONT *) xo_pool;
+  num = xo->top;
+  tail = num + XO_TALL;
+  if (max > tail)
+    max = tail;
+
+  do
+  {
+    font_item(++num, font++);
+  } while (num < max);
+
+  return XO_FOOT;
+}
+
+
+static int
+font_head(xo)
+  XO *xo;
+{
+  vs_head("¦r«¬²£¥Í¾¹", str_site);
+  outs("[¡ö]Â÷¶} [Enter]²£¥Í¦r«¬ [q]ÂsÄý [^P]·s¼W [c]­×§ï [d]§R°£ [h]§ë½Z®æ¦¡\n"
+    "\033[30;47m  ½s¸¹     ¦r  «¬  ¦W  ºÙ                  §@     ªÌ                          \033[m");
+  return font_body(xo);
+}
+
+
+static int
+font_load(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(FONT));
+  return font_body(xo);
+}
+
+
+static int
+font_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(FONT));
+  return font_head(xo);
+}
+
+
+static int
+font_edit(font, echo)
+  FONT *font;
+  int echo;
+{
+  char fpath[64];
+
+  if (echo == DOECHO)
+  {
+    time_t t = time(0);
+    memset(font, 0, sizeof(FONT));
+    archiv32(t, font->fpath);
+  }
+
+  if (vget(b_lines, 0, "¦r«¬¦WºÙ¡G", font->name, sizeof(font->name), echo))
+  {
+    sprintf(fpath, "%s%s", DEF_PATH, font->fpath);
+    if (!vedit(fpath, 0))
+    {
+      vget(b_lines, 0, "¦r«¬§@ªÌ¡G", font->author, sizeof(font->author), echo);
+      sprintf(fpath, "%d", font->height);
+      vget(b_lines, 0, "¦r«¬°ª«×¡G", fpath, 3, echo);
+      font->height = atoi(fpath);
+      sprintf(fpath, "%d", font->width);
+      vget(b_lines, 0, "¦r«¬¼e«×¡G", fpath, 3, echo);
+      font->width = atoi(fpath);
+      return 1;
+    }
+
+    vmsg(echo == DOECHO ? "¨ú®ø·s¼W" : "¨ú®ø­×§ï");
+  }
+
+  return 0;
+}
+
+
+static int
+font_add(xo)
+  XO *xo;
+{
+  FONT font;
+
+  if (!HAS_PERM(PERM_SYSOP))
+    return XO_NONE;
+
+  if (font_edit(&font, DOECHO))
+  {
+    rec_add(xo->dir, &font, sizeof(FONT));
+    xo->pos = XO_TAIL;
+    xo_load(xo, sizeof(FONT));
+  }
+  return font_head(xo);
+}
+
+
+static int
+font_delete(xo)
+  XO *xo;
+{
+  if (!HAS_PERM(PERM_SYSOP))
+    return XO_NONE;
+
+  if (vans(msg_del_ny) == 'y')
+  {
+    if (!rec_del(xo->dir, sizeof(FONT), xo->pos, NULL))
+    {
+      FONT *font;
+      char fpath[64];
+      font = (FONT *) xo_pool + (xo->pos - xo->top);
+      sprintf(fpath, "%s%s", DEF_PATH, font->fpath);
+      unlink(fpath);
+      return font_load(xo);
+    }
+  }
+  return XO_FOOT;
+}
+
+
+static int
+font_change(xo)
+  XO *xo;
+{
+  FONT *font, mate;
+  int pos, cur;
+
+  if (!HAS_PERM(PERM_SYSOP))
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  font = (FONT *) xo_pool + cur;
+
+  mate = *font;
+  font_edit(font, GCARRY);
+  if (memcmp(font, &mate, sizeof(FONT)))
+  {
+    rec_put(xo->dir, font, sizeof(FONT), pos, NULL);
+    move(3 + cur, 0);
+    font_item(++pos, font);
+  }
+
+  return XO_INIT;
+}
+
+static int
+font_browser(xo)
+  XO *xo;
+{
+  FONT *font;
+  int pos, cur;
+  char fpath[64];
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  font = (FONT *) xo_pool + cur;
+  sprintf(fpath, "%s%s", DEF_PATH, font->fpath);
+  more(fpath, NULL);
+  return XO_INIT;
+}
+
+static int
+font_create(xo)
+  XO *xo;
+{
+  FONT *font;
+  int pos, cur;
+  char fpath[64];
+  char buf[26][128];
+  FILE *fp;
+  char str[9];
+  int len;
+  int x;
+
+  if (!vget(b_lines, 0, "½Ð¿é¤J±ý²£¥Íªº¦r¦ê : ", str, sizeof(str), DOECHO))
+    return XO_FOOT;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  font = (FONT *) xo_pool + cur;
+  sprintf(fpath, "%s%s", DEF_PATH, font->fpath);
+
+  fp = fopen(fpath, "r");
+  if (!fp)
+    return XO_FOOT;
+
+  pos = 0;
+  cur = 0;
+  memset(buf, sizeof(buf), 0);
+  while (fgets(fpath, sizeof(fpath), fp))
+  {
+    for (len = strlen(fpath) - 1; len < font->width; ++len)
+      fpath[len] = ' ';
+    fpath[len] = 0;
+
+    if (cur)
+      strcat(buf[pos], fpath);
+    else
+      strcpy(buf[pos], fpath);
+    if (++cur >= font->height)
+    {
+      ++pos;
+      cur = 0;
+    }
+    if (pos >= 26)
+      break;
+  }
+
+  fclose(fp);
+  clear();
+  vs_head("¦r«¬²£¥Í¾¹", str_site);
+
+  x = 3;
+  move(x, 0);
+  prints("§A­n²£¥Íªº¦r¦ê¬° : %s", str);
+  x += 2;
+  move(x, 0);
+  len = strlen(str);
+  for (cur = 0; cur < font->height; ++cur)
+  {
+    for (pos = 0; pos < len; ++pos)
+    {
+      /* ¤p¼g */
+      if (str[pos] >= 'a' && str[pos] <= 'z')
+      {
+        strncpy(fpath, &(buf[str[pos] - 'a'][font->width * cur]), font->width);
+        outs(fpath);
+      }
+      else if (str[pos] >= 'A' && str[pos] <= 'Z')
+      {
+        strncpy(fpath, &(buf[str[pos] - 'A'][font->width * cur]), font->width);
+        outs(fpath);
+      }
+    }
+    outc('\n');
+  }
+  vmsg(NULL);
+  return XO_INIT;
+}
+
+static int
+font_help(xo)
+  XO *xo;
+{
+  char fpath[64];
+
+  sprintf(fpath, "%shelp", DEF_PATH);
+  more(fpath, NULL);
+  return font_head(xo);
+}
+
+
+KeyFunc font_cb[] =
+{
+  XO_INIT, font_init,
+  XO_LOAD, font_load,
+  XO_HEAD, font_head,
+  XO_BODY, font_body,
+
+  Ctrl('P'), font_add,
+  'r', font_create,
+  'q', font_browser,
+  'c', font_change,
+  'd', font_delete,
+  'h', font_help
+};
+
+
+int
+main_font()
+{
+  XO *xo;
+  char fpath[64];
+
+  /* ­É¥Î XZ_PAL¡A©Ò¥H feeter ·|¤£¹ï¡A¨S®t :p */
+  sprintf(fpath, "%sindex", DEF_PATH);
+  xz[XZ_PAL - XO_ZONE].xo = xo = xo_new(fpath);
+  xz[XZ_PAL - XO_ZONE].cb = font_cb;
+  xover(XZ_PAL);
+  free(xo);
+
+  return 0;
+}
+
+--
+[1;32m¡° Origin: [33m¤¸´¼¤j¾Ç ­·¤§¶ð [37m<bbs.yzu.edu.tw> [m
+[1;32m¡° From  : [36mbbs.yzu.edu.tw[m

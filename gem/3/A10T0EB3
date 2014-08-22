@@ -1,0 +1,73 @@
+µo«H¤H: itoc.bbs@bbs.wretch.cc (°Ú°Ú°Ú°Ú~) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¥\¯à] ¨Ï¥ÎªÌ¦Û¤v¶}ªO
+µo«H¯¸: µL¦W¤p¯¸ (2004/12/28 Tue 00:12:27)                Updated: 2004/12/28
+
+¡° ¤Þ­z¡mpigco.bbs@cpu.tfcis.org («¢)¡n¤§»Ê¨¥¡G
+> ´N¬O¨Ï¥ÎªÌÀH«K¶ñE-mail«á¡A
+> ¦pªG¥L§ï¥H¶ñ¼gµù¥U³æ»{ÃÒ¡C
+> ¦b¯¸°È¼f®Ö³q¹Lªº¦P®É¡A
+> ±N¥LªºE-mail§ï¦^X.bbs@bbs.X.X.X
+> ¤£ª¾¹D³o¼Ë§ï·|¤£·|¤Ï¦Ó³y¦¨¨ä¥L¿ù¶Ã¡H¡H
+> §Ú¬OÄ±±o¤£¥u¬O¦b"¨Ï¥ÎªÌ¦Û¤v¶}ªO"³o¥\¯à¤UÀ³¸Ó¦p¦¹¡A
+> ¥­±`¤]À³¸Ó¦p¦¹¡A¤£µM·|Åý¯¸°È»~¥H¬°¥L¯uªº¬O¸ÓE-mailªº¾Ö¦³ªÌ¡C
+> ÁÙ¬O»¡E-mail¦³¨S¦³½T»{¹L¡AÀ³¸Ó¥Î¥t¤@ºØ¤è¦¡ªí²{¤ñ¸û¦n¡H¡H
+
+  §ï¤F ACCT Äæ¦ì­n transacct
+
+: struct.h:struct ACCT
+
+  char email[60];               /* ¥Ø«eµn°Oªº¹q¤l«H½c */
++ char vmail[60];               /* ³q¹L»{ÃÒªº¹q¤l«H½c */
+}      ACCT;
+
+: acct.c:acct_show()
+
+  prints("  \033[32m¶l¥ó«H½c¡G\033[37m%s\n", u->email);
+
++ prints("  \033[32mµù¥U«H½c¡G\033[37m%s\n", u->vmail);
+
+: acct.c:acct_setup()
+
+    vget(++i, 0, "¶l¥ó«H½c¡G", x.email, sizeof(x.email), GCARRY);
++   vget(++i, 0, "µù¥U«H½c¡G", x.vmail, sizeof(x.vmail), GCARRY);
+
+: bbsd.c:u_exit()
+
+        cuser.userlevel = tuser.userlevel;
+        cuser.tvalid = tuser.tvalid;
++       strcpy(cuser.vmail, tuser.vmail);
+
+: user.c:do_pop3()
+
+    /* ´£¤ÉÅv­­ */
+    sprintf(buf, "POP: %s", addr);
+    justify_log(cuser.userid, buf);
+    strcpy(cuser.email, addr);
++   strcpy(cuser.vmail, addr);
+    if (acct_load(&acct, cuser.userid) >= 0)
+
+: mailpost.c:verify_user()
+
+            /* ´£¤ÉÅv­­ */
+            acct.userlevel |= PERM_VALID;
+            time(&acct.tvalid);
++           strcpy(acct.vmail, acct.email);
+            lseek(fd, (off_t) 0, SEEK_SET);
+            write(fd, &acct, sizeof(ACCT));
+
+: bmtad.c:bbs_valid()
+
+  /* ´£¤ÉÅv­­ */
+  acct.userlevel |= PERM_VALID;
+  time(&acct.tvalid);
++ srcpy(acct.vmail, acct.email);
+  lseek(fd, 0, SEEK_SET);
+  write(fd, &acct, sizeof(ACCT));
+  close(fd);
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m¬ÛÃ¯ http://www.wretch.cc/album ¦³§G´º¥DÃD ³t«×«Ü§Ö [30m¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H¤£¬p [37mitoc.Dorm11.NCTU.edu.tw[30m®ü[m

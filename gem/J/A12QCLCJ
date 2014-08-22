@@ -1,0 +1,97 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¦p¦ó°µ©w®É­«¸m¤H®ð
+µo«H¯¸: °Ê¤O®Ö¤ß (2007/01/11 Thu 23:04:38)                Updated: 2007/01/11
+
+¡° ¤Þ­z¡mguessi (¨S)¡n¤§»Ê¨¥¡G
+> ·Qªk: crontab¨C¤@¤p®É ±½board list ¦A±½ulist §ó·smantime
+
+: crontab -e ¥[¤J³o¤G¦æ©ó³Ì«á
+
+# ¨C¤p®É§@¤T¦¸­«¸m¬ÝªO¤H®ð
+6,26,46 * * * * bin/resetbh > /dev/null 2>&1
+
+: src/util/Makefile
+
+EXE =   ... [1;33mresetbh[m
+
+: src/util/resetbh.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/resetbh.c   ( NTHU MapleBBS Ver 3.10 )           */
+/*-------------------------------------------------------*/
+/* target : ­«¸m¬ÝªO¤H®ð                                 */
+/* create : 07/01/11                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+static BCACHE *bshm;
+
+static void
+init_bshm()
+{
+  bshm = shm_new(BRDSHM_KEY, sizeof(BCACHE));
+
+  if (bshm->uptime <= 0)        /* bshm ¥¼³]©w§¹¦¨ */
+    exit(0);
+}
+
+
+static UCACHE *ushm;
+
+static void
+init_ushm()
+{
+  ushm = shm_new(UTMPSHM_KEY, sizeof(UCACHE));
+}
+
+int
+main()
+{
+  int bno, bmate;
+  char *bname;
+  BRD *head, *tail;
+  UTMP *uentp, *uceil, *up;
+
+  chdir(BBSHOME);
+
+  init_bshm();
+  init_ushm();
+
+  bno = -1;
+  head = bshm->bcache;
+  tail = head + bshm->number;
+
+  uentp = ushm->uslot;
+  uceil = (void *) uentp + ushm->offset;
+
+  do
+  {
+    bno++;
+    bname = head->brdname;
+
+    if (!*bname)
+      continue;
+
+    bmate = 0;
+    up = uentp;
+    do
+    {
+      if ((up->mode == M_READA) && !strcmp(up->reading, bname))
+        bmate++;
+    } while (++up <= uceil);
+
+    bshm->mantime[bno] = bmate;
+
+  } while (++head < tail);
+
+  return 0;
+}
+
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m218-168-179-31.dynamic.hin[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

@@ -1,0 +1,33 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD] ¬ÝªOÂsÄý¤H®ð/®É¶¡ (1.°ò¥»)  ­×§ïªº°ÝÃD
+®É¶¡: 2005/06/13 Mon 02:30:54                           Updated: 2005/06/13
+
+  µ¹¤@­ÓÂ²³æªºÂÅÃz/µµÃz..ªº½d¨Ò
+  ¼Æ¦rªùÂe¡BÃC¦â¡B¦r¼Ë¡A¦Û¤vÀH«K§ï
+
+: board.c:class_item()
+
+  /* ³B²z ¤H®ð */
+  bno = bshm->mantime[bno];
+- if (bno > 99)
+-   str3 = "\033[1;31mÃz\033[m";
++ if (bno > 50)
++   str3 = "\033[1;36;41mÃz\033[m";
++ else if (bno >= 40)
++   str3 = "\033[1;35m¬µ\033[m";
++ else if (bno >= 30)
++   str3 = "\033[1;34m¼ô\033[m";
++ else if (bno >= 20)
++   str3 = "\033[1;31m¼ö\033[m";
++ else if (bno >= 10)
++   sprintf(str3 = buf, "\033[1;31[m%2d\033[m", bno);
++ else if (bno >= 5)
++   sprintf(str3 = buf, "\033[1;33[m%2d\033[m", bno);
+  else if (bno > 0)
+    sprintf(str3 = buf, "%2d", bno);
+  else
+    str3 = "  ";
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;45m¢c[42m¢i[m [1mMo[30mdi[mfy: [1;35m2005/06/13 Mon 02:31:07[m

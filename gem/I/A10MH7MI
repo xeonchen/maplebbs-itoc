@@ -1,0 +1,16 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: ½Ð°Ý¦p¦óÅý"¶i¯¸µe­±"¶Ã¼Æ¶]¥X"°ÊºA¬Ýª©"?
+®É¶¡: 2004/03/11 Thu 14:14:19                           Updated: 2006/02/13
+
+¡° ¤Þ­z¡mleira.bbs@wretch.twbbs.org (kkk)¡n¤§»Ê¨¥¡G
+>   ·QÅý¶i¯¸µe­±ÀH¾÷¶]¥X°ÊºA¬Ýª©ªº¹Ï
+>   ¦Ó¤£¥u¬O©T©w´X­ÓÀÉ®×
+
+: bbsd.c:tn_main()
+
+- film_out((ap_start % 3) + FILM_OPENING0, 3);  /* ¶Ã¼ÆÅã¥Ü¶}ÀYµe­± */
++ film_out(FILM_MOVIE, 3);
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mpc512-2.ee.nctu.edu.tw [30mµoªí[m

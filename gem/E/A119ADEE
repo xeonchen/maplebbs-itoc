@@ -1,0 +1,103 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [½Ð±Ð]¦³Ãö¤£¯àµo¤å
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/05/26 Thu 02:06:24)                Updated: 2005/05/26
+
+¡° ¤Þ­z¡mhatvito.bbs@cpu.tfcis.org (123)¡n¤§»Ê¨¥¡G
+> ¦pªG»¡
+> ·Q­nÅýªO¥D¦Û­q¯à¤£¯àµo¤å
+> Ä´¦p»¡
+> ¦³¤j§å¶m¥Á¾xªO
+> ªO¥D¨Ó¤£¤Î³B²z
+> ·Q­n¥ý°±¤îµo¤å¨Ó¾ã²zªO­±
+
+: battr.h
+
+#define BRD_ANONYMOUS   0x20    /* °Î¦W¬ÝªO */
++ #define BRD_NOPOST    0x40    /* ¤£¯àµoªí¤å³¹¨ì¬ÝªO */
+
+  ...
+  ...
+
+- #define NUMBATTRS       6
++ #define NUMBATTRS       7
+
+- #define STR_BATTR       "zTcsvA"
++ #define STR_BATTR       "zTcsvAp"
+
+: battr.h:battr_tbl[]
+
+  "°Î¦W¬ÝªO",           /* BRD_ANONYMOUS */
++ "¤£¯àµoªí¤å³¹¨ì¬ÝªO", /* BRD_NOPOST */
+
+: post.c:do_post()
+
++ if (currbattr & BRD_NOPOST)
++   return XO_NONE;
+
+  if (!(bbstate & STAT_POST))
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ¦pªG§Æ±æ¶}©ñµ¹ªO¥D¦Û¦æ³]©w
+
+: manage.c §â¥H¤U³o¬q¥[¦b post_battr_noscore() «á­±
+
+static int
+post_battr_nopost(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("1)¥i¥H§R°£¤å³¹ 2)¤£¥i§R°£¤å³¹ [Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_NOPOST;
+    break;
+  case '2':
+    newbrd.battr |= BRD_NOPOST;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+#  ifdef HAVE_SCORE
+    "Score   ³]©w¥i§_µû¤À",
+#  endif
++   "Post    µoªí¤å³¹³]©w",
+
+  ...
+  ...
+
+#  ifdef HAVE_SCORE
+    " (S)µû¤À"
+#  endif
++   " (P)µo¤å"
+
+  ...
+  ...
+
+#ifdef HAVE_SCORE
+  case 's':
+    return post_battr_noscore(xo);
+#endif
+
++ case 'p':
++   return post_battr_nopost(xo);
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

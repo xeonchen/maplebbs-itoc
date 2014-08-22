@@ -1,0 +1,47 @@
+§@ªÌ: itoc (League) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¨Ì¤W¯¸ªº port ªº¨q¥X¤£¦Pªºµe­±
+®É¶¡: 2004/02/07 Sat 11:19:46                           Updated: 2004/02/07
+
+> ¡° ¤Þ­z¡mtandrian.bbs@ntcb.twbbs.org.tw (¤Û°ìÅ]«°«á¯ª)¡n¤§»Ê¨¥¡G
+> §â bbsd.c ªº©Ò¦³¦³Ãö mport ªº³¡¤À¥´¶}§Y¥i~~ ^^
+> mport §PÂ_¨Ï¥ÎªÌ±q­þ­Óport¤W¨Ó
+
+: bbsd.c
+
+- /* static int mport; */ /* Thor.990325: ¤£»Ý­n¤F:P */
++ static int mport = 0;       /* ¤W¯¸ªº port */
+static u_long tn_addr;
+
+: bbsd.c:start_daemon()
+
+#if 1
+    n = sizeof(sin);
+    if (getsockname(0, (struct sockaddr *) &sin, &n) >= 0)
+      port = ntohs(sin.sin_port);
+#endif
+-   /* mport = port; */ /* Thor.990325: ¤£»Ý­n¤F:P */
++   mport = port;
+
+  ...
+  ...
+
+- /* mport = port; */ /* Thor.990325: ¤£»Ý­n¤F:P */
++ mport = port;
+  sin.sin_port = htons(port);
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ±µ¤U¨Ó mport ´N¬O¨Ï¥ÎªÌ±q­þ­Ó port ¤W¨Ó
+  ¥i¥H¦Û¥Ñµo´§
+
+: bbsd.c:tn_main()
+
+- prints(MYHOSTNAME " ¡ó " SCHOOLNAME " ¡ó " MYIPADDR "\n"
+-   "Åwªï¥úÁ{¡i\033[1;33;46m %s \033[m¡j¥Ø«e½u¤W¤H¼Æ [%d] ¤H",
+-   str_site, ushm->count);
++ prints(MYHOSTNAME " ¡ó " SCHOOLNAME " ¡ó " MYIPADDR "[port:%d]\n"
++   "Åwªï¥úÁ{¡i\033[1;33;46m %s \033[m¡j¥Ø«e½u¤W¤H¼Æ [%d] ¤H",
++   mport, str_site, ushm->count);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

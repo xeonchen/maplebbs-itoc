@@ -1,0 +1,92 @@
+µo«H¤H: LHD.bbs@YoMin.twbbs.org (§Ú§Ö³Q·dºÆ¤F||) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¾ã¦æ¥ú´Î(7)¡Ðfavor.c §Úªº³Ì·R
+µo«H¯¸: ¹C¥Á¤§®a (Mon, 14 Jul 2003 19:45:37 +0800 (CST))  Updated: 2005/10/06
+
+[1;31m­n¥ý°µ§¹board.cªºclass_item_bar()®@[m
+
+: favor.c:mf_item_bar() ¥[¦b mf_item() ¤§«á
+
+#ifdef HAVE_LIGHTBAR
+static int
+mf_item_bar(xo, mode)
+  XO *xo;
+  int mode;
+{
+  int num;
+  MF *mf;
+  int mftype, brdpost, invalid;
+
+  num = xo->pos + 1;
+  mf = (MF *) xo_pool + xo->pos - xo->top;
+  mftype = mf->mftype;
+  brdpost = cuser.ufo & UFO_BRDPOST;
+
+  if (mftype & MF_FOLDER)
+  {
+    if (brdpost)
+    {
+      struct stat st;
+      char fpath[64];
+
+      mf_fpath(fpath, cuser.userid, mf->xname);
+      stat(fpath, &st);
+      num = st.st_size / sizeof(MF);
+    }
+    prints("%s%6d%c  %s %-66.54s\033[m", mode ? "\033[1;42m" : "",
+      num, mftype & MF_MARK ? ')' : ' ', "¡»", mf->title);
+  }
+  else if (mftype & MF_BOARD)
+  {
+    BRD *bhead, *btail;
+    int chn;
+
+    chn = 0;
+    invalid = 1;
+    bhead = bshm->bcache;
+    btail = bhead + bshm->number;
+
+    do
+    {
+      if (!strcmp(mf->xname, bhead->brdname))
+      {
+        if (mode)
+          class_item_bar(bhead, num, chn, brdpost);
+        else
+          class_item(num, chn, brdpost);
+        invalid = 0;
+        break;
+      }
+      chn++;
+    } while (++bhead < btail);
+
+    if (invalid)        /* itoc.010821: ³Q¬åªº¬ÝªO­n¥t¥~¦L */
+    {
+      prints("%s         \033[36m%-13s%-56s\033[m", mode ?
+        "\033[1;42m" : "", mf->xname, "<¤w§ï¦W©Î³Q§R°£¡A½Ð±N¥»±¶®|§R°£>");
+    } [1;31m /* ªø«×¦nÃø½Õ °®¯Ü¦Û¤v§ï¤F= =*/[m
+  }
+  else /* if (mftype & MF_GEM) */
+  {
+    prints("%s%6d%c  %s %-66.54s\033[m",
+      mode ? "\033[1;42m" : "",
+      brdpost ? 0 : num,
+      mftype & MF_MARK ? ')' : ' ', "¡½", mf->title);
+  }
+
+  return XO_NONE;
+}
+#endif
+
+: favor.c:mf_cb[]
+
+static KeyFunc mf_cb[] =
+{
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, mf_item_bar,
+#endif
+...
+
+--
+[m¢d¢e¢f¢g¢h¢f¢e¢d¢c¢b                [33m¢©  ¢¨      ¢i¢©¢¨¢i ¡´   [1;30mbbs.cis95.net[m
+[30;47m¢h¢f¢e¢c¢b¡Å¢d¢f¢g[0;35m   ©~µL©w©Òªº¶³   [33m¢ª¢i¢« ¢«¢ª ¢i¢ª¢«¢i ¡¶ ¢i¢h¢© [0;1m¹C¥Á¤§®a[m
+[1;34mÄÆ¦Û [31mcismpc19.cis.nctu.edu.tw         [0;33m¢i   ¢©¢¨ ¢i    ¢i ¢i ¢i  ¢i¡Etwbbs¡Eorg[m

@@ -1,0 +1,360 @@
+§@ªÌ: itoc (cygreadline4.dll) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¥æ¤j®Õ¶é¬¡°Ê¤½§i
+®É¶¡: 2004/05/20 Thu 16:23:55                           Updated: 2004/08/17
+
+  ¥æ¤j®Õ¶é¬¡°Ê¤½§i http://info.nctu.edu.tw/news/
+  ¦Û°ÊÂà¶K¨ì BBS ¤Wªº [NCTU_news] ªO
+  (·íµM¡A­n¥ý¶}³o­ÓªO¡F¦pªG·Q´«ªO¦W¡Aµ{¦¡¸Ì­±¤]­n§ï)
+
+: crontab -e ¥[¤J³o¤G¦æ
+
+# ¨C¤Ñ§ì¤G¦¸¥æ¤j®Õ¶é¤½§i
+20 10,14 * * * * bin/NCTUnews > /dev/null 2>&1
+
+: src/util/Makefile
+
+EXE =   ... [1;33mNCTUnews[m
+
+: src/util/NCTUnews.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/NCTUnews.c       ( NTHU CS MapleBBS Ver 3.10 )   */
+/*-------------------------------------------------------*/
+/* target : ¥æ¤j®Õ¶é¬¡°Ê¤½§i                             */
+/* create : 04/05/20                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define LYNX_PATH       "/usr/local/bin/lynx --source"  /* lynx ªºµ´¹ï¸ô®| */
+
+
+/*-------------------------------------------------------*/
+/* BRD shm ³¡¤À¶·»P cache.c ¬Û®e                         */
+/*-------------------------------------------------------*/
+
+
+static BCACHE *bshm;
+
+static void
+init_bshm()
+{
+  /* itoc.030727: ¦b¶}±Ò bbsd ¤§«e¡AÀ³¸Ó´N­n°õ¦æ¹L account¡A
+     ©Ò¥H bshm À³¸Ó¤w³]©w¦n */
+
+  bshm = shm_new(BRDSHM_KEY, sizeof(BCACHE));
+
+  if (bshm->uptime <= 0)        /* bshm ¥¼³]©w§¹¦¨ */
+    exit(0);
+}
+
+
+static void
+update_btime(brdname)
+  char *brdname;
+{
+  BRD *bhdr, *tail;
+
+  bhdr = bshm->bcache;
+  tail = bhdr + bshm->number;
+  do
+  {
+    if (!str_cmp(brdname, bhdr->brdname))
+    {
+      bhdr->btime = -1;
+      break;
+    }
+  } while (++bhdr < tail);
+}
+
+
+/*-------------------------------------------------------*/
+/* µo¤å¨ì¬ÝªO                                            */
+/*-------------------------------------------------------*/
+
+
+static char *Brdname = "NCTU_news";     /* ±ý post ªº¬ÝªO */
+static char *Userid = "¥æ¤j®Õ¶é¤½§i";   /* §@ªÌ */
+static char *Username = "Áp¦XªA°È¤¤¤ß"; /* ¼ÊºÙ */
+
+
+static void
+new_post(fpath, title)           /* µo¤å¨ì¬ÝªO */
+  char *fpath;          /* ÀÉ®×¸ô®| */
+  char *title;          /* ¤å³¹¼ÐÃD */
+{
+  HDR hdr;
+  char folder[64];
+
+  brd_fpath(folder, Brdname, FN_DIR);
+  hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
+  strcpy(hdr.owner, Userid);
+  strcpy(hdr.nick, Username);
+  strcpy(hdr.title, title);
+  rec_add(folder, &hdr, sizeof(HDR));
+
+  update_btime(Brdname);
+}
+
+
+/*-------------------------------------------------------*/
+/* §ìºô­¶                                                */
+/*-------------------------------------------------------*/
+
+
+static int wlen;    /* ¥»¦æ¦³¦h¤Ö¦r */
+static int slen;    /* ¥»¦æ¦³¦h¤Ö¥b«¬¦r */
+
+
+static void
+foutc(ch, fp)
+  int ch;
+  FILE *fp;
+{
+  static int in_tag = 0;    /* 1: ¦b <tag> ¤¤ */
+  static int in_chi = 0;    /* 1: «e¤@½X¬O¤¤¤å¦r */
+
+  if (ch == '<')
+  {
+    in_tag = 1;
+    return;
+  }
+
+  /* ¸õ¹L \t */
+  if (ch == '\t')
+    return;
+
+  if (!in_tag)
+  {
+    if (in_chi)         /* «e¤@­Óchar¬O¤¤¤å¦rªº²Ä¤@½X */
+      in_chi = 0;
+    else if (ch & 0x80)     /* «e¤@­Óchar¤£¬O¤¤¤å¦rªº²Ä¤@½X¡A */
+      in_chi = 1;           /* ÀË¬d³ochar¬O§_¬°¤¤¤å¦rªº²Ä¤@½X */
+    else            /* ¦pªG³£¤£¬O¡Aªí¥Ü³ochar¬O¥b«¬¦r */
+      slen++;
+
+    if (wlen >= 60 - slen % 2)  /* ¤@¦æ³Ì¦h 60 ¦r¡A­Y¦³©_¼Æ­Ó¥b«¬¦r¡A*/
+    {                           /* ¸Ó¦æ¥u¦L 59 ¦r */
+      fputs("\n    ", fp);  /* ¨C¦æ«e­±³£ªÅ¥|®æ */
+      wlen = 0;
+      /* slen = 0; */
+      slen = !in_chi;       /* ­Y·sªº³o¦æ²Ä¤@­Óchar¬O¥b«¬¦r¡Aslen=1 */
+    }
+
+    fputc(ch, fp);
+    wlen++;
+  }
+  else
+  {
+    if (ch == '>')
+      in_tag = 0;
+  }
+}
+
+
+static void
+fouts(str, fp)
+  uschar *str;
+  FILE *fp;
+{
+  int ch;
+
+  wlen = 0;
+  slen = 0;
+  fputs("\n    ", fp);      /* ¨C¦æ«e­±³£ªÅ¥|®æ */
+
+  while (ch = *str)
+  {
+    foutc(ch, fp);
+    str++;
+  }
+}
+
+
+static void
+strip_title(str, title)
+  uschar *str, *title;
+{
+  int ch, len = 0;
+  uschar *dst;
+
+  /* ¥h±¼ str ¤¤ªº \t ¤Î³Ì«áªº <tag>¡A¦s¦b title */
+
+  dst = title;
+  while (ch = *str++)
+  {
+    if (ch == '<')
+      break;
+
+    if (ch != '\t')
+    {
+      *dst++ = ch;
+      if (++len > 60)
+        break;
+    }
+  }
+  *dst = '\0';
+}
+
+
+static void
+html_download(actno)          /* ¤U¸ü¤å³¹¨ÃÂà´«¬°¤å¦rÀÉ */
+  int actno;
+{
+  char link[128], title[TTLEN + 1];
+  char buf[2048];       /* °²³]¤å³¹¨C¬q¤£·|¶W¹L 2048 ¦r */
+  char *fsrc = "tmp/NCTUnews.src";
+  char *fdst = "tmp/NCTUnews.dst";
+  FILE *fpr, *fpw;
+  int mode;
+  char *ptr;
+
+  /* ¤U¸ü¤å³¹ */
+  sprintf(link, "http://info.nctu.edu.tw/news/show_news.php?act_no=%d", actno);
+  sprintf(buf, LYNX_PATH " %s > %s", link, fsrc);
+  system(buf);
+
+  /* Âà´«¬°¤å¦rÀÉ */
+  if (fpr = fopen(fsrc, "r"))
+  {
+    if (fpw = fopen(fdst, "w"))
+    {
+      /* ¶}ÀY¥[¤WÀÉÀY */
+      while (fgets(buf, sizeof(buf), fpr))
+      {
+        /* <font size="2"> ªº¤U¤@¦æ´N¬O¼ÐÃD */
+        if (strstr(buf, "<font size=\"2\">"))
+        {
+          if (fgets(buf, sizeof(buf), fpr))
+          {
+            strip_title(buf, title);
+
+            fprintf(fpw, "%s %s (%s) %s %s\n",
+              STR_AUTHOR1, Userid, Username, STR_POST2, Brdname);
+            fprintf(fpw, "¼ÐÃD: %s\n®É¶¡: %s\n\n", title, Now());
+          }
+          break;
+        }
+      }
+
+      /* ¤º®e */
+      mode = 0;    /* 0:¥¼¶}©l  1:¦L¨ì¤@¥b  2:µ²§ô */
+      while (fgets(buf, sizeof(buf), fpr))
+      {
+        if (ptr = strstr(buf, "<hr>"))
+        {
+          *ptr = '\0';
+          mode++;
+
+          if (mode == 1)  /* ²Ä¤@¦¸¥X²{ <hr> µL¤º¤å */
+            continue;
+        }
+
+        if (mode)
+        {
+          fouts(buf, fpw);
+          if (mode == 2)
+            break;
+        }
+      }
+
+      /* µ²§À¥[¤W¨Ó·½ */
+      fprintf(fpw, "\n--\nNCTU! ¥æ³q¤j¾Ç®Õ¶é¬¡°Ê¤½§i\n%s\n", link);
+      fclose(fpw);
+
+      if (title[0])     /* ­YµL¼ÐÃD¡A¤]³\¬O³Q§R°£¤F */
+        new_post(fdst, title);
+      unlink(fdst);
+    }
+    unlink(fsrc);
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+static int
+urhigh_query()
+{
+  char *ftmp = "tmp/NCTUnews.tmp";
+  char buf[512];       /* °²³]¨C¦æ¤£·|¶W¹L 512 ¦r */
+  char *ptr;
+  FILE *fp;
+  int high;
+
+  high = 0;
+  sprintf(buf, LYNX_PATH " http://info.nctu.edu.tw/news/list.php > %s", ftmp);
+  system(buf);
+
+  if (fp = fopen(ftmp, "r"))
+  {
+    while (fgets(buf, sizeof(buf), fp))
+    {
+      if (ptr = strstr(buf, "show_news.php?act_no="))
+      {
+        high = atoi(ptr + 21);
+        break;
+      }
+    }
+
+    fclose(fp);
+    unlink(ftmp);
+  }
+  return high;
+}
+
+
+int
+main()
+{
+  FILE *fp;
+  int myhigh, urhigh;
+  char buf[10];
+
+  chdir(BBSHOME);
+
+  /* ¬Ý¦Û¤v§ì¨ì²Ä´X½g¤F */
+  myhigh = 0;
+  if (fp = fopen("run/NCTUnews", "r"))
+  {
+    fscanf(fp, "%8s", buf);
+    fclose(fp);
+
+    if ((urhigh = atoi(buf)) > 0)
+      myhigh = urhigh;
+  }
+
+  /* ¬ÝÁp¦XªA°È¤¤¤ß³Ì·sªº¦³´X½g */
+  urhigh = urhigh_query();
+
+  if (!myhigh)           /* ¦pªG¦Û¤v¨S¦³½g¼Æ­p¼Æ¾¹¡A¨º´N§ì³Ì«á¤T½g */
+    myhigh = urhigh - 3;
+
+  if (myhigh >= urhigh)  /* ¨S¦³·s¤½§i */
+    return 0;
+
+  init_bshm();
+
+  /* ¥h§ì·sªº¤½§i */
+  for (myhigh++; myhigh <= urhigh; myhigh++)
+    html_download(myhigh);
+
+  /* §ó·s¦Û¤vªº½g¼Æ­p¼Æ¾¹ */
+  if (fp = fopen("run/NCTUnews", "w"))
+  {
+    fprintf(fp, "%d", urhigh);
+    fclose(fp);
+  }
+
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

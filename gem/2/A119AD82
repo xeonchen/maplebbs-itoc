@@ -1,0 +1,119 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: ¤£¥i¥[±K
+®É¶¡: 2004/06/16 Wed 08:41:11                           Updated: 2005/05/26
+
+¡° ¤Þ­z¡mUizmp (¶Â³Tªk®v)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¥i§_­­¨î¬Y¬ÝªO¤å³¹¤£±o¥[±K§r?
+
+: battr.h
+
+#define BRD_ANONYMOUS   0x20    /* °Î¦W¬ÝªO */
++ #define BRD_NORESTRICT   0x40    /* ¤£¥i¥[±K¬ÝªO */
+
+  ...
+  ...
+
+- #define NUMBATTRS       6
++ #define NUMBATTRS       7
+
+- #define STR_BATTR       "zTcsvA"
++ #define STR_BATTR       "zTcsvAR"
+
+: battr.h:battr_tbl[]
+
+  "°Î¦W¬ÝªO",                   /* BRD_ANONYMOUS */
++ "¤£¥i¥[±K¬ÝªO",               /* BRD_NORESTRICT */
+
+: edit.c:ve_filer()
+
+#ifdef HAVE_REFUSEMARK
+  case 'x':
+-  if (ve_op < 0)               /* itoc.010301: ¤£¯àÀx¦s */
++  if (ve_op < 0 || currbattr & BRD_NORESTRICT)
+     return VE_FOOTER;
+   curredit |= EDIT_RESTRICT;
+   curredit &= ~EDIT_OUTGO;     /* ¥[±K¥²¬O local save */
+   break;
+#endif
+
+: post.c:post_refuse()
+
+  if (!cuser.userlevel) /* itoc.020114: guest ¤£¯à¹ï¨ä¥L guest ªº¤å³¹¥[±K */
+    return XO_NONE;
+
++ if (currbattr & BRD_NORESTRICT)
++   return XO_NONE;
+
+: post.c:post_cross()
+
+#ifdef HAVE_REFUSEMARK
+-    else if (rc == 'x')
++    else if (rc == 'x' && !(currbattr & BRD_NORESTRICT))
+       xpost.xmode = POST_RESTRICT;
+#endif
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ¦pªG§Æ±æ¶}©ñµ¹ªO¥D¦Û¦æ³]©w
+
+: manage.c §â¥H¤U³o¬q¥[¦b post_battr_noscore() «á­±
+
+static int
+post_battr_norestrict(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("1)¥i¥H¥[±K¤å³¹ 2)¤£¥i¥[±K¤å³¹ [Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_NORESTRICT;
+    break;
+  case '2':
+    newbrd.battr |= BRD_NORESTRICT;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+#  ifdef HAVE_SCORE
+    "Score   ³]©w¥i§_µû¤À",
+#  endif
++   "Xrefuse ¥[±K¤å³¹³]©w",
+
+  ...
+  ...
+
+#  ifdef HAVE_SCORE
+    " (S)µû¤À"
+#  endif
++   " (X)¥[±K"
+
+  ...
+  ...
+
+#ifdef HAVE_SCORE
+  case 's':
+    return post_battr_noscore(xo);
+#endif
+
++ case 'x':
++   return post_battr_norestrict(xo);
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

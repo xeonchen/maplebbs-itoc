@@ -1,0 +1,52 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (:MM:), ¬ÝªO: plan
+¼Ð  ÃD: Re: [­×¥¿] cache.c fshm
+µo«H¯¸: XEON (Sat Jan 18 02:27:33 2003)
+
+  C »y¨¥¤¤¤@¯ëªºÅÜ¼Æ¨äÀx¦sÃþ§O (¥]§t storage class¡Bscope¡Blifetime)
+  ¤j·§¥i¤À¬°¥H¤U¤CºØ¡G
+
+(1)§½³¡ÅÜ¼Æ(Local Variable)
+
+  ¨Ò¦p post.c:outgo_post() ªº char *fpath;
+  ´N¬O¤@¯ë³Ì±`¥Îªº¨ººØ¡A¥u¯à¦b³o¨ç¦¡¸Ì­±¥Î¡A¥B¥Î§¹´N¬~±¼¤F
+
+(2)§½³¡ÀRºAÅÜ¼Æ(Local Static Variable)
+
+  ¨Ò¦p talk.c:pal_ship() ªº static PALSHIP palship[PAL_MAX];
+  ­È·|¤@ª½¦s¦b¤£³Q¬~±¼¡A¦ý¬O¥u¦³ pal_ship() ¸Ì­±¯à¥Î
+
+(3)¥þ°ìÅÜ¼Æ(Global Variable)
+
+  ¨Ò¦p board.c ªº char brd_bits[MAXBOARD];
+  ¦b¾ã­Ó board.c ¸Ì­±ªº©Ò¦³¨ç¦¡³£¥i¥H¥Î
+  ­È·|¤@ª½¦s¦b¤£³Q¬~±¼
+
+(4)¥þ°ìÀRºAÅÜ¼Æ(Global Static Variable)
+
+  ¨Ò¦p board.c ªº static char *class_img;
+  ¦b¾ã­Ó board.c ¸Ì­±ªº©Ò¦³¨ç¦¡³£¥i¥H¥Î
+  ¦ý¬O¥u­­¨î¦b board.c ¸Ì­±¤~¯à¥Î
+  ­È·|¤@ª½¦s¦b¤£³Q¬~±¼
+
+(5)ÀÉ¥~©w¸q¥þ°ìÅÜ¼Æ(Extern Global Variable)
+
+  ¨Ò¦p favor.c ªº extern char brd_bits[];
+  ¥i¥H§â­ì¥»¦b board.c ¸Ì­±ªº brd_bits[] ª½±µ®³¹L¨Ó¥Î
+  ¦b¾ã­Ó favor.c ³£¥i¥H¥Î
+  ­È·|¤@ª½¦s¦b¤£³Q¬~±¼
+
+(6)ÀÉ¥~©w¸q§½³¡ÅÜ¼Æ(Extern Local Variable)
+
+  ¨Ò¦p visio.c:vget_match() ªº extern char brd_bits[];
+  ¥i¥H§â­ì¥»¦b board.c ¸Ì­±ªº brd_bits[] ª½±µ®³¹L¨Ó¥Î
+  ¦ý¬O¥u¦³¦b vget_match() ¸Ì­±¯à¥Î
+  ­È·|¤@ª½¦s¦b¤£³Q¬~±¼
+
+(7)¼È¦s¾¹ÅÜ¼Æ(Register Variable)
+
+  ¨Ò¦p talk.c:ulist_cmp_pal() ªº register int k;
+  ¥u¯à¦b³o¨ç¦¡¸Ì­±¥Î¡A¥B¥Î§¹´N¬~±¼¤F
+
+--
+    [1;32m¢~¢w¢w Origin ¢¡ [33;45m °Ê¤O®Ö¤ß [37m processor.tfcis.org [32;40m ¡ã £_£`£a ¢w¢w¢q[m
+    [1;32m¢q     Author ¢£ [36mitoc.Dorm-GD2.NCTU.edu.tw[m

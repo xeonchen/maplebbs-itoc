@@ -1,0 +1,101 @@
+§@ªÌ: itoc (¯}¸Ñ¶´Åé¤~¬O¤ý¹D¡I) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] §Úªº³Ì·R±j¨î¥[¤J¬ÝªO
+®É¶¡: 2004/04/16 Fri 14:29:54                           Updated: 2005/07/21
+
+  §Úªº³Ì·R±j¨î¥[¤J¯¸ªø«ü©wªº¬ÝªO¦b¸m³»
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¥ý§â¤¶­±§ï¦¨¦³¸m³»ªº¥\¯à
+
+: modes.h
+
+- #define XO_TALL         (b_lines - 3)
++ #define XO_TALL         (b_lines - 3 - xo_top)
+
+: global.h
+
+VAR int b_lines;                /* bottom line */
++ VAR int xo_top;
+
+: xover.c:xo_load()
+
+void
+xo_load(xo, recsiz)
+  XO *xo;
+  int recsiz;
+{
+  int fd, max;
+
++ xo_top = 0;
+  max = 0;
+
+  ...
+  ...
+
+      lseek(fd, (off_t) (recsiz * top), SEEK_SET);
+-     read(fd, xo_pool, recsiz * XO_TALL);
++     read(fd, xo_pool + xo_top * recsiz, recsiz * XO_TALL);
+
+: xover.c:xo_cursor()
+
+int
+xo_cursor(ch, pagemax, num, pageno, pos, redraw)
+  int ch, pagemax, num;
+  int *pageno, *pos, *redraw;
+{
++ xo_top = 0;
+  switch (ch)
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¨M©wÅý­þ¨Ç¬ÝªO¸m³»
+
+: xover.c:xo_load()
+
+  if ((fd = open(xo->dir, O_RDONLY)) >= 0)
+  {
+    int pos, top;
+    struct stat st;
+
++   if (xo->key == XZ_MF)
++   {
++     MF mf;
+
++     /* ²Ä¤@­ÓªO¬O sysop ªO */
++     mf.mftype = MF_BOARD;
++     strcpy(mf.xname, "sysop");
++     memcpy(xo_pool + xo_top * recsiz, &mf, recsiz);
++     xo_top++;
+
++     /* ¦pªG¬OªO¥D¡A²Ä¤G­ÓªO¬O bm ªO */
++     if (HAS_PERM(PERM_BM))
++     {
++       mf.mftype = MF_BOARD;
++       strcpy(mf.xname, "bm");
++       memcpy(xo_pool + xo_top * recsiz, &mf, recsiz);
++       xo_top++;
++     }
++   }
+
+    fstat(fd, &st);
+    max = st.st_size / recsiz;
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¨ä¥L¤p²Ó¸`
+
+: favor.c:mf_move()  ¸m³»ªº¬ÝªO¤£¯à³Q²¾°Ê
+
+  MF *mf;
+  char *dir, buf[40];
+  int pos, newOrder;
+
++ if (xo->pos - xo_top < xo_top)
++   return XO_NONE;
+
+  pos = xo->pos;
+  mf = (MF *) xo_pool + (pos - xo->top);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

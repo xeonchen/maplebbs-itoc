@@ -1,0 +1,30 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: Maple_itoc
+¼Ð  ÃD: Re: [°ÝÃD]·sªOinnbbsdªºRFC¼Ð·Ç¤ä´©
+µo«H¯¸: °Ê¤O®Ö¤ß (04/21/04 11:00:02 Wed)                  Updated: 2004/04/21
+
+¡° ¤Þ­z¡mitoc (®Ö¤ß°Ê¤O)¡n¤§»Ê¨¥¡G
+>   ¦]¬°§Ú§âÀË¬d history ªº³¡¤À®³±¼¤F
+>   ©Ò¥H¦pªG§A¥Î bbsnnrp §ì¤G¦¸
+>   ©Î¬O news ¥D°ÊÁý«H¤G¦¸
+>   ´N·|¦P¼Ëªº¤å³¹¥X²{¤G¦¸
+
+  ¦pªG¤£·Q­«ÂÐ¥X²{¡A¨º»ò´N¬O§ï¦¨³o¼Ë
+
+: rec_article.c:receive_article()
+
+int                             /* 0:success  -1:fail */
+receive_article()
+{
+  char *ngptr;
+  char **splitptr;
+  char myaddr[128], mynick[128], mysubject[128], myfrom[128], mydate[80];
+
++ if (HISfetch(MSGID, NULL, NULL))
++   return 0;
+
+--
+  À³¸Ó¬O³o¼Ë§a :p
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

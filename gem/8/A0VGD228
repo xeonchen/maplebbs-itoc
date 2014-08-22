@@ -1,0 +1,384 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] µª¿ý¾÷
+®É¶¡: Sat Jul  5 16:11:44 2003                          Updated: 2003/07/05
+
+: menu.c:vs_head()
+
+void
+vs_head(title, mid)
+  char *title, *mid;
+{
+  char buf[40], ttl[60];
++ char fpath[64];
+  int spc, len;
+
+  ...
+  ...
+
++ usr_fpath(fpath, cuser.userid, "pnote.dat.new");
+
+  if (cutmp->ufo & UFO_BIFF)
+  {
+    mid = "\033[5;41m ¶l®t¨Ó«ö¹a¤F \033[m";
+    spc = 14;
+  }
++ else if (rec_num(fpath, 1))
++ {
++   mid = "\033[5;41m ±z¦³·s¯d¨¥³á \033[m";
++   spc = 14;
++ }
+  else
+
+: menu.c ¾A·íªº¿ï³æ¥[¤J
+
++ "bin/pnote.so:main_pnote", PERM_BASIC, - M_XMODE,
++ "Pnote      ¢u µª¿ý¯d¨¥ ¢t",
+
+: so/Makefile
+
+SO =    ..... pnote.so
+
+: so/pnote.c ¥[·sµ{¦¡
+
+/*-------------------------------------------------------*/
+/* pnote.c      ( NTHU CS MapleBBS Ver 3.10 )            */
+/*-------------------------------------------------------*/
+/* target : µª¿ý¾÷                                       */
+/* create : 98/04/14                                     */
+/* update : 03/07/05                                     */
+/* author : herb                                         */
+/* recast : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define MAX_PNOTE       10      /* µª¿ý¾÷«O¯d³q¼Æ */
+#define MAXHINTLINES    10      /* µª¿ý¾÷¥D¤H¯d¨¥ªø«× */
+
+/* binary ÀÉ */
+static char *fn_pnote_dat_new = "pnote.dat.new";/* µª¿ý¾÷¸ê®Æ®w·sªº¯d¨¥ */
+static char *fn_pnote_dat_old = "pnote.dat.old";/* µª¿ý¾÷¸ê®Æ®wÂÂªº¯d¨¥ */
+
+/* ¯Â¤å¦rÀÉ */
+static char *fn_pnote_hint = "pnote.hint";      /* µª¿ý¾÷¥D¤H°Ý­Ô»y */
+static char *fn_pnote_tmp = "pnote.tmp";        /* ¨q¥X¥þ³¡¯d¨¥®Éªº¼È¦sÀÉ */
+
+
+typedef struct
+{
+  time_t chrono;
+  char userid[IDLEN + 1];
+  char msg[3][71];
+} PNOTE;
+
+
+static int
+pnote_init(pnotes, fpath)       /* ¨ú¥X©Ò¦³ªº¯d¨¥ */
+  PNOTE *pnotes;
+  char *fpath;
+{
+  FILE *fp;
+  int total;
+
+  total = 0;
+  if (fp = fopen(fpath, "r"))
+  {
+    while (fread(&pnotes[total], sizeof(PNOTE), 1, fp) == 1)
+      total++;
+    fclose(fp);
+  }
+  return total;
+}
+
+
+static void
+pnote_show(pnote)
+  PNOTE *pnote;
+{
+  int i;
+
+  for (i = 8; i >= 4; i--)
+  {
+    move(i, 0);
+    clrtoeol();
+  }
+
+  prints("\033[1;36m¢z¢w¢w¢w \033[37m%s\033[m ¦b \033[33m%s\033[m ¯d¨¥µ¹±z",
+    pnote->userid, Btime(&pnote->chrono));
+  outs("\n  ");
+  outs(pnote->msg[0]);
+  outs("\n  ");
+  outs(pnote->msg[1]);
+  outs("\n  ");
+  outs(pnote->msg[2]);
+  outs("\n\033[1;36m  ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}\033[m\n");
+}
+
+
+static void
+pnote_hint(userid)              /* ¨q¥X userid ªº¥D¤H°Ý­Ô»y */
+  char *userid;
+{
+  int i;
+  char buf[80];
+  FILE *fp;
+
+  clear();
+  move(1, 0);
+
+  usr_fpath(buf, userid, fn_pnote_hint);
+  if (fp = fopen(buf, "r"))
+  {
+    outs("\033[1;34m¡´ ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w \033[32m°Ý­Ô»y\033[34m ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w ¡´\033[m\n");
+
+    i = 0;
+    while (i++ < MAXHINTLINES && fgets(buf, sizeof(buf), fp))
+      outs(buf);
+
+    outs("\033[1;34m¡´ ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w ¡´\033[m\n");
+    fclose(fp);
+  }
+  else
+  {
+    prints("±z¦n¡A³o¬O %s ªº¹q¸Üµª¿ý¾÷¡A", userid);
+  }
+  outs("\n½Ð¦bÅ¥¨ì¡u¹Í¡vÁn«á¡A¶}©l¯d¨¥¡AÁÂÁÂ¡C");
+}
+
+
+static void
+pnote_draw(userid)              /* ¯d¨¥µ¹ userid */
+  char *userid;
+{
+  int i, cc;
+  char fpath[64];
+  PNOTE pnote;
+
+  /* ¶}©l¯d¨¥ */
+  do
+  {
+    pnote.msg[0][0] = pnote.msg[1][0] = pnote.msg[2][0] = '\0';
+    move(14, 0);
+    clrtobot();
+    outs("\n½Ð¯d¨¥ (¦Ü¦h¤T¦æ)¡A«ö[Enter]µ²§ô");
+    for (i = 0; (i < 3) &&
+      vget(16 + i, 0, "¡G", pnote.msg[i], 71, DOECHO); i++);
+    cc = vans("(S)¦sÀÉÆ[½à (E)­«·s¨Ó¹L (Q)ºâ¤F¡H[S] ");
+    if (cc == 'q' || i == 0)
+      return;
+  } while (cc == 'e');
+
+  time(&pnote.chrono);
+  strcpy(pnote.userid, cuser.userid);
+
+  /* ¼g¤J¹ï¤èªº¯d¨¥ÀÉ */
+  usr_fpath(fpath, userid, fn_pnote_dat_new);
+  if (rec_num(fpath, sizeof(PNOTE)) >= MAX_PNOTE)
+  {
+    vmsg("¹ï¤èªºµª¿ý¾÷¤w¦³¹L¦h·s¯d¨¥¡AµLªk¦A¯d¨¥");
+    return;
+  }
+  rec_add(fpath, &pnote, sizeof(PNOTE));
+}
+
+
+static void
+pnote_view(pnotes, num)         /* §â binary ÀÉ§ï¦¨¤å¦rÀÉ¡A¨Ã¦L¥X¨Ó */
+  PNOTE *pnotes;
+  int num;
+{
+  int i;
+  char fpath[64];
+  FILE *fp;
+  PNOTE *pnote;
+
+  usr_fpath(fpath, cuser.userid, fn_pnote_tmp);
+
+  if (fp = fopen(fpath, "w"))
+  {
+    fputs("                  \033[1;32m¡¹\033[37m µª ¿ý ¾÷ ¤¤ ªº ¯d ¨¥ \033[32m¡¹\033[m\n\n", fp);
+    for (i = 0; i < num; i++)
+    {
+      pnote = &pnotes[i];
+
+      fprintf(fp, "\033[1;36m¢z¢w¢w¢w \033[37m%s\033[m ¦b \033[33m%s\033[m ¯d¨¥µ¹±z",
+        pnote->userid, Btime(&pnote->chrono));
+      fprintf(fp, "\n  %s\n  %s\n  ", pnote->msg[0], pnote->msg[1], pnote->msg[2]);
+      fprintf(fp, "\n\033[1;36m¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}\033[m\n");
+    }
+    fclose(fp);
+
+    more(fpath, NULL);
+    unlink(fpath);
+  }
+}
+
+
+static void
+Pnote(newflag)
+  int newflag;                  /* 1:·s¯d¨¥ 0:ÂÂ¯d¨¥ */
+{
+  int pos, num;
+  char fpath[64], prompt[80];
+  PNOTE pnotes[MAX_PNOTE];
+
+  usr_fpath(fpath, cuser.userid, newflag ? fn_pnote_dat_new :  fn_pnote_dat_old);
+  if ((num = pnote_init(pnotes, fpath)) <= 0)
+  {
+    vmsg("±z¨S¦³¯d¨¥");
+    return;
+  }
+
+  vs_bar("µª¿ý¾÷");
+
+  pos = 0;
+  sprintf(prompt, "¡· ÂsÄý¯d¨¥ P)«eÂ½ N)«áÂ½ A)¥þ³¡ %s K)§R°£¥þ³¡ Q)Â÷¶} [Q] ", newflag ? "S)«O¯d" : "D)§R°£");
+
+  while (1)
+  {
+    if (pos < 0)                /* ¥þ³¡¯d¨¥³£³Q§R°£©Î³Q«O¯d¤F */
+      return;
+
+    move(2, 0);
+    clrtoeol();
+    prints("\033[1;36mµª¿ý¾÷¸Ìªº \033[37m%d/%d\033[36m ³q%s¯d¨¥\033[m\n", pos + 1, num, newflag ? "·sªº" : "");
+    pnote_show(&pnotes[pos]);
+
+    switch (vans(prompt))
+    {
+    case 'p':
+      pos = (pos == 0) ? num - 1 : pos - 1;
+      break;
+
+    case 'n':
+      pos = (pos == num - 1) ? 0 : pos + 1;
+      break;
+
+    case 'a':
+      pnote_view(&pnotes, num);
+      break;
+
+    case 's':
+      if (newflag)
+      {
+        if (num >= MAX_PNOTE)
+        {
+          vmsg("±zªºªºµª¿ý¾÷¤w«O¯d¹L¦h¯d¨¥");
+        }
+        else
+        {
+          char buf[64];
+
+          usr_fpath(buf, cuser.userid, fn_pnote_dat_old);
+          rec_add(buf, &pnotes[pos], sizeof(PNOTE));
+          memcpy(&pnotes[pos], &pnotes[pos + 1], sizeof(PNOTE) * (num - pos - 1));
+          rec_del(fpath, sizeof(PNOTE), pos, NULL);
+          pos--;
+          num--;
+          vmsg("«O¯d¦¨¥\\");
+        }
+      }
+      break;
+
+    case 'd':
+      if (!newflag)
+      {
+        memcpy(&pnotes[pos], &pnotes[pos + 1], sizeof(PNOTE) * (num - pos - 1));
+        rec_del(fpath, sizeof(PNOTE), pos, NULL);
+        pos--;
+        num--;
+      }
+      break;
+
+    case 'k':
+      unlink(fpath);
+      return;
+      break;
+
+    default:
+      return;
+    }
+  }
+}
+
+
+static void
+p_read()
+{
+  switch (vans("¡· ¾\\Åª¯d¨¥ N)·sªº¯d¨¥ S)³Q«O¦sªº¯d¨¥ Q)¨ú®ø¡H[Q] "))
+  {
+  case 'n':
+    Pnote(1);
+    break;
+
+  case 's':
+    Pnote(0);
+    break;
+  }
+}
+
+
+static void
+p_call()
+{
+  ACCT acct;
+
+  if (acct_get("±z·Q¯d¨¥µ¹½Ö¡G", &acct) > 0)
+  {
+    pnote_hint(acct.userid);
+    pnote_draw(acct.userid);
+  }
+}
+
+
+static void
+p_edithint()
+{
+  char fpath[64];
+
+  switch (vans("¡· ¥D¤H¯d¨¥ D)§R°£ E)¿ý»s Q)¨ú®ø¡H[Q] "))
+  {
+  case 'e':
+    usr_fpath(fpath, cuser.userid, fn_pnote_hint);
+    vedit(fpath, 0);
+    vmsg("¯d¨¥¿ý»s§¹²¦");
+    break;
+
+  case 'd':
+    usr_fpath(fpath, cuser.userid, fn_pnote_hint);
+    unlink(fpath);
+    vmsg("¯d¨¥§R°£§¹²¦");
+    break;
+  }
+}
+
+
+int
+main_pnote()
+{
+  while (1)
+  {
+    switch (vans("¡¹ ­Ó¤Hµª¿ý¾÷¡GR)¾\\Åª¯d¨¥ C)¿ý»s¯d¨¥ E)§ó§ï°Ý­Ô»y Q)Â÷¶}¡H[Q] "))
+    {
+    case 'r':
+      p_read();
+      break;
+
+    case 'c':
+      p_call();
+      break;
+
+    case 'e':
+      p_edithint();
+      break;
+
+    default:
+      return 0;
+    }
+  }
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

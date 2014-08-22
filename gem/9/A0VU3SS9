@@ -1,0 +1,64 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¤ÈÄ±¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: Re: [M3 for Win]Ãö©ó¦n¤Í¦W³æ
+µo«H¯¸: ¤ë¤U©]·Q (2003/12/19 Fri 01:35:47)                Updated: 2004/10/07
+
+¡° ¤Þ­z¡mlitleaf@mail.educities.edu.tw (litleaf)¡n¤§»Ê¨¥¡G
+> ¥t¥~¡A¦pªG§Ú¤£·Q­n¥Î­ì¥»ªº³]©w
+> ¦³¤@°ï (  »P§Ú¬°¤Í¡B§ÚªºªB¤Í¡B¤¬¬°¦n¤Í  )
+> §Ú¥u·Q­n³æ¯Âªº¦n¤Í´N¦n¤F
+
+: ulist.c
+
+#define FTYPE_SELF      0x01
+- #define FTYPE_BOTHGOOD  0x02
+#define FTYPE_MYGOOD    0x04
+- #define FTYPE_OGOOD     0x08
+#define FTYPE_NORMAL    0x10
+#define FTYPE_MYBAD     0x20
+
+  ...
+
+static int mygood_num;          /* ¹ï¤è³]§Ú¬°¦n¤Í */
+- static int ogood_num;           /* §Ú³]¹ï¤è¬°¦n¤Í */
+
+: ulist.c:ulist_init()
+
+- mygood_num = ogood_num = 0;
++ mygood_num = 0;
+
+  ...
+
+-     if (userno & (FTYPE_BOTHGOOD | FTYPE_MYGOOD))
++     if (userno & (FTYPE_MYGOOD))
+        mygood_num++;
+-     if (userno & (FTYPE_BOTHGOOD | FTYPE_OGOOD))
+-       ogood_num++;
+
+: ulist.c:ulist_neck()
+
+  prints("  ±Æ¦C¤è¦¡¡G[\033[1m%s/%s\033[m] ¯¸¤W¤H¼Æ¡G%d "
+-   COLOR_MYGOOD " §Úªº¦n¤Í¡G%d " COLOR_OGOOD " »P§Ú¬°¤Í¡G%d\033[m",
++   COLOR_MYGOOD " §Úªº¦n¤Í¡G%d ",
+    msg_pickup_way[pickup_way],
+    cuser.ufo & UFO_PAL ? "¦n¤Í" : "¥þ³¡",
+-   total_user, mygood_num, ogood_num);
++   total_user, mygood_num);
+
+: ulist.c:ulist_paltype()
+
+  if (is_mygood(userno))
+-   return is_ogood(up) ? FTYPE_BOTHGOOD : FTYPE_MYGOOD;
++   return FTYPE_MYGOOD;
+- return is_ogood(up) ? FTYPE_OGOOD : FTYPE_NORMAL;
++ return FTYPE_NORMAL;
+
+: include/theme.h
+
+- #define COLOR_OGOOD     "\033[1;33m"  /* »P§Ú¬°¤Í */
+
+- #define COLOR_BOTHGOOD  "\033[1;37m"    /* ¤¬³]¦n¤Í */
+
+--
+  ¦Û¤v¥H«e­èª±Maple®Éªºµ§°O®³¨Ó¶K¤W¡C
+--
+  [1;33mOrigin: luna.twbbs.org[m

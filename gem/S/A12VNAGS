@@ -1,0 +1,82 @@
+µo«H¤H: guessi.bbs@cpu.tfcis.org (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] Âà¿ý¤å³¹: ­ì¤å³¹¥[µù°O¿ý
+µo«H¯¸: °Ê¤O®Ö¤ß (2007/03/17 Sat 16:23:39)                Updated: 2007/03/17
+
+­×¥¿­ì¦]: ­ì¥»ªºÂà¿ý¤è¦¡ Âà¿ýªÌIP¦ì¸m¨S¦³³Q°O¿ý¥BµLªk±oª¾­ì¤å³¹¬O§_³QÂà¿ý
+
+­× §ï «á: ­ì¤å³¹ --> ¥H±À¤å¤è¦¡µù°O "¦¹½g¤w³QÂà¿ý¦Ü[xxxx]¬ÝªO"
+
+          Âà¿ý¤å --> °£¤F­ì¥ý¤å³¹¶}ÀYµù°O "¦¹½g¤å³¹Âà¿ý¦Û[xxxx]¬ÝªO"
+                     ¥t¥~ªþ¥[¯¸Ã± ¥Î¥H°O¿ýÂà¤åªÌIP¦ì¸m
+                     ¦P®É¥ç¥i°Ï¹j­ì¤å³¹±À¤å/Âà¿ý¤å±À¤å
+
+ex: ¥H«e¤å³¹¸gÂà¿ýªºª¬ªp   xxxxx ±À: ±À¤å¤º®e±À¤å¤º®e  <<-- ­ì¤å³¹±À¤å ¢{
+    ¦ý¸gÂà¿ý«áªº·s±À¤å     yyyyy ±À: Âà¿ý¤å³¹±À¤å¤º®e  <<-- Âà¿ý«á±À¤å ¢t
+                                                                       ¢x
+                 µLªk¤À¿ë¨â±À¤å¬°Âà¿ý«e´N¤w¸g¦³¤FÁÙ¬OÂà¿ý«á¤~·s¼Wªº  ¡ö¢}
+
+»¡©ú¤å¦rÅã±o¦³¨Ç½ÆÂø ª½±µ¬Ýcode·|¤ñ¸û®e©öÀ´ :p
+
+
+:src/maple/post.c:post_cross()
+
+[1;32m![m FILE *fpr, *fpw[1;33m, *fpo[m;
+
+
+    if (method)         /* ¤@¯ëÂà¿ý */
+    {
+
+      ...
+      ...
+
++     ve_banner(fpw, 0); /* ¯d¤U¯¸Ã± °O¿ýÂà¿ýªÌIP¦ì¸m 070317 guessi */
+
+      fclose(fpw);
+
+      ...
+      ...
+
+    }
+    else
+    {
+
+      ...
+      ...
+
+      strcpy(xpost.date, hdr->date);    /* ­ì¤åÂà¸ü«O¯d­ì¤é´Á */
+    }
+
++   if (fpo = fopen(fpath, "a"))
++   {
++     char msg[64];
++     usint checklevel;
++
++     time_t now;
++     struct tm *ptime;
++
++     time(&now);
++     ptime = localtime(&now);
++
++     checklevel = (bshm->bcache + xbno)->readlevel;
++
++     sprintf(msg, "¥»¤å¤wÂà¿ý¦Ü [%s] ¬ÝªO",
++            (checklevel == PERM_SYSOP || checklevel == PERM_BOARD) ?
++            "¯µ±K" : xboard); /* ÀË¬d¥Ø¼Ð¬ÝªO¾\ÅªÅv­­ */
++
++     fprintf(fpo, "\033[1;30mÂà %s:%-*s %02d/%02d %02d:%02d\033[m\n",
++     cuser.userid, 62 - strlen(cuser.userid), msg,
++     ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
++     /* ®æ¦¡¦Û­q ºÉ¶q»P±À¤åÃþ¦ü */
++
++     fclose(fpo);
++
++   } /* Âà¿ý­ì¤åµù°O¿ý 070317 guessi */
+
+    strcpy(xpost.title, ve_title);
+
+    ...
+    ...
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m59-115-101-19.dynamic.hine[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

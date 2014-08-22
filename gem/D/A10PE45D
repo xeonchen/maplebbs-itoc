@@ -1,0 +1,30 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: «ç»ò¦bmenu¸ÌÀYªº¯¸¦W®Ç¥[¤H¼Æ§r¡H
+®É¶¡: 2004/11/11 Thu 19:33:55                           Updated: 2004/11/11
+
+¡° ¤Þ­z¡mEfen.bbs@bbs.med.ncku.edu.tw (·Ð¦º¤Hªº½Ã¥Í©Ò..)¡n¤§»Ê¨¥¡G
+> ±`¬Ý¨ì¦³¨Ç¯¸¥Dµe­±ªºtitle³¡¤À·|¥X²{
+> [1;33;41m                       °j ­· ¨¦[½u¤W 40 ¤H]                                [m
+> ®ÇÃäªº¤H¼Æ­n«ç»ò¥[§r¡H
+
+: menu.c:vs_head()
+
+  char buf[40], ttl[60];
++ char midbuf[60];
+  int spc, len;
+
+  ...
+  ...
+
+  else          /* menu() ¤¤¤~¥Î vs_head(title, NULL); ¿ï³æ¤¤µL»Ý clear() */
+  {
+    move(0, 0);
+    clrtoeol();
+-   mid = str_site;
++   mid = midbuf;
++   sprintf(mid, "%s [½u¤W %d ¤H]", str_site, total_user);
+  }
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

@@ -1,0 +1,94 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]Tagger©ñ¨ìbmw
+®É¶¡: 2004/03/04 Thu 14:38:25                           Updated: 2005/06/12
+
+¡° ¤Þ­z¡mchwaian (µL¨¥)¡n¤§»Ê¨¥¡G
+> ¦pªG¬O­n§ï¨ìulist_XXXXXX
+> call ulist_write ®É¥ýÀË¬d¦³µLTag
+
+  ¥ý§â tag ¥\¯à¥[¤J userlist ¨t²Î
+
+: ulist.c:ulist_item() ¥[¤J * ªº²Å¸¹
+
+-   num, ufo & UFO_CLOAK ? ')' : ' ', pager,
++   num, tag_char(up->pid) == '*' ? '*' : ufo & UFO_CLOAK ? ')' : ' ', pager,
+
+: ulist.c:ulist_tag() ·s¼W¦¹¨ç¦¡¦b ulist_help() «e­±
+
+static int
+ulist_tag(xo)
+  XO *xo;
+{
+  UTMP *up;
+  int tag, pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  up = ulist_pool[pos];
+
+  if (!up->pid)
+    return XO_NONE;
+
+  if (tag = Tagger(up->pid, pos, TAG_TOGGLE))
+  {
+    move(3 + cur, 6);
+    outc(tag > 0 ? '*' : up->ufo & UFO_CLOAK ? ')' : ' ');
+  }
+
+  /* return XO_NONE; */
+  return xo->pos + 1 + XO_MOVE; /* lkchu.981201: ¸õ¦Ü¤U¤@¶µ */
+}
+
+: ulist.c:ulist_cb[] ·s¼W tag «ü¥O
+
++ 't', ulist_tag,
+
+  'h', ulist_help
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ³o¼Ë´N¤w¸g¦³ tag ¥\¯à¤F¡A±µ¤U¨Ó´N¬Ý§A­n°µ¤°»ò¨Æ
+
+static int
+ulist_xxxx(xo)            // xxxx ¬O¨ç¦¡©R¦W
+  XO *xo;
+{
+  int tag, locus, pos;
+  UTMP *up;
+
+  tag = AskTag("¤°»ò¤°»ò¨Æ");
+
+  if (tag < 0)
+    return XO_FOOT;
+
+  if (!tag)
+    up = ulist_pool[xo->pos];
+  locus = 0;
+
+  do
+  {
+    if (tag)
+    {
+      pos = TagList[locus].recno;
+      up = ulist_pool[pos];
+      if (up->pid != TagList[locus].chrono)     /* ¸Ó¦ì¤l´«¤H¤F */
+        continue;
+    }
+
+    // ±µ¤U¨Ó³oÃä´N¬Ý§A­n®³ up ¨Ó°µ¤°»ò¨Æ
+
+  } while (++locus < tag);
+
+  return XO_FOOT;       // ¤]³\¬O ulist_head()¡A¨Ìµe­±­«Ã¸¦Ó©w
+}
+
+: ulist.c:ulist_cb[]
+
++ 'x', ulist_xxxx,        // «öÁä¤Î¨ç¦¡¦W¦Û©w
+
+  'h', ulist_help
+
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mpc512-2.ee.nctu.edu.tw [30mµoªí[m

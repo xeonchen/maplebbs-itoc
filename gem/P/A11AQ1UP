@@ -1,0 +1,143 @@
+§@ªÌ: itoc (:MM:) ¬ÝªO: itoc
+¼ÐÃD: [¥\¯à] ­pºâ¬ÝªOÂsÄý¤H®ð/®É¶¡
+®É¶¡: Sun May  4 21:38:08 2003                          Updated: 2005/06/13
+
+  ­pºâ¬ÝªOÂsÄý¤H®ð/®É¶¡
+
+  ³o¤èªk¤£¼g¦^ .BRD¡A©Ò¥H¦b­«¶} bbsd ¥H«á·|ÅÜ¦^¹s
+  ©Ò¥H²Ö¿nªº³¡¤À¥u¯à±q­«¶}¥H«áºâ°_
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+: struct.h:BCACHE ¥[¤JÄæ¦ì
+
+  int mantime[MAXBOARD];           /* ¦UªO¥Ø«e¥¿¦³¦h¤Ö¤H¦b¾\Åª */
++ time_t lastvisit[MAXBOARD];      /* ¦UªO³Ì«á¤@¦¸ÂsÄý */
++ time_t totalvisit[MAXBOARD];     /* ¦UªO±q¤W¦¸­«¶}¥H¨Ó²Ö­pÂsÄý®É¶¡ */
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  Ãö©ó lastvisit ªº³¡¤À
+
+: board.c:XoPost()
+
+    if (currbno >= 0)
+      bshm->mantime[currbno]--;         /* °h¥X¤W¤@­ÓªO */
+    bshm->mantime[bno]++;               /* ¶i¤J·sªºªO */
++   bshm->lastvisit[bno] = time(NULL);
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  Ãö©ó totalvisit ªº³¡¤À
+
+: ©Ò¦³¦³¥Î¨ì xover(XZ_POST); xover(XZ_POST); ªº³£­n§ï
+
+: board.c:brd_force()
+
+    if (brd->blast > brd_visit[bno])
+#endif
+    {
++     time_t now;
+      vmsg("¦³·s¤½§i¡I½Ð¥ý¾\\Åª§¹·s¤½§i«á¦AÂ÷¶}");
+      XoPost(bno);
++     time(&now);
+      xover(XZ_POST);
++     bshm->totalvisit[bno] += time(0) - now;
+
+: board.c:class_browse()
+
+  else                  /* ¶i¤J¬ÝªO */
+  {
++   time_t now;
+    if (XoPost(chn))    /* µLªk¾\Åª¸ÓªO */
+      return XO_FOOT;
++   time(&now);
+    xover(XZ_POST);
++   bshm->totalvisit[bno] += time(0) - now;
+
+: board.c:Select()
+
+  if (brd = ask_board(bname, BRD_R_BIT, NULL))
+  {
++   time_t now;
+    bno = brd - bshm->bcache;
+    XoPost(bno);
++   time(&now);
+    xover(XZ_POST);
++   bshm->totalvisit[bno] += time(0) - now;
+
+: favor.c:mf_browse()
+
+  MF *mf;
+  int type;
++ time_t now;
+
+  ...
+  ...
+
+    XoPost(bno);
++   time(&now);
+    xover(XZ_POST);
++   bshm->totalvisit[bno] += time(0) - now;
+
+: menu.c:menu()
+
+    case 'r':
+      if (bbsmode == M_0MENU)
+      {
+        if (currbno >= 0)
+        {
++         time_t now;
+          utmp_mode(M_BOARD);
+          XoPost(currbno);
++         time(&now);
+          xover(XZ_POST);
++         bshm->totalvisit[bno] += time(0) - now;
+
+: song.c:XoSongSub()
+
+  int chn;
++ time_t now;
+
+  chn = brd_bno(BN_REQUEST);
+  XoPost(chn);
++ time(&now);
+  xover(XZ_POST);
++ bshm->totalvisit[bno] += time(0) - now;
+
+: song.c:XoSongLog()
+
+  int chn;
++ time_t now;
+
+  chn = brd_bno(BN_KTV);
+  XoPost(chn);
++ time(&now);
+  xover(XZ_POST);
++ bshm->totalvisit[bno] += time(0) - now;
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+: Åã¥Üªº³¡¤À
+: ¦A¨Ó´N¬OÅã¥Üªº³¡¤À¡AÀH«K­n¦b­þ¸ÌÅã¥Ü
+: ¨Ò¦p¥i¥H¦b post.c:post_head() ©Î board.c:class_item() ¨q¥X¨Ó
+
++ int bno;
++ bno = brd_bno(currboard);
+
+  ¥Î prints §â¥H¤U¦L¥X¨Ó (ª©­±¦Û¦æ°t¸m)
+
+  "%s", Btime(&(bshm->lastvisit[bno]))   // ³Ì«á¤@¦¸ÂsÄý¤é´Á
+  "%d", bshm->totalvisit[bno]            // ²Ö­pÂsÄý®É¶¡ (¬í)
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  1. ¦pªG¦³¤H¥Î switch ±q¬ÝªO¥Ò¸õ¥h¬ÝªO¤Aªº¸Ü
+     (1) ¬ÝªO¤A·|¦³°O¿ý³Ì«áÂsÄý®É¶¡¡A¤]·|­pºâ¤H¦¸
+     (2) ¦ý¬O²Ö¿n®É¶¡·|¥[¦b¬ÝªO¥Ò
+
+  2. §ï§¹ patch ­n²M shm¡A­«¶} bbsd
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢|¢w Modify ¢wùî [37;46mSun, 04 May 2003 21:51:59 +0800 (CST)    [m

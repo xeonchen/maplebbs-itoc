@@ -1,0 +1,131 @@
+µo«H¤H: hightman.bbs@bbs.hightman.net («Ý©w) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý«ç¤\±q¨t²Îpidª¾¹D¨º¦ì¨Ï¥ÎªÌ¬O½Ö?...
+µo«H¯¸: ©ú¤ë¤ô°aBBS (Sat, 05 Jul 2003 12:31:45 +0800)     Updated: 2004/09/11
+
+¥H«e¼gªº¤@­Ó¤pµ{§Ç¡A©ñ¨ì util/ ¤U¡A­×§ï Makefile ½sÄ¶¥¦¡C
+
+: src/util/Makefile
+
+EXE =   ... [1;33mpid2user[m
+
+: src/util/pid2user.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/pid2user.c      (MapleBBS Ver 3.10)              */
+/*-------------------------------------------------------*/
+/* target : ¥Ñpid§ä¥X·í«e¯¸¤º¨Ï¥ÎªÌid©M°ÊºA              */
+/* author : hightman.bbs@bbs.hightman.net                */
+/* create : 02/05/19                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+
+/* hightman.020519: 0
+ * ªñ¤éµo²{­Ó§O¶iµ{¥e¥Îcpu©Mmemory¸ê·½¹L¦h¡A
+ * ¾Ú¦¹µ{§ÇÆ[¹î¸Ó¥Î¤á¦b°µ¤°¤\
+ */
+
+#define _MODES_C_
+
+#include "bbs.h"
+
+static UCACHE *ushm;
+
+
+static int      /* 0: §ä¤£¨ì¨Ï¥ÎªÌ¬O¦¹ pid */
+pid2user(pid)
+  pid_t pid;
+{
+  UTMP *utmp, *uceil;
+  usint offset;
+
+  ushm = shm_new(UTMPSHM_KEY, sizeof(UCACHE));
+
+  offset = ushm->offset;
+  if (offset > (MAXACTIVE - 1) * sizeof(UTMP))
+    offset = (MAXACTIVE - 1) * sizeof(UTMP);
+  utmp = ushm->uslot;
+  uceil = (void *) utmp + offset;
+
+  offset = 1;
+  do
+  {
+    if (utmp->pid == pid)
+    {
+      printf("¨Ï¥ÎªÌ¥N¸¹: %s ª¬ºA: %s [%d] ¡C (¨Ó¦Û %s)\n",
+        utmp->userid, ModeTypeTable[utmp->mode], utmp->mode, utmp->from);
+      offset = 2;
+      break;
+    }
+  } while (++utmp <= uceil);
+
+  return (offset - 1);
+}
+
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  pid_t pid;
+  char c;
+  extern int errno;
+
+  if (argc < 2)
+  {
+    printf("Usage:\t%s <pid>\n", argv[0]);
+    exit(-1);
+  }
+
+  setgid(BBSGID);
+  setuid(BBSUID);
+  chdir(BBSHOME);
+
+  pid = atol(argv[1]);
+
+  printf("±z¿é¤Jªº¶iµ{¸¹¬°¡G [%ld]\n", (long) pid);
+  if (!pid2user(pid))
+  {
+    printf("©êºp¡A®Ú¾Ú pid: [%ld] §ä¤£¨ì BBS ¨Ï¥ÎªÌ¡C\n", (long) pid);
+    exit(0);
+  }
+
+  printf("¬O§_±þ¦º¸Ó¶iµ{(Y/N)¡H[N] ");
+  c = getchar();
+  if (c == 'y')
+  {
+    if (kill(pid, SIGKILL) == 0)
+    {
+      printf("\n¦¨¥\\±þ±¼¶iµ{!\n");
+    }
+    else
+    {
+      if (errno == EINVAL)
+      {
+        printf("\nAn invalid signal was specified.\n");
+      }
+      else if (errno == ESRCH)
+      {
+        printf("\nThe  pid or process group does not exist.\n"
+          "Note that an existing process might be a zombie,\n"
+          "a process which  already  committed  termination,\n"
+          "but has not yet been wait()ed for.\n");
+      }
+      else if (errno == EPERM)
+      {
+        printf("\nThe process does not have permission to \n"
+          "send the signal to any of the receiving processes. \n");
+      }
+      else
+      {
+        printf("\nFail to kill the process for Unknown Reson.\n");
+      }
+    }
+  }
+  exit(0);
+}
+
+--
+[1;32m¡° Origin: [33m©ú¤ë¤ô°a [37m<bbs.hightman.net> [m
+[1;31m¡» From: [36m218.72.33.236[m

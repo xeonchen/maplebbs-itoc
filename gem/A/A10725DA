@@ -1,0 +1,671 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] §K³s¸pªº¬ÝªO¥Ó½Ð
+®É¶¡: 2004/03/16 Tue 23:56:53                           Updated: 2005/05/19
+
+¡° ¤Þ­z¡myenning.bbs@bbs.seehere.org (yenning)¡n¤§»Ê¨¥¡G
+> ¬O¤£¬O¯à¥Î¦¨¹³itoc.twbbs.orgªº¬ÝªO³s¸p¤@¼Ë?
+
+  1. ©Þ±¼ newbrd.c ªº©Ò¦³³s¸p¥\¯à¡A^P ¥u³Ñ¤U¥Ó½Ð¬ÝªO
+  2. §K³s¸pªº¬ÝªO¥Ó½Ð
+  3. ©|¥¼¶}ªOªºÅã¥Ü '+'¡A¤w¶}ªO§¹²¦Åã¥Ü ' '
+     ­Y¬O VIP ªº¥Ó½Ð¡A¦b©|¥¼¶}ªO«e·|Åã¥Ü '*'
+  4. ¥Ó½Ð¬ÝªO®É§Y¶ñ¤J©Ò¦³¸ê°T¡A¯¸ªø«ö o ´Nª½±µ¶}ªO§¹¦¨
+  5. ¦pªG°µ¤FºëµØ°Ïªº patch¡A¨º»òÁÙª½±µ¥[¤J Class
+  6. help ¨S¦³§ï¡A·Q¼gªº¤H¦A¦Û¤v¼g :p
+
+: theme.h
+
+  NECKER_COSIGN¡BFOOTER_COSIGN¡BFEETER_COSIGN
+  ³o¤T­Ó¦Û¤v§ï¤@¤U¡A¤£§ï¤]¨S®t
+
+  «ü¥O´N¥u³Ñ¤U (r)Åª¨ú (^P)¥Ó½Ð (d)§R°£ (o)¶}ªO (E)½s¿è (^Q/^O)¬d¸ß
+
+: struct.h  HAVE_COSIGN ³o¤@¬q§ï¦¨³o¼Ë
+
+#ifdef HAVE_COSIGN
+
+/* ----------------------------------------------------- */
+/* newbrd.c ¤¤¹B¥Îªº¸ê®Æµ²ºc                             */
+/* ----------------------------------------------------- */
+
+typedef struct NewBoardHeader
+{
+  char brdname[BNLEN + 1];
+  char class[BCLEN + 1];
+  char title[BTLEN + 1];
+  time_t btime;
+  time_t etime;
+  char xname[32];
+  char owner[IDLEN + 1];
+  char date[9];
+  usint mode;
+  int readlevel;
+}       NBRD;
+
+
+#define NBRD_FINISH     0x01    /* ¤wµ²®× */
+#define NBRD_VIPAPPLY   0x02    /* VIP ªº¥Ó½Ð */
+
+#endif  /* HAVE_COSIGN */
+
+: newbrd.c ´«¦¨¥H¤U
+: ----------------------------------------------------
+  ª`·N is_vip_apply() ªº³¡¤À­n¦Û¤v§ï¼g¡A·íµM§A¤]¥i¥Hª½±µ return 0¡A´N¨S¦³ VIP
+       nbrd_add() ¸Ì­±ªº¤ÀÃþ¨Ì¦U¯¸¦Û©w
+  ----------------------------------------------------
+  ¦pªGÁÙ§Æ±æ¦Û°Ê¥[¤J Class ¤ÀÃþ¡A¨º»ò°Ñ¦ÒºëµØ°Ï³o½g
+  [¥\¯à] newbrd.c ³s¸p¶}ªO«á¦Û°Ê¥[¤J Class
+: ----------------------------------------------------
+
+/*-------------------------------------------------------*/
+/* newbrd.c   ( YZU_CSE WindTop BBS )                    */
+/*-------------------------------------------------------*/
+/* target : ³s¸p¥\¯à                                     */
+/* create : 00/01/02                                     */
+/* update : 02/04/29                                     */
+/*-------------------------------------------------------*/
+/* run/newbrd/_/.DIR - newbrd control header             */
+/* run/newbrd/_/@/@_ - newbrd description file           */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#ifdef HAVE_COSIGN
+
+extern XZ xz[];
+extern char xo_pool[];
+extern BCACHE *bshm;                /* itoc.010805: ¶}·sªO¥Î */
+
+static int nbrd_add();
+static int nbrd_body();
+static int nbrd_head();
+
+
+static int
+cmpbtime(nbrd)
+  NBRD *nbrd;
+{
+  return nbrd->btime == currchrono;
+}
+
+
+static int
+nbrd_stamp(folder, nbrd, fpath)
+  char *folder;
+  NBRD *nbrd;
+  char *fpath;
+{
+  char *fname;
+  char *family = NULL;
+  int rc;
+  int token;
+
+  fname = fpath;
+  while (rc = *folder++)
+  {
+    *fname++ = rc;
+    if (rc == '/')
+      family = fname;
+  }
+
+  fname = family;
+  *family++ = '@';
+
+  token = time(0);
+
+  archiv32(token, family);
+
+  rc = open(fpath, O_WRONLY | O_CREAT | O_EXCL, 0600);
+  nbrd->btime = token;
+  str_stamp(nbrd->date, &nbrd->btime);
+  strcpy(nbrd->xname, fname);
+  return rc;
+}
+
+
+static void
+nbrd_fpath(fpath, folder, nbrd)
+  char *fpath;
+  char *folder;
+  NBRD *nbrd;
+{
+  char *str = NULL;
+  int cc;
+
+  while (cc = *folder++)
+  {
+    *fpath++ = cc;
+    if (cc == '/')
+      str = fpath;
+  }
+  strcpy(str, nbrd->xname);
+}
+
+
+static int
+nbrd_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(NBRD));
+  return nbrd_head(xo);
+}
+
+
+static int
+nbrd_load(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(NBRD));
+  return nbrd_body(xo);
+}
+
+
+static char
+nbrd_attr(nbrd)
+  NBRD *nbrd;
+{
+  /*         ¤w¶}ªO§¹¦¨¥Î ' '
+     ¥¼¶}ªOªº¤@¯ë¤H¥Ó½Ð¥Î '+'
+     ¥¼¶}ªOªº¢ä¢×¢Þ¥Ó½Ð¥Î '+' (¤@¯ë¨Ï¥ÎªÌ¬Ý¨ì)
+     ¥¼¶}ªOªº¢ä¢×¢Þ¥Ó½Ð¥Î '*' (¥u¦³¯¸ªø¥i¨£)
+   */
+  usint mode;
+
+  mode = nbrd->mode;
+  return mode & NBRD_FINISH ? ' ' :
+    (HAS_PERM(PERM_ALLBOARD) && (mode & NBRD_VIPAPPLY) ? '*' : '+');
+}
+
+
+static void
+nbrd_item(num, nbrd)
+  int num;
+  NBRD *nbrd;
+{
+  prints("%6d %c %-5s %-13s %-13s[%s] %.*s\n",
+    num, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner,
+    nbrd->brdname, nbrd->class, d_cols + 29, nbrd->title);
+}
+
+
+static int
+nbrd_body(xo)
+  XO *xo;
+{
+  NBRD *nbrd;
+  int num, max, tail;
+
+  max = xo->max;
+  if (max <= 0)
+  {
+    if (vans("­n·s¼W³s¸p¶µ¥Ø¶Ü(Y/N)¡H[N] ") == 'y')
+      return nbrd_add(xo);
+    return XO_QUIT;
+  }
+
+  nbrd = (NBRD *) xo_pool;
+  num = xo->top;
+  tail = num + XO_TALL;
+
+  if (max > tail)
+    max = tail;
+
+  move(3, 0);
+  do
+  {
+    nbrd_item(++num, nbrd++);
+  } while (num < max);
+  clrtobot();
+
+  /* return XO_NONE; */
+  return XO_FOOT;        /* itoc.010403: §â b_lines ¶ñ¤W feeter */
+}
+
+
+static int
+nbrd_head(xo)
+  XO *xo;
+{
+  vs_head("¥Ó½Ð¬ÝªO", str_site);
+  outs(NECKER_COSIGN);
+  return nbrd_body(xo);
+}
+
+
+static int
+is_vip_apply()                /* ¬O¤£¬O VIP ªº¥Ó½Ð */
+{
+  char *str, email[80];
+
+  [1;44m// ¥H¤U³o¤@¬q­n¥Ñ¦U¯¸¦Û©w [m
+  if (HAS_PERM(PERM_VALID))
+  {
+    str_lower(email, cuser.email);
+
+    /* ÀË¬d .ee##(g)@nctu.edu.tw */
+    if (str = (char *) strchr(email, '.'))
+    {
+      if (*(str + 1) == 'e' && *(str + 2) == 'e' &&
+        (!strcmp(str + 5, "@nctu.edu.tw") || !strcmp(str + 5, "g@nctu.edu.tw")))
+      {
+        return 1;
+      }
+    }
+
+    /* ÀË¬d u##11###@cc.nctu.edu.tw */
+    if (strlen(email) == 23)
+    {
+      if (email[0] == 'u' && email[3] == '1' && email[4] == '1' &&
+        !strcmp(email + 8, "@cc.nctu.edu.tw"))
+      {
+        return 1;
+      }
+    }
+  }
+  [1;44m// ¥H¤W³o¤@¬q­n¥Ñ¦U¯¸¦Û©w[m
+
+  return 0;
+}
+
+
+static int
+nbrd_add(xo)
+  XO *xo;
+{
+  int fd, readlevel;
+  char *dir, fpath[80], path[80], *plevel;
+  char *brdname, *title;
+  FILE *fp;
+  NBRD nbrd;
+
+  if (!cuser.userlevel)
+    return XO_NONE;
+
+  memset(&nbrd, 0, sizeof(NBRD));
+
+  brdname = nbrd.brdname;
+  title = nbrd.title;
+
+  if (!vget(b_lines, 0, "­^¤åªO¦W¡G", brdname, BNLEN + 1, DOECHO))
+    return XO_FOOT;
+
+  if (brd_bno(brdname) >= 0)
+  {
+    vmsg("¤w¦³¦¹ªO");
+    return XO_FOOT;
+  }
+
+  if (!valid_brdname(brdname))        /* itoc.020726: ÀË¬dªO¦W¬O§_¦Xªk */
+  {
+    vmsg("ªO¦W¤£¦Xªk");
+    return XO_FOOT;
+  }
+
+  [1;44m// ¥H¤U³o¤@¬q­n¥Ñ¦U¯¸¦Û©w [m
+  switch (vans("¬ÝªO¤ÀÃþ¡G1)­Ó¤H 2)¹ìªO 3)¯ZªO 4)ÄÒ¦Ð 5)Àç¶¤ 6)¨ä¥L [Q] "))
+  {
+  case '1':
+    plevel = "­Ó¤H";
+    break;
+  case '2':
+    plevel = "¹ìªO";
+    break;
+  case '3':
+    plevel = "¯ZªO";
+    break;
+  case '4':
+    plevel = "ÄÒ¦Ð";
+    break;
+  case '5':
+    plevel = "Àç¶¤";
+    break;
+  case '6':
+    plevel = "¡H¡H";    /* Åý¯¸ªø¦Û¤v¤â°Ê§ï */
+    vmsg("½Ð©ó¸É¥R¨Æ¶µ¤¤µù©ú±z­nªº¬ÝªO¤ÀÃþ");
+    break;
+  default:
+    return XO_FOOT;
+  }
+  [1;44m// ¥H¤W³o¤@¬q­n¥Ñ¦U¯¸¦Û©w [m
+
+  strcpy(nbrd.class, plevel);
+
+  readlevel = vans("¬ÝªOÄÝ©Ê¡G1)¤½¶} 2)¯µ±K 3)¦n¤Í [Q] ") - '0';
+  switch (readlevel)
+  {
+  case 1:
+    plevel = "¤½¶}";
+    break;
+  case 2:
+    plevel = "¯µ±K";
+    break;
+  case 3:
+    plevel = "¦n¤Í";
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (!vget(b_lines, 0, "¬ÝªO¥DÃD¡G", title, BTLEN + 1, DOECHO))
+    return XO_FOOT;
+
+  dir = xo->dir;
+  if ((fd = nbrd_stamp(dir, &nbrd, fpath)) < 0)
+    return nbrd_head(xo);
+  close(fd);
+
+  vmsg("ÁÙ¦³­n¸É¥R¤°»ò¶Ü¡H[¨Ò¦pÂà«H¡B½Ô´A¯¸ªøªº¸Ü...:p]");
+  sprintf(path, "tmp/%s.nbrd", cuser.userid);        /* ³s¸p­ì¦]ªº¼È¦sÀÉ®× */
+  fd = vedit(path, 0);
+  if (fd)
+  {
+    unlink(fpath);
+    vmsg(msg_cancel);
+    return nbrd_head(xo);
+  }
+
+  strcpy(nbrd.owner, cuser.userid);
+  nbrd.readlevel = readlevel;
+  nbrd.mode = is_vip_apply() ? NBRD_VIPAPPLY : 0;
+  rec_add(dir, &nbrd, sizeof(NBRD));
+
+  fp = fopen(fpath, "a+");
+  fprintf(fp, "§@ªÌ: %s (%s) ¯¸¤º: ¬ÝªO¥Ó½Ð\n", cuser.userid, cuser.username);
+  fprintf(fp, "¼ÐÃD: [¬ÝªO¥Ó½Ð] %s\n", brdname);
+  fprintf(fp, "®É¶¡: %s\n\n", Now());
+  fprintf(fp, "­^¤åªO¦W¡G%s\n", brdname);
+  fprintf(fp, "¬ÝªO¤ÀÃþ¡G%s\n", nbrd.class);
+  fprintf(fp, "¬ÝªO¥DÃD¡G%s\n", title);
+  fprintf(fp, "ªO¥D¦WºÙ¡G%s\n", nbrd.owner);
+  fprintf(fp, "¬ÝªOÄÝ©Ê¡G%s\n\n\n", plevel);
+  f_suck(fp, path);
+  unlink(path);
+  fprintf(fp, "\n--\n¡¼ ¥»¤å³¹¥Ñ %s ±q %s ¥Ó½Ð\n", cuser.userid, fromhost);
+  fclose(fp);
+
+  vmsg("½Ðµ¥«Ý¯¸ªø¶}ªO");
+  return nbrd_init(xo);
+}
+
+
+static int                        /* 1:¶}ªO¦¨¥\ */
+nbrd_newbrd(nbrd)                /* ¶}·sª© */
+  NBRD *nbrd;
+{
+  BRD newboard;
+  ACCT acct;
+
+  memset(&newboard, 0, sizeof(BRD));
+
+  /* itoc.010805: ·s¬ÝªO¹w³] battr = ¤£Âà«H; ¬ÝªOªO¥D¬°´£°_³s¸pªÌ */
+  switch (nbrd->readlevel)
+  {
+  case 2:       /* ¯µ±K */
+    newboard.readlevel = PERM_SYSOP;
+    newboard.battr = BRD_NOTRAN | BRD_NOSTAT | BRD_NOVOTE;
+    break;
+  case 3:       /* ¦n¤Í */
+    newboard.readlevel = PERM_BOARD;
+    newboard.battr = BRD_NOTRAN | BRD_NOSTAT | BRD_NOVOTE;
+    break;
+  default:      /* ¤½¶} */
+    newboard.postlevel = PERM_POST;
+    newboard.battr = BRD_NOTRAN;
+    break;
+  }
+  strcpy(newboard.brdname, nbrd->brdname);
+  strcpy(newboard.class, nbrd->class);
+  strcpy(newboard.title, nbrd->title);
+  strcpy(newboard.BM, nbrd->owner);
+
+  if (acct_load(&acct, nbrd->owner) >= 0)
+    acct_setperm(&acct, PERM_BM, 0);
+
+  if (brd_new(&newboard) < 0)
+    return 0;
+
+  vmsg("·sªO¦¨¥ß¡A°OµÛ¥[¤J¤ÀÃþ¸s²Õ");
+  return 1;
+
+}
+
+
+static int
+nbrd_open(xo)
+  XO *xo;
+{
+  NBRD *nbrd;
+
+  if (!HAS_PERM(PERM_ALLBOARD))
+    return XO_NONE;
+
+  nbrd = (NBRD *) xo_pool + (xo->pos - xo->top);
+
+  /* itoc.030519: Á×§K­«ÂÐ¶}ªO */
+  if (brd_bno(nbrd->brdname) >= 0)
+  {
+    nbrd->mode = NBRD_FINISH;
+    currchrono = nbrd->btime;
+    rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
+    vmsg("¤w¦³¦¹ªO");
+    return nbrd_init(xo);
+  }
+
+  if (nbrd->mode & NBRD_FINISH)
+  {
+    vmsg("¤w§¹¦¨¶}ªO");
+  }
+  else
+  {
+    if (vans("½Ð½T©w¶}±Ò¬ÝªO(Y/N)¡H[N] ") == 'y')
+    {
+      if (nbrd_newbrd(nbrd))
+      {
+        nbrd->mode = NBRD_FINISH;
+        currchrono = nbrd->btime;
+        rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
+      }
+      return nbrd_init(xo);
+    }
+  }
+  return XO_FOOT;
+}
+
+
+static int
+nbrd_browse(xo)
+  XO *xo;
+{
+  int key;
+  NBRD *nbrd;
+  char fpath[80];
+
+  /* itoc.010304: ¬°¤FÅý¾\Åª¨ì¤@¥b¤]¥i¥H¥[¤J³s¸p¡A¦Ò¼{ more ¶Ç¦^­È */
+  for (;;)
+  {
+    nbrd = (NBRD *) xo_pool + (xo->pos - xo->top);
+    nbrd_fpath(fpath, xo->dir, nbrd);
+
+    if ((key = more(fpath, FOOTER_COSIGN)) < 0)
+      break;
+
+    if (!key)
+      key = vkey();
+
+    switch (key)
+    {
+    case KEY_UP:
+    case KEY_PGUP:
+    case '[':
+    case 'k':
+      key = xo->pos - 1;
+
+      if (key < 0)
+        break;
+
+      xo->pos = key;
+
+      if (key <= xo->top)
+      {
+        xo->top = (key / XO_TALL) * XO_TALL;
+        nbrd_load(xo);
+      }
+      continue;
+
+    case KEY_DOWN:
+    case KEY_PGDN:
+    case ']':
+    case 'j':
+    case ' ':
+      key = xo->pos + 1;
+
+      if (key >= xo->max)
+        break;
+
+      xo->pos = key;
+
+      if (key >= xo->top + XO_TALL)
+      {
+        xo->top = (key / XO_TALL) * XO_TALL;
+        nbrd_load(xo);
+      }
+      continue;
+
+    case 'h':
+      xo_help("cosign");
+      break;
+    }
+    break;
+  }
+
+  return nbrd_head(xo);
+}
+
+
+static int
+nbrd_delete(xo)
+  XO *xo;
+{
+  NBRD *nbrd;
+  char fpath[80];
+
+  nbrd = (NBRD *) xo_pool + (xo->pos - xo->top);
+  if (strcmp(cuser.userid, nbrd->owner) && !HAS_PERM(PERM_ALLBOARD))
+    return XO_NONE;
+
+  if (vans(MSG_DEL_NY) != 'y')
+    return nbrd_head(xo);
+
+  nbrd_fpath(fpath, xo->dir, nbrd);
+  unlink(fpath);
+
+  rec_del(xo->dir, sizeof(NBRD), xo->pos, NULL);
+  return nbrd_init(xo);
+}
+
+
+static int
+nbrd_edit(xo)
+  XO *xo;
+{
+  if (HAS_PERM(PERM_ALLBOARD))
+  {
+    char fpath[64];
+    NBRD *nbrd;
+
+    nbrd = (NBRD *) xo_pool + (xo->pos - xo->top);
+    nbrd_fpath(fpath, xo->dir, nbrd);
+    vedit(fpath, 0);
+    return nbrd_head(xo);
+  }
+
+  return XO_NONE;
+}
+
+
+static int
+nbrd_uquery(xo)
+  XO *xo;
+{
+  NBRD *nbrd;
+
+  nbrd = (NBRD *) xo_pool + (xo->pos - xo->top);
+
+  move(1, 0);
+  clrtobot();
+  my_query(nbrd->owner);
+  return nbrd_head(xo);
+}
+
+
+static int
+nbrd_usetup(xo)
+  XO *xo;
+{
+  NBRD *nbrd;
+  ACCT acct;
+
+  if (!HAS_PERM(PERM_ALLACCT))
+    return XO_NONE;
+
+  nbrd = (NBRD *) xo_pool + (xo->pos - xo->top);
+  if (acct_load(&acct, nbrd->owner) < 0)
+    return XO_NONE;
+
+  move(3, 0);
+  acct_setup(&acct, 1);
+  return nbrd_head(xo);
+}
+
+
+static int
+nbrd_help(xo)
+  XO *xo;
+{
+  xo_help("cosign");
+  return nbrd_head(xo);
+}
+
+
+static KeyFunc nbrd_cb[] =
+{
+  XO_INIT, nbrd_init,
+  XO_LOAD, nbrd_load,
+  XO_HEAD, nbrd_head,
+  XO_BODY, nbrd_body,
+
+  'r', nbrd_browse,
+  'd', nbrd_delete,
+  'E', nbrd_edit,
+  'o', nbrd_open,
+
+  Ctrl('P'), nbrd_add,
+  Ctrl('Q'), nbrd_uquery,
+  Ctrl('O'), nbrd_usetup,
+
+  'h', nbrd_help
+};
+
+
+int
+XoNewBoard()
+{
+  XO *xo;
+  char fpath[64];
+
+  sprintf(fpath, "run/newbrd/%s", fn_dir);
+  xz[XZ_COSIGN - XO_ZONE].xo = xo = xo_new(fpath);
+  xz[XZ_COSIGN - XO_ZONE].cb = nbrd_cb;
+  xo->key = XZ_COSIGN;
+  xover(XZ_COSIGN);
+  free(xo);
+
+  return 0;
+}
+#endif        /* HAVE_COSIGN */
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

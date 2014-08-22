@@ -1,0 +1,51 @@
+§@ªÌ: itoc (ºñ¥¨¤H¦n«È¡H) ¬ÝªO: itoc
+¼ÐÃD: [¥\¯à] ¾ã¦æ¥ú´Î(12)¡Ðsong.c ÂIºq
+®É¶¡: Tue Jul 15 11:11:29 2003                          Updated: 2005/10/07
+
+: song.c:song_item_bar()  ¥[¦b song_item() «á­±
+
+#ifdef HAVE_LIGHTBAR
+static int
+song_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:¤W¥ú´Î  0:¥h¥ú´Î */
+{
+  HDR *hdr;
+  int xmode, gtype;
+
+  hdr = (HDR *) xo_pool + xo->pos - xo->top;
+  xmode = hdr->xmode;
+  gtype = (char) 0xba;
+
+  /* ¥Ø¿ý¥Î¹ê¤ß¡A¤£¬O¥Ø¿ý¥ÎªÅ¤ß */
+  if (xmode & GEM_FOLDER)               /* ¤å³¹:¡º ¨÷©v:¡» */
+    gtype += 1;
+
+  if (hdr->xname[0] == '@')             /* ¸ê®Æ:¡¸ ¤ÀÃþ:¡¹ */
+    gtype -= 2;
+  else if (xmode & GEM_BOARD)           /*         ¬ÝªO:¡½ */
+    gtype += 2;
+
+  prints("%s%6d%c \241%c %-.*s%s",
+    mode ? "\033[44m" : "",         //³o¸Ì¬O¥ú´ÎªºÃC¦â¡A¥i¥H¦Û¤v§ï
+    xo->pos + 1, xmode & GEM_RESTRICT ? ')' : ' ', gtype, d_cols + 64,
+    (xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT) ? MSG_DATA_CLOAK :
+    hdr->title,
+    mode ? "\033[m" : "");
+
+  return XO_NONE;
+}
+#endif
+
+: song.c:song_cb[]
+
+static KeyFunc song_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, song_item_bar,
+#endif
+...
+
+--
+[1;31m|[33m Origin [31m| [0;45m MapleBBS-itoc °Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+[1;31m|[35m Author [31m| [36mitoc.dorm11.nctu.edu.tw[m

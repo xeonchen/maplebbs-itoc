@@ -1,0 +1,32 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ¨Ï¥ÎªÌ¦W³æ«ö r ¸õ¥h«H½c
+®É¶¡: 2004/02/18 Wed 09:28:46                           Updated: 2004/02/18
+
+  ¦b¨Ï¥ÎªÌ¦W³æ«ö r ¶i¤J«H½c
+  (¦]¬° r ¬O«O¯dÁä¡A©Ò¥H¦b xover.c ­n¯S§O³B²z)
+
+: ulist.c:ulist_mbox() ·s¼W¦b ulist_help() «e­±
+
+static int
+ulist_mbox(xo)
+  XO *xo;
+{
+  xover(XZ_MBOX);
+  return ulist_init(xo);
+}
+
+: ulist.c:ulist_cb[]
+
+- 'r', ulist_query,
++ 'r', ulist_mbox,
+
+: xover.c:xover()
+
+      if (cmd == KEY_RIGHT || cmd == '\n')
+      {
+-       cmd = 'r';
++       cmd = zone == XZ_ULIST ? 'q' : 'r';
+      }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

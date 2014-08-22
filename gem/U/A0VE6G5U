@@ -1,0 +1,58 @@
+╡oлHдH: tandrian.bbs@ntcb.twbbs.org.tw (д█░ь┼]л░), м▌кO: plan
+╝╨  ├D: [е\пр] ┴Ї┬├дWп╕и╙╖╜
+╡oлHп╕: д█▒s┼]л░ (Sun Aug 11 18:40:27 2002)               Updated: 2005/03/27
+
+  ┴Ї┬├дWп╕и╙╖╜(╛╓ж│┴Їин┼vннк║дHд~пр┴Ї┬├дWп╕жa┬I)
+
+: ufo.h  // ╜╨и╠ж█дvк║ ufo.h ╜╒╛у
+
+- #define UFO_NOUSE18     BFLAG(18)
++ #define UFO_HIDDEN      BFLAG(18)       /* ┴Ї┬├и╙╖╜ */
+
+  ...
+
+- #define STR_UFO         "-mpsnemPBQFANbwtSH------CHA"
++ #define STR_UFO         "-mpsnemPBQFANbwtSHh-----CHA"
+
+  ...
+
+- "лOпd",
++ "┴Ї┬├дWп╕и╙╖╜    (┴Ї┬├/еX▓{)",        /* UFO_HIDEDN */
+
+: talk.c:do_query()
+
+  UTMP *up;
+  int userno, rich;
++ int hidden;
+  char *userid;
+  char fortune[4][9] = {"ик│hд^дв", "д@пын╙┼щ", "оa╣╥дp▒d", "░]╗╓жaеD"};
+
+  ...
+
+  up = utmp_find(userno);
+  rich = acct->money >= 1000000 ? (acct->gold >= 100 ? 3 : 2) :
+    (acct->money >= 50000 ? 1 : 0);
++ hidden = up ? up->ufo : acct->ufo;
++ hidden = (hidden & UFO_HIDDEN) && !HAS_PERM(PERM_ALLACCT);
+
+  ...
+
+  prints("[и╙╖╜] (%s) %s\n",
+-   Btime(&acct->lastlogin), acct->lasthost);
++   hidden ? "д╤к°жaд[ж│о╔║╔" : Btime(&acct->lastlogin),
++   hidden ? "ж╣лы║°║°╡L╡┤┤┴" : acct->lasthost);
+
+: ulist.c:ulist_item()
+
+  зт prints(); ╕╠н▒к║
+  up->from ┤лжи
+  (up->ufo & UFO_HIDDEN && !HAS_PERM(PERM_ALLACCT)) ? MYHOSTNAME : up->from
+
+: edit.c:ve_banner()
+
+  зт fromhost ┤лжи
+  (cuser.ufo & UFO_HIDDEN ? MYHOSTNAME : fromhost)
+
+--
+[0m  [44m∙▐∙∙∙▀ ∙с∙∙∙∙ ∙▌∙∙∙∙ ∙р∙∙∙▀[40m  [32;1mб╝ Origin: [33mд█░ь┼]л░ [37mntcb.twbbs.org[0m
+[0m  [46;1m∙х  ∙у ∙у∙∙∙∙ ∙у∙∙∙∙ ∙у∙∙∙х[0m  [31;1mб╝ From:[0m[36mntcb.twbbs.org[m

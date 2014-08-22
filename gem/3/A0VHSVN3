@@ -1,0 +1,232 @@
+µo«H¤H: verit.bbs@bbs.yzu.edu.tw (.......................) ¬ÝªO: InstallBBS
+¼Ð  ÃD: [WindTop]·s®ö¬P®y¹B¶Õ¬d¸ß
+µo«H¯¸: ¤¸´¼¤j¾Ç­·¤§¶ð (Fri, 18 Jul 2003 02:42:53 +0800)  Updated: 2004/09/07
+
+³o°¦µ{¦¡­n #define POPUP_ANSWER ¤~¯àª½±µ¨Ï¥Î¡ã
+
+°²¦p¨S¦³ªº¸Ü , ±o§â main_sinastar() ¤¤ªº pans §ï¦¨ vans  :)
+
+: maple/menu.c:¾A·í¿ï¶µ¤¤¥[¤J
+
++ "bin/sinastar.so:main_sinastar", 0, - M_XMODE,
++ "NStar      ¡ñ ¬P®y¹B¶Õ ¡ð",
+
+
+: so/Makefile
+
+        bbsnet.so dreye.so enews.so railway.so [1;33msinastar.so[m \
+
+: so/sinastar.c ¥[¤J³o°¦µ{¦¡
+
+/*-------------------------------------------------------*/
+/* sinastar.c   (YZU WindTopBBS Ver 3.02 )               */
+/*-------------------------------------------------------*/
+/* author : verit.bbs@bbs.yzu.edu.tw                     */
+/* target : http://mindcity.sina.com.tw                  */
+/* create : 01/07/09                                     */
+/* modify : 03/07/12                                     */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+#define mouts(x,y,s)    { move(x, y); outs(s); }
+
+
+#define HTTP_PORT       80
+#define SERVER_sinastar "mindcity.sina.com.tw"
+#define REF             "http://mindcity.sina.com.tw"
+
+#define LINE_WORD       50
+
+
+static int
+http_conn(server, s, kind)
+  char *server;
+  char *s;
+  int kind;
+{
+  int sockfd, start_show, chinese, state;
+  int cc, tlen,word, show;
+  char *xhead, *xtail, tag[128], fname[64];
+  FILE *fp;
+  static char pool[2048];
+
+  char *tag_s[5] =
+  {
+    "!--START:HORO_TODAY--", "!--START:HORO_TOMORROW--", "!--START:WEEKLY--",
+    "!--START:WEEKLY--", "!--START:YEARLY--"
+  };
+  char *tag_e[5] =
+  {
+    "!--END:HORO_TODAY--", "!--END:HORO_TOMORROW--", "!--END:WEEKLY--",
+    "!--END:WEEKLY--", "!--END:YEARLY--"
+  };
+
+
+  mouts(b_lines - 1, 0, "³s±µ¦øªA¾¹¤¤¡A½Ðµy­Ô.............");
+  refresh();
+
+  if ((sockfd = dns_open(server, HTTP_PORT)) < 0)
+  {
+    vmsg("µLªk»P¦øªA¾¹¨ú±o³sµ²¡A¬d¸ß¥¢±Ñ");
+    return -1;
+  }
+
+  write(sockfd, s, strlen(s));
+  shutdown(sockfd, 1);
+
+  /* parser return message from web server */
+  xhead = pool;
+  xtail = pool;
+  word = 0;
+  show = 0;
+  chinese = 0;
+  state = 0;
+  tlen = 0;
+  start_show = 0;
+
+  sprintf(fname, "tmp/%s.star", cuser.userid);
+  fp = fopen(fname, "w");
+
+  for (;;)
+  {
+    if (xhead >= xtail)
+    {
+      xhead = pool;
+      cc = read(sockfd, xhead, sizeof(pool));
+      if (cc <= 0)
+        break;
+      xtail = xhead + cc;
+    }
+    cc = *xhead++;
+
+    if ((tlen == strlen(tag_s[kind]) + 1) &&
+      (!str_ncmp(tag, tag_s[kind], strlen(tag_s[kind]))))
+    {
+      start_show = 1;
+    }
+    else if ((tlen == strlen(tag_e[kind]) + 1) &&
+      (!str_ncmp(tag, tag_e[kind], strlen(tag_e[kind]))))
+    {
+      break;
+    }
+
+    if (cc == '<' || cc == '&')
+    {
+      tlen = 1;
+      continue;
+    }
+    if (tlen)
+    {
+      if (cc == '>' || cc == ';')
+      {
+        if ((tlen == 3) && (!str_ncmp(tag, "br", 2)) &&
+          start_show && !state)
+        {
+          fputs("\n    ", fp);
+          state = 1;
+        }
+        else if ((tlen == 3) && (!str_ncmp(tag, "tr", 2)) &&
+          start_show && kind > 1 && !state)
+        {
+          fputs("\n    ", fp);
+          state = 1;
+        }
+        tlen = 0;
+        word = 0;
+        continue;
+      }
+      if (tlen <= 128)
+        tag[tlen - 1] = cc;
+      tlen++;
+      continue;
+    }
+    if (start_show)
+    {
+      if (word > LINE_WORD && cc < 0 && !chinese && !state)
+      {
+        fputs("\n    ", fp);
+        state = 1;
+        word = 0 ;
+      }
+      if (cc == ' ')
+        chinese = 0;
+      else if (cc != '\r' && cc != '\n')
+      {
+        word++;
+        fputc(cc, fp);
+        state = 0;
+        chinese = (cc < 0) ? (chinese ? 0 : 1) : 0;
+      }
+      else
+      {
+        word = 0;
+      }
+    }
+  }
+  close(sockfd);
+  fputs("\n\n    ¸ê®Æ¨Ó·½¬°·s®ö¬P®yºâ©Rºô http://mindcity.sina.com.tw/\n\n.", fp);
+  fclose(fp);
+
+  if (more(fname, (char *) -1) >= 0)
+  {
+    if (vans("±z­n±N¬d¸ßµ²ªG±H¦^«H½c¶Ü¡H[N] ") == 'y')
+      mail_self(fname, cuser.userid, "[³Æ §Ñ ¿ý] ·s®ö¬P®y¬d¸ßµ²ªG", MAIL_READ);
+  }
+
+  unlink(fname);
+  return 0;
+}
+
+/* °_©lÂI */
+int
+main_sinastar()
+{
+  char sendform[256], c1, c2;
+
+  char *star[12] =
+  {
+    "aries",     "taurus",   "gemini",
+    "cancer",    "leo",      "virgo",
+    "libra",     "scorpio",  "sagittarius",
+    "capricorn", "aquarius", "pisces"
+  };
+
+  char *strades[14] =
+  {
+    "A0",
+    "AAries        ¨d¦Ï®y",  "BTaurus       ª÷¤û®y",  "CGemini       Âù¤l®y",
+    "DCancer       ¥¨ÃÉ®y",  "ELeo          ·à¤l®y",  "FVirgo        ³B¤k®y",
+    "GLibra        ¤Ñ¯¯®y",  "HScorpio      ¤ÑÃÈ®y",  "ISagittarius  ®g¤â®y",
+    "JCapricorn    Å]½~®y",  "KAquarius     ¤ô²~®y",  "LPisces       Âù³½®y",
+    NULL
+  };
+
+  char *_kind[7] =
+  {
+    "A0",
+    "AToday      ¤µ¤é¹B¶Õ", "BTomorrow   ©ú¤é¹B¶Õ", "CWeek       ¤@¶g¹B¶Õ",
+    "DMonth      ¥»¤ë¹B¶Õ", "EYear       ¦~«×¹B¶Õ",
+    NULL
+  };
+
+  clear();
+  if ((c1 = pans(3, 18, "¿ï¾Ü¬P®y", strades)) >= 'a')
+  {
+    clear();
+    if ((c2 = pans(6, 18, "¿ï¾ÜÃþ«¬", _kind)) >= 'a')
+    {
+      c1 -= 'a';
+      c2 -= 'a';
+      sprintf(sendform, "GET /west/MC-12stars/%s%d.%shtml HTTP/1.0\n\n",
+        star[c1], c2 + 1, c2 == 4 ? "s" : "");
+      http_conn(SERVER_sinastar, sendform, c2);
+    }
+  }
+  return 0;
+}
+
+--
+[1;32m¡° Origin: [33m¤¸´¼¤j¾Ç ­·¤§¶ð [37m<bbs.yzu.edu.tw>[m
+[1;32m¡° From  : [36mbbs.yzu.edu.tw[m

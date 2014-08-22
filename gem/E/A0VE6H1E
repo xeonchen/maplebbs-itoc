@@ -1,0 +1,50 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] Every_Z ®É¥i¥HÀx¦sµe­±¨ì¼È¦sÀÉ
+®É¶¡: Sun May 25 02:08:54 2003                          Updated: 2003/06/25
+
+  ¹³ WindTop ¤@¼Ëªº every_Z ¿Ã¹õÂ^¨ú
+
+: xover.c ¤@¶}©l¦³¤G³B
+
+#define MSG_ZONE_SWITCH "§Ö³t¤Á´«¡G(A)ºëµØ (B)¤å³¹ ... (W)¤ô²y [1;33m(S)¿Ã¹õ[m¡G"
+
+: xover.c:every_Z()
+
+  case 'w':
+    if (HAS_PERM(PERM_BASIC))
+      cmd = XZ_BMW;
+    break;
+
++ case 's':
++   {
++     FILE *fp;
++     int i;
++     screenline slt[t_lines];
++
++     if (!(fp = tbf_open()))
++     {
++       vmsg("¼È¦sÀÉ¶}±Ò¿ù»~");
++       break;
++     }
++
++     vs_save(slt);
++
++     for (i = 0; i <= b_lines; i++)
++     {
++       slt[i].data[slt[i].len] = '\0';
++       fprintf(fp, "%s\n", slt[i].data);
++     }
++
++     fclose(fp);
++   }
++   break;
+  }
+
+  if (cmd == zone)
+  {
+    z_status--;
+    return XO_FOOT;
+  }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

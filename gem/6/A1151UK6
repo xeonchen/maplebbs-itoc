@@ -1,0 +1,23 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [½Ð°Ý] ÂIºq¸m¤¤ªº°ÝÃD
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/04 Mon 15:48:53)                Updated: 2005/04/05
+
+¡° ¤Þ­z¡mPon («õÄ_ :P)¡n¤§»Ê¨¥¡G
+>     ·Q½Ð°Ý¤@¤U¤j¤jÂIºq©³¤U¨º¦ê XXX ·Q¹ï XXX »¡ ... ­n«ç»ò§â¥L¸m¤¤©O
+>     ¤p§Ì¬O¦³·Q¨ì¦b«e­±¸É¤W
+>     ¿Ã¹õ¼e«×´î±¼ <~Src~> <~Des~> <~Say~> °£¥H¤G ­ÓªÅ¥Õ
+
+: song.c:song_quote()
+
+    /* ¦b³Ì«á¤@¦æ¥[¤W <~Src~> ·Q¹ï <~Des~> »¡ <~Say~> */
+    strcpy(buf, "\033[1;33m" SONG_SRC " ·Q¹ï " SONG_DES ...);
+    song_swap(buf, SONG_SRC, src);
+    song_swap(buf, SONG_DES, des);
+    song_swap(buf, SONG_SAY, say);
+-   fputs(buf, fpw);
++   fprintf(fpw, "%*s%s", (b_cols - strlen(buf) - 11) >> 1, "", buf);
++                               /* strlen("\033[1;33m\033[m\n") = 11 */
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

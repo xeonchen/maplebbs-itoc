@@ -1,0 +1,150 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: Re: [∞›√D]¨›™O¶X®÷?
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2007/03/16 Fri 19:26:04)                Updated: 2006/03/17
+
+°∞ §ﬁ≠z°mallen501pc.bbs@bbs.sa.ncyu.edu.tw (¿Ræi§§..)°n§ßª ®•°G
+> ß⁄∫ﬁ™∫Ø∏∏Ã≠±•ÿ´e¶≥3≠”¨›™Oª›≠n¶X®÷¶®§@≠”¨›™O,∏‹ª°™Ω±µß‚brd/XXX™∫™F¶Ë≤æπL•h
+> ¨O§£¶Ê™∫ßa? ®∫ªÚ¡Ÿ≠n≠◊ßÔ§∞ªÚ?
+
+  ~/bin/mergebrd A B C D
+  ±N A B C D •|≠”™O¶X®÷¶® A ™O  (A ™O•i•H¨O∑s¶®•ﬂ™∫™O°A©Œ¨O§w∏g¶s¶b™∫™O)
+
+: src/util/Makefile
+
+EXE =   ... mergebrd
+
+: src/util/mergebrd.c ∑sºWµ{¶°¶p§U
+
+/*-------------------------------------------------------*/
+/* util/mergebrd.c      ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : merge several boards into one board          */
+/* create : 07/03/16                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+/* syntax : mergebrd dst src1 [src2 src3 ...]            */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+static int
+is_board(brdname)
+  char *brdname;
+{
+  BRD brd;
+  int fd;
+  int rc = 0;
+
+  if ((fd = open(FN_BRD, O_RDONLY)) >= 0)
+  {
+    while (read(fd, &brd, sizeof(BRD)) == sizeof(BRD))
+    {
+      if (!strcmp(brdname, brd.brdname))
+      {
+        rc = 1;
+        break;
+      }
+    }
+    close(fd);
+  }
+
+  return rc;
+}
+
+
+static int
+merge_board(src, dst)
+  char *src, *dst;
+{
+  int i;
+  char x;
+  char fnew[64], fold[64];
+  char cmd[256];
+
+  if (!strcmp(src, dst))
+  {
+    printf("§£Ø‡±N¶P§@™O¶X®÷\n");
+    return 0;
+  }
+
+  if (!is_board(src))
+  {
+    printf("®S¶≥ %s ≥o™O°I\n", src);
+    return 0;
+  }
+
+  for (i = 0; i < 32; i++)
+  {
+    x = radix32[i];                       /* @/ ©ﬂ±Û */
+    sprintf(fold, "brd/%s/%c/*", src, x);
+    sprintf(fnew, "brd/%s/%c/", dst, x);
+    sprintf(cmd, "cp %s %s", fold, fnew); /* ∞≤≥]®S¶≥¶PºÀ¿…¶W™∫°C≠Y¶≥∑|¬–ª\ */
+    system(cmd);
+  }
+
+  brd_fpath(fold, src, FN_DIR);
+  brd_fpath(fnew, dst, FN_DIR);
+  sprintf(cmd, "cat %s >> %s", fold, fnew);
+  system(cmd);
+
+  return 1;
+}
+
+
+static int
+hdr_cmp(a, b)
+  HDR *a;
+  HDR *b;
+{
+  return a->chrono - b->chrono;
+}
+
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  int i, num;
+  char *src, *dst;
+  char folder[64];
+
+  if (argc < 3)
+  {
+    printf("Usage: %s dst src1 [src2 src3 ...]\n", argv[0]);
+    return -1;
+  }
+
+  chdir(BBSHOME);
+
+  dst = argv[1];
+  if (!is_board(dst))
+  {
+    printf("®S¶≥ %s ≥o™O°I\n", dst);
+    return -1;
+  }
+
+  num = 0;
+  for (i = 2; i < argc; i++)
+  {
+    src = argv[i];
+    printf("∂}©l±N %s ™O¶X®÷®Ï %s ™O§∫\n", src, dst);
+    num += merge_board(src, dst);
+  }
+
+  if (num > 0)
+  {
+    brd_fpath(folder, dst, FN_DIR);
+    rec_sync(folder, sizeof(HDR), hdr_cmp, NULL);
+    printf("%d ≠”™O¶X®÷¶®•\\n", num);
+  }
+
+  return 0;
+}
+
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m218-168-183-31.dynamic.hin[m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

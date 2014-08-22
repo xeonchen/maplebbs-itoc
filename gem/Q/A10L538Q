@@ -1,0 +1,61 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]Repostªº­ì©l¤º®e¤£ºâ¨ìwordsnum
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/09/23 Thu 13:49:46)                Updated: 2004/09/23
+
+¡° ¤Þ­z¡mchwaian (µL¨¥)¡n¤§»Ê¨¥¡G
+> ¨Ï¥ÎªÌ¥i¥H¤@ª½repost¥i¥H°k¹L¦³°µ°»´ú½Æ»s¶K¤WªºÀË¬d
+> ¦Ó¤j¶qÁÈ¨úª÷¹ô
+> ¬O¦³·Q¹L¦b
+> ve_quote¸Ì¦pªG¬O¿ï¾Ü­«¶K¥þ¤å
+> ¬O§_¥i¥t¤@­Ówords_checkºâ¥Xwordsnum2
+> ¦b³Ì«áwords_check¤§«á¦A¦©±¼ ¨Ã¥BÁ×§K¦©¨ì¤p©ó¹sªºª¬ªp
+> ¤£ª¾¹D¬O§_¦³¤H¦³§ó¦n·Qªkªº ½Ð«ü±Ð
+
+  µo¤å½Z¶O¥Ñ minimun{key-in¦¸¼Æ¡B¤å³¹¦r¼Æ¡B¯Ó¶O®É¶¡} ¨Ó¨M©w
+
+: edit.c
+
+int wordsnum;
++ int keysnum;
+
+: edit.c:vedit()
+
+  clear();
+
++ keysnum = 0;
+
+  for (;;)
+  {
+
+    cc = vkey();
+
+    if (isprint2(cc))
+    {
+      ve_char(cc);
++     keysnum++;
+    }
+
+: post.c
+
+extern int wordsnum;
++ extern int keysnum;
+
+: post.c:do_post()
+
+-   if (currbattr & BRD_NOCOUNT || wordsnum < 30)
++   if (currbattr & BRD_NOCOUNT || (BMIN(wordsnum, keysnum)) < 30)
+    {                           /* itoc.010408: ¥H¦¹´î¤ÖÄé¤ô²{¶H */
+      outs("¤å³¹¤£¦C¤J¬ö¿ý¡A·q½Ð¥]²[¡C");
+    }
+    else
+    {
+-     mode = BMIN(wordsnum, spendtime) / 10;    /* ¨C¤Q¦r/¬í ¤@¤¸ */
++     mode = BMIN(wordsnum, spendtime);
++     mode = BMIN(mode, keysnum);
++     mode /= 10;                               /* ¨C¤Q ¦r/¬í/Áä ¤@¤¸ */
+      prints("³o¬O±zªº²Ä %d ½g¤å³¹¡A±o %d »È¡C", ++cuser.numposts, mode);
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mpc512-12.ee.nctu.edu.tw [30mµoªí[m

@@ -1,0 +1,26 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (:MM:) ¬ÝªO: plan
+¼Ð  ÃD: Re: Ãö©ó¥D¿ï³æ·s¼W¡u¾ú¥v¬ö¿ý¡v
+µo«H¯¸: XEON (Thu, 15 May 2003 20:51:16 +0800 (CST))      Updated: 2003/06/29
+
+¡° ¤Þ­z¡mTideWave.bbs@whshs.cs.nccu.edu.tw (£iµLºÉªº´`Àô¡¡n¤§»Ê¨¥¡G
+> ´N¬O·Q­n§âºëµØ°Ï¨º¨Ç²Î­p¸ê®Æ  ²¾¨ì¥D¿ï³æ¤]¥i¥Hª½±µ¬Ý
+
+  ¥H gem/@/@-topgold ¬°¨Ò¡A¾lÃþ±À
+
+: menu.c:view_topgold()
+
+static int
+view_topgold()
+{
+  more("gem/@/@-topgold", NULL);
+  return 0;
+}
+
+: menu.c ¾A·íªº¿ï³æ¥[¤J
+
+  view_topgold, 0, M_READA,
+  "TopGold      ª÷¹ô±Æ¦æ",
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mitoc.Dorm-GD2.NCTU.edu.tw                [m

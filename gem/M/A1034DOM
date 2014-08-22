@@ -1,0 +1,49 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý²Ö¿n¤W¯¸®É¼Æ
+µo«H¯¸: Àº¤Ñ±^ (Sat, 01 Nov 2003 00:47:56 +0800 (CST))    Updated: 2005/04/29
+
+  ¥²¶·°µºëµØ°Ï³o½g
+  [¥\¯à] acct.c struct.h bbsd.c ²Ö¿n¤W¯¸®É¼Æ
+
+  ¿é¥Xµ²ªG¥i¥H¦b¢Ð¢Ð¢á¯¸¤ºªººëµØ°Ï«Ø¥ß¸ê®Æ -topstaytime ¨Ó¾\Åª¡C
+
+: src/util/topusr.c
+
+#define OUTFILE_TOPLOGIN BBSHOME"/gem/@/@-toplogin"
++ #define OUTFILE_TOPSTAYTIME  BBSHOME"/gem/@/@-topstaytime"
+
+
+: src/util/topusr.c
+
+static DATA toplogins[TOPNUM], topposts[TOPNUM], ...;
++ static DATA topstaytime[TOPNUM],
+
+
+: src/util/topusr.c:topusr()
+
+  if ((p = findmin(&toplogins))->num < acct->numlogins)
+  {
+    str_ncpy(p->userid, acct->userid, sizeof(p->userid));
+    str_ncpy(p->username, acct->username, sizeof(p->username));
+    p->num = acct->numlogins;
+  }
+
++ if ((p = findmin(&topstaytime))->num < acct->staytime)
++ {
++   str_ncpy(p->userid, acct->userid, sizeof(p->userid));
++   str_ncpy(p->username, acct->username, sizeof(p->username));
++   p->num = acct->staytime;
++ }
+
+
+: src/util/topusr.c:main()
+
+  qsort(toplogins, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_TOPLOGIN, "¤W¯¸¦¸¼Æ±Æ¦æº]", &toplogins);
+
++ qsort(topstaytime, TOPNUM, sizeof(DATA), sort_compare);
++ write_data(OUTFILE_TOPSTAYTIME, "±¾¯¸¯dÅÊ¤ÀÄÁº]", &topstaytime);
+
+--
+ [1;41m¢z[44m¢q[m Or[1mig[30min[m: [41m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;33mBioStar [30m±q [35m163.23.212.18 [30mµoªí[m

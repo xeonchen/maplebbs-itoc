@@ -1,0 +1,532 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°ÝÃö©ó¶®ªê¡I©_¼¯ªº·s»D¥\¯à
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/02/12 Thu 12:45:28)                Updated: 2006/08/12
+
+  ­n¥ý°µºëµØ°Ï³o½g
+  [¥\¯à] enews-open.c ©_¼¯·s»DÂà¦Ü¬ÝªO
+
+: menu.c ¾A·í¿ï³æ¥[¤J
+
++ "bin/enews.so:main_enews", 0, - M_GAME,
++ "Enews       ©_¼¯·s»D",
+
+: theme.h
+
+#define FOOTER_VEDIT    \
+COLOR1 " %s " COLOR2 " (^Z)»¡©ú (^W)²Å¸¹ (^L)­«Ã¸ (^X)ÀÉ®×³B²z ... \033[m"
+
++ #define FOOTER_ENEWS   \
++ COLOR1 " ©_¼¯·s»D " COLOR2 " (kj)¤W¤U½g (¡ô¡õ¡ö)¤W¤UÂ÷¶}             "
++ "                           "
+
+  ...
+  ...
+
+#define FEETER_INNBBS   \
+COLOR1 " Âà«H³]©w " COLOR2 " (¡ô/¡õ)¤W¤U (PgUp/PgDn)¤W¤U­¶ ... "
+
++ #define FEETER_ENEWS \
++ COLOR1 " ©_¼¯·s»D " COLOR2 " (¤è¦V)²¾°Ê (¦r¥À/¼Æ¦r)¶µ¥Ø/½g¼Æ " \
++ "(ENTER)ÂsÄý (F/x) Âà±H/Âà¿ý (q)Â÷¶} "
+
+: game/Makefile
+
+SO =     ..... [1;33menews.so[m
+
+: game/enews.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* enews.c  ( NTHU CS MapleBBS Ver 3.10 )                */
+/*-------------------------------------------------------*/
+/* target : Yahoo! ©_¼¯·s»D                              */
+/* create : 02/01/27                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#if 0
+
+ ¥»©_¼¯·s»Dµ{¦¡»Ý­n°t¦X enews-open ¥h§ì¸ê®Æ¡Acrontab ¦p¤U¡G
+
+# ¨C¤Ñ 10:30AM 4:30PM §ì©_¼¯·s»D
+30 10,16 * * * bin/enews-open
+
+ ­n¨Ï¥Î enews-open.c ¥²¶·¸Ë¦³ lynx ¤Î iconv¡C
+
+ ¤å³¹ÀÉ®×©ñ¦b run/kimo/
+
+ ¸ê®Æ¨Ó·½¡GYahoo! ©_¼¯·s»D http://tw.news.yahoo.com/
+
+#endif
+
+
+#include "bbs.h"
+
+
+/*-------------------------------------------------------*/
+/* variable                                              */
+/*-------------------------------------------------------*/
+
+
+/* itoc.020129: ¥Ø«e¤£¤ä´©Â½­¶¡A©Ò¥H¨CºØ¤ÀÃþ·s»D³Ì¦h¤]¬O 16 ±ø¦Ó¤w */
+
+#define MAX_ENEWS   16  /* ¤@­¶³Ì¦h¦³ 16 ¶µ */
+
+static char title[MAX_ENEWS][TTLEN + 1];    /* ¥»¤ÀÃþ·s»Dªº©Ò¦³¼ÐÃD */
+static char xname[MAX_ENEWS][10];           /* ¥»¤ÀÃþ·s»Dªº©Ò¦³ÀÉ®×¸ô®| */
+static int maxitem;                         /* ¥»¤ÀÃþªº¦@¦³´X½g */
+
+extern BCACHE *bshm;
+
+extern void outgo_post(HDR *hdr, char *board);
+
+#define mouts(x,y,s)    { move(x, y); outs(s); }
+
+static void
+enews_fpath(fpath, kind, fname)
+  char *fpath;
+  char kind;
+  char *fname;
+{
+  sprintf(fpath, "run/kimo/%c/%s", kind, fname);
+}
+
+
+/*-------------------------------------------------------*/
+/* E-News ¿ï³æ                                           */
+/*-------------------------------------------------------*/
+
+
+static void
+enews_item(num, cc)
+  int num;
+  int cc;
+{
+  move(6 + num, 0);
+  clrtoeol();
+  move(6 + num, 15);
+  prints(cc == num ? "%2d " COLOR4 " %.*s \033[m" : "%2d  %.*s",
+    num + 1, d_cols + 54, title[num]);  /* ¤ÓªøªººI±¼ */
+}
+
+
+static void
+enews_body(kind, cc)
+  char kind;
+  int cc;
+{
+  int num;
+
+  if (!maxitem)
+    return;
+
+  for (num = 0; num < maxitem; num++)
+    enews_item(num, cc);
+
+  for (; num < MAX_ENEWS; num++)
+  {
+    move(6 + num, 0);
+    clrtoeol();
+  }
+
+  /* ´å¼Ð²¾¥h©Ò¿ï¶µªº³Ì«á */
+  num = 20 + strlen(title[cc]);
+  if (num > 74)     /* ¤ÓªøªººI±¼ */
+    num = 74;
+  move(6 + cc, num);
+}
+
+
+static void
+enews_neck(kind, cc)
+  char kind;
+  int cc;
+{
+  int i;
+  char class[12][5] =
+  {
+    "¬Fªv", "ªÀ·|", "°ê»Ú", "¨â©¤", "°]¸g", "¼vµø",
+    "Åé¨|", "¥Í¬¡", "¥ð¶¢", "°·±d", "¬ì§Þ", "·s©_"
+  };
+
+  move(4, 0);
+  clrtoeol();
+  move(4, 4);
+  for (i = 'A'; i <= 'L'; i++)
+    prints(i == kind ? "\033[1;36m%c\033[37;41m%s\033[m " :
+      "\033[1;36m%c\033[m%s ", i, class[i - 'A']);
+
+  enews_body(kind, cc);
+}
+
+
+static void
+enews_head(kind, cc)
+  char kind;
+  int cc;
+{
+  clear();
+
+  mouts(0, 8, "\033[1;37;42m  ùÝùù¢¡ùß ùùùùùùùùùùùùùùùùùùùùùùùùùùùùùù"
+    "ùùùùùùùùùùùùùùùùùù¢¡  \033[m");
+  mouts(1, 8, "\033[1;37;42m  ùø  ùøùø¢~ùù¢¡¢~  ¢¡¢~ùù¢¡     \033[33m"
+    "¶®ªê¡I©_¼¯·s»D\033[37m            ùø  \033[m");
+  mouts(2, 8, "\033[1;37;42m  ùø  ùøùøùàùùùåùøùøùø¢¢ùù¢¡     \033[33m"
+    "http://tw.news.yahoo.com/\033[37m ùø  \033[m");
+  mouts(3, 8, "\033[1;37;42m  ùãùù¢¢ùäùäùùùäùäùäùäùùùù¢£ ùùùùùùùùùùùù"
+    "ùùùùùùùùùùùùùùùùùù¢£  \033[m");
+
+  outf(FEETER_ENEWS);
+
+  enews_neck(kind, cc);
+}
+
+
+static void
+enews_load(kind)
+  char kind;
+{
+  char fpath[64];
+  FILE *fp;
+  ENEWS enews;
+
+  maxitem = 0;
+
+  enews_fpath(fpath, kind, ".ENEWS");
+  if (!(fp = fopen(fpath, "r")))
+    return;
+
+  while (fread(&enews, sizeof(ENEWS), 1, fp) == 1 && maxitem < MAX_ENEWS)
+  {
+    strcpy(title[maxitem], enews.title);
+    strcpy(xname[maxitem], enews.xname);
+    maxitem++;
+  }
+  fclose(fp);
+}
+
+
+/*-------------------------------------------------------*/
+/* ¨ä¥L¥\¯à                                              */
+/*-------------------------------------------------------*/
+
+
+static int      /* ¦^¶Ç³Ì«áÅª¨ì­þ¤@½g */
+enews_browse(kind, cc)
+  char kind;
+  int cc;
+{
+  int key;
+  char fpath[64];
+
+  for (;;)
+  {
+    if (cc >= maxitem)
+      break;
+
+    enews_fpath(fpath, kind, xname[cc]);
+
+    /* Thor.990204: ¬°¦Ò¼{more ¶Ç¦^­È */
+    if ((key = more(fpath, FOOTER_ENEWS)) < 0)
+      break;
+
+    if (!key)       /* ¤wÅª§¹ */
+      key = vkey();
+
+    switch (key)
+    {
+    case KEY_RIGHT:
+    case KEY_PGDN:
+    case KEY_DOWN:
+    case ' ':
+    case 'j':
+      if (cc < maxitem - 1)
+      {
+        cc++;
+        continue;
+      }
+      break;
+
+    case KEY_UP:
+    case KEY_PGUP:
+    case 'k':
+      if (cc > 0)
+      {
+        cc--;
+        continue;
+      }
+      break;
+    }
+
+    break;
+  }
+
+  return cc;
+}
+
+
+static void
+enews_cross(kind, cc)       /* ´£¨Ñ³æ½gÂà¿ý¨ì¬ÝªO */
+  char kind;
+  int cc;
+{
+  int rc, battr, xbno;
+  char xboard[IDLEN + 1], xfolder[64], fpath[64];
+  HDR xpost;
+
+  if (!cuser.userlevel)
+    return;
+
+  if (ask_board(xboard, BRD_W_BIT, "\n\n\033[1;33m½Ð¬D¿ï¾A·íªº¬ÝªO¡A"
+    "¤Á¤ÅÂà¿ý¶W¹L¤TªO¡C\033[m\n\n"))
+  {
+    rc = vget(2, 0, "(S)¦sÀÉ (L)¯¸¤º (Q)¨ú®ø¡H[Q] ", fpath, 3, LCECHO);
+    if (rc == 'l' || rc == 's')
+    {
+      enews_fpath(fpath, kind, xname[cc]);
+      brd_fpath(xfolder, xboard, fn_dir);
+
+      /* Âà¿ý·s»D´Nª½±µ­ì¤åÂà¸ü¡A¦ý¬O§@ªÌ´«¬°¦Û¤v */
+      hdr_stamp(xfolder, HDR_COPY | 'A', &xpost, fpath);
+      strcpy(xpost.owner, cuser.userid);
+      strcpy(xpost.nick, cuser.username);
+      strcpy(xpost.title, title[cc]);
+
+      xbno = brd_bno(xboard);
+      battr = (bshm->bcache + xbno)->battr;
+
+      /* Thor.990111: ¦b¥i¥HÂà¥X«e, ­ncheck user¦³¨S¦³Âà¥XªºÅv¤O? */
+      if (!HAS_PERM(PERM_INTERNET) || (battr & BRD_NOTRAN))
+        rc = 'l';
+
+      if (rc == 's' && (!(battr & BRD_NOTRAN)))
+        xpost.xmode = POST_OUTGO;
+
+      rec_bot(xfolder, &xpost, sizeof(HDR));
+
+      if (rc == 's' && (!(battr & BRD_NOTRAN)))
+        outgo_post(&xpost, xboard);
+
+      btime_update(xbno);
+
+      /* Thor.981205: check ³QÂàªºªO¦³¨S¦³¦C¤J¬ö¿ý? */
+      if (battr & BRD_NOCOUNT)
+      {
+        vmsg("Âà¿ý§¹¦¨¡A¤å³¹¤£¦C¤J¬ö¿ý¡A·q½Ð¥]²[¡C");
+      }
+      else
+      {
+        cuser.numposts++;
+        vmsg("Âà¿ý§¹¦¨");
+      }
+    }
+  }
+  enews_head(kind, cc);
+}
+
+
+static int
+enews_forward(kind, cc)     /* ´£¨Ñ³æ½gÂà±H */
+  char kind;
+  int cc;
+{
+  char rcpt[64];
+  char fpath[64], folder[64], *userid;
+  int userno, rc;
+  int method;       /* Âà±H¨ì 0:¯¸¥~ >0:¦Û¤v <0:¨ä¥L¯¸¤º¨Ï¥ÎªÌ */
+
+  if (!HAS_PERM(PERM_INTERNET) || HAS_STATUS(STATUS_MAILOVER))
+    return XO_NONE;
+
+  strcpy(rcpt, cuser.email);
+  if (!vget(b_lines, 0, "¥Øªº¦a¡G", rcpt, sizeof(rcpt), GCARRY))
+    return XO_FOOT;
+
+  userid = cuser.userid;
+  userno = 0;
+
+  if (!mail_external(rcpt)) /* ¤¤³~ÄdºI */
+  {
+    if (!str_cmp(rcpt, userid))
+    {
+      /* userno = cuser.userno; */  /* Thor.981027: ±Hºë¿ï¶°µ¹¦Û¤v¤£³qª¾¦Û¤v */
+      method = 1;
+    }
+    else
+    {
+      if ((userno = acct_userno(rcpt)) <= 0)
+      {
+        zmsg(err_uid);
+        return XO_FOOT;
+      }
+      method = -1;
+    }
+
+    usr_fpath(folder, rcpt, fn_dir);
+  }
+  else
+  {
+    if (not_addr(rcpt))
+    {
+      zmsg(err_email);
+      return XO_FOOT;
+    }
+
+    method = 0;
+  }
+
+  enews_fpath(fpath, kind, xname[cc]);
+
+  if (method)           /* Âà±H¯¸¤º */
+  {
+    HDR mhdr;
+
+    hdr_stamp(folder, HDR_COPY, &mhdr, fpath);
+
+    if (method > 0)     /* Âà±H¦Û¤v */
+    {
+      strcpy(mhdr.owner, "[ºë ¿ï ¶°]");
+      mhdr.xmode = MAIL_READ | MAIL_NOREPLY;
+    }
+    else            /* Âà±H¨ä¥L¨Ï¥ÎªÌ */
+    {
+      strcpy(mhdr.owner, userid);
+    }
+    strcpy(mhdr.nick, cuser.username);
+    strcpy(mhdr.title, title[cc]);
+    rc = rec_add(folder, &mhdr, sizeof(HDR));
+  }
+  else              /* Âà±H¯¸¥~ */
+  {
+    rc = bsmtp(fpath, title[cc], rcpt, 0);
+  }
+
+  if (userno > 0 && rc >= 0)
+    m_biff(userno);
+
+  zmsg(rc < 0 ? "³¡¥÷«H¥óµLªk±H¹F" : "±H«H§¹²¦");
+
+  enews_head(kind, cc);
+  return XO_NONE;
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+int
+main_enews()
+{
+  int cc, ch;
+  char kind;
+
+  kind = 'A';   /* ¤ÀÃþ */
+  cc = 0;       /* ²Ä´X½g */
+
+  enews_load(kind);
+  enews_head(kind, cc);
+
+  while (ch = vkey())
+  {
+    if (ch >= 'a' && ch <= 'l')
+    {
+      kind = ch - 32;       /* ÅÜ¤j¼g */
+      cc = 0;
+      enews_load(kind);
+      enews_neck(kind, cc);
+      continue;
+    }
+
+    if (ch >= '1' && ch <= '9')
+    {
+      char ans[5];
+
+      ans[0] = ch;
+      ans[1] = '\0';
+      vget(b_lines, 0, "¸õ¦Ü²Ä´X¶µ¡G", ans, 4, GCARRY);
+      outf(FEETER_ENEWS);   /* ­«Ã¸ feet */
+
+      ch = atoi(ans);
+      if (ch > 0  && ch <= maxitem)
+      {
+    enews_item(cc, 12345);  /* ­«Ã¸­ì¨Ó¨º¦æ */
+    cc = ch - 1;
+    enews_item(cc, cc);
+      }
+      continue;
+    }
+
+    switch (ch)
+    {
+    case 'q':
+    case 'e':
+      return 0;
+
+    case KEY_RIGHT:
+      kind = kind < 'L' ? kind + 1 : 'A';
+      cc = 0;
+      enews_load(kind);
+      enews_neck(kind, cc);
+      break;
+
+    case KEY_LEFT:
+      kind = kind > 'A' ? kind - 1 : 'L';
+      cc = 0;
+      enews_load(kind);
+      enews_neck(kind, cc);
+      break;
+
+    case KEY_DOWN:
+      enews_item(cc, 12345);     /* ­«Ã¸­ì¨Ó¨º¦æ */
+      cc = cc < maxitem - 1 ? cc + 1 : 0;
+      enews_item(cc, cc);
+      break;
+
+    case KEY_UP:
+      enews_item(cc, 12345);    /* ­«Ã¸­ì¨Ó¨º¦æ */
+      cc = cc > 0 ? cc - 1 : maxitem - 1;
+      enews_item(cc, cc);
+      break;
+
+    case '\n':
+      cc = enews_browse(kind, cc);
+      enews_head(kind, cc);
+      break;
+
+    case '0':
+    case KEY_HOME:
+      if (cc != 0)
+      {
+        enews_item(cc, 12345);  /* ­«Ã¸­ì¨Ó¨º¦æ */
+        cc = 0;
+        enews_item(cc, cc);
+      }
+      break;
+
+    case KEY_END:
+      if (cc != maxitem - 1)
+      {
+        enews_item(cc, 12345);  /* ­«Ã¸­ì¨Ó¨º¦æ */
+        cc = maxitem - 1;
+        enews_item(cc, cc);
+      }
+      break;
+
+    case 'x':
+      enews_cross(kind, cc);
+      break;
+
+    case 'F':
+      if (enews_forward(kind, cc) == XO_FOOT)
+        outf(FEETER_ENEWS);
+      break;
+    }
+  }
+}
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mpc512-2.ee.nctu.edu.tw [30mµoªí[m

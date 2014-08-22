@@ -1,0 +1,101 @@
+µo«H₪H: johnny.bbs@bbs.hwsh.ylc.edu.tw (²ײ¦÷­Û~~~~~), ¬Ý×O: plan
+¼׀  ֳD: [₪ו¥ף] ¦A¾ד²z~¯¸×ר¦b¨ֿ¥־×ּ¦W³ז₪₪¬Ý¯u¦W
+µo«H¯¸: ×ך·ֻ¶ַ»¡ (Wed Jul 24 00:13:14 2002)               Updated: 2004/10/02
+
+  ¯¸×ר¦b¨ֿ¥־×ּ¦W³ז₪₪¬Ý¯u¦W
+
+: ufo.h  // ½׀¨ּ¦Û₪v×÷ ufo.h ½ױ¾ד
+
++ #define UFO_REALNAME    BFLAG(23)       /* ¦n₪ֽ¥i¥H¬Ý¨£ֱפ§־ */
+#define UFO_CLOAK       BFLAG(24)       /* 1: ¶i₪Jֱפ§־ */
+
+  ...
+
+- #define STR_UFO         "-mpsnemPBQFANbwtSH------CHA"
++ #define STR_UFO         "-mpsnemPBQFANbwtSH-----RCHA"
+
+  ...
+
+- "«O¯d",
++ "¨ֿ¥־×ּ¦W³ז¬Ý©m¦W(©m¦W/¼Ê÷Ù)",        /* UFO_REALNAME */
+
+  "ֱפ¨­³N          (ֱפ¨­/²{¨­)",        /* UFO_CLOAK */
+
+: struct.h:struct UTMP ₪U¼W¥[
+
++ char realname[20];            /* 02/09/01 ¯u¹ך©m¦W */
+
+: bbsd.c:utmp_setup()₪U  ¥[₪@¦ז
+
+  strcpy(utmp.userid, cuser.userid);
++ strcpy(utmp.realname, cuser.realname);
+
+: ulist.c:ulist_realname() ·s¼W¨ח¦¡©ף ulist_help() ₪§«e
+
+static int
+ulist_realname(xo)
+  XO *xo;
+{
+  if (HAS_PERM(PERM_SYSOP))
+  {
+    cuser.ufo ^= UFO_REALNAME;
+    cutmp->ufo = cuser.ufo;
+    return ulist_init(xo);
+  }
+  return XO_NONE;
+}
+
+: ulist.c:ulist_cb[] ¼W¥[ R ֱהµ¹₪ֱ´«¯u¹ך©m¦W
+
++ 'R', ulist_realname,          /* 02/09/01 ¯u¹ך©m¦W */
+
+: ulist.c:ulist_body()
+
+#ifdef DETAIL_IDLETIME
+  time_t now;
+#endif
++ int seerealname;
+
+  ...
+
+  seecloak = HAS_PERM(PERM_SEECLOAK);
++ seerealname = sysop && (cuser.ufo & UFO_REALNAME);
+
+  ...
+
+#ifdef DETAIL_IDLETIME
+-   ulist_item(++num, up, slot, now, sysop);
++   ulist_item(++num, up, slot, now, sysop, seerealname);
+#else
+-   ulist_item(++num, up, slot, NULL, sysop);
++   ulist_item(++num, up, slot, NULL, sysop, seerealname);
+#endif
+
+: ulist.c:ulist_item()
+
+static void
+- ulist_item(num, up, slot, now, sysop)
++ ulist_item(num, up, slot, now, sysop, seerealname)
+  int num;
+  UTMP *up;
+  int slot;
+  time_t now;
+  int sysop;
++ int seerealname;
+{
+  ...
+
+  §ג prints(); ¸ּ­±×÷
+  up->username ´«¦¨ seerealname ? up->realname : up->username
+
+--
+[0m   [35;1m¢~שששששÞשש¢¡      ¢~
+[0m   [35;1m¢¢    שר  ¢£      שר        ¢~        ¢~
+[0m   [35;1m      שר¢~שששששש¢¡שאשששששש¢¡שאשששששש¢¡שאשששששש¢¡¢¡      ¢~
+[0m  [35;1m       שרשר      שרשר      שרשר      שרשר      שרשר      שר
+[0m   [33;44;1m¢¢שששש¢£¢¢שששששש¢£¢¢      ¢£¢¢      ¢£¢¢      ¢£¢¢שששששÞ¢£
+[0m   [44m [33;1m              ¡³by  johnny¡³                       שש¢£  [0m
+
+--
+[1;32m¡¼ Origin: [33m×ך·ֻ¶ַ»¡ [37mbbs.hwsh.ylc.edu.tw
+[31m¡¼ From: [36m61-216-185-228.HINET-IP.hinet.net[m

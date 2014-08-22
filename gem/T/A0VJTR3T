@@ -1,0 +1,174 @@
+§@ªÌ: itoc.bbs@bbs.cs.nthu.edu.tw ¯¸¤º: plan
+¼ÐÃD: Re: ½Ð±Ð¤@¤U¦p¦ó­««Ø .BRD
+®É¶¡: Sun Oct 20 17:34:53 2002                          Updated: 2005/05/19
+
+¡° ¤Þ­z¡mrojer¡n¤§»Ê¨¥¡G
+>         ­Y .BRD Äê±¼
+>         ¦³¿ìªk¥Îµ{¦¡¥h­«·s«Ø¥ß¶Ü?!
+
+  °õ¦æ¦¹µ{¦¡¥H«á¡A¦A±N .BRD_new ÂÐ»\ .BRD §Y¥i
+
+  ªO¥D­n¤â°Ê­««Ø
+  ¯S®í¬ÝªOÅv­­(¯µ±K/¦n¤Í/¯¸°ÈªO)­n¤â°Ê­«³]
+  ¤ÀÃþ­n¤â°Ê§ï
+
+: src/util/Makefile
+
+EXE =   ..... [1;33mrebrd[m
+
+: src/util/rebrd.c ·s¼W³oµ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/rebrd.c         ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ­««Ø .BRD                                    */
+/* create : 02/10/20                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+/*
+  ­^¤åªO¦W¥h brd/* §ì
+  ¤¤¤åªO¦W¥h gem/@/@Class §ì
+  ¬ÝªOÄÝ©Ê¥h innd/newsfeeds.bbs §ì
+  ªO¥D­n¤â°Ê­««Ø
+  ¯S®í¬ÝªOÅv­­(¯µ±K/¦n¤Í/¯¸°ÈªO)­n¤â°Ê­«³]
+  ¤ÀÃþ­n¤â°Ê§ï
+*/
+
+
+#include "bbs.h"
+
+
+static int                  /* 1:¦¹¬ÝªOÂà«H 0:¦¹¬ÝªO¤£Âà«H */
+board_outgo(brdname)
+  char *brdname;
+{
+  newsfeeds_t nf;
+  int fd;
+  int rc = 0;
+
+  /* ­Y newsfeeds ¸Ì­±¦³¸ê®Æ¡A´N¥Nªí­nÂà«H */
+
+  if ((fd = open("innd/newsfeeds.bbs", O_RDONLY)) >= 0)
+  {
+    while (read(fd, &nf, sizeof(newsfeeds_t)) == sizeof(newsfeeds_t))
+    {
+      if (!str_cmp(brdname, nf.board))
+      {
+        rc = 1;
+        break;
+      }
+    }
+    close(fd);
+  }
+
+  return rc;
+}
+
+
+static void
+board_title(folder, brdname, title)  /* ¥h gem/@/@Class §ä brd.title */
+  char *folder;
+  char *brdname;
+  char *title;
+{
+  int xmode;
+  char fpath[64];
+  HDR hdr;
+  FILE *fp;
+
+  if (*title)           /* ¤w¸g§ä¨ì */
+    return;
+
+  if (fp = fopen(folder, "r"))
+  {
+    while (fread(&hdr, sizeof(HDR), 1, fp) == 1)
+    {
+      xmode = hdr.xmode & (GEM_BOARD | GEM_FOLDER);
+
+      if (xmode == (GEM_BOARD | GEM_FOLDER))      /* ¬ÝªOºëµØ°Ï±¶®| */
+      {
+        if (!strcmp(hdr.xname, brdname))
+        {
+          /* °Ñ¦Ò gem.c:brd2gem() ªº®æ¦¡ */
+          str_ncpy(title, hdr.title + BNLEN + 1 + BCLEN + 1, BTLEN + 1);
+          break;
+        }
+      }
+      else if (xmode == GEM_FOLDER)               /* ¨÷©v recursive ¶i¥h§ä */
+      {
+        hdr_fpath(fpath, folder, &hdr);
+        board_title(fpath, brdname, title);
+      }
+    }
+
+    fclose(fp);
+  }
+}
+
+
+static void
+transbrd(brdname)
+  char *brdname;
+{
+  static int chrono = 1000;
+
+  BRD brd;
+  int outgo;
+  char title[BTLEN + 1];
+
+  memset(&brd, 0, sizeof(BRD));
+  outgo = board_outgo(brdname);
+
+  str_ncpy(brd.brdname, brdname, sizeof(brd.brdname));
+  title[0] = '\0';
+  board_title("gem/@/@"CLASS_INIFILE, brdname, title);
+  sprintf(brd.title, "¤ÀÃþ %s", title);  /* ¤ÀÃþ¤â°Ê§ï */
+  /* brd.BM ¯d¥Õ¡A¤â°Ê«ì´_ */
+
+  brd.bvote = 0;                /* §ë²¼·|¬y¥¢ */
+  brd.bstamp = ++chrono;
+  brd.readlevel = 0;            /* ¯S®íªOÅv­­¤â°Ê§ï */
+  brd.postlevel = PERM_POST;
+  brd.battr = outgo ? 0 : BRD_NOTRAN;
+
+  /* ³o¨Ç·|¦Û°Ê§ó·s */
+  brd.btime = 0;
+  brd.bpost = 0;
+  brd.blast = 0;
+
+  /* ·sÀÉ®×«Ø¦b .BRD_new ¦AÂÐ»\ .BRD §Y¥i */
+  rec_add(".BRD_new", &brd, sizeof(BRD));
+}
+
+
+int
+main()
+{
+  DIR *dirp;
+  struct dirent *de;
+  char *str;
+
+  chdir(BBSHOME);
+
+  if (!(dirp = opendir("brd")))
+    exit(-1);
+
+  unlink(".BRD_new");
+
+  while (de = readdir(dirp))
+  {
+    str = de->d_name;
+    if (*str <= ' ' || *str == '.')
+      continue;
+
+    transbrd(str);
+  }
+
+  closedir(dirp);
+  exit(0);
+}
+
+--
+¡° Origin: ·¬¾ôÅæ¯¸<bbs.cs.nthu.edu.tw> ¡» From: itoc.Dorm-GD2.NCTU.edu.tw

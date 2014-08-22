@@ -1,0 +1,50 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] ³Qµû¤À¹Lªº¤å³¹ÅÜ¥¼Åª
+®É¶¡: 2004/11/11 Thu 18:31:52                           Updated: 2007/04/26
+
+  ¥²¶·¥ý°µ³o½g
+  [¥\¯à] post.c HDR ·s¼W¤@­ÓÄæ¦ìµ¹¤wÅª¥¼Åª»²§U§PÂ_
+
+: post.c:editarticle() ·s¼W¦¹¨ç¦¡©ó post_edit() «e­±
+
+static void
+editarticle(hdd, ram)
+  HDR *hdd, *ram;
+{
+  hdd->stamp = ram->stamp;
+}
+
+: post.c:post_edit()
+
+  if (HAS_PERM(PERM_ALLBOARD))                  /* ¯¸ªø­×§ï */
+  {
+#ifdef HAVE_REFUSEMARK
+    if (!chkrestrict(hdr))
+      return XO_NONE;
+#endif
+    vedit(fpath, 0);
++   currchrono = hdr->chrono;
++   change_stamp(dir, hdr);
++   rec_ref(dir, hdr, sizeof(HDR), xo->pos, cmpchrono, editarticle);
++   post_history(xo, hdr);
++   btime_update(currbno);
+  }
+  else if (cuser.userlevel && !strcmp(hdr->owner, cuser.userid))
+  {
+    if (!vedit(fpath, 0))       /* ­Y«D¨ú®ø«h¥[¤W­×§ï¸ê°T */
+    {
+      if (fp = fopen(fpath, "a"))
+      {
+        ve_banner(fp, 1);
+        fclose(fp);
+      }
++     currchrono = hdr->chrono;
++     change_stamp(dir, hdr);
++     rec_ref(dir, hdr, sizeof(HDR), xo->pos, cmpchrono, editarticle);
++     post_history(xo, hdr);
++     btime_update(currbno);
+    }
+  }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,111 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¤å¥ó] ºëµØ°Ïªº½g¼Æ¤W­­©M®e¶q¤W­­
+µo«H¯¸: Àº¤Ñ±^ (Tue, 08 Jul 2003 23:53:02 +0800 (CST))    Updated: 2005/10/07
+
+  (6) Åã¥ÜºëµØ°Ï¨Ï¥Î¶q
+
+    ¦pªG¯à§i¶DªO¥D»P¨Ï¥ÎªÌºëµØ°Ï¥Î¤F¦h¤Ö......
+    Åý gem_checksize() °£¤FÀË¬dºëµØ°Ï¬O§_¹L¤j...  ÁÙ¯à¦^³øÀË¬d¨ìªº¤j¤p...
+    Åý¥L­Ì¯àÀH®Éª`·N...  ¤£­n¦b¤£ª¾Ä±ªº±¡§Î´N¶W¹L¤W­­...
+
+: maple/gem.c:gem_totalsize() ·s¼W©ó gem_help() ¤§«e
+
+static int
+gem_totalsize(xo)
+  XO *xo;
+{
+  int i, total_n, total_k;
+  char *ptr, *str, fpath[64];
+  struct stat st;
+  struct dirent *de;
+  DIR *dirp;
+
+  if (!(xo->key & GEM_W_BIT))
+    return XO_NONE;
+
+  if (*xo->dir == 'g' && *(xo->dir + 4) == 'b')     /* ¬ÝªOºëµØ°Ï */
+  {
+    strcpy(fpath, xo->dir);
+    if (!(str = strchr(fpath + 8, '/')))
+      return XO_NONE;
+    strcpy(str + 1, fn_dir);
+  }
+  else if (*xo->dir == 'u')                         /* ­Ó¤HºëµØ°Ï */
+  {
+    usr_fpath(fpath, cuser.userid, "gem/" FN_DIR);
+  }
+  else                                              /* (A)nnounce */
+  {
+    strcpy(fpath, "gem/.DIR");
+  }
+
+  if (!stat(fpath, &st))
+    total_n = st.st_size;
+  else
+    total_n = 0;
+  if (!total_n)     /* .DIR ¶}±Ò¥¢±Ñ©Î size=0 ªí¥Ü¨S¦³ºëµØ°Ï */
+    return 0;
+  total_k = 0;
+  ptr = (char *) strchr(fpath, '.');
+
+  /* ¬ÝªOºëµØ°Ï¤Î (A)nnounce ­nÀË¬d 32 ­Ó¤l¥Ø¿ý¡A
+     ­Ó¤HºëµØ°Ï¥u»ÝÀË¬d 1 ­Ó¤l¥Ø¿ý */
+  for (i = (*xo->dir == 'g') ? 31 : 0; i >= 0; i--)
+  {
+    *ptr = radix32[i];
+    *(ptr + 1) = '\0';
+    if (!(dirp = opendir(fpath)))
+      continue;
+
+    *(ptr + 1) = '/';
+    while (de = readdir(dirp))
+    {
+      str = de->d_name;
+
+      if (*str <= ' ' || *str == '.')
+        continue;
+
+      strcpy(ptr + 2, str);
+
+      if (!stat(fpath, &st))
+      {
+        if (*str == 'F')
+          total_n += st.st_size;
+        else if (*str == 'A')
+          total_k += st.st_size;
+      }
+    }
+    closedir(dirp);
+  }
+
+  sprintf(fpath, "ºëµØ°ÏÀÉ®×¼Æ¡G%d¡AÁ`¤j¤p¡G%dKB",
+    total_n / sizeof(HDR), total_k >> 10);
+  vmsg(fpath);
+
+  return XO_FOOT;
+}
+
+: maple/gem.c:gem_cb[]
+
++ 's', gem_totalsize,     /* «öÁä¦Û­q */
+
+  'h', gem_help
+
+=======================================================
+
+²Î­pªºµ²ªG©M¶i¤J§@·~¨t²Î¤¤¥Î du ²Î­pªºµ²ªG¤£¦P......
+³q±` du ²Î­pµ²ªG¸û¤j......
+
+­ì¦]¦p¤U :
+
+1) °O±o¬å±¼ºëµØ°ÏªºªF¦è®É...  ÀÉ®×¨Ã¥¼¯u¹ê¬å±¼...
+   ¦n¹³¥u¦³ unlink ¦Ó¤w...  ÅÜ¦¨"·É®ü¬B¿ò"......
+   ¥u¦³¥Î gem-check ¤~·|¯uªº²M±¼......
+
+2) F ¶}ÀYªºÀÉ®×¥u¦C¤JÀÉ®×¼Æ¥Ø²Î­p......
+   A ¶}ÀYªºÀÉ®×¥u¦C¤JÁ`¤j¤pªº­pºâ......
+   du ¬O²Î­p©Ò¦³ÀÉ®×...  µ²ªG´N·|¤ñ¸û¤j...
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [35;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m211-20-172-91.HINET-IP.hinet.net[m

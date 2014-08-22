@@ -1,0 +1,71 @@
+µo«H¤H: LHD.bbs@bs2.twbbs.org (¦n§N®@) ¬ÝªO: plan
+¼Ð  ÃD: Re: expireªº³]©w
+µo«H¯¸: ¦¸¥@¥N¢Ð¢á¢± (2005/01/09 Sun 00:47:01)            Updated: 2005/01/09
+
+¡° ¤Þ­z¡mpigco.bbs@cpu.tfcis.org («¢)¡n¤§»Ê¨¥¡G
+> §Ú­n«ç»ò­×§ï¤~¯àÅý­Ó¤HªOªº¤å³¹¤W­­¸ò¤@¯ëªO¤£¤@¼Ë©O¡H
+> §Ú§Æ±æ¤@¯ëªOªº¤W­­¬O5000¡A¥i¬O­Ó¤HªOªº¤W­­¬O3000¡C
+> §Úª¾¹D5000¨ºÃä¥h§ïdefault´N¦n¡C
+> ¨º§PÂ_P_¶}ÀYªºªO¡A¤å³¹¤W­­¬O3000­n«ç»ò¿ì¡H
+> §Ú¤@ª½³£Ä±±oexpire.confªº³]©w¤£¬O«Ü¹ê¥Î¡A
+> ¤£ª¾¹D¦³¨S¦³¥i¯à§ï¦¨¤ñ¸û¤è«Kªº³]©w¤è¦¡...
+> ¹³¬O§Ú·Q¤ÀÃþ¦¨¤½¶}ªO¡BÂà«HªO¡B­Ó¤HªO¤TºØÃþ§O¦U¤@²Õ¤W­­¼Æ¦r¡A
+> ´N¥u¯à³]¤@ºØ¬°default¡A¨ä¥Lªº­n¤@­Ó¤@­Ó¼W¥[...
+
+: expire.c
+
+  #define DEF_DAYS        365           /* ¹w³]²M°£¶W¹L 365 ¤Ñªº¤å³¹ */
+  #define DEF_MAXP        5000          /* ¹w³]²M°£¶W¹L 5000 ½gªº¤å³¹ */
++ #define DEF_MAXP_P      3000          /* ­Ó¤HªO¹w³]²M°£¶W¹L 3000 ½gªº¤å³¹ */
+  #define DEF_MINP        500           /* ¹w³]§C©ó 500 ½gªº¬ÝªO¤£¬å¤å³¹ */
+
+: expire.c:main() ¦pªG­Ó¤HªOªO¦W³£¬O¥H P_ ¶}ÀY¡A¨º»ò³o¼Ë§ï
+
+          key->days = number;
+-         key->maxp = db.maxp;
++         key->maxp = (strncmp(bname, "P_", 2) || (argc == 5)) ? db.maxp :
++           DEF_MAXP_P;
+          key->minp = db.minp;
+...
+
+    if (count)
+    {
+      key = (Life *) bsearch(bname, table, count, sizeof(Life), life_cmp);
+      if (!key)
++     {
+        key = &db;
++       /* LHD: ­Ó¤HªO¹w³]¤W­­ */
++       key->maxp = strncmp(bname, "P_", 2) ? DEF_MAXP : DEF_MAXP_P;
++     }
+    }
+    else
+    {
+      key = &db;
++     /* LHD: ­Ó¤HªO¹w³]¤W­­ */
++     key->maxp = strncmp(bname, "P_", 2) ? DEF_MAXP : DEF_MAXP_P;
+    }
+
+: expire.c:main() ¦pªG­Ó¤HªO¤ÀÃþ³£¬O¡u­Ó¤H¡v¡A¨º»ò³o¼Ë§ï
+: ³o¼Ë§ï·|¦³­Ó¤p°ÝÃD¡A´N¬O¦pªG¦b expire.conf ³]©w¤F¤@µ§­Ó¤HªO¡A¦ý¨S«ü©w max
+: ¦¹®É¸Ó­Ó¤HªOªº max ·|¨Ì¾Ú DEF_MAXP ¦Ó¤£¬O DEF_MAXP_P
+
+    if (count)
+    {
+      key = (Life *) bsearch(bname, table, count, sizeof(Life), life_cmp);
+      if (!key)
++     {
+        key = &db;
++       key->maxp = strcmp(brdp->class, "­Ó¤H") ? DEF_MAXP : DEF_MAXP_P;
++     }
+    }
+    else
+    {
+      key = &db;
++     key->maxp = strcmp(brdp->class, "­Ó¤H") ? DEF_MAXP : DEF_MAXP_P;
+    }
+
+--
+[1;34m¢e¢e¢e¢e¢e¢e¢e        ¢e¢e¢e¢e  ¢e¢e¢e¢e¢e¢e[;1m    ¡Õtelnet://bs2.twbbs.org¡Ö[m
+[1;34m  ¢i¢e¢e¢e¢e¢i        ¢i        ¢e¢e¢e¢e¢e¢i [;30;47mPlayer: [32mLHD                      [m
+[1;36m¢e¢i¢e¢e¢e¢e¢i  ¢e¢e¢e¢i        ¢i¢e¢e¢e¢e¢e [;30;47mFrom: [31mbsd3.cis.nctu.edu.tw       [m
+¡¸ ¦¸¥@¥N¢Ð¢á¢± ¡¸ ¥i¥Ó½Ð­Ó¤HªO [1m100MB¶W¤j¬ÛÃ¯ http://pic.twbbs.org ¸ê¬ì¤H200MB[m

@@ -1,0 +1,214 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: new¤@­Ó·s±b¸¹®É¡A¥X²{¨Ï¥ÎªÌ±ø´Ú(¯¸³W)
+µo«H¯¸: °Ê¤O®Ö¤ß (2003/12/25 Thu 02:10:39)                Updated: 2005/03/23
+
+¡° ¤Þ­z¡mcyanofox.bbs@bbs.cs.nchu.edu.tw (§Ú¬O¦n¤H¤@±Úªº:()¡n¤§»Ê¨¥¡G
+> ¦p¦ó¦b¥Ó½Ð¤@­Ó·sid®É¡A¥ý¥X²{¯¸³W¡A¨Ï¥ÎªÌ¦P·N«á¦AÄ~Äò¤U­±ªº¨BÆJ
+> (¹³ptt¨º¼Ë)
+> ¦Ó¨º­Ó¯¸³WÀÉ©ñ¦b~/etc/©³¤U(©Î¥L³B¡A³Ì¦n¥i¥Ñ¯¸¤W§ï)
+> ­YµL¯¸³WÀÉ«hÃö³¬¦¹¥\¯à
+
+: bbsd.c:acct_apply()
+
+  SCHEMA slot;
+  char buf[80];
+  char *userid;
+  int try, fd;
+
++ if (startgame(IQFILE) != FULLSCORE)
++   login_abort("\n«Ü©êºp¡A±z¦Ò¸Õ¤£³q¹L¡AµLªkµù¥U");
+
+  film_out(FILM_APPLY, 0);
+
+: etc/iqdata.aq  §âÃD®wÀÉ(iqdata.aq)©ñ¦betc¤U¡A®æ¦¡©ó¤U
+: ÃD¥Ø+¥¿½Tµª®×
+: ¥¿½Tµª®×¥u¯à¬O¤@­Ó char
+
+¯¸ªø¬O«Ó­ô(Y/N)¡H y
+½Ö¬O¥@¬É¤W³Ì«Óªº¤H (1)Á`²Î (2)¯¸ªø (3)¶W¤H¡H 2
+·s¤â¤W¯¸­n´X¤Ñ(1-9)¡H 3
+
+: bbsd.c: ·s¼W¥H¤U¨ç¦¡©ó acct_apply() «e­±
+
+/*-------------------------------------------------------*/
+/* target : ¼Æ¾Ç¤j´I¯Î                                   */
+/* author : codeman.bbs@amtigers.adsldns.org             */
+/*          hxw.bbs@bbs.sayya.org                        */
+/*-------------------------------------------------------*/
+
+
+/* ÃD¥Ø¼Æ(Q_MAX)­n¤j©ó¥XÃD¼Æ(Q_MUCH) */
+
+#define Q_LENTH     160         /* ÃD¥Øªø«× */
+#define Q_MAX       1024        /* ³Ì¦h¯à¦³´XÃD */
+#define Q_MUCH      10          /* ¥X¦h¤ÖÃD */
+#define Q_TOTAL     total       /* ÀÉ®×¤¤¦@¦³¦h¤ÖÃD¥Ø */
+#define FULLSCORE   100         /* ©w¸qº¡¤À¬O 100 ¤À */
+
+#undef  SHOWRANSER              /* show the right anser ¨q¥X¸Ñµª */
+                                /* «ØÄ³¤£­n¡A¦]¬°³o¼Ë´N¤£¦nª±¤F */
+
+/*-------------------------------------------------------*/
+/* ÃD®w®æ¦¡                                              */
+/* ÃD¥Øªø¥H¤@­Ó¿Ã¹õ¥i¿é¥X¬°­­                            */
+/* ½d¨Ò:                                                 */
+/* 1+1=2? y                                              */
+/* 2+3=4? n                                              */
+/* ^^ÃD¥Ø ^µª®×                                          */
+/* µù:µª®×¬O¸Ó¦r¦ê¦©±¼´«¦æªº³Ì«á¤@­Ó¦r¤¸                 */
+/*-------------------------------------------------------*/
+
+
+#define IQFILE  "etc/iqdata.aq"             /* ©w¸qÃD®wÀÉªºÀÉ¦W */
+
+
+static int
+logo()              /* ¼ÐÃD */
+{
+  vs_bar("¯¸³W¦Ò¸Õ");
+  move(1,0);
+  outs("\033[1;33;41m");
+  outs("*****************************************************************\n");
+  outs("*                         ¯¸³W¦Ò¸Õ                              *\n");
+  outs("*****************************************************************");
+  outs("\033[m");
+}
+
+
+static int
+showans(anser)              /* §â¨Ï¥ÎªÌ¿é¤Jªºµª®×¨q¥X¨Ó */
+  char anser[Q_MAX];
+{
+  int i;
+
+  move(Q_MUCH + 1, 0);
+  outs("±zªºµª®×¬O:\n");
+  for (i = 0; i < Q_MUCH; i++)
+    prints("%d:%c  ", i + 1, anser[i]);
+}
+
+
+#ifdef SHOWRANSER
+static int
+showrans(ranser, aqnum, question)   /* ¨q¥X¥¿¸Ñªº¨ç¦¡ */
+  char ranser[Q_MAX];
+  int aqnum[Q_MUCH];
+  char *question[Q_LENTH];
+{
+  int i;
+
+  vs_bar("¯¸³W¦Ò¸Õ");
+  for (i = 0; i < Q_MUCH; i++)
+    prints("%d.%s :%c\n", i+1, question[aqnum[i]], ranser[aqnum[i]]);
+}
+#endif
+
+
+static int          /* ¦^¶Ç¹ï¤F´XÃD */
+anscompare(anser, ranser, aqnum)   /* ¤ñ¹ïµª®×ªº¨ç¦¡ */
+  char anser[Q_MAX];
+  char ranser[Q_MAX];
+  int aqnum[Q_MUCH];
+{
+  int i, rmuch;
+
+  rmuch = 0;
+  for (i = 0; i < Q_MUCH; i++)
+  {
+    if (ranser[aqnum[i]] == anser[i])
+      rmuch++;
+  }
+  return rmuch;
+}
+
+
+static int          /* ¦^¶Ç¤À¼Æ */
+countscore(rmuch)               /* ­pºâ¤À¼Æªº¨ç¦¡ */
+  int rmuch;
+{
+  return rmuch * FULLSCORE / Q_MUCH;
+}
+
+
+static int
+startgame(fpath)
+  char *fpath;           /* ÃD®wªºÀÉ¦W */
+{
+  FILE *fp;
+  char *question[Q_MAX];
+  char anser[Q_MAX], ranser[Q_MAX]; /* anser¬O¨Ï¥ÎªÌªºµª®×,ranser¬O¥¿¸Ñ */
+  int qnum, total;                  /* total¬OÀÉ®×¤¤ªºÁ`ÃD¥Ø¼Æ,qnum¬OÃD¸¹ */
+  int aqnum[Q_MUCH] = {0};          /* aqnum¬O¤v¥X²{¹LªºÃD¸¹ */
+  int alnum[Q_MAX] = {0};           /* already exists num ¤v¥X²{¹LªºÃD¸¹ */
+  int i;
+  int score;
+  char buf[3];
+
+  if (!(fp = fopen(fpath, "r")))
+    return FULLSCORE;
+
+  logo();
+
+  /* ±N question ªº°O¾ÐÅé·Ç³Æ¦n */
+  for (i = 0; i < Q_MAX; i++)
+    question[i] = (char *) malloc(Q_LENTH);
+
+  /* §âÃD¥ØÅª¨ì question °}¦C¤¤ */
+  total = 0;
+  while (fgets(question[total], Q_LENTH, fp))
+  {
+    i = strlen(question[total]) - 2;
+    ranser[total] = (char) *(question[total] + i);
+                                        /* §â­Ë¼Æ²Ä¤G­Ó¦r¤¸Åª¤Jranser°}¦C */
+    *(question[total] + i) = '\0';
+    total++;
+  }
+
+  fclose(fp);
+
+  /* ¶Ã¼Æ¨úÃD,¦C¦L¨ì¿Ã¹õ¤W,¨Ã±Nµª®×¦s¨ìanser°}¦C */
+  srand(time(NULL) + cuser.userno);
+  for (i = 0; i < Q_MUCH; i++)
+  {
+    /* §PÂ_¶Ã¼Æ¬O§_¥X²{¹L,­Y¦³´N­«¨ú */
+    do
+    {
+      qnum = rnd(total);
+    } while (alnum[qnum] == 1);
+
+    alnum[qnum] = 1;
+    move(9, 0);
+    clrtobot();
+    prints("\033[1m%s\033[m", question[qnum]);
+    anser[i] = vget(10, 0, "½Ð¿é¤Jµª®× : ", buf, 3, LCECHO);
+    aqnum[i] = qnum;
+  }
+
+  /* ¤ñ¹ïranser©Manserµª®× */
+  i = anscompare(anser, ranser, aqnum);
+
+  /* ­p¤À */
+  score = countscore(rmuch);
+  move(9, 0);
+  clrtobot();
+  move(9, 18);
+  prints("±zµª¹ï¤F %d ÃD¡I", i);
+  move(10, 18);
+  prints("±z±o¤F %d ¤À¡Aº¡¤À¬O %d ¤À¡C", score, FULLSCORE);
+  vmsg(NULL);
+
+#ifdef SHOWRANSER  /* ¨q¥X¸Ñµª */
+  showrans(ranser, aqnum, question);
+  showans(anser);
+  vmsg(NULL);
+#endif
+
+  for (i = 0; i < Q_MAX; i++)
+    free(question[i]);
+
+  return score;
+}
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

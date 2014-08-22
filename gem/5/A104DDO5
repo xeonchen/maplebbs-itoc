@@ -1,0 +1,73 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]Tagger©ñ¨ìbmw
+®É¶¡: 2004/03/04 Thu 12:49:59                           Updated: 2004/03/05
+
+  °e¼s¼½µ¹³Q tag ªº³o¨Ç¤H
+
+: bmw.c:bmw_broadcast() ·s¼W¦¹¨ç¦¡©ó bmw_help() «e­±
+
+static int
+bmw_broadcast(xo)
+  XO *xo;
+{
+  int tag, locus, userno;
+  char *dir;
+  BMW *bmw, xbmw, benz;
+  UTMP *up;
+
+  tag = AskTag("¯S©w¹ï¶H¼s¼½");
+
+  if (tag < 0)
+    return XO_FOOT;
+
+  benz.caller = NULL;
+  bmw_edit(NULL, "¡¹¼s¼½¡G", &benz);
+
+  if (!benz.caller)      /* bmw_edit() ¤¤¦^µª No ¤£°e¥X¼s¼½ */
+    return XO_FOOT;
+
+  /* itoc.000213: ¥[ "> " ¬°¤F»P¤@¯ë¤ô²y°Ï¤À */
+  sprintf(benz.userid, "%s> ", cuser.userid);
+
+  bmw = tag ? &xbmw : (BMW *) xo_pool + xo->pos - xo->top;
+  dir = xo->dir;
+  locus = 0;
+
+  do
+  {
+    if (tag)
+      EnumTag(bmw, dir, locus, sizeof(BMW));
+
+    /* itoc.010304: Åý¶Ç°Tªº bmw ¤]¥i¥H¦^ */
+    /* §Ú°e¤ô²yµ¹§O¤H¡A¦^µ¹¦¬°TªÌ¡F§O¤H°e¤ô²yµ¹§Ú¡A¦^µ¹°e°TªÌ */
+    userno = (bmw->sender == cuser.userno) ? bmw->recver : bmw->sender;
+    if (!userno)
+      continue;
+
+    if (up = utmp_find(userno))
+    {
+#ifdef HAVE_NOBROAD
+      if (up->ufo & UFO_RCVER)
+        continue;
+#endif
+
+      if (can_override(up))
+      {
+        benz.recver = userno;
+        bmw_send(up, &benz);
+      }
+    }
+  } while (++locus < tag);
+
+  return XO_FOOT;
+}
+
+: bmw.c:bmw_cb[]
+
++ 'B', bmw_broadcast,
+
+  'h', bmw_help
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;45m¢¢[42m¢¡[m [1mMo[30mdi[mfy: [1;36m2004/03/04 Thu 12:50:44[m

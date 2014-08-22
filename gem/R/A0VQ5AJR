@@ -1,0 +1,123 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: [¤å¥ó] ¡]¤­¤ÀÄÁ²Ö¿n¡^µn¤J»Pµn¥X¤H¼Æ MRTG ¹Ïªí
+µo«H¯¸: Àº¤Ñ±^ (Sat, 01 Nov 2003 01:41:28 +0800 (CST))    Updated: 2003/11/01
+
+¦pªG§Ë¤@­ÓÀÉ®×°O¿ýµn¤Jªº§Ç¸¹...  ¨C¤@¦¸¦³¨Ï¥ÎªÌµn¤J´N²Ö¥[¤W¥h...
+¦pªG§Ú·Qª¾¹D²{¦b A ®É¶¡¨ì B ®É¶¡¤¤¦³¦h¤Ö¦¸µn¤J I ......
+¨º´N¬Oµn¤Jªº§Ç¸¹ªº®t¶Z¡G I = SB - SA ......
+A ®É¶¡¨ì B ®É¶¡½u¤W¤H¼Æ®t¶Z D = LB - LA ......
+½u¤W¤H¼Æ®t¶Zµ¥¤Jµn¤J¦¸¼Æ I ´î±¼µn¥X¦¸¼Æ O¡G L = I - O ......
+O = I - L ......  ¦³ÂI½ÆÂø......
+¤U­±µ{¦¡½X¦pªG¦³¤£«ê·í...  ÁÙ½Ð¦U¦ì«e½ú¤£§[«ü¥¿...
+
+: include/struct.h:·s¼W LOGNUM µ²ºc
+
+typedef struct
+{
+  int online;                   /* ½u¤W¤H¼Æ */
+  int log_serial;               /* µn¤J§Ç¸¹ */
+} LOGNUM;
+
+
+: include/struct.h:
+
+#define FN_BRD          ".BRD"          /* board list */
+#define FN_SCHEMA       ".USR"          /* userid schema */
+[1;32;40m+ #define FN_LOGNUM       ".LOGNUM"[m
+
+
+: util/showLOGNUM.c:·s¼W³o­ÓÀÉ®×
+
+#include "bbs.h"
+
+static UCACHE *ushm;
+
+
+static inline void
+init_ushm()
+{
+  ushm = shm_new(UTMPSHM_KEY, sizeof(UCACHE));
+}
+
+
+int
+main()
+{
+  int login, logout, diff;
+  LOGNUM log_a, log_b;
+
+  chdir(BBSHOME);
+
+  memset(&log_a, 0, sizeof(log_a));
+  memset(&log_b, 0, sizeof(log_b));
+
+  if (rec_get(FN_LOGNUM, &log_a, sizeof(LOGNUM), 0))
+    rec_add(FN_LOGNUM, &log_a, sizeof(log_a));
+
+  if (rec_get(FN_LOGNUM, &log_b, sizeof(LOGNUM), 1))
+    rec_add(FN_LOGNUM, &log_b, sizeof(log_b));
+
+  init_ushm();
+  log_a.online = ushm->count;
+
+  login = log_a.log_serial - log_b.log_serial;
+  diff = log_a.online - log_b.online;
+  logout = login - diff;
+
+  log_b.online = log_a.online;
+  log_b.log_serial = log_a.log_serial;
+
+  rec_put(FN_LOGNUM, &log_b, sizeof(LOGNUM), 1, NULL);
+
+  printf("%d\n%d\n0\n0\n", login, logout);
+
+  exit (0);
+}
+
+
+ ¥ý¶]¤@¦¸ showLOGNUM ¥H¥Í¦¨ .LOGNUM ÀÉ®×......
+
+
+: maple/bbsd.c:utmp_setup()
+
+  UTMP utmp;
+  uschar *addr;
+[1;32;40m+ LOGNUM lognum;[m
+
+
+: maple/bbsd.c:utmp_setup()
+
+  if (!utmp_new(&utmp))
+    login_abort("\n±z­è­è¿ïªº¦ì¤l¤w¸g³Q¤H±¶¨¬¥ýµn¤F¡A½Ð¤U¦¸¦A¨Ó§a");
+
+[1;32;40m+ rec_get(FN_LOGNUM, &lognum, sizeof(LOGNUM), 0);[m
+[1;32;40m+ lognum.online = ushm->count;[m
+[1;32;40m+ lognum.log_serial++;[m
+[1;32;40m+ rec_put(FN_LOGNUM, &lognum, sizeof(LOGNUM), 0, NULL);[m
+
+
+mrtg »P apache ­n¥ý¦w¸Ë¦n......
+½s¿è¤@­Ó mrtg ªº cfg ÀÉ®×...  ¤º®e¦p¤U...
+
+Target[BBS]: `/usr/home/bbs/bin/showLOGNUM`
+MaxBytes[BBS]: 2500                                 # ³q±`¥Î MAXACTIVE
+Title[BBS]: BBS µn¤J»Pµn¥X MRTG ¹Ï¡]³Ìªñ¤­¤ÀÄÁ¤º¡^
+PageTop[BBS]: BBS µn¤J»Pµn¥X MRTG ¹Ï¡]³Ìªñ¤­¤ÀÄÁ¤º¡^
+Options[BBS]: gauge, growright
+YLegend[BBS]: BBS OnLine
+ShortLegend[BBS]: ¤H
+WorkDir: /usr/home/mrtg/www/lognum                  # ¦Û­q...
+LegendO[BBS]: µn¥X¤H¼Æ
+LegendI[BBS]: µn¤J¤H¼Æ
+Language: big5
+
+¼g¤J¨t²Î crontab ¤¤......  ¤º®eµø±¡ªp¦Ó©w......
+*/5 * * * * root /usr/local/bin/mrtg /usr/local/etc/mrtg/mrtg_bbslog.cfg
+
+½d¨Ò¡G
+http://bbs.bio.ncue.edu.tw/mrtg/lognum/bbs.html
+
+
+--
+ [1;41m¢z[44m¢q[m Or[1mig[30min[m: [41m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;33mBioStar [30m±q [35m163.23.212.18 [30mµoªí[m

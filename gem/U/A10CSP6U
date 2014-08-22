@@ -1,0 +1,181 @@
+µo«H¤H: chwaian.bbs@processor.tfcis.org (µL¨¥) ¬ÝªO: plan
+¼Ð  ÃD: ¦r¨å
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/02/14 Sat 16:43:32)                Updated: 2004/03/28
+
+Dr.Eye ¤w¸g¼È®ÉÃö³¬¦n¤@°}¤l°Õ
+
+¥i¥H¼È®É®³WindTopªºdictd¨Ó´À¥N
+
+¥ý¸Ëdictd («DFreeBSD¨t²ÎªÌ½Ð¦Û¦æ¸Ñ¨M)
+
+http://freebsd.sinica.edu.tw/zh-tut/dict.html
+
+
+µM«á§â¤U­±ªºµ{¦¡¥[¨ìso¥Ø¿ý©³¤U
+
+
+/*-------------------------------------------------------*/
+/* dictd.c    ( YZU WindTOPBBS Ver 3.10 )                */
+/*-------------------------------------------------------*/
+/* author : statue.bbs@bbs.yzu.edu.tw                    */
+/* target : ¦r¨å                                         */
+/* create : 01/11/18                                     */
+/* update : 01/11/18                                     */
+/*-------------------------------------------------------*/
+
+#include "bbs.h"
+
+int
+main_dictd()
+{
+  char word[73], word2[128];
+  char tmp[256];
+  char fname[64];
+  uschar *str, *ptr, *pend;
+
+  while(1)
+  {
+    clear();
+    move(0, 23);
+    outs("\033[1;37;44m¡· ¦h¥Î³~¦r¨å ¡·\033[m");
+    move(2, 0);
+    outs("¦¹¦r¨å¨Ó·½¬° FreeBSD ªº dict-database¡C"
+      "¦r¨å¥²¶·¿é¤J§¹¾ã³æ¦r©Î¤ù»y¡C\n");
+    move(4, 0);
+    outs("¦r¨å¥N¸¹   ¦r¨å»¡©ú\n");
+    outs("=============================================================="
+      "==============\n");
+    outs("web1913    Chinese to English dictionary\n");
+    outs("wn         Taiwan MOE computer dictionary\n");
+    outs("gazetteer  Network Terminology\n");
+    outs("jargon     pydict data\n");
+    outs("devils     THE DEVIL'S DICTIONARY "
+      "((C)1911 Released April 15 1993)\n");
+    outs("easton     Easton's 1897 Bible Dictionary\n");
+    outs("elements   Elements database 20001107\n");
+    outs("gazetteer  U.S. Gazetteer (1990)\n");
+    outs("gcide      The Collaborative International Dictionary of "
+      "English v.0.44\n");
+    outs("hitchcock  Hitchcock's Bible Names Dictionary (late 1800's)\n");
+    outs("vera       Virtual Entity of Relevant Acronyms "
+      "(Version 1.9, June 2002)\n");
+    outs("web1913    Webster's Revised Unabridged Dictionary (1913)\n");
+    outs("wn         WordNet (r) 2.0\n");
+    outs("world02    CIA World Factbook 2002\n");
+    outs("world95    The CIA World Factbook (1995)\n");
+
+    memset(word, 0, sizeof(word));
+    memset(word2, 0, sizeof(word2));
+
+    if (!vget(22, 0, "word: ", word, sizeof(word) - 1, DOECHO))
+      return 0;
+
+    str = word;
+    ptr = word2;
+    pend = str + strlen(word);
+
+    while (str < pend)
+    {
+      if (*str >= 0x81 && *str < 0xFE && *(str + 1) >= 0x40
+        && *(str + 1) <= 0xFE && *(str + 1) != 0x7F)    /* ¤¤¤å¦r BIG5+ */
+      {
+        if (*(str + 1) == 0x5C)
+        {
+          *ptr = *str;
+          *(ptr + 1) = *(str + 1);
+          *(ptr + 2) = 0x5C;
+          ptr++;
+        }
+        else
+        {
+          *ptr = *str;
+          *(ptr + 1) = *(str + 1);
+        }
+        ptr++;
+        str++;
+      }
+      else
+      {
+        *ptr = *str;
+        /* security reason */
+        if (*ptr == ';' || *ptr == '"' || *ptr == '|' || *ptr == '&')
+          return 0;
+      }
+      str++;
+      ptr++;
+    }
+
+    sprintf(fname, "tmp/%s.dictd", cuser.userid);
+    sprintf(tmp, "/usr/home/bbs/bin/cdict5 \"%s\" > %s", word, fname);
+    system(tmp);
+    sprintf(tmp, "/usr/local/bin/dict -h localhost \"%s\" >> %s",
+      word2, fname);
+    system(tmp);
+    more(fname, NULL);
+    sprintf(tmp, "¬O§_§â %s ªº¬d¸ßµ²ªG±H¦^¦Û¤v«H½c¡H (y/N) ", word);
+    if (vans(tmp) == 'y')
+    {
+      sprintf(tmp, "[³Æ §Ñ ¿ý] %s ªº¦r¨å¬d¸ßµ²ªG", word);
+      mail_self(fname, cuser.userid, tmp, 0);
+    }
+    unlink(fname);
+  }
+
+  return 0;
+}
+
+
+/usr/local/etc/dictd.conf ¬Ý§A¸Ë¤F­þ¨Çdictd-database ­n°O±o¹ïÀ³­×§ï
+
+µ{¦¡ªº¦ì¸m¬Ý§A¬O¸Ë¦b
+
+/usr/local/bin/dict ÁÙ¬O /usr/local/sbin/dictd
+
+¤]­n°O±o§ï¤@¤U
+
+µM«á§âmain_dictd¥[¨ìmenu´N¦n°Õ
+
+
+¦pªG­n§ï¸Ëcdict5¬°¦r¨å (´N¬OµL¦W¸ò¨g¯X¥Îªº¨º­Ó)
+
+
+¥ý¤U¸ü©³¤U³o¨â­ÓÀÉ®×
+
+http://ftp.isu.edu.tw/pub/Unix/BBS/PolyU/cdict5-library.tgz
+ftp://ftp.tw.freebsd.org/pub/FreeBSD/ports/local-distfiles/ijliao/cdict5.tgz
+
+
+µM«á¥þ³¡¸ÑÀ£ÁY©ñ¨ì/usr/local/lib/cdict5©³¤U
+
+
+µM«á¦b³o¥Ø¿ý°õ¦æmake
+
+¦A°õ¦æmake index (¥i¥H¬ÝINSTALLªº»¡©ú)
+
+¦pªG¹Lµ{¤¤§ä¤£¨ìlibgdbm.a
+
+½Ð¬Ý¬Ý¬O§_¦b/usr/local/lib©³¤U §â³o­ÓÀÉ®×«þ¨©¨ì/usr/lib©³¤U§Y¥i
+
+¦pªG§ä¤£¨ìgdbm.h
+
+¥i¥H¤U¸ühttp://www.klid.dk/pub/gnu/gnu-utils/include/gdbm.h
+
+¨ìcdict5¥Ø¿ý¤U µM«á­×§ï¬ÛÃö»Ý­ngdbm.hµ{¦¡½Xªº³¡¤À
+
+( #include <gdbm.h> §ï¦¨  #include "gdbm.h")
+
+µM«á°µ§¹¤W­z¨â­Ó°Ê§@ ( make ; make index)
+
+·|²£¥Í¤@­ÓÀÉ®×¥s°µcdict5
+
+¥i¥H§â¦¹ÀÉ«þ¨©¨ì/home/bbs/bin©³¤UµM«á¦Achown§ï¤@¤UÅv­­ §Y¥i
+
+±µ¤U¨Óªº´N¸ò¤W­±´X½g¤@¼Ë°Õ
+
+§ï±¼¤W­± "/usr/local/bin/dict -h localhost \"%s\"
+
+ªº³¡¤À§Y¥i
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mchwaian [30m±q [35m61-216-219-252.HINET-IP.hinet.net [30mµoªí[m

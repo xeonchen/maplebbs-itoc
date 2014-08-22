@@ -1,0 +1,37 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ±K½X¥[ªø
+µo«H¯¸: °Ê¤O®Ö¤ß (Wed, 15 Oct 2003 23:57:48 +0800 (CST))  Updated: 2004/03/15
+
+  ¬°¤F¼W¥[±K½Xªø«×¦Ó¤£»Ý­nÂà´« .ACCT
+  ¬G±N±K½X±q·t½X§ï¦¨©ú½X
+  ¥H¤U­×§ï¡AÅý ©ú½X/DES·t½X ³£¯à¦Y
+
+: lib/str_passwd()
+
+int
+chkpasswd(passwd, test)
+  char *passwd, *test;
+{
+  char *pw;
+
++ if (!strcmp(passwd, test))
++  return 0;
+
+  str_ncpy(pwbuf, test, sizeof(pwbuf));
+  pw = crypt(pwbuf, passwd);
+  return (strncmp(pw, passwd, PASSLEN));
+}
+
+: bbsd.c:acct_apply()
+
+- str_ncpy(cuser.passwd, genpasswd(buf), PASSLEN + 1);
++ str_ncpy(cuser.passwd, buf, PASSLEN + 1);
+
+: strcut.h
+
+- #define PSWDLEN         8
++ #define PSWDLEN         PASSLEN
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m ¥x«n¤@¤¤£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

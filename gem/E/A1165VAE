@@ -1,0 +1,33 @@
+µo«H¤H: kevin007.bbs@bbs.ctu.edu.tw (µl¤lÀ°Á`²ë¥D) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]¨Ï¥ÎªÌ¤ô²y¬ö¿ý
+µo«H¯¸: ¬P¥ú©]»y (2005/04/18 Mon 03:11:30)                Updated: 2005/04/18
+
+®³itoc¤j¤j¤§«epoªº ¨S¸Õ¹L ¤£¾å±o¥\¯à«ç¼ËXD
+
+: bmw.c:bmw_log()
+
+    if ((cuser.ufo & UFO_NWLOG) || !st.st_size)
+    {
+      op = 'c';
+    }
++   else if (st.st_size > 1000 * 1024)  /* > 1000KB «h±j¨îÀx¦s */
++   {
++     op = 'm'
++   }
+    else
+    {
+      more(buf, (char *) -1);
+
+¡° ¤Þ­z¡mpoit.bbs@bbs.wretch.cc (·L²Dªº©u¸`....)¡n¤§»Ê¨¥¡G
+> Ãö©ó¨Ï¥ÎªÌªº¤ô²y¬ö¿ý
+> ¦³¨S¦³¿ìªk³]©w¤j¤p¤W­­©O
+> ¨Ò¦p¤ô²y¬ö¿ý¦pªG¶W¹L50KB
+> ¦bÂ÷¯¸®É¥u¯à¿ï¾Ü±H¨ì«H½c©Î§R°£
+> µLªkÄ~Äò«O¯d¤ô²y¬ö¿ý
+> ¤£µM³ÌªñÆ[¹îµo²{
+> ¦³¨Ç¨Ï¥ÎªÌ¤ô²y¬ö¿ý¤j¤p¦³¨Ç¸Ø±i
+> ¥i¬O¤S¨S¿ìªk±j­¢¨Ï¥ÎªÌ²M°£
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m «Ø°ê¬ì§Þ¤j¾Ç£»¬P¥ú©]»y [35;47m bbs.ctu.edu.tw [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mkevin007 [30m±q [36m192.168.2.232 [30mµoªí[m

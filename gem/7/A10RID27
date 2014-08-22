@@ -1,0 +1,110 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: [¤å¥ó] NoCeM ·s»D¸s²Õ¾×«H¨t²Î
+®É¶¡: 2004/11/16 Tue 16:54:43
+
+* NoCeM ·s»D¸s²Õ¾×«H¨t²Î
+
+  ¸Ô²ÓÂ²¤¶¤Î­ì²z½Ð°Ñ¦Ò ~/src/innbbsd/nocem/NOCEM¡C
+
+
+* ¦p¦ó±Ò°Ê NoCeM ¾÷¨î¡H
+
+  Â²³æ¦a»¡¡A¦³¥H¤U¨BÆJ¡G
+  + innbbsconf.h : #define _NoCeM_
+  + ³]©w ncmperm.bbs
+  + ±µ¦¬ [tw.bbs.admin] ·s»D¸s²Õ
+
+  §ó¸Ô²Óªº¤º®e½Ð°Ñ¦Ò ~/doc/doc/203_innbbsd1.htm¡C
+
+
+* Á|­Ó¹ê»Ú¹B§@ªº¨Ò¤l
+
+  xyz.bbs@xx.yy.zz ¦b [tw.bbs.comp.unix] µoªí¤F¤T½g¼s§i¤å³¹
+  abc.bbs@aa.bb.cc ¦b [tw.bbs.comp.network] µoªí¤F¤@½g¼s§i¤å³¹
+
+  §Úªº BBS ¦b 12:00 ±N³o¥|½g§ì¤U¨Ó¤F¡A©ó¬O§Úªº¯¸¤W¦h¤F¥|½g¼s§i¤å³¹
+
+  news.math.nctu ¦b 12:10 ±N³o¥|½g§ì¨ì¸Ó¯¸¤W¡Aµo²{³o¥|½g¬O¼s§i¤å³¹¡A
+  ´N·|¦b [tw.bbs.admin] µoªí¤@½g¤å³¹ (ºÙ¬° notice)¡A¦p¤U¡G
+
+  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  ¼ÐÃD¡G@@NCM NCTU-Math-spam NoCeM ¤½§i¡A½s¸¹ 150 ¸¹
+  ¤º®e¡G¤j®a¦n¡A³o¬O¥Ñ news@news.math.nctu.edu.tw ªº 150 ¸¹¤½§i¡A
+        ¥»¯¸µo²{¥H¤U¥|½g¬O¼s§i¤å³¹¡A¤À§O¬O¡G
+        (1) xyz.bbs@xx.yy.zz ©ó 11:36 ¦b [tw.bbs.comp.unix] µoªí
+            ¼ÐÃD¬°¡uÀu * ½è*¬ü *¬Ü * ªA" °È'¡v
+        (2) xyz.bbs@xx.yy.zz ©ó 11:39 ¦b [tw.bbs.comp.unix] µoªí
+            ¼ÐÃD¬°¡uµ¥«Ý©¯ºÖ¤¤(¼x¨k¤Í)¡C¡v
+        (3) xyz.bbs@xx.yy.zz ©ó 11:41 ¦b [tw.bbs.comp.unix] µoªí
+            ¼ÐÃD¬°¡u------- ¥æ ¤k ¤Í ±Ð ¾Ç 1:03¡v
+        (4) abc.bbs@aa.bb.cc ©ó 11:47 ¦b [tw.bbs.comp.network] µoªí
+            ¼ÐÃD¬°¡u¹ê²{±z¤H¥Íªº¹Ú·Q¡v
+  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  [µù] ¥»¤å¬°¤F«K©ó»¡©ú¡A©Ò¥H¤~§â notice ªº®æ¦¡¼g¦¨³o¼Ë¡A
+       ¹ê»Ú¤W notice ªº®æ¦¡¥i¥H¦b [tw.bbs.admin] ¬Ý¨ì¡C
+
+  §Úªº BBS ¦b 12:20 §ì¨ì¤F news.math.nctu ªº¤å³¹®É¡A
+  µo²{³o½g¤å³¹¤£¬O¤@¯ë¤å³¹¡A¦Ó¬O NoCeM ¤½§i¡A
+  ´N·|¥hÅª¤º®e¡A§â§Ú 12:00 ©Ò¦¬¤U¨Óªº¨º¥|½g¤å³¹µ¹§R°£¡C
+
+  ¨º»ò³o¥|½g¼s§i¤å³¹¡A±N¥u¯à¦b§Úªº BBS ¦s¯d 12:00~12:20¡C
+
+
+* ¬O¤£¬O¸Ë¤F NoCeM ´N¥i¥H¨S¦³¼s§i¤å³¹¤F¡H
+
+  ·íµM¤£¬O¡A¥Ñ¥H¤Wªº¹B§@¨Ò¤l¥i¥Hµo²{¡A¼s§i¤å³¹·|¦b BBS ¤W¦s¯d
+  ¤@¬q®É¶¡¡Aª½¨ì¦¬¨ì nocem-server ªº notice ¤½§i®É¤~·|§R°£¡C
+
+  °£¦¹¤§¥~¡Afilter ¤]¤£¬O¸U¯à¡A¦³¨Ç¤å³¹¤H­Ì¥i¥H¿ë»{¥X¬O¬O¼s§i
+  ¤å³¹¡A¦ý¬O filter µ{¦¡¿ë»{¤£¥X¨Ó¡A¦¹®É³o½g¼s§i¤å³¹´N¥i¥H°k
+  ¹L NoCeM ªº°l±þ¡C
+
+
+* ¦³­þ¨Ç NoCeM filter ¥i¥H¿ï¾Ü¡H
+
+  ­þ¨ÇÃþ«¬ªº¤å³¹·|³Q§P©w¬°¼s§i¤å³¹¡A¬O¥Ñ¹LÂoµ{¦¡¨Ó¦Û°Ê§PÂ_ªº¡A
+  ¥Ø«e±`¨£ªº NoCeM filter ¦³¡G
+
+  issuer                       type
+  ============================ ========
+  news@news.math.nctu.edu.tw   badhabit
+  news@news.math.nctu.edu.tw   google
+  news@news.math.nctu.edu.tw   hinet
+  news@news.math.nctu.edu.tw   power
+  news@news.math.nctu.edu.tw   seednet
+  news@news.math.nctu.edu.tw   spam
+  news@news.math.nctu.edu.tw   tanet
+  nocem@bbs.isu.edu.tw         spam
+  nocem@leeym.com              spam
+  nocem@newsgate.nctu.edu.tw   spam
+  nocem@spring.edu.tw          cleanfeed
+  nocem@spring.edu.tw          dnsbl-bl.spamcop.net
+  nocem@spring.edu.tw          dnsbl-list.dsbl.org
+  nocem@spring.edu.tw          dnsbl-sbl-xbl.spamhaus.org
+  (³°Äò¼W¥[¤¤)
+
+  ¦Ü©ó¨C­Ó issuer/type ©Ò¨Ï¥Îªº¹LÂo³W«h¬O¤°»ò¡A«h»Ý­n¸ß°Ý¸Ó
+  issuer ¤~¯à±oª¾¡C
+
+  ¨ä¤¤ news@news.math.nctu.edu.tw ªº¹LÂo³W«h¬°¡G(by DarkKiller)
+
+  * spam
+    ³o­Ó¬O¥Ñ cleanfeed ³o°¦µ{¦¡§PÂ_¬° spam ªº¤å³¹¡C
+
+  * hinet
+    ¥u­n Path ³o­ÓÄæ¦ì¦³ ".hinet.net" ´N³Q»{¬°¬O hinet °e¥Xªº¤å³¹¡C
+
+  * seednet
+    ¥u­n Path ³o­ÓÄæ¦ì¦³ ".seed.net.tw" ´N³Q»{¬°¬O seednet °e¥Xªº¤å³¹¡C
+
+  * power
+    ²Å¦X¤U¦C±ø¥ó¨ä¤¤¤§¤@ªº¤å³¹¡G
+    + ¤å³¹ªø«×¶W¹L 1000 ¦æ¡C
+    + ¦b tw.bbs.lang.* ¥H¥~ªº°Q½×°Ï¥X²{ª`­µ¡C
+    + ¼ÐÃD§t¦³ ANSI code ©Î¨ä¥L¯S®í¦r¤¸¡C
+    + ¶Â¦W³æ¼s§i°Ó¡C
+    + ¨ä¥L¡C
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mpc512-2.EE.NCTU.edu.tw [30mµoªí[m

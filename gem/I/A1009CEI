@@ -1,0 +1,112 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] bmtad.c ±H«Hµ¹ºëµØ°Ï
+®É¶¡: 2004/01/14 Wed 11:04:38                           Updated: 2004/01/14
+
+  ª½±µ±H«H¨ìºëµØ°Ï¦¬¿ý
+  (³o«Ü¼É¤Oªº¡A¤°»ò¨Ó·½³£¤£ÀË¬dªº :p)
+
+: bmtad.c:bbs_gem() ·s¼W¦b bbs_brd() «á­±
+
+static int
+bbs_gem(ap, data, brdname)      /* itoc.030323: ±H«Hµ¹ºëµØ°Ï */
+  Agent *ap;
+  char *data;
+  char *brdname;
+{
+  HDR hdr;
+  int fd, method, sno;
+  FILE *fp;
+  char folder[80], buf[256], from[256], *author, *fpath, *title;
+
+  fp = flog;
+  sno = ap->sno;
+
+  sprintf(folder, "gem/brd/%s/%s", brdname, FN_DIR);
+
+  /* allocate a file for the new post */
+
+  fpath = ap->fpath;
+  method = *fpath ? HDR_LINK | 'A' : 'A';
+  if ((fd = hdr_stamp(folder, method, &hdr, fpath)) < 0)
+  {
+    fprintf(fp, "MAIL-\t[%d] <%s> stamp error\n", sno, brdname);
+    return -2;
+  }
+
+  author = ap->addr;
+  title = ap->nick;
+  sprintf(ap->memo, "%s -> %s", author, brdname);
+
+  if (*title)
+    sprintf(from, "%s (%s)", author, title);
+  else
+    strcpy(from, author);
+
+  title = ap->title;
+  if (method == 'A')
+  {
+    if (!*title)
+      sprintf(title, "¨Ó¦Û %.64s", author);
+
+    sprintf(buf, "µo«H¤H: %.50s ¬ÝªO: %s\n¼Ð  ÃD: %.72s\nµo«H¯¸: %s\n\n",
+      from, brdname, title, Btime(&hdr.chrono));
+
+    write(fd, buf, strlen(buf));
+    write(fd, data, ap->data + ap->used - data);
+    close(fd);
+  }
+
+  hdr.xmode = 0;
+  str_ncpy(hdr.owner, author, sizeof(hdr.owner));
+  str_ncpy(hdr.title, title, sizeof(hdr.title));
+  rec_add(folder, &hdr, sizeof(HDR));
+
+  fprintf(fp, "%d\t%s\t%s\t%s/%s\n", sno, author, title, brdname, hdr.xname);
+  ap->xrcpt++;
+  ap->xdata += ap->used;
+
+  mta_memo(ap, 0);
+  return 0;
+}
+
+: bmtad.c:is_rcpt()
+
+    else if (!str_cmp(str, ".brd"))
+    {
+      *str = '\0';
+      if (getbrdname(rcpt))
+      {
+        *letter = 0;
+        return 0;
+      }
+    }
++   else if (!str_cmp(str, ".gem"))
++   {
++     *str = '\0';
++     if (getbrdname(rcpt))
++     {
++       *letter = 2;
++       return 0;
++     }
++   }
+
+: bmtad.c:mta_mailer()
+
+    do
+    {
+      str = rcpt->userid;
+-     if (ap->letter)
+-       bbs_mail(ap, data, str);
+-     else
+-       bbs_brd(ap, data, str);
++     if (ap->letter == 0)
++       bbs_brd(ap, data, str);
++     else if (ap->letter == 1)
++       bbs_mail(ap, data, str);
++     else if (ap->letter == 2)
++       bbs_gem(ap, data, str);
+    } while (rcpt = rcpt->rnext);
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

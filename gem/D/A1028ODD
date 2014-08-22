@@ -1,0 +1,136 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (test), ¬ÝªO: plan
+¼Ð  ÃD: Re: [¶¢²á] ¦n¶}¤ß³á~
+µo«H¯¸: XEON (Fri Aug  9 01:00:02 2002)
+
+  ¥H­n¥[¤W feeling ¬°¨Ò¤l
+
+: transacct.c
+
+  NEW ¥[¤W¤@­Ó·sÄæ¦ì feeling
+  OLD ¬OÂÂªº struct ACCT
+
+struct NEW                      /* ­n©M·sª©µ{¦¡ struct ¤@¼Ë */
+{
+  int userno;                   /* unique positive code */
+
+  char userid[IDLEN + 1];       /* ID */
+  char passwd[PASSLEN];         /* ±K½X */
+  char realname[20];            /* ¯u¹ê©m¦W */
+  char username[24];            /* ¼ÊºÙ */
++ char feeling[5];              /* ¤ß±¡ */
+
+  usint userlevel;              /* Åv­­ */
+  usint ufo;                    /* habit */
+  uschar signature;             /* ¹w³]Ã±¦WÀÉ */
+
+  char year;                    /* ¥Í¤é(¥Á°ê¦~) */
+  char month;                   /* ¥Í¤é(¤ë) */
+  char day;                     /* ¥Í¤é(¤é) */
+  char sex;                     /* ©Ê§O */
+  int money;                    /* »È¹ô */
+  int gold;                     /* ª÷¹ô(ÂX¥R¥Î) */
+
+  int numlogins;                /* ¤W¯¸¦¸¼Æ */
+  int numposts;                 /* µoªí¦¸¼Æ */
+  int numemails;                /* ±Hµo Inetrnet E-mail ¦¸¼Æ */
+
+  time_t firstlogin;            /* ²Ä¤@¦¸¤W¯¸®É¶¡ */
+  time_t lastlogin;             /* ¤W¤@¦¸¤W¯¸®É¶¡ */
+  time_t tcheck;                /* ¤W¦¸ check «H½c/¦n¤Í¦W³æªº®É¶¡ */
+  time_t tvalid;                /* ³q¹L»{ÃÒªº®É¶¡ */
+
+  char lasthost[30];            /* ¤W¦¸µn¤J¨Ó·½ */
+  char email[60];               /* ¥Ø«eµn°Oªº¹q¤l«H½c */
+};
+
+
+struct OLD                      /* ­n©MÂÂª©µ{¦¡ struct ¤@¼Ë */
+{
+  int userno;                   /* unique positive code */
+
+  char userid[IDLEN + 1];       /* ID */
+  char passwd[PASSLEN];         /* ±K½X */
+  char realname[20];            /* ¯u¹ê©m¦W */
+  char username[24];            /* ¼ÊºÙ */
+
+  usint userlevel;              /* Åv­­ */
+  usint ufo;                    /* habit */
+  uschar signature;             /* ¹w³]Ã±¦WÀÉ */
+
+  char year;                    /* ¥Í¤é(¥Á°ê¦~) */
+  char month;                   /* ¥Í¤é(¤ë) */
+  char day;                     /* ¥Í¤é(¤é) */
+  char sex;                     /* ©Ê§O */
+  int money;                    /* »È¹ô */
+  int gold;                     /* ª÷¹ô(ÂX¥R¥Î) */
+
+  int numlogins;                /* ¤W¯¸¦¸¼Æ */
+  int numposts;                 /* µoªí¦¸¼Æ */
+  int numemails;                /* ±Hµo Inetrnet E-mail ¦¸¼Æ */
+
+  time_t firstlogin;            /* ²Ä¤@¦¸¤W¯¸®É¶¡ */
+  time_t lastlogin;             /* ¤W¤@¦¸¤W¯¸®É¶¡ */
+  time_t tcheck;                /* ¤W¦¸ check «H½c/¦n¤Í¦W³æªº®É¶¡ */
+  time_t tvalid;                /* ³q¹L»{ÃÒªº®É¶¡ */
+
+  char lasthost[30];            /* ¤W¦¸µn¤J¨Ó·½ */
+  char email[60];               /* ¥Ø«eµn°Oªº¹q¤l«H½c */
+};
+
+: transaccct.c trans_acct()
+
+static void
+trans_acct(old, new)
+  OLD *old;
+  NEW *new;
+{
+  memset(new, 0, sizeof(NEW));
+
+  new->userno = old->userno;
+
+  str_ncpy(new->userid, old->userid, sizeof(new->userid));
+  strcpy(new->passwd, old->passwd);
+  str_ncpy(new->realname, old->realname, sizeof(new->realname));
+  str_ncpy(new->username, old->username, sizeof(new->username));
++ str_ncpy(new->feeling, "§Ö¼Ö", sizeof(new->feeling));     /* µ¹ªì©l­È */
+
+  new->userlevel = old->userlevel;
+  new->ufo = transfer_ufo(old->ufo);    /* itoc.010917: ufo Äæ¦ì¥¼¥²¤@¼Ë */
+  new->signature = old->signature;
+
+- new->year = 0;                /* µ¹ªì©l­È */
+- new->month = 0;
+- new->day = 0;
+- new->sex = 0;
+- new->money = 100;
+- new->gold = 1;
++ new->year = old->year;
++ new->month = old->month;
++ new->day = old->day;
++ new->sex = old->sex;
++ new->money = old->money;
++ new->money = old->gold;
+
+  new->numlogins = old->numlogins;
+  new->numposts = old->numposts;
+  new->numemails = old->numemail;
+
+  new->firstlogin = old->firstlogin;
+  new->lastlogin = old->lastlogin;
+  new->tcheck = old->tcheck;
+  new->tvalid = old->tvalid;
+
+  str_ncpy(new->lasthost, old->lasthost, sizeof(new->lasthost));
+  str_ncpy(new->email, old->email, sizeof(new->email));
+}
+
+> ---------------------------------------------- <
+
+  ¦P²z¡Aµo¦æ·sªº¹ô¨î¡A¤]¬O¥Î transacct
+  struct NEW ©M struct OLD ³£¼g¦¨©M struct ACCT ¤@¼Ë
+  µM«á main() ¸Ì­±§ï³o¥y
+
+  new.money = old.money / 40000;
+
+--
+[1;32m¡¼ Origin: [33m°Ê¤O®Ö¤ß [37mxeon.tfcis.org  [31m¡¼ From: [36mitoc.Dorm-GD2.NCTU.edu.tw[m

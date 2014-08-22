@@ -1,0 +1,33 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: itoc
+¼Ð  ÃD: [¥\¯à] talk.c ¨Ï¥ÎªÌ¿ï³æª½±µÂê©w»È¹õ¡®Áô§Î
+µo«H¯¸: ¤¤¿³¸ê¬ì (Sat, 19 Jul 2003 18:40:07 +0800 (CST))  Updated: 2003/08/17
+
+    ¨Ï¥ÎªÌ¦b¨Ï¥ÎªÌ¿ï³æ«ö 'i' ¥i¥HÁô§Î¡]¦pªG¨S¦³Åv­­ªº¸Ü¡A­n¿ú¡^
+
+: ulist.c:ulist_cloak()
+
+static int
+ulist_cloak(xo)         /* itoc.010908: §Ö³tÁô¨­ */
+  XO *xo;
+{
++ if (!cuser.userlevel)
++   return XO_NONE;
+
+  if (HAS_PERM(PERM_CLOAK))
+  {
+    cuser.ufo ^= UFO_CLOAK;
+    cutmp->ufo = cuser.ufo;
+-   return ulist_init(xo);
+  }
++ else
++ {
++   DL_func("bin/bank.so:b_invis"); /* qazq.030719: ¨Ï¥ÎªÌ¿ï³æ§Ö³tÁô¨­ */
++ }
+
+- return XO_NONE;
++ return ulist_init(xo);
+}
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-139-67.HINET-IP.hinet.net[m

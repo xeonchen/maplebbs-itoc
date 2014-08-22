@@ -1,0 +1,136 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] banner ¥ß§Ó¤p®æ¨¥
+®É¶¡: Fri Aug  1 23:14:00 2003                          Updated: 2005/05/17
+
+  °½¾Ç pighouse.twbbs.org ªº½Þ¨¥½Þ»y :p
+
+  ¤å³¹³Ì«áªº banner ¥[¤W¤@¥y¥ß§Ó®æ¨¥
+
+
+: etc/proverb ½d¨ÒÀÉ¡A¥i¥H¥[ ASCII ©Î±m¦â
+
+# ¤«¸¹¶}ÀYªºªº¬Oµù¸Ñ
+¤Ñ¤~¬O 1 ¤Àªº¤Ñ¥÷¥[¤W 99 ¤Àªº§V¤O
+°¸º¸µoµo¨cÄÌ, ¬O°·±dªº, ¥u­n§ä¹ïªº¶É­Ë©U§£ªº¦a¤è
+¥Î¯¬ºÖ¨Ó«Ê½p, Åý«ä©À¥h§ë»¼
+§O§â¦Û¤vªº§Ö¼Ö, «Ø¿v¦b§O¤Hªºµh­W¤W
+©Ò¿×¨k¤k¤§¶¡ªº¯Â¤Í½Ë, ¤£¹L¬Oªø®É¶¡«ùÄòªº¤¬¬Û¿ù¹L
+³Ì¥i¹½ªº¤H, ¦pªG²Ó¥[¬ã¨s, µ²ªGµo²{¥L¤£¹L¬O­Ó¥i¼¦¤H
+¥@¬É¤§¤j, ¨âÁû¹Ð®Jªº¬Û¹J, ¬O¦ÛµM¤]¬O©¯¹B
+·í¤HÃþ¥u·Q¨ì°l¨D³Ó§Qªº®É­Ô, ´N·|ÅÜ±o·¥¨ä¨õ¦H
+¤Hªº©Ê©R¥u¦³¤@±ø, ¤£®e§A¥h¸Õ±´
+¸£³U´N¬O³Ì¦nªº°O¨Æ¥», Ä±±o­«­nªº, ¦ÛµM·|°O¦í
+§O¤@¨ý¦aºÙÆg§O¤Hªº¦¨´N, ¸ÕµÛ¾Ç²ß¥L¤Hªº§V¤O
+·R¹³­·¨®¤@¼ËÂà°ÚÂà, ¦p¦P§Ú¹ï§Aªº·RÅÊÂà°ÚÂà
+§¹¬üªº°²·Q¼Ä´N¬O³q©¹³Ó§Q¤§¸ôªº©U§£
+§O§â¦Û¤vªº§Ö¼Ö, «Ø¿v¦b§O¤Hªºµh­W¤W
+§A¤£¯à±±¨î¥Í©Rªºªøµu, ¦ý§A¥i¥H±±¨î¥¦ªº¼e«×
+¤HÃþ¦]¬°¦³¹Ú·Q¦Ó°¶¤j, «o¦]¬°²{¹ê¦Ó´Ý»Å
+°²°µ¯u®É¯u¥ç°², µL¬°¦³³B¦³ÁÙµL
+³o¤@¬í, §Ú¥u§Æ±æ§A¹Lªº«Ü¦n
+½åªº¬O¥L, ·Mªº¬O§Ú, ª§¤°»ò¡I
+·R±¡´N¹³µ¥¤½¨®¤@¼Ë, §AµLªkª¾¹D¦o¤°»ò®É­Ô¨Ó
+¤Z¬O¹F¤£¨ìªº´N¥s§¹¬ü
+¥Î¬Q¤Ñ¨ÓÄµ±§, ¥Î¤µ¤Ñ¨ÓºÉ¤O, ¥Î©ú¤Ñ·í¥Ø¼Ð
+¤H¤£¬V­·¹Ð, ­·¹Ð¦Û¬V¤H
+¦Y¤£¨ìªº¸²µå, ¥Ã»·³£Ä±±o¬O»Äªº
+³Ì¥i¹½ªº¤H, ¦pªG²Ó¥[¬ã¨s, µ²ªGµo²{¥L¤£¹L¬O­Ó¥i¼¦¤H
+¥u¬Ý¾ð¸­, ´N¬Ý¤£¨£¾ð; ¥u¬Ý¨£¾ð, ´N¬Ý¤£¨£¾ðªL
+
+: struct.h:FCACHE
+
+typedef struct
+{
+  int shot[MOVIE_MAX];          /* Thor.980805: ¦X²z½d³ò¬° 0..MOVIE_MAX - 1 */
+  char film[MOVIE_SIZE];
+  char today[16];
++ int pronum;                   /* ¦³´X¥y®æ¨¥ */
++ char proverb[100][STRLEN];    /* ³Ì¦h 100 ¥y®æ¨¥ */
+} FCACHE;
+
+: camera.c:main()
+
++ do_proverb(fshm);
+
+  exit(0);
+}
+
+: camera.c:do_proverb() ¥[¤J main() «e­±
+
+/* ----------------------------------------------------- */
+/* ¸ü¤J®æ¨¥¨Î¥y                                          */
+/* ----------------------------------------------------- */
+
+
+static void
+do_proverb(fshm)
+  FCACHE *fshm;
+{
+  int num;
+  char msg[STRLEN], *str;
+  FILE *fp;
+
+  if (!(fp = fopen("etc/proverb", "r")))
+  {
+    fshm->pronum = 1;
+    strcpy(fshm->proverb[0], "¿ù»~¡I¨S¦³®æ¨¥ÀÉ");
+    return;
+  }
+
+  for (num = 0; num < 100;)
+  {
+    if (!fgets(msg, STRLEN, fp))
+      break;
+    if (*msg == '#' || *msg == '\n')
+      continue;
+    if (str = strchr(msg, '\n'))
+      *str = '\0';
+    strcpy(fshm->proverb[num], msg);
+    num++;
+  }
+
+  fclose(fp);
+
+  if (num)
+  {
+    fshm->pronum = num;
+  }
+  else
+  {
+    fshm->pronum = 1;
+    strcpy(fshm->proverb[0], "¿ù»~¡I®æ¨¥ÀÉ¸Ì¨S¦³®æ¨¥");
+  }
+}
+
+: edit.c:ve_banner() ª©­±ªº³]­p½Ð°Ñ¦Ò pighouse.twbbs.org
+
+  else
+  {
++   extern FCACHE *fshm;
+    fprintf(fp, "\n--\n...¤@ªø¦ê¡A¦U¯¸¤£¦P\n");
++   fprintf(fp, "®æ¨¥¡G%s\n", fshm->proverb[time(0) % fshm->pronum]);
+  }
+
+: visio.c:vmsg() ¦pªG¤£·Q¥[¦b¤å³¹³Ì«á banner ¸Ü¡A¤]¥i¥H¨ú¥N vmsg(NULL);
+
+int
+vmsg(msg)
+  char *msg;                    /* length <= 54 */
+{
+  extern FCACHE *fshm;
+
+  if (!msg)
+    msg = fshm->proverb[time(0) % fshm->pronum];
+
+#ifdef POPUP_MESSAGE
+  return pmsg(msg);
+#else
+  move(b_lines, 0);
+  clrtoeol();
+  prints(COLOR1 " ¡» %-55s " COLOR2 " [½Ð«ö¥ô·NÁäÄ~Äò] \033[m", msg);
+  return vkey();
+#endif
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

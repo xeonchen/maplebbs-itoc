@@ -1,0 +1,69 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: Re: [∞›√D] ºˆ™˘¨›™O •H§Œ ¨›™O§HÆ
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2006/03/26 Sun 12:25:45)                Updated: 2006/03/27
+
+°∞ §ﬁ≠z°mguessi.bbs@bbs.wretch.cc (®S)°n§ßª ®•°G
+> ≤{¶b™∫§Hº∆≠p¶∏ ¶≥Æ…¨∆¶‹∑|•X≤{¡Ù¬√¨›™O ©˙©˙•u¶≥§@≠”§H∂i±o§F¨›™O ´o¶≥§HÆ > 1
+> ≠Y•H≠p∫‚™O§Õ™∫§Ë¶°¿≥∏”•i•H∏—®Mßa ? Ω–∞›∏”´ÁªÚ∞µ©O ?
+> Øu™∫§£Ø‡ßYÆ…bmateº∆∂q∂‹? ¡Ÿ¨Oª°®∫ºÀ´‹Ø”I/O
+> ©Í∫pπÔ©Û≥o≥°§¿§£§”§F∏— ¡ŸΩ–´¸±–
+
+: cache.c:utmp_brdmate() ∑sºW¶π®Á¶°¶b utmp_find() ´·≠±
+
+int
+utmp_brdmate(bname)
+  char *bname;
+{
+  UTMP *uentp, *uceil;
+  int num;
+
+  num = 0;
+  uentp = ushm->uslot;
+  uceil = (void *) uentp + ushm->offset;
+  do
+  {
+    if ((uentp->mode == M_READA) && !strcmp(uentp->reading, bname))
+      num++;
+  } while (++uentp <= uceil);
+
+  return num;
+}
+
+: post.c:post_head()
+
+- prints(NECKER_POST, d_cols, "", currbattr & BRD_NOSCORE ? "¢Æ" : "°≥",
+-   bshm->mantime[currbno]);
++ prints(NECKER_POST, d_cols, "", currbattr & BRD_NOSCORE ? "¢Æ" : "°≥",
++   utmp_brdmate(currboard));
+
+: board.c:class_item()
+
+  /* ≥B≤z §HÆ */
+- bno = bshm->mantime[bno];
++ bno = utmp_brdmate(brd->brdname);
+
+  ≥oºÀ¥N¨OßYÆ…™∫§F°A§£πL≠n•I•X§@®«•Nª˘
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ≠Y¶≥∞µ [•\Ø‡] board.c §¿≤’∞QΩ◊∂∞∑sºWºˆ™˘¨›™O
+  ®∫ªÚ¡Ÿ≠nßÔ
+
+: cache.c:utmp_brdmate()
+
+  int num;
++ int bno;
+
++ if ((bno = brd_bno(bname)) < 0)
++   return -1;
+
+  ...
+  ...
+
++ bshm->mantime[bno] = num;
+
+  return num;
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m itoc.Dorm11.NCTU.edu.tw  [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

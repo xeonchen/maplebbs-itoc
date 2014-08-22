@@ -1,0 +1,63 @@
+§@ªÌ: Kudo (²H³J~~) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] expire ¼g¶i .BRD [expire.c³¡¤À]
+®É¶¡: Thu Apr 11 04:36:28 2002                          Updated: 2004/04/30
+
+: expire.c
+
+- #define DEF_DAYS        365             /* ¹w³]²M°£¶W¹L 365 ¤Ñªº¤å³¹ */
+- #define DEF_MAXP        3000            /* ¹w³]²M°£¶W¹L 3000 ½gªº¤å³¹ */
+- #define DEF_MINP        150             /* ¹w³]§C©ó 150 ½gªº¬ÝªO¤£¬å¤å³¹ */
+
+: expire.c:main()
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  FILE *fp;
+  int number, count;
+  Life db, table[MAXBOARD], *key;
+- char *ptr, *bname, buf[256];
++ char *bname, buf[256];
+  BRD *brdp, *bend;
+
+  ...
+  ...
+
+  init_bshm();
+
+  count = 0;
+- if (fp = fopen(FN_ETC_EXPIRE, "r"))
+- {
+-   ...
+-   fclose(fp);
+- }
++ brdp = bshm->bcache;
++ bend = brdp + bshm->number;
++ do
++ {
++   if (!brdp->brdname[0])
++     continue;
++   strcpy(table[count].bname, brdp->brdname);
++   table[count].days = ((argc > 1) && (number = atoi(argv[1])) > 0) ?
++     number : brdp->maxtime;
++   table[count].maxp = ((argc > 2) && (number = atoi(argv[2])) > 0) ?
++     number : brdp->maxpost;
++   table[count].minp = ((argc > 3) && (number = atoi(argv[3])) > 0) ?
++     number : brdp->minpost;
++   count++;
++ } while (++brdp < bend);
+
+  if (count > 1)
+  {
+    qsort(table, count, sizeof(Life), life_cmp);
+  }
+
+--
+Chih-Kuan Chien (Kudo)
+kudo@ms21.url.com.tw
+
+--
+[1;32m¡¼ Origin: [33m²H³Jªº¤pºÛ [37mbbs.kudo.idv.tw
+[1;31m¡¼ From: [36mwww.kudo.idv.tw[m

@@ -1,0 +1,68 @@
+µo«H¤H: rainphiz.bbs@cpu.tfcis.org (¡@) ¬ÝªO: plan
+¼Ð  ÃD: Re: °Ý¤@­Ó¥\¯à ¤@¦¸³]©w¥þ¯¸¬ÝªO¤wÅª¨ú
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/08/24 Thu 00:36:09)                Updated: 2006/08/25
+
+¡° ¤Þ­z¡mguessi (¨S)¡n¤§»Ê¨¥¡G
+>    [Z]¥i¥H³]©w¥þ¯¸¬ÝªO­q¾\/¤Ï­q¾\
+>    ¨º»òÅª¨ú/¥¼Åª¨ú¤S¸Ó¦p¦ó¾Þ§@©O?
+>    ¥ý¸ÕµÛ¬d¬Ýµ{¦¡½X½s­× ¦ý... errorÀWÀW
+>    ·Q½Ð±Ð¦U¦ì ³o¼Ëªº¥\¯à¦p¦ó¼¶¼g ÁÂÁÂ :)
+
+   ´N¬O class_visit ¸ò class_unvisit §Û§Û§ï§ï¡A
+   board.c §ä­Ó¦a¤è©ñ¶i¥h
+
+: board.c:class_allvisit() ©ñ¦b class_unvisit() «á­±
+
+static int
+class_allvisit(xo)
+  XO *xo;
+{
+  BRD *brd;
+  short *chp;
+  int ans, pos, chn, max;
+
+  ans = vans("³]©w©Ò¦³¬ÝªO (V)¤wÅª (U)¥¼Åª (Q)¨ú®ø¡H [Q] ");
+  if (ans != 'v' && ans != 'u')
+    return XO_FOOT;
+
+  max = xo->max;
+  pos = 0;
+  do
+  {
+    chp = (short *) xo->xyz + pos;
+    chn = *chp;
+    if (chn >= 0)
+    {
+      brd = bshm->bcache + chn;
+      brh_get(brd->bstamp, chn);
+      if (ans == 'v')
+      {
+        brh_visit(0);
+#ifndef ENHANCED_VISIT
+        time(&brd_visit[chn]);
+#endif
+      }
+      else
+      {
+        brh_visit(1);
+#ifndef ENHANCED_VISIT
+        brd_visit[chn] = 0; /* itoc.010402: ³ÌªñÂsÄý®É¶¡Âk¹s¡A¨Ï¬ÝªO¦Cªí
+                                            ¤¤Åã¥Ü¥¼Åª */
+#endif
+      }
+    }
+  } while (++pos < max);
+
+  return class_body(xo);
+}
+
+: board.c:class_cb[]
+
++  Ctrl('V'), class_allvisit,
+
+--
+  ¤£·\¬O amaki ¤j¡A¶W¼É¤Oªº XD
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m218-175-148-79.dynamic.hin[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

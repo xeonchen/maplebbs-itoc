@@ -1,0 +1,78 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] ¤å³¹µû¤À­×§ï
+µo«H¯¸: µL¦W¤p¯¸ (2006/03/23 Thu 21:15:50)                Updated: 2006/05/29
+
+¡° ¤Þ­z¡myiyihi.bbs@processor.tfcis.org (...........)¡n¤§»Ê¨¥¡G
+> ¥i¥H¦b¤£¸Ó±Àªº¤å³¹«e«ö i ¡B®³±¼±À¤å¼Æ¦r
+> ­n§â¦¹¥\¯àµ¹ªO¥D¨Ï¥Î³o­Ó¸Ó¦p¦ó§ï©O ¡H
+
+: post.c:post_resetscore() ½Ð¥[¦bpost_score()¤§«e addscore()¤§«á
+
+static int
+post_resetscore(xo)
+  XO *xo;
+{
+  if (bbstate & STAT_BOARD) /* bm only */
+  {
+    HDR *hdr;
+    int pos, cur, score;
+    char ans[3];
+
+    pos = xo->pos;
+    cur = pos - xo->top;
+    hdr = (HDR *) xo_pool + cur;
+
+    switch (vans("¡·µû¤À³]©w 1)¦Û­q 2)²M°£ 3)Ãz 4)Äê [Q] "))
+    {
+    case '1':
+      if (!vget(b_lines, 0, "½Ð¿é¤J¼Æ¦r¡G", ans, 4, DOECHO))
+        return XO_FOOT;
+      score = atoi(ans);
+      if (score > 35 || score < -35)
+        return XO_FOOT;
+      hdr->xmode |= POST_SCORE; /* ­ì¤å¥i¯àµLµû¤À */
+      hdr->score = score;
+      break;
+
+    case '2':
+      hdr->xmode &= ~POST_SCORE; /* ²M°£´N¤£»Ý­nPOST_SCORE¤F */
+      hdr->score = 0;
+      break;
+
+   case '3':
+      hdr->xmode |= POST_SCORE;         /* ­ì¤å¥i¯àµLµû¤À */
+      hdr->score = 35;
+      break;
+
+    case '4':
+      hdr->xmode |= POST_SCORE;         /* ­ì¤å¥i¯àµLµû¤À */
+      hdr->score = -35;
+      break;
+
+    default:
+      return XO_FOOT;
+    }
+
+    currchrono = hdr->chrono;
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono);
+    move(3 + cur, 7);
+    outc(post_attr(hdr));
+  }
+
+  return XO_FOOT;
+}
+
+: post.c:post_cb[] ¤Î post.c:xpost_cb[]
+
+#ifdef HAVE_SCORE
+  '%', post_score,
++ 'i', post_resetscore,
+#endif
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î[37m61-231-192-209.dynamic.hinet.net[30m®ü[m

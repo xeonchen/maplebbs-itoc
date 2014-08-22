@@ -1,0 +1,99 @@
+µo´H§H: SnowWolf.bbs@xeon.tfcis.org (¿R©]) ¨›™O: plan
+º–  √D: [§Â•Û] BLog for itoc-maple ≥]©wblog•ÿø˝----3
+µo´HØ∏: ∞ §OÆ÷§ﬂ (Sun, 07 Sep 2003 23:52:00 +0800 (CST))  Updated: 2003/09/07
+
+[32;1m∑sºW LocalVars.pm ®Ï~/bin/§Œ~/blog/web/[m
+#!/usr/bin/perl
+package LocalVars;
+require Exporter;
+@ISA = qw/Exporter/;
+@EXPORT = qw/
+    $BBSHOME
+    $BLOGROOT $BLOGDATA $BLOGCACHE
+    $BLOGdbname $BLOGdbhost $BLOGdbuser $BLOGdbpasswd $BLOGdefault
+/;
+
+$BBSHOME = '/home/bbs';
+
+# BLOG:
+#    $BLOGDATA ¨O•Œ®”©Ò∏m Blog ∏ÍÆ∆™∫∏ÙÆ|
+#    $BLOGCACHE¨O•Œ®”©Ò∏m Template compiled ∏ÍÆ∆™∫∏ÙÆ|,
+#              ∂∑¨∞ apache owner •iºg§J
+$BLOGROOT = '/home/bbs/blog';
+$BLOGDATA = '/home/bbs/blog/data';
+$BLOGCACHE = '/home/bbs/blog/cache';
+$BLOGdbname = 'blog';
+$BLOGdbhost = 'localhost';
+$BLOGdbuser = 'root';
+$BLOGdbpasswd = 'yourpwd';
+$BLOGdefault = 'sysop';
+
+1;
+
+[32;1m∑sºW BBSFileHeader.pm ®Ï~/bin/§Œ~/blog/web[m
+#!/usr/bin/perl
+package BBSFileHeader;
+use strict;
+use IO::Handle;
+use Data::Dumper;
+
+use fields qw/dir fh cache num/;
+
+sub TIEHASH
+{
+    my($class, $dir,$dindex) = @_;
+    my $self = fields::new($class);
+
+#JCWang:≠◊ßÔ for Maple
+    open $self->{fh}, "<$dir".$dindex;
+    return undef if( !$self->{fh} );
+
+    $self->{dir} = $dir;
+    $self->{num} = (-s $dir.$dindex)/256;       #JCWang:fix for Maple
+    return $self;
+}
+
+sub FETCH
+{
+    my($self, $k) = @_;
+
+    return $self->{dir} if( $k eq 'dir' );
+    return $self->{num} if($k eq 'num');
+
+    my($num, $key) = $k =~ /(.*)\.(.*)/;
+    my($t, %h);
+
+    $num += $self->FETCH('num') if( $num < 0 );
+
+    return $self->{cache}{$num}{$key} if( $self->{cache}{$num}{$key} );
+
+#    JCWang:¶≥¬‡πLDIR≠nßÔ≥o∏Ã™∫§j§p
+     seek($self->{fh}, $num * 256, 0);
+     $self->{fh}->read($t, 256);
+
+    if( $key eq 'isdir' ){
+#JCWang:πÔMaple 3.10≠◊•ø
+        return($self->FETCH("$num.xname")=~/^F*/);
+    }
+    elsif( $key eq 'content' ){
+        my $fn = "$self->{dir}".substr($self->FETCH("$num.xname"),7,1)."/".$self->FETCH("$num.xname");
+        my($c, $fh);
+        open $fh, "<$fn" || return '';
+        $fh->read($c, (-s $fn));
+        return $c;
+    }
+    else{
+#       JCWang:≠n®Ã∑”.DIR™∫ÆÊ¶°Ω’æ„
+        ($h{chrono},$h{xmode},$h{xid},$h{xname},$h{owner},$h{nick},
+         $h{score},$h{date},$h{title})= unpack('iiiZ32Z80Z49ZZ9Z73',$t);
+        $self->{cache}{$num}{$_} = $h{$_}
+            foreach('chrono','xmode', 'xname','owner','nick','date','title');
+        return $h{$key};
+    }
+}
+
+1;
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m     [31m∞[1m §[0;31mOÆ[1m÷§[0;31mﬂ [1mprocessor.tfcis.org    [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[ [1m    140.127.38.223                  [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

@@ -1,0 +1,26 @@
+§@ªÌ: Kudo (²H³J~~) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] expire ¼g¶i .BRD [§Ç½g]
+®É¶¡: Thu Apr 11 04:18:05 2002                          Updated: 2002/10/17
+
+¨Ï¥Î¤è¦¡:
+1. ½Ð¥ýÃö¯¸, ©Úµ´ bbs ³s½u, ²M shm
+
+2. ¥ý±N transbrd.c ©ñ¶i src/util ¤U make (°O±o§ï Makefile),
+   µM«á°õ¦æ¶i¦æÂà´«, ³o°¦µ{¦¡·|±N­ì¥» etc/expire.conf ªº¸ê®ÆÅª¥X¨Ó
+   §K±o¦Û¤v¤@­Ó¤@­Ó³], ¼g±o¤£¬O«Ü§¹¬ü½Ð¤j®a¨£½Ì°Õ:p.
+
+3. §ïµ{¦¡ acct.c struct.h expire.c & ¥i¯àªº¸ÜÁÙ¦³ global.h
+   (acct.c ³¡¤Àµ{¦¡¬O¥i¥H¥Î, ¦ý¼g±o¤£°÷§¹¬ü, µ¥§Ú¦A¬ã¨s¬ã¨s)
+
+4. ±N¥þ³¡ªºµ{¦¡ make clean «á¦A­«·s make
+
+5. ¶}¯¸´ú¸ÕÅo^^
+
+ps. µ{¦¡°Ñ¦Ò¦U¤j¤j¼gªº§ï¨Óªº:p.¶¶«K¾Ç¾Ç itoc ¦Ñ¤j¶K§ïªkªº¤è¦¡:p
+--
+Chih-Kuan Chien (Kudo)
+kudo@ms21.url.com.tw
+
+--
+[1;32m¡¼ Origin: [33m²H³Jªº¤pºÛ [37mbbs.kudo.idv.tw
+[1;31m¡¼ From: [36mwww.kudo.idv.tw[m

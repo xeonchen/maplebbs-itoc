@@ -1,0 +1,183 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (¬Ý¤FÃD¥Ø´Nª¾¹D¸Ó©ñ±ó) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¤£¯àundef¿ú¹ô¨t²Î¶Ü¡H
+µo«H¯¸: °Ê¤O®Ö¤ß (Mon, 18 Aug 2003 01:39:01 +0800 (CST))  Updated: 2005/11/28
+
+¡° ¤Þ­z¡mqask (qask)¡n¤§»Ê¨¥¡G
+> ·PÁÂitoc¤jªº¦^À³¡A¤£¹L§ÚÁÙ¬O·Q¸Õ¸Õ®³±¼code¡A
+> (ÁöµM²´¤£¨£¬°²b¡A¥i¬O®ö¶O¸ê·½¦b¹Bºâ¤W­±¤F:p)
+> ¥i¥Hµy·L«üÂI¤@¤Ucode¤j·§¤À¥¬¦b­þ¸Ì¶Ü
+
+  ­º¥ý§ï struct ACCT
+
+- int money;                    /* »È¹ô */
+- int gold;                     /* ª÷¹ô */
++ int useless1;                 /* ªÅÄæ¤@ */
++ int useless2;                 /* ªÅÄæ¤G */
+
+  §â³o¤G­ÓÄæ¦ì´«¦¨ªÅÄæ¦ì¡A³o¼Ë´NµL»ÝÂà´« .ACCT
+  ¦pªG§A¬O¬[¤@­Ó·s¯¸ªº¸Ü¡A¨º»ò¥i¥Hª½±µ§R°£³o¤G¦æ¡A¦Ó¤£»Ý¼W¥[ useless Äæ¦ì
+
+  µM«á­«·s make clean os-type
+  ©Ò¦³¥X²{ªº error ³£¬O¬ÛÃöªº
+  §Aªº¥Ø¼Ð´N¬O±N©Ò¦³ªº error ³£±Æ°£
+  ¨Ï¯à make ¦¨¥\
+
+  ----------------------------------------------------
+
+  [ºØÃþ] ¥Î¿ú¶RªA°È¡Aª½±µ§R°£¸Ó¬q§Y¥i
+
+  [½d¨Ò] song.c
+
+- if (cuser.money < 1000)
+- {
+-   vmsg("­n 1000 »È¹ô¤~¯àÂIºq¨ì¬ÝªO³á");
+-   return XO_FOOT;
+- }
+
+- cuser.money -= 1000;
+
+  ----------------------------------------------------
+
+  [ºØÃþ] ¥Î¿ú«Ø¥ß°_¨Óªºª÷¿Ä¨î«×
+
+  bank.c ¾ã¤ä§R°£¡A¤]­n¦P¨B­×§ï so/Makefile
+
+  §R°£¤F bank.c¡A¨º»ò¦b menu.c ©Ò¦³©I¥s bank.so ªº¿ï³æ³£­n®³±¼
+
+  ----------------------------------------------------
+
+  [ºØÃþ] ¥Î¿ú«Ø¥ß°_¨Óªº¹CÀ¸¨î«×
+
+  ¦b menu.c ¤¤ªº menu_game2[] ªº¥þ³¡¡Bmenu_game3[] ªº³¡¤À
+  ³£¬O¥Î¿ú¤~¯àª±ªº½ä³Õ¹CÀ¸
+
+  §R°£ menu.c ªº³o³¡¤À
+  ¨Ã§R°£³o¨Ç *.so ¹ïÀ³ªº so/*.c¡A¤]­n¦P¨B­×§ï so/Makefile
+
+  pip/* ¥þ³¡§R°£¡Amenu.c ¤¤ªº¹q¤lÂû®³±¼
+
+  ----------------------------------------------------
+
+  [ºØÃþ] Åã¥Ü¥Îªº¡Aª½±µ§R°£¸Ó¬q§Y¥i
+
+  [½d¨Ò] acct.c
+
+- prints("  \033[32m§Úªº¼ÊºÙ¡G\033[37m%-35s\033[32m¾Ö¦³»È¹ô¡G\033[37m%d\n",
+-   u->username, u->money);
++ prints("  \033[32m§Úªº¼ÊºÙ¡G\033[37m%-35s\033[32m\n", u->username);
+
+  ----------------------------------------------------
+
+  [ºØÃþ] ³]©w¥Îªº¡Aª½±µ§R°£¸Ó¬q§Y¥i
+
+  [½d¨Ò] acct.c
+
+-   sprintf(buf, "%d", u->money);
+-   vget(++i, 0, "»È    ¹ô¡G", buf, 10, GCARRY);
+-   if ((num = atoi(buf)) >= 0)
+-     x.money = num;
+
+  ----------------------------------------------------
+
+  [ºØÃþ] ¥[¿ú¥Îªº¡A´`½u§R°£
+
+  [½d¨Ò] post.c:do_post()
+
+-     addmoney(mode);
+
+  ¦Ó mode ÅãµM´N¤£»Ý­n¤F
+
+-     mode = BMIN(wordsnum, spendtime) / 10;
+
+  ¦Ó spendtime ¤]¬O¦]¬°­nºâ¿ú¤~·s¼Wªº
+
+- time_t spendtime;
+-   spendtime = time(0);
+- spendtime = time(0) - spendtime; /* itoc.010712: post Á`¦@ªáªº®É¶¡(¬í¼Æ) */
+
+  ----------------------------------------------------
+
+  [ºØÃþ] ¦]¬°¿ú¹ô¨t²Î¡A¬°¤FÁ×§K multi ¦Ó·s¼Wªº
+
+  [½d¨Ò] bbsd.c:u_exit()
+
+-       if (cutmp->status & STATUS_COINLOCK)
+-       {
+-         cuser.money = tuser.money;
+-         cuser.gold = tuser.gold;
+-       }
+-       else
+-       {
+-         if (cuser.money < 0)   cuser.money = 0;
+-         if (cuser.gold < 0)    cuser.gold = 0;
+-       }
+
+  ³o¨Ç³£§R°£¨S°ÝÃD¡A¦ý¬O STATUS_COINLOCK ¤S¬O¤°»ò©O¡H
+  ¤@¸ô trace ¦^¥h¡A´Nª¾¹D³o¬O¬°¤FÀË¬d multi ¦Ó·s¼Wªº
+  ©Ò¥H¨Ó¨ì ufo.h
+
+- #define STATUS_COINLOCK BFLAG(4)        /* ¿ú¹ôÂê©w */
+
+  ±µµÛ¨Ó¨ì bbsd.c:tn_login()
+
+- int attempts, multi;
++ int attempts;
+
+- multi = 0;
+
+-         /* itoc.020619: §Y¨Ï§R°£­«½Æªº login ÁÙ¬Oºâ multi¡A¤£¯àÀx¦sª÷¿ú */
+-         multi = 1;
+
+- if (multi)
+-   cutmp->status |= STATUS_COINLOCK;
+
+  ¶i¦Ó¨Ó¨ì acct.c ¥H¤Î so/*.c
+
+- if (cutmp->status & STATUS_COINLOCK)
+- {
+-   vmsg(MSG_COINLOCK);
+-   return XEASY;
+- }
+
+  ----------------------------------------------------
+
+  [ºØÃþ] ¨ä¥L
+
+  ¤@¸ô trace ¦^¥h¡A³q³q§R°£
+
+  [½d¨Ò] talk.c:do_query()
+
+- if (acct->money >= 1000000)
+- {
+-   if (acct->gold >= 100)    userno = 3;
+-   else                      userno = 2;
+- }
+- else
+- {
+-   if (acct->money >= 50000) userno = 1;
+-   else                      userno = 0;
+- }
+
+  ÅãµM¥i¬Ý¥X³o¬q¬O§Q¥Î gold/money ¨Ó¨M©w userno¡A©Ò¥H¤]¥i¥H§R°£¤U­±³o¦æ
+
+- prints(" [°]²£] %s", fortune[userno]);        /* ­É¥Î userno */
+
+  ¬Ý¨ì¤F fortune¡A§ä¤@§ä¤]¨S§Oªº¦a¤è¥Î¡A©Ò¥H¤]¥i¥H§R°£
+
+- /* itoc.010408: query ®É¥X²{¹ï¤èªº°]´Iª¬ªp */
+- char fortune[4][5] = {"¤^¤¢", "¤@¯ë", "¤p±d", "°]»Ö"};
+
+
+  ----------------------------------------------------
+  ----------------------------------------------------
+
+  [µ²½×] °ò¥»¤W§@ªk´N¬O³o¼Ë¡A¥Ñ©ó¿ú¹ô¨î«×¤w¸g²`´Ó«Ü¤[¤F
+         ¦Ó¥B¬Oª½±µ¼g¦b .ACCT ¸Ì­±¡A¦Ó¤£¬O©ñ¦b .ATTR ¸Ì­±
+         ©Ò¥H­n©Þ°£ªº¸Ü¡Aªº½T¬O­nªá¤@¨Ç¥\¤Òªº
+
+         ¤Ï¥¿´N¬O¸ò [1;33mSTATUS_COINLOCK¡BMSG_COINLOCK¡Bmoney¡Bgold[m ¬ÛÃöªº
+         ¤@¸ô trace ¦^¥h¡A³q³q¤£­n
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m     [31m°[1mÊ¤[0;31mO®[1mÖ¤[0;31mß [1mprocessor.tfcis.org    [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[ [1m    itoc.dorm11.nctu.edu.tw         [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

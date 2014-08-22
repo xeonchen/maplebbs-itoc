@@ -1,0 +1,446 @@
+µo«H¤H: chwaian.bbs@cpu.tfcis.org (µL¨¥) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]§ì¨ú©_¼¯¹q¼v
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/11/03 Wed 00:19:17)                Updated: 2006/03/08
+
+®³itoc¼gªºNCTUnews.c(³o°¦µ{¦¡¯u¦n¥Î@_@)§ïªº
+
+·|§ì http://tw.movie.yahoo.com/movie_comming.html ªº¤å³¹
+
+
+ÁÙ­n¶} Kimo_Movies ªO
+
+
+: crontab -e ¥[¤J³o¤G¦æ
+
+# ©_¼¯¹q¼v¨C¤Ñ§ì¨â¦¸
+5 10,20 * * * bin/Kimomovie > /dev/null 2>&1
+
+: src/util/Makefile
+
+EXE =   ... [1;33mKimomovie[m
+
+: src/util/Kimomovie.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/Kimomovie.c     ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ©_¼¯¹q¼v                                     */
+/* create : 04/05/20                                     */
+/* update :   /  /                                       */
+/* author : chwaian.bbs@cpu.tfcis.org                    */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define LYNX_PATH       "/usr/local/bin/lynx --source"  /* lynx ªºµ´¹ï¸ô®| */
+
+
+/*-------------------------------------------------------*/
+/* BRD shm ³¡¤À¶·»P cache.c ¬Û®e                         */
+/*-------------------------------------------------------*/
+
+
+static BCACHE *bshm;
+
+static void
+init_bshm()
+{
+  /* itoc.030727: ¦b¶}±Ò bbsd ¤§«e¡AÀ³¸Ó´N­n°õ¦æ¹L account¡A
+     ©Ò¥H bshm À³¸Ó¤w³]©w¦n */
+
+  bshm = shm_new(BRDSHM_KEY, sizeof(BCACHE));
+
+  if (bshm->uptime <= 0)        /* bshm ¥¼³]©w§¹¦¨ */
+    exit(0);
+}
+
+
+static void
+update_btime(brdname)
+  char *brdname;
+{
+  BRD *bhdr, *tail;
+
+  bhdr = bshm->bcache;
+  tail = bhdr + bshm->number;
+  do
+  {
+    if (!str_cmp(brdname, bhdr->brdname))
+    {
+      bhdr->btime = -1;
+      break;
+    }
+  } while (++bhdr < tail);
+}
+
+
+/*-------------------------------------------------------*/
+/* µo¤å¨ì¬ÝªO                                            */
+/*-------------------------------------------------------*/
+
+
+static char *Brdname = "Kimo_Movies";     /* ±ý post ªº¬ÝªO */
+static char *Userid = "©_¼¯¹q¼v";   /* §@ªÌ */
+static char *Username = "³Ì·s¹q¼v"; /* ¼ÊºÙ */
+
+
+static void
+new_post(fpath, title)           /* µo¤å¨ì¬ÝªO */
+  char *fpath;          /* ÀÉ®×¸ô®| */
+  char *title;          /* ¤å³¹¼ÐÃD */
+{
+  HDR hdr;
+  char folder[64];
+
+  brd_fpath(folder, Brdname, FN_DIR);
+  hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
+  strcpy(hdr.owner, Userid);
+  strcpy(hdr.nick, Username);
+  strcpy(hdr.title, title);
+  rec_add(folder, &hdr, sizeof(HDR));
+
+  update_btime(Brdname);
+}
+
+
+/*-------------------------------------------------------*/
+/* §ìºô­¶                                                */
+/*-------------------------------------------------------*/
+
+
+static int wlen;    /* ¥»¦æ¦³¦h¤Ö¦r */
+static int slen;    /* ¥»¦æ¦³¦h¤Ö¥b«¬¦r */
+
+
+static void
+foutc(ch, fp)
+  int ch;
+  FILE *fp;
+{
+  static int in_tag = 0;    /* 1: ¦b <tag> ¤¤ */
+  static int in_chi = 0;    /* 1: «e¤@½X¬O¤¤¤å¦r */
+
+  if (ch == '<')
+  {
+    in_tag = 1;
+    return;
+  }
+
+  /* ¸õ¹L \t */
+  if (ch == '\t')
+    return;
+
+  if (!in_tag)
+  {
+    if (in_chi)             /* «e¤@­Óchar¬O¤¤¤å¦rªº²Ä¤@½X */
+      in_chi = 0;
+    else if (ch & 0x80)     /* «e¤@­Óchar¤£¬O¤¤¤å¦rªº²Ä¤@½X¡AÀË¬d³ochar¬O§_¬°¤¤¤å¦rªº²Ä¤@½X */
+      in_chi = 1;
+    else                    /* ¦pªG³£¤£¬O¡Aªí¥Ü³ochar¬O¥b«¬¦r */
+      slen++;
+
+    if (wlen >= 60 - slen % 2)  /* ¤@¦æ³Ì¦h 60 ¦r¡A­Y¦³©_¼Æ­Ó¥b«¬¦r¡A¸Ó¦æ¥u¦L 59 ¦r */
+    {
+      fputs("\n    ", fp);  /* ¨C¦æ«e­±³£ªÅ¥|®æ */
+      wlen = 0;
+      /* slen = 0; */
+      slen = !in_chi;       /* ­Y·sªº³o¦æ²Ä¤@­Óchar¬O¥b«¬¦r¡Aslen=1 */
+    }
+
+    fputc(ch, fp);
+    wlen++;
+  }
+  else
+  {
+    if (ch == '>')
+      in_tag = 0;
+  }
+}
+
+
+static void
+fouts(str, fp)
+  uschar *str;
+  FILE *fp;
+{
+  int ch;
+
+  wlen = 0;
+  slen = 0;
+  fputs("\n    ", fp);      /* ¨C¦æ«e­±³£ªÅ¥|®æ */
+
+  while (ch = *str)
+  {
+    foutc(ch, fp);
+    str++;
+  }
+}
+
+
+static void
+strip_title(str, title)
+  uschar *str, *title;
+{
+  int ch, len = 0;
+  uschar *dst;
+
+  /* ¥h±¼ str ¤¤ªº \t ¤Î³Ì«áªº <tag>¡A¦s¦b title */
+
+  dst = title;
+  while (ch = *str++)
+  {
+    if (ch == '<')
+      break;
+
+    if (ch != '\t')
+    {
+      *dst++ = ch;
+      if (++len > TTLEN)
+        break;
+    }
+  }
+  *dst = '\0';
+}
+
+
+static void
+html_download(actno)          /* ¤U¸ü¤å³¹¨ÃÂà´«¬°¤å¦rÀÉ */
+  int actno;
+{
+  char link[128], title[TTLEN + 1], title2[TTLEN + 1];
+  char buf[2048];       /* °²³]¤å³¹¨C¬q¤£·|¶W¹L 2048 ¦r */
+  char *fsrc = "tmp/Kimomovie.src";
+  char *fdst = "tmp/Kimomovie.dst";
+  FILE *fpr, *fpw;
+  int mode;
+  char *ptr;
+  int right;            /* ¤£¦s¦bªººô§}¸õ¹L */
+
+
+  right = 0;
+
+  /* ¤U¸ü¤å³¹ */
+  sprintf(link, "http://tw.movie.yahoo.com/mstory.html?t=movie&id=%d", actno);
+  sprintf(buf, LYNX_PATH " '%s' > %s", link, fsrc);
+  system(buf);
+
+  /* Âà´«¬°¤å¦rÀÉ */
+  if (fpr = fopen(fsrc, "r"))
+  {
+    if (fpw = fopen(fdst, "w"))
+    {
+      /* ¶}ÀY¥[¤WÀÉÀY */
+
+      while (fgets(buf, sizeof(buf), fpr))
+      {
+        /* film_people.gif ªº¤U¤@¦æ´N¬O¼ÐÃD */
+        if (strstr(buf, "film_people.gif"))
+        {
+          fgets(buf, sizeof(buf), fpr);
+          fgets(buf, sizeof(buf), fpr);
+          strip_title(buf, title);
+          fgets(buf, sizeof(buf), fpr);
+
+          if (fgets(buf, sizeof(buf), fpr))
+          {
+
+            strip_title(buf, title2);
+
+            sprintf(title,"%s (%s)",title,title2);
+
+            fprintf(fpw, "%s %s (%s) %s %s\n",
+              STR_AUTHOR1, Userid, Username, STR_POST2, Brdname);
+            fprintf(fpw, "¼ÐÃD: %s\n®É¶¡: %s\n\n", title, Now());
+            right = 1;
+          }
+          break;
+        }
+      }
+
+
+      while (fgets(buf, sizeof(buf), fpr))
+      {
+        if (strstr(buf, "Ãþ¡@¡@«¬¡G"))
+        {
+          fgets(buf, sizeof(buf), fpr);
+          fgets(buf, sizeof(buf), fpr);
+          strip_title(buf, title2);
+          fprintf(fpw, "\nÃþ¡@¡@«¬¡G%s\n", title2);
+        }
+        else if (strstr(buf, "¤ù¡@¡@ªø¡G"))
+        {
+          fgets(buf, sizeof(buf), fpr);
+          fgets(buf, sizeof(buf), fpr);
+          strip_title(buf, title2);
+          fprintf(fpw, "\n¤ù¡@¡@ªø¡G%s\n", title2);
+        }
+        else if (strstr(buf, "¤À¡@¡@¯Å¡G"))
+        {
+          fgets(buf, sizeof(buf), fpr);
+          fgets(buf, sizeof(buf), fpr);
+          strip_title(buf, title2);
+          fprintf(fpw, "\n¤À¡@¡@¯Å¡G%s\n", title2);
+        }
+        else if (strstr(buf, "¾É¡@¡@ºt¡G"))
+        {
+          fgets(buf, sizeof(buf), fpr);
+          fgets(buf, sizeof(buf), fpr);
+          strip_title(buf, title2);
+          fprintf(fpw, "\n¾É¡@¡@ºt¡G%s\n", title2);
+        }
+        else if (strstr(buf, "ºt¡@¡@­û¡G"))
+        {
+          fgets(buf, sizeof(buf), fpr);
+          fgets(buf, sizeof(buf), fpr);
+          strip_title(buf, title2);
+          fprintf(fpw, "\nºt¡@¡@­û¡G%s\n", title2);
+        }
+        else if (strstr(buf, "µo¦æ¤½¥q¡G"))
+        {
+          fgets(buf, sizeof(buf), fpr);
+          fgets(buf, sizeof(buf), fpr);
+          strip_title(buf, title2);
+          fprintf(fpw, "\nµo¦æ¤½¥q¡G%s\n", title2);
+        }
+        else if (strstr(buf, "¤W¬M¤é´Á¡G"))
+        {
+          fgets(buf, sizeof(buf), fpr);
+          fgets(buf, sizeof(buf), fpr);
+          strip_title(buf, title2);
+          fprintf(fpw, "\n¤W¬M¤é´Á¡G%s\n", title2);
+          fprintf(fpw, "\n¼@±¡Â²¤¶¡G\n");
+          break;
+        }
+      }
+
+      mode = 0;    /* 0:¥¼¶}©l  1:¦L¨ì¤@¥b  2:µ²§ô */
+
+      while (fgets(buf, sizeof(buf), fpr))
+      {
+        if (ptr = strstr(buf, "<td class=\"mbody\">"))
+        {
+          *ptr = '\0';
+          mode++;
+        }
+        else if (strstr(buf, "<!--¼v¤ù¤º®e¤¶²Ð¶}©l-->"))
+        {
+          mode++;
+        }
+
+        if (mode)
+        {
+           fouts(buf, fpw);
+           if (mode == 2)
+            break;
+        }
+
+      }
+
+
+      /* µ²§À¥[¤W¨Ó·½ */
+      fprintf(fpw, "\n--\nYahoo!©_¼¯¹q¼v\n%s\n", link);
+      fclose(fpw);
+      fclose(fpr);
+
+      if (right)
+        new_post(fdst, title);
+      unlink(fdst);
+    }
+    unlink(fsrc);
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+static int
+urhigh_query()
+{
+  char *ftmp = "tmp/Kimomovie.tmp";
+  char buf[512];       /* °²³]¨C¦æ¤£·|¶W¹L 512 ¦r */
+  char *ptr;
+  FILE *fp;
+  int high;
+  int tmp;
+
+  high = 0;
+  tmp = 0;
+  sprintf(buf, LYNX_PATH " http://tw.movie.yahoo.com/movie_comming.html > %s",
+    ftmp);
+  system(buf);
+
+  if (fp = fopen(ftmp, "r"))
+  {
+    while (fgets(buf, sizeof(buf), fp))
+    {
+      if (ptr = strstr(buf, "mstory.html?t=movie&id="))
+      {
+        tmp = atoi(ptr + 23);
+
+        if(tmp > high)
+         high = tmp;
+      }
+    }
+
+    fclose(fp);
+    unlink(ftmp);
+  }
+  return high;
+}
+
+
+int
+main()
+{
+  FILE *fp;
+  int myhigh, urhigh;
+  char buf[10];
+
+  chdir(BBSHOME);
+
+  /* ¬Ý¦Û¤v§ì¨ì²Ä´X½g¤F */
+  myhigh = 0;
+  if (fp = fopen("run/Kimomovie", "r"))
+  {
+    fscanf(fp, "%8s", buf);
+    fclose(fp);
+
+    if ((urhigh = atoi(buf)) > 0)
+      myhigh = urhigh;
+  }
+
+  /* ¬Ý©_¼¯¹q¼v³Ì·sªº¦³´X½g */
+  urhigh = urhigh_query();
+
+  if (!myhigh)           /* ¦pªG¦Û¤v¨S¦³½g¼Æ­p¼Æ¾¹¡A¨º´N§ì³Ì«á¤T½g */
+    myhigh = urhigh - 3;
+
+  if (myhigh >= urhigh)  /* ¨S¦³·s¤å³¹ */
+    return 0;
+
+  init_bshm();
+
+  /* ¥h§ì·sªº¤å³¹ */
+  for (myhigh++; myhigh <= urhigh; myhigh++)
+    html_download(myhigh);
+
+  /* §ó·s¦Û¤vªº½g¼Æ­p¼Æ¾¹ */
+  if (fp = fopen("run/Kimomovie", "w"))
+  {
+    fprintf(fp, "%d", urhigh);
+    fclose(fp);
+  }
+
+  return 0;
+}
+
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mchwaian [30m±q [31m61-216-216-43.dynamic.hinet.net [30mµoªí[m

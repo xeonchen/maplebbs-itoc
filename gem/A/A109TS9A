@@ -1,0 +1,36 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¥b§Y®É³]©w¨Ï¥ÎªÌªº¬ÝªOÅv­­
+®É¶¡: 2004/01/02 Fri 23:26:10                           Updated: 2006/04/17
+
+  ¦]¬°°ÊºA³]©w¨Ï¥ÎªÌªº¬ÝªOÅv­­­n§ï¤Ó¦h¤F
+
+  ©Ò¥H¼g­Ó¥b§Y®Éªº¡AÂ²³æ«Ü¦h :p
+
+: visio.c:outf()
+
+void
+outf(str)
+  uschar *str;
+{
++ static time_t tcheck = 0;
++ time_t now;
+
++ if (str == FEETER_CLASS)
++ {
++   if (!tcheck)
++     tcheck = ap_start;
++   time(&now);
++   if (now - tcheck >= 10 * 60)        /* 10 ¤ÀÄÁ§ó·s¤@¦¸ */
++   {
++     if (cuser.userlevel)
++       brh_save();
++     board_main();
++     tcheck = now;
++   }
++ }
+  outz(str);
+  prints("%*s\033[m", d_cols, "");
+}
+
+--
+[1m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,127 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¢Û¢é¢ø¢ô¢í¡Ð¢ñ¢ü¢÷¢ë) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¬ÝªOÄÝ©Ê¡Ð¤£¯à¦^ÂÐ¤å³¹¨ì¬ÝªO¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/01/11 Sun 11:16:07)                Updated: 2005/05/26
+
+    ¦]¬°¯¸¤W¦³¨Ç¬ÝªO·|¦³¤j¶qªºÄé¤ô²{¶H¡A¦ý¬O¤S¤£²Å¦X¸ÓªOªº­·®æ¡C
+
+    ¤ñ¦p»¡¬O feeling ªO¡B blame ªO¡C
+
+    §ï¦¨¤£¯à¦^¤åÀ³¸Ó¥i¥H´î¤ÖÄé¤ô²{¶H¡C
+
+    ¦ý¬O¤]¥u¬Oªv¼Ð¤£¯àªv¥»°Õ¡I¦Û¤v§â¼ÐÃD§ï¦¨ Re: xxxxx ¤]¬O¥i¥Hªº¡I
+
+    ¦ý¬O¦h¤Ö¥i¥H´î¤Ö§a¡I¨þ¨þ¡ã
+
+==============================================================================
+
+: battr.h
+
+#define BRD_ANONYMOUS   0x20    /* °Î¦W¬ÝªO */
++ #define BRD_NOREPLY   0x40    /* ¤£¯à¦^À³¤å³¹¨ì¬ÝªO */
+
+  ...
+  ...
+
+- #define NUMBATTRS       6
++ #define NUMBATTRS       7
+
+- #define STR_BATTR       "zTcsvA"
++ #define STR_BATTR       "zTcsvAr"
+
+: battr.h:battr_tbl[]
+
+  "°Î¦W¬ÝªO",           /* BRD_ANONYMOUS */
++ "¤£¯à¦^À³¤å³¹¨ì¬ÝªO", /* BRD_NOREPLY */
+
+: post.c:do_reply()
+
+- switch (vans("¡¶ ¦^À³¦Ü (F)¬ÝªO (M)§@ªÌ«H½c (B)¤GªÌ¬Ò¬O (Q)¨ú®ø¡H[F] "))
++ switch (vans((currbattr & BRD_NOREPLY) ?
++   "¡¶ ¦^À³¦Ü (M)§@ªÌ«H½c (Q)¨ú®ø¡H[Q] " :
++   "¡¶ ¦^À³¦Ü (F)¬ÝªO (M)§@ªÌ«H½c (B)¤GªÌ¬Ò¬O (Q)¨ú®ø¡H[F] "))
+  {
+    ...
+    ...
+
+  case 'b':
++   if (currbattr & BRD_NOREPLY)    /* qazq.040110: ¤£¯à¦^¤å¨ì¬ÝªO */
++     return XO_FOOT;
+    if (cuser.userlevel)    /* guest ¿ï Both ¤´¥u¦^¨ì¬ÝªO¤W¡A¤£¦^§@ªÌ«H½c */
+      curredit = EDIT_BOTH;
+    break;
+  }
+
++ if (currbattr & BRD_NOREPLY)  /* qazq.040110: ¤£¯à¦^¤å¨ì¬ÝªO */
++ {
++   *quote_file = '\0';
++   return XO_FOOT;
++ }
+
+  if (hdr->xmode & (POST_INCOME | POST_OUTGO))
+    curredit |= EDIT_OUTGO;
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ¦pªG§Æ±æ¶}©ñµ¹ªO¥D¦Û¦æ³]©w
+
+: manage.c §â¥H¤U³o¬q¥[¦b post_battr_noscore() «á­±
+
+static int
+post_battr_noreply(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("1)¥i¥H¦^À³¤å³¹ 2)¤£¥i¦^À³¤å³¹ [Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_NOREPLY;
+    break;
+  case '2':
+    newbrd.battr |= BRD_NOREPLY;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+#  ifdef HAVE_SCORE
+    "Score   ³]©w¥i§_µû¤À",
+#  endif
++   "Reply   ¦^À³¤å³¹³]©w",
+
+  ...
+  ...
+
+#  ifdef HAVE_SCORE
+    " (S)µû¤À"
+#  endif
++   " (R)¦^¤å"
+
+  ...
+  ...
+
+#ifdef HAVE_SCORE
+  case 's':
+    return post_battr_noscore(xo);
+#endif
+
++ case 'r':
++   return post_battr_noreply(xo);
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-137-2.HINET-IP.hinet.net [30mµoªí[m

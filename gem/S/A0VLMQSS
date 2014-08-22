@@ -1,0 +1,150 @@
+µo´H§H: SnowWolf.bbs@xeon.tfcis.org (¿R©]) ¨›™O: plan
+º–  √D: [§Â•Û] BLog for itoc-maple µ{¶°≠◊ßÔ----2
+µo´HØ∏: ∞ §OÆ÷§ﬂ (Sun, 07 Sep 2003 23:36:46 +0800 (CST))  Updated: 2004/03/11
+
+: gem.c  ∑sºW§U¶Cµ{¶°¶bgem_toggle§ß´·
+
+static void
+BlogMain(num)
+  int num;
+{
+  char cmd[256], userid[IDLEN + 1], hash[35];
+
+  vs_bar("≥°∏®ÆÊ");
+
+  move(1, 0);
+  outs("Ω–øÔæ‹±z≠n∞ı¶Ê™∫≠´ß@:\n"
+    "0.¶^®Ï§W§@ºh\n"
+    "1.ªsß@≥°∏®ÆÊºÀ™OÆÊ¶°\n"
+    "  ®œ•Œ∑s™∫ config •ÿø˝§UºÀ™O∏ÍÆ∆\n"
+    "  ≥q±`¶b≤ƒ§@¶∏®œ•Œ≥°∏®ÆÊ©ŒºÀ™OßÛ∑s™∫Æ…≠‘®œ•Œ\n"
+    "\n"
+    "2.≠´∑sªsß@≥°∏®ÆÊ\n"
+    "  •u¶b≥°∏®ÆÊ∏ÍÆ∆æ„≠”∂√±º™∫Æ…≠‘§~®œ•Œ\n"
+    "\n"
+    "3.±N•ª§Â•[§J≥°∏®ÆÊ\n"
+    "  ±N¥Âº–©“¶b¶Ï∏m™∫§Â≥π•[§J≥°∏®ÆÊ\n"
+    "\n"
+    "4.ßR∞£∞j≈T\n");
+
+  str_lower(userid, cuser.userid);
+
+  while (1)
+  {
+    switch (vans("Ω–øÔæ‹(0-3)°H[0] "))
+    {
+    case '1':
+      sprintf(cmd, "bin/builddb.pl -c %s", userid);
+      system(cmd);
+      break;
+    case '2':
+      sprintf(cmd, "bin/builddb.pl -a %s", userid);
+      system(cmd);
+      break;
+    case '3':
+      sprintf(cmd, "bin/builddb.pl -f -n %d %s", num, userid);
+      system(cmd);
+      break;
+    case '4':
+      if (vget(16, 0, "Ω–øÈ§J∏”Ωg™∫¬¯¥Í≠»°G", hash, sizeof(hash), DOECHO) &&
+        vans(msg_del_ny) == 'y')
+      {
+        sprintf(cmd, "bin/bmysql %s %s", hash, userid);
+        if (!strchr(cmd, ';'))    /* security reason */
+          system(cmd);
+      }
+      break;
+    default:
+      return;
+    }
+  }
+}
+
+
+static int
+gem_blog(xo)
+  XO *xo;
+{
+  char cmd[256], userid[IDLEN + 1];
+
+  /* •u≠≠≠”§H∫Îµÿ∞œ®œ•Œ */
+  if (xo->dir[0] != 'u')
+    return XO_NONE;
+
+  switch (vans("1)∞µ≥°∏®ÆÊ 2)ßÛ∑s≥°∏®ÆÊ°H[N] "))
+  {
+  case '1':
+    BlogMain(xo->pos);
+    break;
+
+  case '2':
+    str_lower(userid, cuser.userid);
+    sprintf(cmd, "bin/builddb.pl -f -n %d %s", xo->pos, userid);
+    system(cmd);
+    vmsg("∏ÍÆ∆ßÛ∑sßπ¶®");
+    break;
+  }
+
+  return XO_FOOT;
+}
+
+: gem.c:gem_cb[]
+
+static KeyFunc gem_cb[]
+  'B', gem_toggle,
++ 'b', gem_blog,
+
+
+: util/Makefile
+
+EXE =   ... [1;33mbmysql[m
+
+.................
+
+linux:
+        @$(MAKE) CC=gcc CFLAGS="-O2 -pipe -I../include
+ -fomit-frame-pointer -Wunused" LDFLAGS="-s -L../lib -ldao -lcrypt -lresolv
+ [1;33m-Lpath-to-the-mysql-library -lmysqlclient[m" $(EXE)
+
+freebsd:
+        @$(MAKE) CC=gcc CFLAGS="-O2 -pipe -I../include -fomit-frame-pointer
+ -Wunused" LDFLAGS="-s -L../lib
+ [1;33m-L/usr/local/lib/mysql -lmysqlclient[m
+ -ldao -lcrypt" $(EXE)
+
+: util/bmysql.c  ∑sºW bmysql.c ©Û util/
+
+#include <mysql/mysql.h>
+
+/* JCWang:Ω–¶U¶Ï§j§j®Ã∑”¶€§v™∫®t≤Œ¶€¶Ê≠◊ßÔ§U≠±define */
+#define BLOGDB_HOST   "localhost"
+#define BLOGDB_USER   "root"
+#define BLOGDB_PASSWD "yourpwd"
+#define BLOGDB_DB     "blog"
+#define BLOGDB_PORT   0
+#define BLOGDB_SOCK   0 /* NULL */
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  MYSQL mysql;
+  char cmd[256];
+
+  sprintf(cmd, "delete from comment where hash='%s'&&brdname='%s'",
+    argv[1], argv[2]);
+
+  if (mysql_init(&mysql) &&
+    mysql_real_connect(&mysql, BLOGDB_HOST, BLOGDB_USER, BLOGDB_PASSWD, BLOGDB_DB, BLOGDB_PORT, BLOGDB_SOCK, 0) &&
+    !mysql_query(&mysql, cmd))
+  {
+    mysql_close(&mysql);
+  }
+
+  return 0;
+}
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m     [31m∞[1m §[0;31mOÆ[1m÷§[0;31mﬂ [1mprocessor.tfcis.org    [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[ [1m    140.127.38.223                  [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

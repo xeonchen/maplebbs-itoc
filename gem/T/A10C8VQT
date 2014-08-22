@@ -1,0 +1,21 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ³s¸pª©
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/06/07 Mon 21:53:49)                Updated: 2005/08/23
+
+¡° ¤Þ­z¡myhl (yhl)¡n¤§»Ê¨¥¡G
+> ³s¸pªº¤å³¹¥i¥H¦b¦¨¥\³s¸p«á
+> Âà¤@½g¨ìnewboard¥h¶Ü
+
+  ¥ý°µºëµØ°Ï³o½g
+  [¥\¯à] post.c µo¤å¨ì¬ÝªO
+
+: newbrd.c:nbrd_reply()
+
+    currchrono = nbrd->btime;
+    rec_ref(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime, addreply);
++   if (nbrd->total <= 1)
++     add_post("newboard", fpath, "³s¸p³q¹L");
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

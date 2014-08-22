@@ -1,0 +1,83 @@
+µo«H¤H: hpo14.bbs@ntust.org (­¯¥Í) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] Âà¿ý¤å³¹¦Ü«H½c: ­ì¤å³¹¥[µù°O¿ý
+µo«H¯¸: ¸ê¤u²M¬y¯¸ (2007/05/10 Thu 03:58:15)              Updated: 2007/05/10
+
+°Ñ¦Ò³o½g¼gªº [1;42m[­×¥¿] Âà¿ý¤å³¹: ­ì¤å³¹¥[µù°O¿ý[m by guessi
+
+¤p§Ì»{¬°¡A°£Âà¿ý¤å³¹¨ì¬ÝªOÀ³¸Ó¦b­ì¤å¥[µù¬ö¿ý¥H¥~
+
+­Y¦³¨Ï¥ÎªÌ±N¤å³¹Âà¦^¦Û¤v©Î¬O¥L¤H«H½cªº¸Ü¡A¤]À³¸Ó¦b­ì¤å¥[µù¬ö¿ý
+
+¥Ø«e¦Û¤v¨Ï¥Î¬O¨S¦³°ÝÃD¡C
+
+: src/maple: post_forward(xo)
+
+int
+post_forward(xo)
+  XO *xo;
+{
+  ACCT muser;
++ int result;
+  HDR *hdr;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+   ¡K¡K
+
+  if (acct_get("Âà¹F«H¥óµ¹¡G", &muser) > 0)
+  {
+    strcpy(quote_user, hdr->owner);
+    strcpy(quote_nick, hdr->nick);
+    hdr_fpath([1;33mquote_file[m, xo->dir, hdr);
+    sprintf(ve_title, "%.64s (fwd)", hdr->title);
+    move(1, 0);
+    clrtobot();
+    prints("Âà¹Fµ¹: %s (%s)\n¼Ð  ÃD: %s\n",
+      muser.userid, muser.username, ve_title);
+
+-   mail_send(muser.userid);
++   result = mail_send(muser.userid);
+
++   if (result >= 0)
++   {
++     char fpath[64];
++     FILE *fp;
++
++     hdr_fpath(fpath, xo->dir, hdr);
+
+      //³oÃä¤p§Ì¤£½T©w¯à§_ª½±µ¨Ï¥Î¤W­±¼Ð¶À¦âªºÅÜ¼Æ·í§@ FILEªºÀÉ®×¸ô®|
+      //¦]¬° hdr_path §ìªº³£¤@¼Ë
+      //¦pªG¥i¥H¡A«h¤U­±ªº [1;32mfpath[m ½Ð§ï¦¨ [1;33mquote_file[m
++
++     if (fp = fopen([1;32mfpath[m, "a"))
++     {
++       char msg[32];
++
++       time_t now;
++       struct tm *ptime;
++
++       time(&now);
++       ptime = localtime(&now);
++
++       sprintf(msg, "Âà¿ý¦Ü %s «H½c", (muser.userid == cuser.userid) ?
++         muser.userid : "¨p¤H");
++
++       fprintf(fp, "\033[32m¡­ \033[1m%s\033[;32m %-*s\033[m"
++         " %02d/%02d %02d:%02d\033[m\n",
++         cuser.userid, 62 - strlen(cuser.userid), msg,
++         ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
++         /* ®æ¦¡¦Û­q ºÉ¶q»P±À¤åÃþ¦ü */
++
++       fclose(fp);
++
++     } /* Âà¿ý­ì¤åµù°O¿ý 070510 hpo14 */
++   }
+
+    *quote_file = '\0';
+  }
+  return XO_HEAD;
+}
+
+--
+[1m>> [33m¥xÆW¬ì§Þ¤j¾Ç ¸ê¤u²M¬y¯¸ [;31m# [1;31mntust.org [;31m#[m
+[1m>> [;32mAu[1mthor: 61.59.78.243[m

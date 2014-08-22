@@ -1,0 +1,157 @@
+µo«H¤H: LHD.bbs@YoMin.twbbs.org (§Ú²Ö¤F) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¾ã¦æ¥ú´Î¡Ðboard.c (©ö©ó¾ã¦Xfavor.cª©)
+µo«H¯¸: ¹C¥Á¤§®a (Mon, 14 Jul 2003 17:54:20 +0800 (CST))  Updated: 2005/10/07
+
+: board.c:class_item_bar() ¤Î class_bar() ¥[¦b class_item() ¤§«á
+
+#ifdef HAVE_LIGHTBAR
+#ifdef MY_FAVORITE
+void
+#else
+static void
+#endif
+class_item_bar(brd, bno, chn, brdpost)
+  BRD *brd;
+  int bno, chn, brdpost;
+{
+  int num, fd, fsize;
+  char *str1, *str2, *str3, token, buf[16];
+  char folder[64];
+  struct stat st;
+
+  /* itoc.020123: ¤£ºÞ¦³µL UFO_BRDPOST¡A¤@·§§ó·s¡A¥H§K¥¼Åª¿O¤£·|«G */
+  brd_fpath(folder, brd->brdname, fn_dir);
+  if ((fd = open(folder, O_RDONLY)) >= 0 && !fstat(fd, &st))
+  {
+    if (st.st_mtime > brd->btime)
+    {
+      brd->btime = time(0) + 0; /* 45 ¬íÄÁ¤º¤£­«½ÆÀË¬d */
+      if ((fsize = st.st_size) >= sizeof(HDR))
+      {
+#ifdef ENHANCED_BSHM_UPDATE
+        HDR hdr;
+
+        brd->bpost = fsize / sizeof(HDR);
+        /* itoc.020829: §ä³Ì«á¤@½g¥¼³Q§R°£/¥[±Kªº HDR */
+        for (fsize -= sizeof(HDR); fsize >= sizeof(HDR); fsize -= sizeof(HDR))
+        {
+          lseek(fd, fsize, SEEK_SET);
+          read(fd, &hdr, sizeof(HDR));
+          if (!(hdr.xmode & POST_RESTRICT))
+            break;
+        }
+        brd->blast = hdr.chrono;
+#else
+        brd->bpost = fsize / sizeof(HDR);
+        lseek(fd, fsize - sizeof(HDR), SEEK_SET);
+        read(fd, &brd->blast, sizeof(time_t));
+#endif
+      }
+      else
+      {
+        brd->blast = brd->bpost = 0;
+      }
+    }
+    close(fd);
+  }
+
+  /* ³B²z ½s¸¹/½g¼Æ */
+  num = brdpost ? brd->bpost : bno;
+
+  /* ³B²z zap/friend/secret ªOªº²Å¸¹ */
+  if (brd_bits[chn] & BRD_Z_BIT)
+    token = TOKEN_ZAP_BRD;
+  else if (brd->readlevel == PERM_SYSOP)
+    token = TOKEN_SECRET_BRD;
+  else if (brd->readlevel == PERM_BOARD)
+    token = TOKEN_FRIEND_BRD;
+  else
+    token = ' ';
+
+  /* ³B²z ¤wÅª/¥¼Åª */
+#ifdef ENHANCED_VISIT
+  /* itoc.010407: §ï¥Î³Ì«á¤@½g¤wÅª/¥¼Åª¨Ó§PÂ_ */
+  brh_get(brd->bstamp, chn);
+  str1 = brh_unread(brd->blast) ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#else
+  str1 = brd->blast > brd_visit[chn] ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#endif
+
+  /* ³B²z §ë²¼/Âà«H */
+  if (brd->bvote)
+    str2 = (brd->bvote > 0) ? ICON_VOTED_BRD : ICON_GAMBLED_BRD;
+  else
+    str2 = (brd->battr & BRD_NOTRAN) ? ICON_NOTRAN_BRD : ICON_TRAN_BRD;
+
+  /* ³B²z ¤H®ð */
+  bno = bshm->mantime[bno];
+  if (bno > 99)
+    str3 = "\033[1;31mÃz\033[m";
+  else if (bno > 0)
+    sprintf(str3 = buf, "%2d", bno);
+  else
+    str3 = "  ";
+
+  prints("\033[1;42m%6d%c%s\033[1;42m%-13s\033[1;3%dm%-5s"
+    "\033[37m%s %-*.*s %s %-*.*s\033[m",
+    num, token, str1, brd->brdname,
+    brd->class[3] & 7, brd->class, str2,
+    (d_cols >> 1) + 31, (d_cols >> 1) + 30, brd->title, str3,
+    d_cols - (d_cols >> 1) + 13, d_cols - (d_cols >> 1) + 13, brd->BM);
+}
+
+
+static int
+class_bar(xo, mode)
+  XO *xo;
+  int mode;
+{
+  short *chp;
+  BRD *brd;
+  int chn, cnt, brdpost;
+
+  cnt = xo->pos + 1;
+  chp = (short *) xo->xyz + xo->pos;
+  chn = *chp;
+  brd = bshm->bcache + chn;
+  brdpost = class_flag & UFO_BRDPOST;
+
+  if (chn >= 0)         /* ¤@¯ë¬ÝªO */
+  {
+    if (mode)
+      class_item_bar(brd, cnt, chn, brdpost);
+    else
+      class_item(cnt, chn, brdpost);
+  }
+  else
+  {
+    short *chx;
+    char *img, *str;
+
+    img = class_img;
+    chx = (short *) img + (CH_END - chn);
+    str = img + *chx;
+    prints("%s%6d%c  %-13.13s\033[33m%5.5s\033[37m%-51s%s",
+      mode ? "\033[1;42m" : "",
+      cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
+      str, str + BNLEN + 1, str + BNLEN + 1 + BCLEN + 1,
+      mode ? "\033[m" : "");
+  }
+
+   return XO_NONE;
+}
+#endif
+
+: board.c:class_cb[]
+
+static KeyFunc class_cb[] =
+{
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, class_bar,
+#endif
+...
+
+--
+[m¢d¢e¢f¢g¢h¢f¢e¢d¢c¢b                [33m¢©  ¢¨      ¢i¢©¢¨¢i ¡´   [1;30mbbs.cis95.net[m
+[30;47m¢h¢f¢e¢c¢b¡Å¢d¢f¢g[0;35m   ©~µL©w©Òªº¶³   [33m¢ª¢i¢« ¢«¢ª ¢i¢ª¢«¢i ¡¶ ¢i¢h¢© [0;1m¹C¥Á¤§®a[m
+[1;34mÄÆ¦Û [31mcismpc19.cis.nctu.edu.tw         [0;33m¢i   ¢©¢¨ ¢i    ¢i ¢i ¢i  ¢i¡Etwbbs¡Eorg[m

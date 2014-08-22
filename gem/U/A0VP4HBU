@@ -1,0 +1,30 @@
+§@ªÌ: itoc (Wesley¬O¥Ë´µ¯W) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ¤å³¹Åª¨ì¤@¥b®É«ö [ ] ¥ýÅª§¹¸Ó½g¦A¥h§O½g
+®É¶¡: Sun Oct 19 16:03:42 2003                          Updated: 2004/11/14
+
+  ¦b¾\Åª¶W¹L¤@­¶ªº¤å³¹¡AÅª¨ì¤@¥bªº®É­Ô«ö [ ]
+  ­ì¥»·|ª½±µ°±¤î¥»½gªº¾\Åª¡A¸õ¥h¤W/¤U¤@½g¦P¥DÃDªº
+  §ï¦¨¥ý¤W/¤U¤@­¶¨ì¥»½gµ²§ô«á¡A¦A¥DÃD¦¡¾\Åª
+
+: more.c:more()
+
+-   if (key == ' ' || key == KEY_PGDN || key == KEY_RIGHT || key == Ctrl('F'))
++   if (key == ' ' || key == KEY_PGDN || key == KEY_RIGHT ||
++     key == Ctrl('F') || key == ']')
+    {
+      shift = PAGE_SCROLL;
+    }
+
+-   else if (key == KEY_PGUP || key == Ctrl('B') || key == KEY_DEL)
++   else if (key == KEY_PGUP || key == Ctrl('B') ||
++     key == KEY_DEL || key == '[')
+    {
+      if (lino <= b_lines)
+      {
+-       cmd = 'k';
++       cmd = (key == '[') ? '[' : 'k';
+        break;
+      }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

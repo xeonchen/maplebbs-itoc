@@ -1,0 +1,93 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ªO¥D¦Û¦æ§ïÅÜ¤ÀÃþ
+®É¶¡: 2004/01/02 Fri 22:40:21                           Updated: 2005/05/26
+
+  ªO¥D¥i¥H¦Û¥Ñ¦a¦b¯¸ªø­­©wªº¤ÀÃþ¤¤¸õ¨Ó¸õ¥h
+  ¥B§ï¤ÀÃþ¤]·|¶¶«K§ï (A)nnounce¡÷Class ¸Ì­±ªº¦ì¸m
+
+: manage.c ·s¼W³o¤@¬q©ó post_manage() «e­±
+
+/* ----------------------------------------------------- */
+/* ªO¥D¥\¯à : ­×§ï¤ÀÃþ                                   */
+/* ----------------------------------------------------- */
+
+
+static int
+cmphdr(hdr)
+  HDR *hdr;
+{
+  return !strcmp(hdr->xname, currboard);
+}
+
+
+static int
+post_brdclass(xo)
+  XO *xo;
+{
+#define NUM_CLASS   3   /* ­Ó¤H¤ÀÃþ¦³¤TºØ */    [1;44m// ­n´X­Ó¡A¦Û¤v§ï [m
+  int rc, i;
+  BRD *brd;
+  HDR gem;
+  char *path[NUM_CLASS] =       [1;44m// ¤ÀÃþ¦Û©w¡A°O±o­n¦b¯¸¤W¶}¬Û¹ïÀ³ªº¤ÀÃþ [m
+  {
+    "gem/@/@Apple", "gem/@/@Banana", "gem/@/@Orange"
+  };
+
+  brd = bshm->bcache + currbno;
+
+  [1;44m// ­­¨îªº³W«h¦Û©w [m
+  if (strcmp(brd->class, "­Ó¤H"))
+  {
+    vmsg("¥u¦³­Ó¤HªO¤~¯à§ïÅÜ¤ÀÃþ");
+    return XO_FOOT;
+  }
+
+  if (vans("¬O§_­×§ï¬ÝªO¤ÀÃþ(Y/N)¡H[N] ") == 'y')
+  {
+    [1;44m// ¤ÀÃþ¦W¦r¦Û©w [m
+    rc = vans("¬ÝªO¤ÀÃþ¡G(1)Ä«ªG (2)­»¿¼ (3)¾ï¤l¡H[Q] ") - '1';
+    if (rc < 0 || rc >= NUM_CLASS)
+      return XO_FOOT;
+
+    if (vans(msg_sure_ny) == 'y')
+    {
+      /* §R°£ÂÂªº¤ÀÃþ */
+      for (i = 0; i < NUM_CLASS; i++)
+      {
+        /* ¤w§ä¨ìÂÂ¤ÀÃþ¡A´N¤£»Ý­nÄ~Äò§ä¨ä¥L¤ÀÃþ */
+        if (!rec_del(path[i], sizeof(HDR), 0, cmphdr))
+          break;
+      }
+
+      /* ¥[¤J·sªº¤ÀÃþ¨Ã±Æ§Ç */
+      brd2gem(brd, &gem);
+      rec_add(path[rc], &gem, sizeof(HDR));
+      rec_sync(path[rc], sizeof(HDR), cmphdr, NULL);
+
+      vmsg("¬ÝªO¤ÀÃþ¤w­×§ï¦¨¥\\¡A¤@¤p®É«á±N©ó¤ÀÃþ¸s²Õ¤¤§ó·s");
+    }
+  }
+
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+    "Manager ¼W´î°ÆªO¥D",
++   "Class   §ïÅÜ¤ÀÃþ",
+
+  ...
+
+- char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO"
++ char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO (C)¤ÀÃþ"
+
+  ...
+
+  case 'm':
+    return post_changeBM(xo);
+
++ case 'c':
++   return post_brdclass(xo);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

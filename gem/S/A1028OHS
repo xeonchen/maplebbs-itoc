@@ -1,0 +1,17 @@
+§@ªÌ: Dopin (ats.twbbs.org) ¬ÝªO: WD_QUESTION
+¼ÐÃD: Re: [°ÝÃD] ¤@³¡¾÷¾¹¤W¬[¨â­Ó bbs
+®É¶¡: Fri Jun  6 17:24:06 2003                          Updated: 2003/06/06
+
+¡° ¤Þ­z¡mdinos.bbs@wdbbs.net (¬y®öº~)¡n¤§»Ê¨¥¡G
+: °²³]§Ú¦³ a.a.a.a ©M b.b.b.b ¨â­Ó¤£¦Pªº ip
+: ¨º¯à¤£¯à¦b¦P¤@³¡¾÷¾¹¤W¬[ Abbs & BBBS¡H
+: telnet a.a.a.a 23 ®É¶i¤J ABBS
+: telnet b.b.b.b 23 ®É¶i¤J BBBS
+: ³Â·Ð«üÂI¤@¤U~~~
+
+´£¥Ü 1. °ò¥»¤W§Q¥Î struct sockaddr_in
+´£¥Ü 2. ·|¥Î¨ì getsockname
+´£¥Ü 3. ·|¥Î¨ì inet_ntoa()
+
+--
+[1;36m¡°Post by [37mDopin         [36mfrom [33m210.68.39.15            [m

@@ -1,0 +1,562 @@
+§@ªÌ: chwaian (µL¨¥) ¬ÝªO: itoc
+¼ÐÃD: Re: ·Q½Ð°Ý¦³°µ½ä½Lªº¯¸ªø
+®É¶¡: 2004/08/23 Mon 20:20:27                           Updated: 2005/06/08
+
+: src/game/Makefile
+
+SO =    .... [1;33mbet.so[m
+
+: src/game/ ©³¤U¼W¥[³o°¦µ{¦¡
+
+/*-------------------------------------------------------*/
+/* so/bet.c         ( NTHU CS MapleBBS Ver 3.00 )        */
+/*-------------------------------------------------------*/
+/* target : ºÆ¨g½ä½L (­ì¦W:¤Uª`¹CÀ¸)                     */
+/* create :   /  /                                       */
+/* update :   /  /                                       */
+/* author : dsyan.bbs@Forever.twbbs.org                  */
+/*          weiren@weiren.net                            */
+/*-------------------------------------------------------*/
+
+#if 0
+   ­ìºc·Q¤Îµ{¦¡¥Ñ dsyan ´£¨Ñ¤Î¼¶¼g..
+   «á¸g weiren §ï¼g³¡¤À¬[ºc±o¦¹µ{¦¡..
+   ¦³¥ô¦ó°ÝÃD©Î«ØÄ³Åwªï»P³o¨â¦ì³sµ¸.. :)
+
+   dsyan ¬O¤Ñªø¦a¤[(Forever.twbbs.org) ªº¯¸ªø
+   =>dsyan.bbs@Forever.twbbs.org
+   weiren ¬O¯îÂÕ¤Æ¹Ò (weird.twbbs.org.tw) ªº¯¸ªø
+   =>http://www.weiren.net/
+   =>weiren@weiren.net
+#endif
+
+
+#include "bbs.h"
+
+#define maxboard    40
+#define newgame     5           /* ³Ì«á¶}ªº´X½L­nÅÜ¦â */
+#define LOCK_FILE   "etc/game/bet/bet.lock"
+
+
+static void
+add_post(brdname, fpath, title) /* µo¤å¨ì¬ÝªO */
+  char *brdname;                /* ±ý post ªº¬ÝªO */
+  char *fpath;                  /* ÀÉ®×¸ô®| */
+  char *title;                  /* ¤å³¹¼ÐÃD */
+{
+  HDR hdr;
+  char folder[64];
+
+  brd_fpath(folder, brdname, FN_DIR);
+  hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
+  strcpy(hdr.owner, STR_SYSOP);
+  strcpy(hdr.nick, SYSOPNICK);
+  strcpy(hdr.title, title);
+  hdr.xmode = POST_MARKED;
+  rec_bot(folder, &hdr, sizeof(HDR));
+
+  btime_update(brd_bno(brdname));
+}
+
+
+int
+main_bet()
+{
+  char i, j, k, num, cc[51], userid[IDLEN + 1];
+  char buf[80], fpath[64], cho[9][51];
+  int t[maxboard], money, tmp, phh, a, b, newbet[newgame];
+  int turn = 0, ch_color;
+  char ch;
+  time_t set_time, close_time;
+  FILE *fs, *fss;
+
+  if (HAS_STATUS(STATUS_COINLOCK))
+  {
+    vmsg(msg_coinlock);
+    return XEASY;
+  }
+
+  more("etc/game/bet/bet.welcome", NULL);
+  if (fss = fopen("etc/game/bet/bet.new", "r"))
+  {
+    for (j = 0; j < newgame; j++)
+      fscanf(fss, "%d\n", &newbet[j]);
+    fclose(fss);
+  }
+
+  while (-1)
+  {
+    vs_bar("ºÆ¨g½ä½L");
+
+    if (dashf(LOCK_FILE))
+    {
+      vmsg("µo¿ú®É¶¡°±¤î¤Uª`");
+      return 0;
+    }
+
+    do
+    {
+      move(1, 0);
+      outs("\033[44;1m½s¸¹  ³æ  »ù           ¶µ    ¥Ø    ±Ô    ­z ¶} §½ ªÌ"
+        "   ©|¦³´X¤p®É  \033[m\n");
+      fs = fopen("etc/game/bet/bet.list", "r");
+      if (turn == 0)
+        tmp = 0;
+      else
+      {
+        tmp = 20;
+        for (k = 0; k < 20; k++)
+        {
+          fscanf(fs, "%d %ld %s\n", &t[i], &close_time, userid);
+          fgets(buf, 60, fs);
+        }
+      }
+      for (i = tmp; i < 20 + tmp; i++)
+      {
+        fscanf(fs, "%d %ld %s\n", &t[i], &close_time, userid);
+        fgets(buf, 60, fs);
+        j = strlen(buf) - 1;
+        buf[j] = 0;
+        a = (close_time - time(0)) / 3600 / 24;
+        b = (close_time - time(0)) / 3600 % 24;
+
+        ch_color = 0;
+        for (j = 0; j < newgame; j++)
+        {
+          if (newbet[j] == i + 1)
+            ch_color = 1;
+        }
+
+        if (t[i])
+        {
+          sprintf(fpath, "etc/game/bet/bet.ans%d", i + 1);
+          if (fss = fopen(fpath, "r"))
+          {
+            fclose(fss);
+            prints("\033[35;1m %2d    %5d  %-40s %-12s [µ¥«Ýµo¿ú]\033[m\n",
+              i + 1, t[i], buf, userid);
+          }
+          else if (close_time - time(0) > 0)
+            prints("\033[%d;1m %2d    %5d  %-40s %-12s %2d¤Ñ%2d¤p®É\033[m\n",
+              ch_color ? 37 : 32, i + 1, t[i], buf, userid, a, b);
+          else
+            prints("\033[32;1m %2d    %5d  %-40s %-12s     [«Ê½L]\033[m\n",
+              i + 1, t[i], buf, userid);
+        }
+        else
+          prints("\033[31;1m %2d    -----      ©|¥¼¦³¤H¶}§½\033[m\n", i + 1);
+      }
+      fclose(fs);
+      move(22, 0);
+      clrtoeol();
+      prints("\033[1;44;37m«öÁä»¡©ú: [n]¤U¤@­¶ [p]¤W¤@­¶ [b]¤Uª`/¶}®à/¶}½L "
+        "[q]Â÷¶}  ª÷¹ô: %10d     \033[m", cuser.gold);
+      do
+      {
+        ch = igetch();
+      } while (ch != 'q' && ch != 'n' && ch != 'p' && ch != 'b');
+      if (ch == 'q')
+        return 0;
+      if (ch == 'n')
+        turn = 1;
+      if (ch == 'p')
+        turn = 0;
+      j = 0;
+      if (ch == 'b')
+      {
+        vget(22, 0, "½Ð¿é¤J 1-40 ©Îª½±µ«ö Enter Â÷¶}¡G", cc, 3, DOECHO);
+        j = atoi(cc);
+      }
+    } while (!j || j > maxboard || j < 1);
+
+
+    if (dashf(LOCK_FILE))
+    {
+      vmsg("µo¿ú®É¶¡°±¤î¤Uª`");
+      return 0;
+    }
+
+    if (t[j - 1])                /* ¤w¦³¤H¶}§½ */
+    {
+      fs = fopen("etc/game/bet/bet.list", "r");
+      for (i = 0; i < j; i++)
+      {
+        fscanf(fs, "%d %ld %s\n", &t[i], &close_time, userid);
+        fgets(buf, 60, fs);
+      }
+      fclose(fs);
+      if (close_time < time(0))        /* ®É¶¡¨ì */
+      {
+        sprintf(fpath, "etc/game/bet/bet.ans%d", j);
+        if (dashf(fpath))
+        {
+          vmsg("µ²ªG¤w¤½§G..¼úª÷±N©ó©ú¤Ñ 6:30am µo©ñ..:)");
+        }
+        else if (strcmp(userid, cuser.userid))
+        {
+          sprintf(buf, "¤Uª`´Á­­¤w¨ì..µ¥«Ý %s ¶}§½..", userid);
+          vmsg(buf);
+        }
+        else
+        {
+          int ch[9], all = 0;
+
+          vs_bar("ºÆ¨g½ä½L");
+          prints("\n\n\033[44;1m  ±m²¼¼Æ    ­¿²v      ±Ô  ­z"
+            "           \033[m\n\n");
+          sprintf(fpath, "etc/game/bet/bet.cho%d", j);
+          fs = fopen(fpath, "r");
+          fscanf(fs, "%d\n%d\n", &tmp, &all);
+          for (i = 0; i < tmp; i++)
+          {
+            long xx;
+            fgets(cho[i], 250, fs);
+            fscanf(fs, "%d\n", &ch[i]);
+            xx = all * 100 / ch[i];
+            prints("%d)%6d   %3d.%-2d   %s",
+              i + 1, ch[i], xx / 100, xx % 100, cho[i]);
+          }
+          fclose(fs);
+          sprintf(buf, "½Ð¿é¤J³Ì«áªºµ²ªG(1-%d)©Îª½±µ«ö EnterÂ÷¶}¡G", tmp);
+          move(20, 0);
+          prints("\033[1;31mª`·N¡G¶Ã¶}½LªÌ¡A±N³B¥H°±Åv»Pª÷¿úÂk¹sªº³B¤À\033[m");
+          vget(22, 0, buf, cc, 3, DOECHO);
+          num = atoi(cc);
+
+          if (dashf(LOCK_FILE))
+          {
+            vmsg("µo¿ú®É¶¡°±¤î¤Uª`");
+            return 0;
+          }
+          if (num <= tmp && num >= 1)
+          {
+            if (vans(msg_sure_ny) == 'y')
+            {
+              char fpath[64], title[30], fname[60];
+
+              if (dashf(LOCK_FILE))
+              {
+                vmsg("µo¿ú®É¶¡°±¤î¤Uª`");
+                return 0;
+              }
+
+              sprintf(fpath, "etc/game/bet/bet.ans%d", j);
+              fss = fopen(fpath, "w");
+              fprintf(fss, "%d", num);
+              fclose(fss);
+
+              sprintf(fpath, "tmp/addpost.tmp%d", j);
+              sprintf(fname, "etc/game/bet/bet.betlog%d", j);
+
+              if (fss = fopen(fpath, "w"))
+              {
+                sprintf(title, "½L¸¹[%d] «Ê½Lµ²ªG", j);
+
+                fprintf(fss, "%s %s (%s) %s %s\n", STR_AUTHOR1, STR_SYSOP,
+                  SYSOPNICK, STR_POST2, BN_BET);
+                fprintf(fss, "¼ÐÃD: %s\n®É¶¡: %s\n\n", title, Now());
+
+                fprintf(fss, "\n[¶}¼úµ²ªG]¡G%d\n", num);
+                fprintf(fss, "\n--\n¡° ©³¤U¬°¦¹¦¸¤Uª`ª¬ªp¡A"
+                  "©ú¤Ñ¦­¤W6:30±Nµo©ñ¼úª÷\n\n\n");
+
+                f_suck(fss, fname);
+
+                fclose(fss);
+                add_post(BN_BET, fpath, title);
+                unlink(fpath);
+                unlink(fname);
+              }
+            }
+          }
+        }
+      }
+      else
+      {
+        sprintf(fpath, "etc/game/bet/bet.scr%d", j);
+        more(fpath, NULL);
+
+        while (1)
+        {
+          int ch[9], all = 0, hhall = 0;
+
+          vs_bar("ºÆ¨g½ä½L");
+          prints("\n\n\033[44;1m  ±m²¼¼Æ       ­¿²v      ±Ô  ­z"
+            "           \033[m\n\n");
+          sprintf(fpath, "etc/game/bet/bet.cho%d", j);
+          fs = fopen(fpath, "r");
+          fscanf(fs, "%d\n%d\n", &tmp, &all);
+          for (i = 0; i < tmp; i++)
+          {
+            int hh = 0;
+            long xx;
+            fgets(cho[i], 250, fs);
+            fscanf(fs, "%d\n", &ch[i]);
+            sprintf(fpath, "etc/game/bet/bet.cho%d.%d", j, i + 1);
+            if (fss = fopen(fpath, "r"))
+            {
+              char id[13];
+              phh = 0;
+              while (fscanf(fss, "%s %d\n", id, &hh) != EOF)
+              {
+                if (!strcmp(id, cuser.userid))
+                {
+                  phh += hh;
+                  hhall += hh;
+                }
+              }
+              fclose(fss);
+            }
+            else
+              hh = 0;
+            xx = all * 100 / ch[i];
+            prints("%2d)%4d/%4d   %3d.%-2d   %s",
+              i + 1, phh, ch[i], xx / 100, xx % 100, cho[i]);
+          }
+          fclose(fs);
+          prints("\n¥þ>%4d/%4d\n", hhall, all);
+          prints("\n¥»§½Á`½äª÷: \033[1;36m%d\033[m ³æ±i½ä²¼»ù®æ: %d",
+            all * t[j - 1], t[j - 1]);
+
+          sprintf(buf, "½Ð¿é¤J§Aªº¿ï¾Ü(1-%d)©Î«ö q ¸õ¥X¡G", tmp);
+          vget(20, 0, buf, cc, 2, DOECHO);
+          if (dashf(LOCK_FILE))
+          {
+            vmsg("µo¿ú®É¶¡°±¤î¤Uª`");
+            return 0;
+          }
+          if (cc[0] == 'q')
+            break;
+          num = cc[0] - 48;
+          if (num > tmp || num < 1)
+            vmsg("¿é¤J½d³ò¦³»~!!½Ð­«·s¿é¤J..");
+          else
+          {
+            sprintf(buf, "¤@±i±m¨éª÷¹ô%d¤¸¡A§A¥Ø«e¦³ª÷¹ô%d¤¸¡A"
+              "­n¶R´X±i¡H(0-%d)",
+              t[j - 1], cuser.gold, cuser.gold / t[j - 1]);
+            vget(21, 0, buf, cc, 6, DOECHO);
+            if (dashf(LOCK_FILE))
+            {
+              vmsg("µo¿ú®É¶¡°±¤î¤Uª`");
+              return 0;
+            }
+            if (atoi(cc) > cuser.gold / t[j - 1] || !atoi(cc) ||(atoi(cc) < 1))
+              vmsg("¿é¤J½d³ò¦³»~!!¨ú®ø..");
+            else
+            {
+              int hh = 0;
+              if (close_time < time(0))
+              {
+                vmsg("¶W¹L®É¶¡¤F!");
+                return 0;
+              }
+              cuser.gold -= (atoi(cc) * t[j - 1]);
+              sprintf(fpath, "etc/game/bet/bet.cho%d", j);
+              fs = fopen(fpath, "r");
+              fscanf(fs, "%d\n%d\n", &tmp, &all);
+              for (i = 0; i < tmp; i++)
+              {
+                fgets(cho[i], 250, fs);
+                fscanf(fs, "%d\n", &ch[i]);
+              }
+              fclose(fs);
+              ch[num - 1] += atoi(cc);
+              all += atoi(cc);
+              fs = fopen(fpath, "w");
+              fprintf(fs, "%d\n%d\n", tmp, all);
+              for (i = 0; i < tmp; i++)
+              {
+                char g = strlen(cho[i]) - 1;
+                cho[i][g] = 0;
+                fprintf(fs, "%s\n%d\n", cho[i], ch[i]);
+              }
+              fclose(fs);
+              sprintf(fpath, "etc/game/bet/bet.cho%d.%d", j, num);
+              fs = fopen(fpath, "a");
+              fprintf(fs, "%s %d\n", cuser.userid, atoi(cc));
+              fclose(fs);
+
+              sprintf(fpath, "etc/game/bet/bet.betlog%d", j);
+              sprintf(buf, "¨Ï¥ÎªÌ%s¶R¤F%d±i%d¸¹¿ï¶µ(%s)\n",
+                cuser.userid, atoi(cc), num, Now());
+              f_cat(fpath, buf);
+            }
+          }
+        }
+      }
+    }
+    else    /* ¦Û¤v¶}§½ */
+    {
+      int khour, kd;
+
+      more("etc/game/bet/bet.anno", NULL);
+
+      if (vans("½T©w­n¶}§½(Y/N)¡H[N] ") != 'y')
+        continue;
+
+      if (dashf(LOCK_FILE))
+      {
+        vmsg("µo¿ú®É¶¡°±¤î¤Uª`");
+        return 0;
+      }
+
+      sprintf(cc, "tmp/%s_bet.scr", cuser.userid);
+      vmsg("½Ð«ö¥ô¤@Áä¶}©l½s¿è¦¹¦¸ [¶}§½©v¦®]");
+      if (vedit(cc, 0) < 0)
+        continue;
+
+      vs_bar("ºÆ¨g½ä½L");
+      vget(2, 0, "½Ð¶ñ°±ª`®É¶¡´X¤p®É«á(¤Q¦ì¼Æ­n¸É0¡A0½Ð¿é¤J00¡A"
+        "1½Ð¿é¤J01¡A¥H¦¹Ãþ±À)¡G", buf, 3, DOECHO);
+      khour = (buf[0] - '0') * 10 + (buf[1] - '0');
+      vget(3, 0, "½Ð¶ñ°±ª`®É¶¡¤Ñ«á(¤Q¦ì¼Æ­n¸É0¡A0½Ð¿é¤J00¡A"
+        "1½Ð¿é¤J01¡A¥H¦¹Ãþ±À)¡G", buf, 3, DOECHO);
+      kd = (buf[0] - '0') * 10 + (buf[1] - '0');
+      if (khour < 10 && kd == 0)
+      {
+        vmsg("®É¶¡¹Lµu(³Ìµu 10 ¤p®É)");
+        continue;
+      }
+      if (kd > 14)
+      {
+        vmsg("®É¶¡¹Lªø(³Ìªø 14 ¤Ñ)");
+        continue;
+      }
+      if (khour > 24)
+      {
+        vmsg("®É¶¡¤£¥i¶W¹L24¤p®É");
+        continue;
+      }
+      if (kd < 0 || khour < 0)
+      {
+        vmsg("¤Q¦ì¼Æ°O±o¸É0");
+        continue;
+      }
+      set_time = time(0) + khour * 3600 + kd * 24 * 3600;
+
+      if (!vget(4, 0, "½ÐÂ²µu±Ô­z¦¹§½¡G", cc, 41, DOECHO))
+        continue;
+
+      move(5, 0);
+      outs("\033[1;31m³]©w¿ï¶µ¡A½Ðª`·N©M§½¡B¤ñÁÉ¨ú®øµ¥ª¬ªp¡A"
+        "µ´¤£¥i¨S¦³µª®×¡A³]©w«á¤£¥i§ó§ï¡C\033[m");
+
+      vget(6, 0, "¦@¦³´X­Ó¿ï¶µ¡H(2-9)", buf, 2, DOECHO);
+      tmp = atoi(buf);
+      if (tmp < 1 || tmp > 9)
+      {
+        vmsg("¿ï¶µ¼Æ¥Ø¿ù»~!!");
+        continue;
+      }
+
+      vget(7, 0, "±m¨é¤@±i¦h¤Ö¿ú¡H(100-10000)", buf, 6, DOECHO);
+      money = atoi(buf);
+      if (money < 100 || money > 10000)
+      {
+        vmsg("¿é¤Jª÷ÃB¿ù»~!!");
+        continue;
+      }
+      if (cuser.gold < money * (10 * tmp + 5))
+      {
+        sprintf(buf, "§Aªº¿ú¤£¨¬ %d ¤¸³á!!", money * (10 * tmp + 5));
+        vmsg(buf);
+        continue;
+      }
+
+      for (i = 0; i < tmp; i++)
+      {
+        move(8 + i, 0);
+        prints("¿ï¶µ%d¡G", i + 1);
+        do
+        {
+          vget(8 + i, 7, "", cho[i], 50, DOECHO);
+        } while (!cho[i][0]);
+      }
+      sprintf(buf, "etc/game/bet/bet.cho%d", j);
+      if (dashf(LOCK_FILE))
+      {
+        vmsg("µo¿ú®É¶¡°±¤î¤Uª`");
+        return 0;
+      }
+      if (dashf(buf))
+      {
+        fclose(fs);
+        vmsg("¦³¤H¤ñ§A§Ö¤@¨B¤F");
+        return 0;
+      }
+
+      if (vans("½T©w¶}½L(Y/N)¡H[N] ") != 'y')
+      {
+        sprintf(cc, "etc/game/bet/bet.scr%d", j);
+        unlink(cc);
+        sprintf(cc, "tmp/%s_bet.*", cuser.userid);
+        unlink(cc);
+        vmsg("¶}®à¨ú®ø!!");
+        return 0;
+      }
+
+      fs = fopen(buf, "w");
+      fprintf(fs, "%d\n%d\n", tmp, tmp * 10);
+      for (i = 0; i < tmp; i++)
+      {
+        fprintf(fs, "%s\n10\n", cho[i]);
+        sprintf(buf, "etc/game/bet/bet.cho%d.%d", j, i + 1);
+        fss = fopen(buf, "a+");
+        fprintf(fss, "%s %d\n", cuser.userid, 10);
+        fclose(fss);
+      }
+      fclose(fs);
+
+      if (fss = fopen("etc/game/bet/bet.new", "r"))
+      {
+        for (i = 0; i < newgame; i++)
+          fscanf(fss, "%d\n", &newbet[i]);
+        fclose(fss);
+      }
+      if (fss = fopen("etc/game/bet/bet.new", "w"))
+      {
+        fprintf(fss, "%d\n", j);
+        for (i = 0; i < newgame - 1; i++)
+          fprintf(fss, "%d\n", newbet[i]);
+        fclose(fss);
+      }
+
+      cuser.gold -= (money * (10 * tmp + 5));
+      close_time = set_time;
+      fs = fopen("etc/game/bet/bet.list", "r");
+      fss = fopen("etc/game/bet/bet.list.w", "w");
+      for (i = 0; i < maxboard; i++)
+      {
+        if (i + 1 == j)
+        {
+          fgets(buf, 60, fs);
+          fgets(buf, 60, fs);
+          fprintf(fss, "%d %ld %s\n", money, close_time, cuser.userid);
+          fprintf(fss, "%s\n", cc);
+        }
+        else
+        {
+          fgets(buf, 60, fs);
+          fprintf(fss, buf);
+          fgets(buf, 60, fs);
+          fprintf(fss, buf);
+        }
+      }
+      fclose(fs);
+      fclose(fss);
+      f_mv("etc/game/bet/bet.list.w", "etc/game/bet/bet.list");
+
+      sprintf(buf, "tmp/%s_bet.scr", cuser.userid);
+      sprintf(fpath, "etc/game/bet/bet.scr%d", j);
+      f_mv(buf, fpath);
+      sprintf(fpath, "tmp/%s_bet.*", cuser.userid);
+      unlink(fpath);
+      vmsg("¶}®à§¹¦¨!!");
+    }
+  }
+}
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mchwaian [30m±q [36m218-171-119-168.dynamic.hinet.net [30mµoªí[m

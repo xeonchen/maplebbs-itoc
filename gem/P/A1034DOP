@@ -1,0 +1,56 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¢Û¢é¢ø¢ô¢í¡Ð¢ñ¢ü¢÷¢ë) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¯¸ÄÖ²Î­p¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/01/31 Sat 13:54:15)                Updated: 2005/06/11
+
+  ²Î­p¥þ¯¸ªº±b¸¹±q«Ø¥ß¨ì²{¦bªº®É¶¡¡A¨Ã¥B±Æ§Ç¦L¥X¡I
+
+  ¿é¥Xµ²ªG¥i¥H¦b¢Ð¢Ð¢á¯¸¤ºªººëµØ°Ï«Ø¥ß¸ê®Æ -topage ¨Ó¾\Åª¡C
+
+: src/util/topusr.c
+
+#define OUTFILE_TOPLOGIN BBSHOME"/gem/@/@-toplogin"
++ #define OUTFILE_TOPAGE  BBSHOME"/gem/@/@-topage"
+
+
+: src/util/topusr.c
+
+static DATA toplogins[TOPNUM], topposts[TOPNUM], ...;
++ static DATA topage[TOPNUM],
++ static time_t now;
+
+: src/util/topusr.c:topusr()
+
+  if ((p = findmin(&toplogins))->num < acct->numlogins)
+  {
+    str_ncpy(p->userid, acct->userid, sizeof(p->userid));
+    str_ncpy(p->username, acct->username, sizeof(p->username));
+    p->num = acct->numlogins;
+  }
+
++ if ((p = findmin(&topage))->num < (now - acct->firstlogin))
++ {
++   str_ncpy(p->userid, acct->userid, sizeof(p->userid));
++   str_ncpy(p->username, acct->username, sizeof(p->username));
++   p->num = (now - acct->firstlogin) / 86400;
++ }
+
+
+: src/util/topusr.c:main()
+
+  char c;
+  int year, month, day;
+- time_t now;
+  struct tm *ptime;
+
+  ...
+  ...
+
+  qsort(toplogins, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_TOPLOGIN, "¤W¯¸¦¸¼Æ±Æ¦æº]", &toplogins);
+
++ qsort(topage, TOPNUM, sizeof(DATA), sort_compare);
++ write_data(OUTFILE_TOPAGE, "µù¥U¸ê¾ú¦Ñ¤Hº]", &topage);
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m218-170-141-39.HINET-IP.hinet.net [30mµoªí[m

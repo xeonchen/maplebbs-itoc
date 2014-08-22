@@ -1,0 +1,62 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ªO¥D§ïÅÜ¬ÝªO¤ÀÃþ
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/01/10 Sat 10:26:12)                Updated: 2005/05/26
+
+¡° ¤Þ­z¡mTitan.bbs@KH.twbbs.org (Âû±Æ¬ü¤Ö¤k)¡n¤§»Ê¨¥¡G
+>         ¥i¥H°µ¨ìÅýªO¥D¦Û¤v§ïÅÜ¬ÝªO¤ÀÃþ¶Ü¡H
+>         ´N¬OÃþ¦ü"­Ó¤H"§ï¦¨"¹ÎÅé"³o¼Ë...
+>         ¥u¦³±Ô­zÅÜ¦Ó¤w¡A¤£»Ý­n§ïÅÜ¦ì¸m
+>         ºëµØ°Ï¦³´£¨ì¥i¥H§ïÅÜ¤ÀÃþÃC¦â¡A¤£¹L¦n¹³¨S¬Ý¨ì¥i¥H§ï¤ÀÃþ
+
+  ¥u§ï¤ÀÃþ±Ô­z¡A¤£§ï (A)nnounce¡÷Class ¸Ì­±ªº¦ì¸m
+
+: manage.c ·s¼W³o¤@¬q©ó post_manage() «e­±
+
+/* ----------------------------------------------------- */
+/* ªO¥D¥\¯à : ­×§ï¤ÀÃþ                                   */
+/* ----------------------------------------------------- */
+
+static int
+post_brdclass(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  if (vans("¬O§_­×§ï¬ÝªO¤ÀÃþ(Y/N)¡H[N] ") == 'y')
+  {
+    vget(b_lines, 0, "¬ÝªO¤ÀÃþ¡G", newbrd.class, BCLEN + 1, GCARRY);
+
+    if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+    {
+      memcpy(oldbrd, &newbrd, sizeof(BRD));
+      rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    }
+  }
+
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+    "Manager ¼W´î°ÆªO¥D",
++   "Class   §ïÅÜ¤ÀÃþ",
+
+  ...
+
+- char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO"
++ char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO (C)¤ÀÃþ"
+
+  ...
+
+  case 'm':
+    return post_changeBM(xo);
+
++ case 'c':
++   return post_brdclass(xo);
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

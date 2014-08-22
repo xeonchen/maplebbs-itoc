@@ -1,0 +1,62 @@
+µo«H¤H: gaod.bbs@bbs.hychen.org (¶³²H­·²M) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]Ãö©óchatroom
+µo«H¯¸: ¬P±¡©]»y (2006/07/18 Tue 01:35:35)                Updated: 2006/07/18
+
+¡° ¤Þ­z¡mbillyjmj.bbs@bbs.wretch.cc (ºñ¯ù¥b¿})¡n¤§»Ê¨¥¡G
+> ½Ð°Ý...
+> 1. ¦b¿Ã¹õªº¦æ¼Æº¡¤F¤§«á, ­Y§Æ±æ«á­±¿é¤Jªº¦r¬O¤@ª½¦b³Ì¤U­±­n«ç»ò§ï©O?
+
+: src/so/chat.c:printchatline() §ï¦¨³o¼Ë
+
+static void
+printchatline(msg)
+  char *msg;
+{
+  int line;
+  extern screenline *cur_slp;
+
+  line = chatline;
+  move(line, 0);
+  clrtoeol();
+  outs(msg);
+  outc('\n');
+
+  if (frec)
+    fprintf(frec, "%s\n", msg);
+
+  if (fmail)
+    fprintf(fmail, "%s\n", msg);
+
+  if (++line == stop_line)
+  {
+    int i;
+    screenline *last_slp;
+
+    line--;
+    move(i = 2, 0);
+    last_slp = cur_slp;
+
+    while (++i <= line)
+    {
+      move(i, 0);
+      memcpy(last_slp, cur_slp, sizeof(screenline));
+      last_slp->smod = 0;
+      last_slp->emod = 255;
+      last_slp->oldlen = 255;
+      last_slp->mode = SL_MODIFIED;
+      last_slp = cur_slp;
+    }
+  }
+
+  move(line, 0);
+  clrtoeol();
+  outs("\033[0m¡÷");
+  clrtoeol();
+  chatline = line;
+}
+
+³o¬O§Ú³oÃäªº¼gªk
+
+--
+[1;32m¡° Origin: [33m¬P±¡©]»y [37m<bbs.hychen.org> [m
+[1;32m¡° From  : [36m125-227-8-21.dynamic.hinet.net[m

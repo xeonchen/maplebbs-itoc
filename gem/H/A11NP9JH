@@ -1,0 +1,33 @@
+µo´H§H: ssc24.bbs@cpu.tfcis.org (alt + F4 •i•H¡ÙßŒ) ¨›™O: plan
+º–  √D: [•\Ø‡] •ºª{√“¶®•\®œ•Œ™Ã§£Ø‡µn§J Coppermine Photo Gallery
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2005/11/17 Thu 21:34:21)                Updated: 2005/11/17
+
+≠n∞µ≥oΩg ≠n•˝∞µ [•\Ø‡] BBS ªP Coppermine Photo Gallery ±b∏π¶P®B
+
+: /src/daemon/bpop3d.c : cmd_user()
+
+    if (acct.userlevel & PERM_DENYLOGIN)
+    {
+      sprintf(msg, "-ERR %s denied", acct.userid);
+    }
+    else
+    {
++     if (acct.userlevel & PERM_VALID)
++     {
+        strcpy(cn->userid, acct.userid);
+        memcpy(cn->passwd, acct.passwd, PASSLEN + 1);
+        /* SoC: follow the behavior of qpopper */
+        /* sprintf(msg, "+OK Password required for %s%s", acct.userid, POP3_FQDN);
+        sprintf(msg, "+OK Password required for %s.", acct.userid);
++     }
++     else
++     {
++       sprintf(msg, "-ERR %s denied", acct.userid);
++     }
+
+--
+∞Ω¶Y®B ¨JµM≥£®S≥qπLª{√“§F ®∫bpop3d§]§£µπ•Œ ¨€√Ø¶€µM§]§£Ø‡µn§J
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m218-161-76-60.dynamic.hine[m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

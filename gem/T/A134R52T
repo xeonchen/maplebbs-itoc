@@ -1,0 +1,82 @@
+µo´H§H: maya.bbs@cpu.tfcis.org (∫ø∂Æ) ¨›™O: plan
+º–  √D: [∞QΩ◊] §jD§Â≥π≥∆•˜
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2007/05/18 Fri 17:19:36)                Updated: 2007/05/18
+
+ß⁄∑Q≠nß‚§jD™∫§Â≥π≥∆•˜¶‹rangedel¨›™O°A
+©Û¨O∞µ§F•H§U≠◊ßÔ°A¥˙∏’§F§pd°B§jD°B¶€d°A•\Ø‡¶¸•G•ø±`°A
+
+: global.h
+
+  deleted     Ø∏∞» §Â≥π¨@±œ°E∏Í∑Ω¶^¶¨ PERM_BM       PERM_SYSOP
++ rangedel    Ø∏∞» §Â≥π¨@±œ°E§j§M¶^¶¨ PERM_ALLBOARD PERM_SYSOP
+
+  ...
+  ...
+
+  #define BN_DELETED      "deleted"       /* ™O•DßR∞£™∫§Â≥π©Ò¶b¶π */
++ #define BN_RANGEDELETED "rangedel"      /* ™O•D§jD™∫§Â≥π©Ò¶b¶π */
+
+: §‚∞ ∂}™O
+
+  §‚∞ ºW•[¨›™Orangedel
+
+: post.c:delpost_movepost() ∑sºW¶π®Á¶°¶b delpost() ´·≠±
+
+static void
+delpost_movepost(xo, hdr)
+  XO *xo;
+  HDR *hdr;
+{
+  cancel_post(hdr);
+  move_post(hdr, xo->dir, 1, 1);
+}
+
+: post.c:post_rangedel(xo)
+
+- return xo_rangedel(xo, sizeof(HDR), chkpost, delpost);
++ return xo_rangedel(xo, sizeof(HDR), chkpost, delpost_movepost);
+
+: post.c:move_post()
+
+static inline int
+- move_post(hdr, folder, by_bm)
++ move_post(hdr, folder, by_bm, rangedel)
+  HDR *hdr;
+  char *folder;
+  int by_bm;
++ int rangedel;
+{
+  ...
+  ...
+
+- #ifdef HAVE_REFUSEMARK
+-   board = by_bm && !(xmode & POST_RESTRICT) ? BN_DELETED : BN_JUNK;
+- #else
+-   board = by_bm ? BN_DELETED : BN_JUNK;
+- #endif
+
++   if (by_bm)
++   {
++#ifdef HAVE_REFUSEMARK
++     if (xmode & POST_RESTRICT)
+        BN_JUNK;
++     else
++#endif
++     if (rangedel)
++       board = BN_RANGEDELETED;
++     else
++       board = BN_DELETED;
++   }
++   else
++   {
++     board = BN_JUNK;
++   }
+
+: post.c:post_delete()
+
+-     pos = move_post(hdr, xo->dir, by_BM);
++     pos = move_post(hdr, xo->dir, by_BM, 0);
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m220-133-248-167.hinet-ip.h[m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

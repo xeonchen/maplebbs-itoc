@@ -1,0 +1,51 @@
+µo«H¤H: TonyQ.bbs@bbs.wretch.cc (¨IÀq¬Oª÷) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¦³Ãö±À¤å
+µo«H¯¸: µL¦W¤p¯¸ (2007/04/27 Fri 03:29:23)                Updated: 2007/04/27
+
+¡° ¤Þ­z¡mbrucebee.bbs@cpu.tfcis.org (bruce)¡n¤§»Ê¨¥¡G
+> ¤£ª¾¹D¯à¤£¯à¦b¤@Ãä±À¤å®É
+> Åã¥Ü¥X³Ñ´X­Ó¦r ©Î³Ñ´X®æ¥b«¬??
+> ­n¤£µM¦³®É¥´¨ì³Ì«á¤~ª¾¹D¦³ÂIªø  ­n·Q¿ìªk¿@ÁY
+
+: modes.h
+
+  #define LCECHO          0x0200    /* low case echo¡A´«¦¨¤p¼g */
+  #define GCARRY          0x0400    /* ·|Åã¥Ü¤W¤@¦¸/¥Ø«eªº­È */
++ #define CTECHO          0x0800    /* Bone.070427: count echo ¥[¤Wªø«×Åã¥Ü */
+
+: visio.c:vgets()
+
+  for (;;)
+  {
++   if (echo & CTECHO)
++   {
++     move(x, 74);
++     prints("%02d/%02d", len, max - len);
++   }
+
+    move(x, y + col);
+    ch = vkey();
+
+
+: ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¦Ü©ó¥Îªk«ÜÂ²³æ¡A«h¬O§â vget() ªºªø«× -6 ¥B¥[­Ó COUNTECHO
+
+  ½d¨Ò¦p¤U¡G
+
+: post.c:post_score()
+
+- if (!vget(b_lines, 0, "½Ð¿é¤J²z¥Ñ¡G", reason, maxlen, DOECHO))
++ if (!vget(b_lines, 0, "½Ð¿é¤J²z¥Ñ¡G", reason, maxlen - 6, DOECHO | CTECHO))
+
+: bmw.c:bmw_edit()
+
+-  ch = vget(0, 0, hint, bmw->msg, 62, GCARRY);
++  ch = vget(0, 0, hint, bmw->msg, 56, GCARRY | CTECHO);
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î[37m220-134-27-68.HINET-IP.hinet.net[30m®ü[m

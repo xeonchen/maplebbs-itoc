@@ -1,0 +1,119 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¦Ï·R¦YªQ¯ñ) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¥\¯à]¾×«H¥Õ¦W³æ
+µo«H¯¸: ¤ë¤U©]·Q (Sat, 05 Jul 2003 00:24:35 +0800 (CST))  Updated: 2004/07/23
+
+  ¬Y¨Ç¤Hªº«H¥ó¬y¶q«Ü¤j¡A«Ü³ßÅw§â¯¸¥~ªº¤å³¹¡B¤p»¡¡B¤é°O³q³q±H¦^¦Û¤v«H¥ôªº
+
+  ¯¸¥x¡A°w¹ï³oÃþ¬y¶q¤j¡A¥B¯¸ªø»{¥i(³q±`¬O¨p¥æ¬Æ¦nªº)ªºid¡A¥i¥H±Ä¥ÎÃþ¦ü
+
+  mail.acl¤è¦¡³]­p¾×«H¥Õ¦W³æªº¥\¯à¡C
+
+  ¥t¥~¦³¤H³Q¾×«H«á¡A±`±`·|¸ß°Ý¬O¤£¬OPOP3©Î¬OSMTP±¾ÂI¡A¤]¯Á©ÊÅýmail.acl¦b
+
+  Announce¸Ì¦P¨B¡C
+
+  ¦b¦¬«HµL­­¦W³æ¤Wªº¡A¨Ó«H¤@«ß¤£ÀË¬d¬O§_¶W¹L½g¼Æ
+
+: global.h
+
+#define MAIL_ACLFILE    "etc/mail.acl"          /* ¦¬«H¥Õ¦W³æ */
+#define UNMAIL_ACLFILE  "etc/unmail.acl"        /* ¦¬«H¶Â¦W³æ */
++ #define UNLIMIT_ACLFILE "etc/unlimit.acl"     /* ¦¬«HµL­­¦W³æ */
+
+: bmtad.c:struct Agent
+
+typedef struct Agent
+{
+  struct Agent *anext;
+  int sock;
+  int sno;
+  int state;
+  int mode;
+  int letter;
++ int unlimit;
+  unsigned int ip_addr;
+
+: bmtad.c
+
+static ACL_t *mail_root = NULL;         /* MAIL_ACLFILE ªº acl_root */
+static ACL_t *unmail_root = NULL;       /* UNMAIL_ACLFILE ªº acl_root */
++ static ACL_t *unlimit_root = NULL;    /* UNLIMIT_ACLFILE ªº acl_root */
+
+: bmtad.c:main()
+
+  mail_root = acl_load(MAIL_ACLFILE, mail_root);
+  unmail_root = acl_load(UNMAIL_ACLFILE, unmail_root);
++ unlimit_root = acl_load(UNLIMIT_ACLFILE, unlimit_root);
+
+  ...
+  ...
+
+      if (state & SS_CONFIG)
+      {
+        state ^= SS_CONFIG;
+
+        mail_root = acl_load(MAIL_ACLFILE, mail_root);
+        unmail_root = acl_load(UNMAIL_ACLFILE, unmail_root);
++       unlimit_root = acl_load(UNLIMIT_ACLFILE, unlimit_root);
+      }
+
+: bmtad.c:mta_from()
+
+      if (!(ap->mode & (AM_VALID | AM_BBSADM)) && acl_spam(head, tail))
+      {
+        tail[-1] = '@';
+        agent_log(ap, "SPAM-M", head);
+        return NULL;
+      }
++     ap->unlimit = acl_match(unlimit_root, head, tail);
+
+      tail[-1] = '@';
+
+: bmtad.c:cmd_mail()
+
+  if (acl_spam(user, domain))
+  {
+    ap->xspam++;
+    ap->mode |= AM_SPAM;
+    agent_log(ap, "SPAM-M", ptr);
+    agent_reply(ap, "550 spam mail");
+    return;
+  }
++ ap->unlimit = acl_match(unlimit_root, user, domain);
+
+: bmtad.c:mta_mailer()
+
+  /* --------------------------------------------------- */
+  /* check E-mail address for anti-spam first            */
+  /* --------------------------------------------------- */
+
+  addr = ap->addr;
+- if ((str = strchr(addr, '@')) && str_ncmp(addr, "mailer-daemon@", 14))
++ if (!ap->unlimit && (str = strchr(addr, '@')) &&
++   str_ncmp(addr, "mailer-daemon@", 14))
+  {
+
+: admutil.c:a_xfile()
+
+    "¦¬«H¥Õ¦W³æ",
+    "¦¬«H¶Â¦W³æ",
++   "¦¬«HµL­­¦W³æ",
+
+  ...
+  ...
+
+    MAIL_ACLFILE,
+    UNMAIL_ACLFILE,
++   UNLIMIT_ACLFILE,
+
+: etc/unlimit.acl
+
+  ·s¼W¤@­Ó unlimit.acl ÀÉ®× (©Î±q BBS ¤Wªº (0)Admin¡÷(X)file §ï¤]¥i¥H)
+  ®æ¦¡©M (un)mail.acl §¹¥þ¬Û¦P
+  ¦b¦W³æ¤Wªº¦a§}¥iµL­­¨Ó«H
+
+  µù: ¦bµL­­¦W³æ¤Wªº¦a§}ÁÙ¬O­n¥ý³q¹L¶Â¥Õ¦W³æªºÀË¬d¡A
+      ©Ò¥HÁÙ¬O±o¦b¥Õ¦W³æ¤W¡A¦ý¤£¦b¶Â¦W³æ¤W
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

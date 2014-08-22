@@ -1,0 +1,96 @@
+µo«H¤H: waynesan.bbs@csc241.twbbs.org («z²Óªüªê) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] edit.c ¼e¿Ã¹õ­×¥¿
+µo«H¯¸: °g¤Û°ê«× (2004/08/17 Tue 18:23:06)                Updated: 2004/08/17
+
+¤£¾å±o·íªìedit³¡¤À¬°¦ó¨S¦³¥[¤W¼e¿Ã¹õ....
+
+¥[¤W¥h¤]¤£¿ù§a??@@a
+
+--------------------------------------------------------------------
+
+:theme.h
+
+#define FOOTER_MORE     \
+COLOR1 " ÂsÄý P.%d (%d%%) " COLOR2 " (h)»¡©ú [PgUp][PgDn][0][$]²¾°Ê (/n)·j´M (C)¼È¦s (¡öq)µ²§ô"
+
+#define FOOTER_VEDIT    \
+[1;32m![m COLOR1 " %s " COLOR2 " (^Z)»¡©ú (^W)²Å¸¹ (^L)­«Ã¸ (^X)ÀÉ®×³B²z ùø%s¢x%sùø%5d:%3d[1;32m%*s[m     \033[m"
+
+
+: edit.c:ve_outs()
+
+static void
+ve_outs(text)
+uschar *text;
+{
+  int ch;
+  uschar *tail;
+
+[1;33m-[m   tail = text + SCR_WIDTH;
+[1;33m+[m   tail = text + b_cols;
+  while (ch = *text)
+  {
+    switch (ch)
+...
+
+: edit.c:vedit()
+
+...
+
+  for (;;)
+  {
+    vln = vx_cur;
+    mode = ve_mode;
+    col = ve_col;
+[1;32m![m     /* itoc.031123.µù¸Ñ: ¦pªG¶W¹L [1;32mb_cols[m¡A¨º»ò­¶­±©¹¥kÂ½¡A¨Ã«O¯d¥ª­¶ªº³Ì«á 4 ¦r */
+[1;33m-[m     cc = (col < SCR_WIDTH) ? 0 : (col / (SCR_WIDTH - 4)) * (SCR_WIDTH - 4);
+[1;33m+[m     cc = (col < b_cols) ? 0 : (col / (b_cols - 4)) * (b_cols - 4);
+    if (cc != margin)
+    {
+      mode |= VE_REDRAW;
+      margin = cc;
+
+...
+
+        if (tmp)
+        {
+          if (mode & VE_ANSI)
+            outx(tmp->data);
+          else if (tmp->len > margin)
+            ve_outs(tmp->data + margin);
+          tmp = tmp->next;
+        }
+        else
+        {
+[1;33m-[m           outc('~');
+[1;33m+[m           prints("~%*s|", 77, "");
+        }
+      }
+#ifdef EVERY_BIFF
+      if (!(mode & VE_BIFF))
+
+...
+
+      else
+      {
+        prints(FOOTER_VEDIT,
+#ifdef EVERY_BIFF
+          mode & VE_BIFF ? "¶l®t¨Ó¤F" : "½s¿è¤å³¹",
+#else
+          "½s¿è¤å³¹",
+#endif
+          mode & VE_INSERT ? "´¡¤J" : "¨ú¥N",
+          mode & VE_ANSI ? "ANSI" : "¤@¯ë",
+[1;33m-[m         ve_lno, 1 + (mode & VE_ANSI ? pos : col));
+[1;33m+[m         ve_lno, 1 + (mode & VE_ANSI ? pos : col)[1;32m, d_cols, ""[m);
+      }
+
+
+
+--
+    [1;31m¡Z¡Z[m
+  [1;31m¡þ  [37m¡þ[34m¢v¢v¢@  [31m°g[34m¤Û[37m°ê«×[31m Charming [34mShadow [37mCountry[m
+[1;31m¢y  [37m¡þ[31m  [37m¡þ¢@  [34m¢j[33m¤J¹Ò¦ì§} csc241.twbbs.org[m
+[1;31m¢y  [37m¢@¡þ[31m  [37m¡þ  [34m¢j[32m¦ì§}¥N½X 203.71.212.241[m
+[1;31m  ¢@¡Z¡Z[37m¡þ[31m  [34m¡þ  [36m¨Ó·½¥À°ê 218-160-105-190.dynamic.hinet.net[m
+[1;31m  [4m¡þ¡@¡@[34m¢v¢v¢@[;1;31m  µoªí®É¶¡ 2004/08/17 Tue 18:21:31[m

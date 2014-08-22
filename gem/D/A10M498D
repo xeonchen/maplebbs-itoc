@@ -1,0 +1,269 @@
+µo«H¤H: tsaikd.bbs@bbs.cs.nchu.edu.tw (¤d¤H±Ù) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] window.c pans() pmsg() ¦Û°Ê½Õ¾ã¼e«×¨Ã¥i¤ä´©¦h¦æ°T®§
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/10/05 Tue 11:20:03)                Updated: 2004/12/30
+
+¾ã¦Xitoc¤j¤j [1;32m[­×¥¿] window.c pans() ¦Û°Ê½Õ¾ã¼e«×[m
+¤Î¤p§Ì¤§«eªº [1;32m[¥\¯à] window.c pmsg ¤Î pans ¥i¤ä´©¦h¦æ°T®§[m
+
+¨Ï pans() ªº title
+¤Î pmsg() ªº msg
+¥i¥H¥Î '\n' ªº¤è¦¡¨ÓÂ_¦æ¡A¦Ó¤£·|³y¦¨µe­±¿ù¶Ã
+
+: maple/window.c
+
++ #define COLOR_POPMENU_HEADER  "\033[1;37;44m" /* ¿ï³æ¼ÐÃDÃC¦â */
++ #define COLOR_POPMENU_BODY    "\033[32;40m"   /* ¿ï³æ¤º¤åÃC¦â */
+
+static screenline slt[t_lines];
+static int x_roll;
++ static int desc_maxlen;           /* ³Ìªø¿ï¶µªºªø«× */
+
+
+: maple/window.c : pans()
+
+int             /* ¶Ç¦^¤p¼g¦r¥À©Î¼Æ¦r */
+pans(x, y, title, desc)
+  int x, y;             /* -1: ¦Û°Ê§ä¥Xµe­±¤¤¤ß¨Ó©ñ menu */
+  char *title;
+  char *desc[];
+{
+  int cur, old_cur, max, ch;
+  char hotkey;
+
++ /* §ä¥X title ¤Î desc ¤¤³Ìªøªºªø«× */
++ char buf[512];        /* tsaikd.041005: title ¥i¯à¦³¦n´X¦æ */
++ char *tmp;
++
++ strcpy(buf, title);
++ desc_maxlen = strlen(strtok(buf, "\n"));
++ while (tmp = strtok(NULL, "\n"))
++   desc_maxlen = (desc_maxlen > strlen(tmp)) ? desc_maxlen : strlen(tmp);
++ for (ch = 1; desc[ch]; ch++)
++ {
++   if (desc_maxlen < strlen(desc[ch]))
++     desc_maxlen = strlen(desc[ch]);
++ }
++ desc_maxlen += (desc_maxlen % 2) + 2;       /* ÅÜ¦¨°¸¼Æ */
+
+  x_roll = vs_save(slt);
+
+  hotkey = desc[0][0];
+
++ /* tsaikd.041007: ¦Û°Ê§ä¦ì¸m */
++ if (x < 0)
++   x = (b_lines - 4 - ch) / 2;
++ if (y < 0)
++   y = (b_cols - 12 - desc_maxlen) / 2;
+
+  /* µe¥X¾ã­Ó¿ï³æ */
+  max = draw_menu(x, y, title, desc, hotkey, &cur);
+...
+...
+
+    if (old_cur != cur)         /* ´å¼ÐÅÜ°Ê¦ì¸m¤~»Ý­n­«Ã¸ */
+    {
++     int i, shift;
++     shift = 0;
++     for (i = 0; i < strlen(title); i++)
++     {
++       if (title[i] == '\n')
++         shift++;
++     }
++     draw_item(x + old_cur + shift, y, desc[old_cur], hotkey, 0);
++     draw_item(x + cur + shift, y, desc[cur], hotkey, 1);
+-     draw_item(x + old_cur, y, desc[old_cur], hotkey, 0);
+-     draw_item(x + cur, y, desc[cur], hotkey, 1);
+      old_cur = cur;
+      /* Á×§K¦b°»´ú¥ª¥kÁä¥þ§Î¤U¡A«ö¥ªÁä·|¸õÂ÷¤G¼h¿ï³æªº°ÝÃD */
+      move(b_lines, 0);
+    }
+
+
+: maple/window.c : ­«¼g draw_menu()
+
+static int      /* ¦^¶ÇÁ`¦@¦³´X­Ó¿ï¶µ */
+draw_menu(x, y, title, desc, hotkey, cur)
+  int x, y;
+  char *title;
+  char *desc[];
+  char hotkey;
+  int *cur;     /* ¦^¶Ç¹w³]­È©Ò¦b¦ì¸m */
+{
+  int i, meet;
+  char buf[128];
+
+  /* tsaikd.041005: title ³Ì¤j¥i¥H©ñ¤­¦æ¡A³Ì«á¤@­Ó¥²»Ý¬O NULL */
+  char *ptitle[5 + 1], buf_title[512];
+
+  /* tsaikd.041005: §â title ¤À¦æ */
+  strcpy(buf_title, title);
+  ptitle[0] = strtok(buf_title, "\n");
+  for (i = 0; i < 5; i++)
+  {
+    if (!(ptitle[i] = strtok(NULL, "\n")))
+      break;
+  }
+  ptitle[i] = NULL;     /* tsaikd.041005: ³Ì«á¤@­Ó¥²»Ý¬O NULL */
+
+  /* tsaikd.041005: µe¥X¤WÃä½u */
+  strcpy(buf, " ¢~");
+  for (i = -6; i < desc_maxlen; i += 2)
+    strcat(buf, "¢w");
+  strcat(buf, "¢¡ ");
+  draw_line(x++, y, buf);
+
+  /* tsaikd.041005: ¦L¥X title */
+  for (i = 0; ptitle[i]; i++)
+  {
+    /* tsaikd.041005: ­É¥Î meet */
+    meet = ptitle[1] ? desc_maxlen : 
+      strlen(ptitle[i]) + (strlen(ptitle[i]) % 2);
+    sprintf(buf, " ¢x" COLOR_POPMENU_HEADER "  %*s%-*s   \033[m¢x ",
+      (desc_maxlen-meet) >> 1 + 1, " ",
+      (desc_maxlen+meet) >> 1, ptitle[i]);
+    draw_line(x++, y, buf);
+  }
+
+  /* tsaikd.041005: µe¥X title »P¿ï¶µªº¤À¹j½u */
+  strcpy(buf, " ¢u");
+  for (i = -6; i < desc_maxlen; i += 2)
+    strcat(buf, "¢w");
+  strcat(buf, "¢t ");
+  draw_line(x++, y, buf);
+
+  /* tsaikd.041005: ¦L¥X¿ï¶µ */
+  for (i = 1; desc[i]; i++)
+  {
+    meet = (desc[i][0] == hotkey);
+    draw_item(x++, y, desc[i], hotkey, meet);
+    if (meet)
+      *cur = i;
+  }
+  meet = i;
+
+  /* tsaikd.041005: µe¥X¤UÃä½u */
+  strcpy(buf, " ¢¢");
+  for (i = -6; i < desc_maxlen; i += 2)
+    strcat(buf, "¢w");
+  strcat(buf, "¢£ ");
+  draw_line(x, y, buf);
+
+  /* Á×§K¦b°»´ú¥ª¥kÁä¥þ§Î¤U¡A«ö¥ªÁä·|¸õÂ÷¤G¼h¿ï³æªº°ÝÃD */
+  move(b_lines, 0);
+
+  return meet - 1;
+}
+
+: maple/window.c : draw_item()
+
+-  sprintf(buf, " ¢x%s%c %c%c%c%-25s  \033[m¢x ",
+-    mode ? COLOR4 : "\033[30;47m", mode ? '>' : ' ',
+-    (hotkey == *desc) ? '[' : '(', *desc,
+-    (hotkey == *desc) ? ']' : ')', desc + 1);
++  sprintf(buf, " ¢x%s%s %c%c%c%-*s  \033[m¢x ",
++    mode ? COLOR4 : COLOR_POPMENU_BODY, mode ? "¡÷" : "  ",
++    (hotkey == *desc) ? '[' : '(', *desc,
++    (hotkey == *desc) ? ']' : ')', desc_maxlen - 1, desc + 1);
+
+
+: maple/windows.c : pmsg()
+
+int
+pmsg(msg)
+  char *msg;            /* ¤£¥i¬° NULL */
+{
+  int len, x, y, i;
+- char buf[80];
++ char buf[512];
++ char *pbuf;   /* tsaikd.041005: ¦³¤À¦æ®É§ä¥X³Ìªøªº¤@¦æ */
+
+  x_roll = vs_save(slt);
+
+- len = strlen(msg);
+
++ strcpy(buf, msg);
++ len = strlen(strtok(buf, "\n"));
++ for (i = 1; (pbuf = strtok(NULL, "\n")); i++)
++   len = len < strlen(pbuf) ? strlen(pbuf) : len;
+
+  if (len < 16)         /* ¨ú msg title ¨ä¤¤¸ûªøªÌ¬° len */
+    len = 16;
+  if (len % 2)          /* ÅÜ¦¨°¸¼Æ */
+    len++;
+
+- x = (b_lines - 4) >> 1;       /* ¸m¤¤ */
++ x = (b_lines - i - 4) >> 1;      /* ¸m¤¤ */
+  y = (b_cols - 8 - len) >> 1;
+
+...
+...
+
+  strcpy(buf, "¢u");
+  for (i = -4; i < len; i += 2)
+    strcat(buf, "¢w");
+  strcat(buf, "¢t");
+  draw_line(x++, y, buf);
+
+- sprintf(buf, "¢x\033[30;47m  %-*s  \033[m¢x", len, msg);
+- draw_line(x++, y, buf);
+
++ while (1)        /* tsaikd.041005: §â msg ¨Ì·Ó \n ¤À¦æ¦L¥X */
++ {
++   sprintf(buf, "¢x\033[30;47m  %-*s", len, msg);
++   strtok(buf, "\n");
++   sprintf(buf, "%-*s  \033[m¢x", len + 12, buf);
++   draw_line(x++, y, buf);
++   if (!(msg = strstr(msg, "\n")))
++     break;
++   msg++;
++ }
+
+  strcpy(buf, "¢¢");
+
+
+: ¦pªG¦³°µ
+: [¥\¯à] visio.c µøµ¡«¬ªº Y/N
+: ¨º»òÁÙ­n±N visio.c : vans() §ï¦¨³o¼Ë
+
+int
+vans(prompt)
+  char *prompt;
+{
+  char ans[3];
+
++#ifdef POPUP_ANSWER
++  int len;
++  char buf[80], *str, *menu[4];
++
++  if (str = (char *) strrchr(prompt, '['))
++  {
++    if (str[-6] == 'Y' && str[-4] == 'N' && (str[1] == 'Y' || str[1] == 'N'))
++    {
++      strcpy(buf, prompt);
++      len = str - prompt;
++      str = buf + len;
++      *str = '\0';
++      str[2] = str[1];
++      menu[0] = str + 1;
++      menu[1] = "Yes  ¬O";
++      menu[2] = "No   §_";
++      menu[3] = NULL;
++
++      /* tsaikd.041005 §ä¥X prompt ¤¤³Ìªøªºªø«× */
++      len = strlen(strtok(buf, "\n"));
++      while (str = strtok(NULL, "\n"))
++        len = (len > strlen(str)) ? len : strlen(str);
++      len = len < 16 ? 16 : len;
++      strcpy(buf, prompt);
++      *(strrchr(buf, '[')) = '\0';
++      return pans((b_lines - 4) >> 1, (b_cols - 8 - len) >> 1, buf, menu);
++    }
++  }
++#endif
+  /* itoc.010812.µù¸Ñ: ·|¦Û°Ê´«¦¨¤p¼gªº */
+  return vget(b_lines, 0, prompt, ans, sizeof(ans), LCECHO);
+}
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mtsaikd [30m±q [35m140.116.104.202 [30mµoªí[m

@@ -1,0 +1,118 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (©Û³ê»ä­·ªº¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: [­×§ï]¦Û­q°ÆªO¥D«áÅÜ°Ê½u¤W¨Ï¥ÎªÌÅv­­
+µo«H¯¸: ¤ë¤U©]·Q (Thu, 11 Sep 2003 02:23:01 +0800 (CST))  Updated: 2003/09/13
+
+  ÅÜ§ó°ÆªO¥D«á¡AÅý³Q¨ø¥ôªºªO¥D®³¤UÅv­­¡A·s¤W¥ôªO¥D±¾¤WÅv­­¡A³o­Ó­×§ï½Ð¤Åª¼¥Ø§Û
+
+  ¤U­±ªºµ{¦¡½X¡A±z¥²¶·¦³°µ¡u½u¤WÅÜ§ó¨Ï¥ÎªÌÅv­­¡v¥B·s¼W¬ÛÃö¨ç¦¡¡A¥i°Ñ¦ÒitocºëµØ
+
+  °Ï¡C
+
+: manage.c : post_changeBM()
+
+static int
+post_changeBM(xo)
+  XO *xo;
+{
+  char buf[80], uid[IDLEN + 1], *blist;
+  BRD *oldbrd, newbrd;
+  ACCT acct;
+  int dirty, len;
++ int has_set = 0;
+
+  ......
+  ......
+
+  while (1)
+  {
+    if (!vget(10, 0, "½Ð¿é¤JªO¥D¡Aµ²§ô½Ð«ö .....", uid, IDLEN + 1, DOECHO))
+    {
+-      if (dirty != strlen(cuser.userid))    /* ¦³°µ­×§ï */
+-        strcpy(newbrd.BM, buf);
++      if ((*uid == '\0' || !strcmp(cuser.userid, uid)) && !has_set)
++        return XO_BODY;
++      else
+        break;
+    }
+
+  ......
+  ......
+
+      strcat(buf, "/");
+      strcat(buf, acct.userid);
+      buf[BMLEN] = '\0';                /* Á×§K¹Lªø */
++      strcpy(newbrd.BM, buf);
+
+      move(8, 0);
+      prints("¥Ø«eªO¥D¬° %s", buf);
+      clrtoeol();
+
++      has_set = 1;
+
+  ......
+  ......
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
++  utmp_BMset(newbrd.BM, currbno);
+
+
+: cache.c : utmp_BMset()
+
+  ·s¼W³o¤ä¨ç¦¡¡A¦ý½Ð¤Åª¼¥Ø§Û¿ý¤U­±µ{¦¡½X¡A¤U­±µ{¦¡½X¦W³æÀÉªº¸ô®|½Ð¥Î¦Û¤v¯¸¤Wªº
+
+  ¦W³æÀÉ¸ô®|©Î¬OÀÉ¦W¡A¥B¶·°µÅÜ§ó¡C
+
+void
+utmp_BMset(blist, bno)   /* amaki.030909: °ÊºA³]©w½u¤WªO¥Dªº¬ÝªO¾\ÅªÅv­­ */
+  char *blist;
+  int bno;
+{
+  extern BCACHE *bshm;
+  int fd, key;
+  UTMP *uentp, *uceil;
+  BRD *brd;
+  char fpath[64];
+
+  brd = bshm->bcache + bno;
+  uentp = ushm->uslot;
+  uceil = (void *) uentp + ushm->offset;
+
+  if ((brd->readlevel & PERM_SYSOP) || (brd->readlevel & PERM_BOARD))
+  {
+    brd_fpath(fpath, brd->brdname, fn_pal);
+    key = (brd->readlevel & PERM_SYSOP) ? '1' : '2';
+  }
+  else
+  {
+    brd_fpath(fpath, brd->brdname, fn_badpal);
+    key = '3';
+  }
+
+  fd = open(fpath, O_RDONLY);
+
+  do
+  {
+    /* ­«·s§PÂ_¸ÓªOªº brd_bits */
+    if (is_bm(blist, uentp->userid))
+    {
+      uentp->brd_bits[bno] =(uentp->brd_bits[bno] &
+        (BRD_V_BIT | BRD_H_BIT | BR_Z_BIT)) |
+        (BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT);
+      uentp->status |= STATUS_BRD_BIT;
+    }
+    else if (uentp->brd_bits[bno] & BRD_X_BIT)
+    {
+      uentp->brd_bits[bno] =(uentp->brd_bits[bno] &
+        (BRD_V_BIT | BRD_H_BIT | BR_Z_BIT)) |
+        pal_brdutmp(fd, brd->BM, uentp, key);
+      uentp->status |= STATUS_BRD_BIT;
+    }
+  } while (++uentp <= uceil);
+}
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

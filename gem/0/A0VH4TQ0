@@ -1,0 +1,50 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¾ã¦æ¥ú´Î(2)¡Ðbmw.c ¼ö°T¦^ÅU
+µo«H¯¸: ¤¤¿³¸ê¬ì (Mon, 14 Jul 2003 16:21:07 +0800 (CST))  Updated: 2004/03/06
+
+: bmw.c:bmw_item1()  ¥[¦b bmw_item()«á­±
+
+#ifdef HAVE_LIGHTBAR
+static int
+bmw_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:¤W¥ú´Î  0:¥h¥ú´Î */
+{
+  BMW *bmw;
+  struct tm *ptime;
+
+  bmw = (BMW *) xo_pool + (xo->pos - xo->top);
+  ptime = localtime(&bmw->btime);
+
+  if (bmw->sender == cuser.userno)  /* °e¥Xªº¤ô²y */
+  {
+    prints("%s%6d%c\033[33m%-13s\033[36m%-53.53s\033[33m%02d:%02d\033[m",
+      mode ? "\033[45m" : "",
+      xo->pos + 1, tag_char(bmw->btime),
+      bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min);
+  }
+  else                              /* ¦¬¨ìªº¤ô²y */
+  {
+    prints("%s%6d%c%-13s\033[32m%-53.53s\033[37m%02d:%02d%s",
+      mode ? "\033[45m" : "",
+      xo->pos + 1, tag_char(bmw->btime),
+      bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min,
+      mode ? "\033[m" : "");
+  }
+
+  return XO_NONE;
+}
+#endif
+
+
+: bmw.c:bmw_cb[]
+
+KeyFunc bmw_cb[] =
+{
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, bmw_item_bar,
+#endif
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-136-210.HINET-IP.hinet.net[m

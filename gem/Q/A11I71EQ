@@ -1,0 +1,421 @@
+µo«H¤H: hialan.bbs@bbs.math.cycu.edu.tw (¹Lªº¤Ó»{¯u) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] BBS ±Ð¾Ç¨t²Î
+µo«H¯¸: ¼Æ¾Ç¤§®a (2005/09/11 Sun 03:43:30)                Updated: 2005/09/12
+
+¦]¬°§Ú­Ì¨t¤W¦³³\¦h¤H¤£·|¨Ï¥Î BBS
+©Ò¥H§Ú¥´ºâ¦b¨Ï¥ÎªÌµù¥U§¹¤§«á¡A½Ð¥L­Ì¾\Åª BBS Â²³æªº¾Þ§@»¡©ú
+
+¦ý¬O¦pªG¨Ï¥ÎºëµØ°Ïªº¼Ò¦¡¨Ó¼g¤å¥ó¡A´N¥²¶·°²³]¨Ï¥ÎªÌ¤w¸g·|¨Ï¥ÎºëµØ°Ï
+©Ò¥H§Ú¼g¤F¤@­ÓªF¦è¡A¨ÓÂ²¤¶ BBS ¦p¦ó¨Ï¥Î¡C
+
+¦]¬°¼gªº¤è¦¡¦³ÂI¼É¤O¡A©Ò¥H·Q¥ý§â§Ú§¹¦¨ªº¬[ºc¤½§G¦b³o¸Ì
+§Æ±æ¦³¬Û¦P§xÂZ©Î¬O¦³§ó¦n¹ê°µ¤è¦¡ªº¤H¯à°÷µ¹ÂI·N¨£
+
+²¦³º²{¦b­n­×§ï¤º®e¹ê¦b¬O¤Ó³Â·Ð¤F¡A¦Ó§Ú³Ì§Æ±æªº¬O¤º®e©Mµ{¦¡¤À¶}
+¦Ó¤S§Æ±æ¥u­n¤@­Ó¤å¥ó´N¥i¥H¹F¦¨¡A´N¬O³o¼Ë @@"
+
+²{¦b¥ý§â§Ú¤w¸g¼g¦nªºªF¦è¶K¤W¨Ó¡A·íµM§Æ±æ¦³¬Ý¨ìªº¤H¯à°÷µ¹¨Ç·N¨£¡A·P®¦
+====================================================================
+
+/* bbsteach.c BBS ±Ð¾Ç¨t²Î! */
+
+#include "bbs.h"
+
+#define FEETER_TEACH    \
+COLOR1 "  BBS ±Ð¾Ç  " COLOR2 " ¥»³¹¸`¤w¸gµ²§ô¡A½Ð«ö¥ô·NÁä¿ï¾Ü³¹¸`       \033[m
+"
+
+#define TEACH_MSGTOP    2
+#define TEACH_MSGBOT    (b_lines - 2)
+
+
+#define MODE_CLEAR  0
+#define MODE_WAIT   -1
+#define MODE_NOWAIT -2
+
+static int
+bbsteach_msg(int line, char *msg)
+{
+    static int mycurrline = TEACH_MSGTOP;
+
+    if(line < TEACH_MSGTOP && line > 0)
+    {
+        /*¦b¥Ø«e¦æÅã¥Ü°T®§*/
+        mycurrline = TEACH_MSGTOP;
+    }
+    else if(line == MODE_CLEAR)
+    {
+        /*²MªÅµe­±*/
+        clear();
+        outs("\033[0;1;46m¡i BBS ±Ð¾Ç¨t²Î ¡j\033[m");
+        mycurrline = TEACH_MSGTOP;
+        line = MODE_NOWAIT;
+    }
+    else if(line == MODE_WAIT || line == MODE_NOWAIT)
+    {
+        /*¤U¤@¦æ*/
+        if(++mycurrline > TEACH_MSGBOT)
+            return bbsteach_msg(MODE_CLEAR, msg);
+    }
+    else if(line > TEACH_MSGBOT)
+    {
+        mycurrline = TEACH_MSGBOT;
+    }
+
+    if(msg!=0)
+    {
+        move(mycurrline, 0);
+        clrtoeol();
+        outs(msg);
+
+        if(line != MODE_NOWAIT)
+            return vmsg(NULL);
+    }
+
+    return 0;
+}
+
+static inline int
+nextmsg(char *msg)
+{
+    return bbsteach_msg(MODE_WAIT, msg);
+}
+
+static inline int
+nowaitmsg(char *msg)
+{
+    return bbsteach_msg(MODE_NOWAIT, msg);
+}
+
+static void
+bbsteach_key(int key, char *msg)
+{
+    int cmd;
+    uschar str;
+    char buf[256]={'\0'};
+
+    move(b_lines, 0);
+    clrtoeol();
+    prints(COLOR1 " ¡¹ ½Ð¿é¤J %-60.60s\033[m", msg);
+
+    while((cmd = vkey()) != key)
+    {
+        str = (unsigned char) cmd;
+
+        if(tolower(cmd) == 'q')
+          break;
+
+        if(islower(key))
+        {
+            if(tolower(cmd) == key && isupper(cmd))
+                sprintf(buf, "¼Ú³á! §A¿é¤J¨ì¤j¼gªº %c ¤F¡A¦Ó§Ú»Ý­nªº¬O¤p¼gªº %c¡A½Ðª`·N§A
+¦³¨S¦³¶}±Ò¤j¼g¿O!", cmd, key);
+        }
+        else if(isupper(key))
+        {
+            if(toupper(cmd) == key && islower(cmd))
+                sprintf(buf, "¼Ú³á! §A¿é¤J¨ì¤p¼gªº %c ¤F¡A¦Ó§Ú»Ý­nªº¬O¤j¼gªº %c¡A½Ðª`·N§A
+¦³¨S¦³¶}±Ò¤j¼g¿O!", cmd, key);
+        }
+
+        if(str >= 0x81 && str < 0xFE)
+        {
+            sprintf(buf, "¼Ú³á! §A¿é¤Jªº¬O¥þ«¬²Å¸¹¡A½Ð¿é¤J¥b«¬ªº %c ³á!", key);
+        }
+
+        if(buf[0] != '\0')
+        {
+            move(b_lines-1, 0);
+            clrtoeol();
+            outs(buf);
+
+            buf[0] = '\0';
+        }
+    }
+
+    nextmsg(0);
+    nextmsg(msg);
+    nextmsg(0);
+}
+
+int bbsteach()
+{
+    int playing = 0;
+    int cmd;
+    char buf[80], buf2[256];
+
+    while(1)
+    {
+        switch(playing)
+        {
+        case 0:
+            bbsteach_msg(MODE_CLEAR, "Åwªï¨Ï¥Î BBS ±Ð¾Ç¨t²Î");
+            nextmsg(0);
+            nextmsg("¥»¨t²Î·|¤¶²Ð BBS °ò¥»¨Ï¥Îªº¤è¦¡");
+            nextmsg("¥D­n´£¨Ñµ¹ÁÙ¨S¨Ï¥Î¹L BBS ªº¨Ï¥ÎªÌ¡C");
+            nextmsg("\033[1;33;41m  ±j¯P«ØÄ³ÁÙ¨S©l¥Î¹L BBS ¾\\Åª¥»¤å¥ó¡C  \033[m");
+            nextmsg("¦pªG¥»¨t²Î¦b±zµn¤J®É¦Û°Ê¥X²{¡Aªí¥Ü±z©|¥¼³q¹L»{ÃÒ¡C");
+            nextmsg(0);
+            nextmsg("§A¥i¥H¦b¥H¤U¦a¤è§ä¨ì³o­Ó±Ð¾ÇºëÆF¡G");
+            nowaitmsg("(\033[1;36mX\033[m)yz       ¡i ¯S®í©Û«Ý©Ò ¡j");
+            nowaitmsg("    (\033[1;36mO\033[m)ther      ¡i Âø¤CÂø¤K ¡j");
+            nowaitmsg("        (\033[1;36mB\033[m)BSTeach   ¡i ±Ð¾ÇºëÆF ¡j");
+            nextmsg(0);
+            nextmsg("¦pªG±z·Q­nÂ÷¶}¥»¨t²Î¡A½Ð¦bµy«á¿é¤J '0' µ²§ô!");
+
+            break;
+        case 1:
+            bbsteach_msg(MODE_CLEAR, "BBS ÂsÄý¤è¦¡Â²¤¶");
+            nextmsg(0);
+            nextmsg("­nÂsÄý BBS ¡A¥u­n¨Ï¥ÎÁä½Lªº¤è¦VÁä§Y¥i");
+            nextmsg("©¹¥ª (¡ö) ³q±`¥NªíÂ÷¶}¡A©¹¥k (¡÷) ³q±`¥Nªí¶i¤J©Î¾\\Åª");
+            nextmsg("·íµM¡A§A¤]¥i¥H¨Ï¥Î­^¤å¦r¥À¨Ó°µ¯S©w¥\\¯àªº¨Æ±¡¡C");
+            nextmsg("¦ý­nª`·N¤j¤p¼g­^¤å¦r¥À¬O¤£¤@¼Ëªº¡A¹³¬O 'A' ©M 'a' ´N·|²£¥Í¤£¦Pªºµ²ªG¡C");
+            nextmsg("©Ò¥H½Ð¯S§Oª`·N§Aªº¤j¼g¿O(Áä½L¥kÃä¤T­Ó¿O¤¤¶¡¨º­Ó)¬O§_¤w¸g¶}±Ò¡C");
+            nextmsg(0);
+            nextmsg("¦³ªº®É­Ô§A¥i¯à·|¤£ª¾¹D¦³¤°»ò«öÁä¥i¥H¥Î¡A³o®É­Ô§A¥i¥H¬Ý¬Ýµe­±³Ì¤U¤è©Î¬Oµe­±¤W¤è¡C");
+            nextmsg(FEETER_TEACH);
+            nextmsg("¥L·|Åã¥Ü¦b¥Ø«e±¡ªp¤U³Ì±`¥Îªº«öÁä«ü¥O¡C¦ý¬Oµe­±¦³­­¡AÁ`¤£¯à¦C¥X©Ò¦³«ü¥O¡C");
+            nextmsg("³o®É­Ô§Ú­Ì´N¥i¥H«ö ¤p¼g 'h' ¨Ó¬Ý¬ÝÄÝ©ó¦¹µe­±ªº»¡©ú");
+            nextmsg(0);
+            nextmsg("±µ¤U¨Ó§Ú­Ì±N¤¶²Ð³Ì¥ý¬Ý¨ìªº¥Ø¿ý¿ï³æ¡C");
+
+            break;
+
+        case 2:
+            bbsteach_msg(MODE_CLEAR, "¥Ø¿ý¿ï³æ");
+            nextmsg(0);
+            nextmsg("¦b±z¶i¤J BBS ¤§«á¡A·|¬Ý¨ì¦p¤Uªº¿ï³æ¡G");
+            nowaitmsg("(\033[1;36mA\033[m)nnounce  ¡i ºëµØ¤½§GÄæ ¡j");
+            nowaitmsg("(\033[1;36mB\033[m)oards    ¡i §G§i°Q½×°Ï ¡j");
+            nowaitmsg("(\033[1;36mC\033[m)lass     ¡i ¤À²Õ°Q½×¶° ¡j");
+            nowaitmsg("(\033[1;36mF\033[m)avorite  ¡i §Úªº³Ì·R¸s ¡j");
+            nowaitmsg("(\033[1;36mM\033[m)ail      ¡i «H¥ó¨åÂÃ²° ¡j");
+            nowaitmsg("(\033[1;36mT\033[m)alk      ¡i ¥ð¶¢²á¤Ñ¦a ¡j");
+            nowaitmsg("(\033[1;36mU\033[m)ser      ¡i ­Ó¤H¤u¨ã§{ ¡j");
+            nowaitmsg("(\033[1;36mX\033[m)yz       ¡i ¯S®í©Û«Ý©Ò ¡j");
+            nowaitmsg("(\033[1;36mG\033[m)oodbye   ¡i ¤U¦¸¦A·|§a ¡j");
+            nextmsg(0);
+            nextmsg("§A¥i¥H²¾°Ê¿ï³æ¥ú´Î(´N¬OÂÅ¦âªº¨º­Ó)¨ì§A·Q­n¶i¤Jªº¦a¤è");
+            nextmsg("¨Ò¦p: [\033[1;44m(C)lass     ¡i ¤À²Õ°Q½×¶° ¡j\033[m]");
+            nextmsg("µM«á¨Ï¥Î (¡÷) ¶i¤J¡A (¡ö) Â÷¶}");
+            nextmsg(0);
+            nextmsg("³o¸Ì­±¦³«Ü¦hªF¦è¡A´X¥G©Ò¦³´£¨Ñªº¥\\¯à³£·|©ñ¦b¤W­±");
+            nextmsg("¦bµ²§ô³o­ÓºëÆF¤§«á¡A±z¥i¥H¨ì³B¬Ý¬Ý¡A³o­Ó BBS ¸Ì­±¨ì©³¦³¤°»ò¥\\¯à¡C");
+
+            break;
+
+        case 3:
+            bbsteach_msg(MODE_CLEAR, "¿ï¾Ü¬ÝªO");
+            nextmsg(0);
+            nextmsg("¦b BBS ¦³³\\¦h°Q½×¸s²Õ¡A¦Ó¤@­Ó°Q½×¸s²Õ§Ú­Ì¥s°µ¬ÝªO¡C");
+            nextmsg("¬°¤FÅý§Ú­Ì§ó§Ö§ä¨ì§Ú­Ì·Q­nªº¬ÝªO¡A³q±`³£·|±N¬ÝªO¤ÀÃþ¡C");
+            nextmsg(0);
+            nextmsg("±µµÛ§Ú­Ì¥Ü½d¦p¦ó§ä¨ì sysop ¬ÝªO¡C");
+            nextmsg("­º¥ý¡A¦b¥D¥Ø¿ý¿ï¾Ü¡i ¤À²Õ°Q½×¶° ¡j");
+            nextmsg(0);
+            nextmsg("[\033[1;44m(C)lass     ¡i ¤À²Õ°Q½×¶° ¡j\033[m]");
+            nextmsg(0);
+            nextmsg("µM«á¿ï¾Ü(±N '>' ²Å¸¹²¾¨ì«e­±¡A©Î¬O¥Î¥ú´Î¿ï¾Ü¥L)");
+            nextmsg(0);
+            nextmsg("     1 \033[1;36m¡¼BBS/\033[m                 [ ¯¸°ÈºÞ²z ] BBS ¬ÛÃö¨Æ°È°Q½×°Ï");
+            nextmsg(0);
+            nextmsg("µM«á¨Ï¥Î (¡÷) ©Î¬O ENTER ¶i¤J³o­Ó¤ÀÃþ¡C±µµÛ¿ï¾Ü¡G");
+            nextmsg(0);
+            nextmsg("  1176   sysop        \033[1;30m¯¸°È\033[m ¡º ³ø§i¯¸ªø¡I¼Æ¾Ç¤§®a´Û­t§Ú~~       1 SYSOP");
+            nextmsg(0);
+            nextmsg("¦p¦¹¤@¨Ó¡A§A´N¶i¤J sysop ¬ÝªO¤F¡C");
+            nextmsg(0);
+            nextmsg("±µµÛ§Ú­Ì±N±Ð§A¦p¦ó¾\\Åª»Pµoªí¤å³¹¡C");
+
+            break;
+
+        case 4:
+            bbsteach_msg(MODE_CLEAR, "¾\\Åª»Pµoªí¤å³¹");
+            nextmsg(0);
+            nextmsg("¾\\Åª¤å³¹´N¦p¦P¿ï¾Ü¬ÝªO¤@¼Ë¡A±N '>' ²¾¨ì·Q­n¾\\Åªªº¤å³¹«e­±¡C");
+            nextmsg("(¡÷)¶i¤J¡A«ö(¡ô)(¡õ)©Î¬O ªÅ¥ÕÁä ¾\\Åª¤å³¹¡A«ö (¡ö) Â÷¶}¡C");
+            nextmsg(0);
+            nextmsg("²{¦b§Ú­Ì¨Óµoªí¤å³¹¡C");
+            nextmsg("¦b¬ÝªO¦Cªí¤¤«öµÛ 'Ctrl' ¦A«ö 'p'¡C");
+            nextmsg("(³oºØ²Õ¦X«öÁä§Ú­Ì³q±`ªí¥Ü¦¨ Ctrl+P) ´N¥i¥Hµoªí¤å³¹");
+            nowaitmsg("²{¦b´N½Ð§A«ö Ctrl+P §a!");
+
+            bbsteach_key(Ctrl('P'), "Ctrl+P");
+            nextmsg("«Ü¦n¡A¥Ø«e§A¤w¸g¶i¤Jµoªí¤å³¹ªº¼Ò¦¡¤F¡A±µµÛ½Ð§A¿é¤J¼ÐÃD:");
+
+            vget(b_lines, 0, "¼ÐÃD: ", buf, 60, DOECHO);
+
+            move(b_lines, 0);   /*¦n¹³·|¦³°ÝÃD -_-*/
+            clrtoeol();
+
+            nextmsg(0);
+            nextmsg(buf);
+            nextmsg(0);
+            nextmsg("²{¦b§Ú­Ì­n½s¿è¤å³¹¡A§A¥i¥H¦b¸Ì­±¨Ï¥Î¤è¦VÁä±±¨î´å¼Ð¡A¬Ý¬Ý­n¦b­þ¸Ì¿é¤J¡C");
+            nextmsg("¦b³Ì«e­±¦pªG¬O '~' ²Å¸¹¡Aªí¥Ü¨º¤@¦æ¥Ø«e¨S¦³ªF¦è¡C§A±NµLªk²¾°Ê¨ì¨º­Ó¦ì¸m¡C");
+            nextmsg("¦A¼g§¹¤å³¹¥H«á¦pªG·Q­n¦sÀÉÂ÷¶}¡A½Ð¨Ï¥Î«öÁä Ctrl+X¡C");
+            nextmsg("µM«á¿ï¾Ü¦sÀÉ (¿é¤J¤p¼g 's') µM«á«ö ENTER §Y¥i¡C");
+            nowaitmsg("²{¦b´ú¸Õ«öÁä¡A½Ð¿é¤J Ctrl+X");
+
+            bbsteach_key(Ctrl('X'), "Ctrl+X");
+
+            nextmsg("²{¦b§Ú­Ì±N½s¿è¤å³¹¡A½Ð°O±o¨Ï¥Î Ctrl+X µoáá¤å³¹©ÎÂ÷¶}¡C");
+
+            sprintf(buf, "tmp/bbsteach_post");
+            vedit(buf, 0);
+
+            unlink(buf);
+
+            bbsteach_msg(MODE_CLEAR, "«Ü¦n¡A§A²{¦b¤w¸g·|µoªí¤å³¹¤F!");
+            nextmsg("±µµÛ¡A§Ú­Ì±N±Ð§A¦p¦ó¦^À³¤å³¹¡C");
+
+            break;
+
+        case 5:
+        {
+            struct tm *ptime;
+            time_t now;
+
+            bbsteach_msg(MODE_CLEAR, "¦^ÂÐ¤å³¹»P±ÀÂË¤å³¹");
+            nextmsg(0);
+            nextmsg("³q±`¬Ý¨ì¤@½g¤å³¹¡A¦pªG§A¦³·N¨£·Q­nµoªí¡A¸Ó«ç»ò¿ì©O?");
+            nextmsg("³o®É­Ô§Ú­Ì¥i¥H¨Ï¥Î¤p¼g 'y' ¨Ó¦^À³¤å³¹¡C");
+            nowaitmsg("²{¦b´NÅý§Ú­Ì¨Ó½m²ß¤@¤U¦p¦ó¦^´_¤å³¹§a! ½Ð«ö¤p¼g 'y'");
+
+            bbsteach_key('y', "¤p¼g 'y'");
+
+            nextmsg("«Ü¦n¡A²{¦b¤w¸g¶i¤J¦^ÂÐ¤å³¹ªºª¬ºA¤F¡C");
+            nextmsg("µM«á¨t²Î·|°Ý§A­n¦^ÂÐ¨ì¬ÝªO¡AÁÙ¬O§@ªÌ«H½c¡C³q±`³£¿ï¾Ü¬ÝªO¡C");
+
+            vget(b_lines, 0, "¡¶ ¦^À³¦Ü (F)¬ÝªO (M)§@ªÌ«H½c (B)¤GªÌ¬Ò¬O (Q)¨ú®ø¡H[F] ", buf, 3, LCECHO);
+            move(b_lines, 0);
+            clrtoeol();
+
+            nextmsg(0);
+            nextmsg("µM«á¨t²Î·|½Ð§A­×§ï¼ÐÃD¡C");
+
+            strcpy(buf, "³o¬O­ì¤åªº¼ÐÃD¡C");
+            vget(b_lines, 0, "¼ÐÃD¡G", buf, 60, GCARRY);
+            move(b_lines, 0);
+            clrtoeol();
+
+            nextmsg(0);
+            nextmsg(buf);
+            nextmsg(0);
+
+            nextmsg("±µµÛ·|¸ß°Ý¬O§_­n¤Þ¥Î­ì¤å¡C");
+            nextmsg("¨ä¤¤¤ñ¸û¯S®íªº¬O¤Þ¥Î¥þ¤å¡A¥L·|³s¼ÐÃD®É¶¡µ¥µ¥³£ÅÜ¦¨¤Þ¤å¡C");
+            nextmsg("ÁÙ¦³¤@­Ó¥s°µ­«¶K¥þ¤å¡A¥L¤£·|­×§ï¤å³¹ªº¥ô¦ó¦a¤è¡C");
+            nowaitmsg("²{¦b´NÅý§Ú­Ì¨Ó¸Õ¸Õ¬Ý¡C");
+
+            vget(b_lines, 0, "¬O§_¤Þ¥Î­ì¤å Y)¤Þ¥Î N)¤£¤Þ¥Î A)¤Þ¥Î¥þ¤å R)­«¶K¥þ¤å 1-9)¤Þ¥Î¼h¼Æ¡H[Y] ", buf, 3, LCECHO);
+            move(b_lines, 0);
+            clrtoeol();
+
+            nextmsg("±µµÛ´N¬O½s¿è¤å³¹¡A²Ó¸`½Ð¾\\Åª¤W¤@­Ó³¹¸`¡C");
+
+            bbsteach_msg(MODE_CLEAR, "±ÀÂË¤å³¹");
+            nextmsg(0);
+            nextmsg("ÁÙ¦³¥t¥~¤@ºØ¦^ÂÐªº¾÷¨î´N¬O±ÀÂË¤å³¹¡C");
+            nextmsg("¦pªG§A¹ï³o½g¤å³¹¥u¦³¤@ÂIÂI¤p·N¨£¡A¹³¬O¥u¦³¤@¥y¸Ü¦Ó¤w¡AÁÙ¨S¦³¤j¨ì»Ý­n¦^¤åªº¦a¨B¡C");
+            nextmsg("³o­Ó®É­Ô´N¥i¥H¨Ï¥Î±ÀÂË¤å³¹¡C");
+            nextmsg(0);
+            nextmsg("±ÀÂË¤å³¹¥u»Ý­n¦b¤å³¹«e­±¿é¤J '%' ²Å¸¹¡AµM«á±N²z¥Ñ¥´¤W§Y¥i¡C");
+            nowaitmsg("²{¦b´NÅý§Ú­Ì¨Ó¹ê²ß¤@¤U¡G");
+
+            bbsteach_key('%', "¥b«¬ %");
+
+            vget(b_lines, 0, "¡· µû¤À 1)±À¤å¡H[1]", buf, 3, LCECHO);
+            move(b_lines, 0);
+            clrtoeol();
+
+            strcpy(buf, "³o¸Ì¬O±ÀÂË¤º®e!!");
+            vget(b_lines, 0, "½Ð¿é¤J²z¥Ñ¡G", buf, 60, GCARRY);
+            move(b_lines, 0);
+            clrtoeol();
+
+            nextmsg(buf);
+            nextmsg(0);
+            nextmsg("µM«á·|¦b¤å³¹¤U­±¥[¤J¥H¤Uµ²ªG¡G");
+            nextmsg(0);
+
+            time(&now);
+            ptime = localtime(&now);
+            sprintf(buf2, "¡÷ \033[36m%s \033[1;31m±À\033[m¡G%-*s%02d/%02d/%02d\n",
+                cuser.userid, 62 - strlen(cuser.userid), buf,
+                ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+
+            nextmsg(buf2);
+            nextmsg(0);
+
+            nextmsg("¦p¦¹´N§¹¦¨±À¤å¤F!");
+
+            break;
+        }
+
+        default:
+            bbsteach_msg(MODE_CLEAR, "¥»±Ð¾Ç¤w¸g§¹²¦¡C");
+            nextmsg(0);
+            nextmsg("ÁÂÁÂ§A­@¤ß¬Ý§¹³o¥÷±Ð¾Ç¤å¥ó¡C");
+            nextmsg("¦pªGÁÙ¦³¥ô¦ó°ÝÃD½Ðª½±µ¦b sysop ¬ÝªO¤¤µo°Ý");
+            nextmsg("¼ö¤ßªº¯¸°È±N·|§i¶D§A¸Ñ¨Mªº¤è¦¡¡C");
+            nextmsg("¯¬±z¦³­Ó´r§Ö¨Ï¥Î BBS ªº¸gÅç¡C");
+
+            playing = -1;
+            return 0;
+        }   /* End of switch */
+
+
+        move(b_lines, 0);
+        clrtoeol();
+        outs(FEETER_TEACH);
+        vkey();
+
+        while(1)
+        {
+                bbsteach_msg(MODE_CLEAR, "¿ï¾Ü³¹¸`");
+                nextmsg(0);
+                nowaitmsg("½Ðª½±µ«ö ENTER ¬Ý¤U¤@­Ó³¹¸`¡A©Î¿ï¾Ü·Q­n¾\\Åªªº³¹¸`¡G");
+                nowaitmsg(0);
+                nowaitmsg("1) ÂsÄý¤è¦¡Â²¤¶");
+                nowaitmsg("2) ¥Ø¿ý¿ï³æ");
+                nowaitmsg("3) ¿ï¾Ü¬ÝªO");
+                nowaitmsg("4) ¾\\Åª»Pµoªí¤å³¹");
+                nowaitmsg("5) ¦^ÂÐ¤å³¹»P±ÀÂË¤å³¹");
+                nowaitmsg(0);
+                nowaitmsg("0) Â÷¶}");
+
+                move(b_lines, 0);
+                clrtoeol();
+                printf("½Ð¿é¤J·Q­n¾\\Åªªº¥DÃD, ¤£¿é¤J=%d: ", ++playing);
+                if((cmd = tolower(vkey())) && ((cmd >= '0' && cmd <= '9') || cmd == 'q' || cmd == '\n' ))
+                {
+                    if(cmd == 'q' || cmd == '0')
+                        return 0;
+
+                    if(cmd > '0' && cmd < '6')
+                        playing = cmd - '0';
+
+                    break;
+                }
+        }
+    }
+
+    return 0;
+}
+
+
+
+--
+[m[1;30m¡@[;30;40m¢[31;41me[40m¢[33;44me¢[31;41me[34;44m¢[36;46me¢e [44m [34;43m¢[33me[31;40m¢[30me   [1;30m                   http://www.moztw.org/firefox/[m
+[1;30m¡@ [41m [;31;41m¢e  [44m¢[46me[36m¢e ¢[44me[41m¢[31;43me[41m [40m   [30;45m¢[35me[30m¢e¢[35me[30;40m¢[45me[40m¢e¢e¢e¢e¢e¢[35me[30;45m¢[35;40me[30m¢e¢e¢e¢e¢e¢e[m
+[1;30m¡@[41m     [;31;41m¢[43me[44m [46m [44m [34;46m¢[44me[46m¢[44me[43m   [40m  [30m¢[35;45me[30;40m¢e[35m¢[30me¢[35me[30m¢[35me[30m¢[35me¢[30me[35m¢e[30m¢e[35m¢[45me[40m¢[30me¢[35me¢e[30m¢e[35m¢e  ¢e[m
+[30m¢i[31m¢i¢i¢i[34m¢i[36;46m¢[34me[40m¢i¢i¢i[33;41m¢[30;40me¢i[45m ¢e[35m¢[30;40me[45m¢[35me[40m¡@[45m [40m¡@[45m [40m¢e[45m [40m¡@[45m [40m¡@[45m [31;40m¡@ [35;45m¢[30;40me¢[45me[35;40m¢e[30;45m¢[40me[m
+[1;30m¡@[41m       [;34;41m¢e¢[44me [33m¢[43me[31m¢[33me [40m  [30m¢[35;45me[40m ¡@¡@[45m [30;40m¢e[35;45m¢[30;40me¢[35;45me[40m¡@¢[30me [45m [31;40m¡@[45m [40m¡@ [35;45m¢[30;40me¢[35me[30;45m¢e[35;40m¢[30me
+[m[1;30m¡@[;30;40m¢[31;41me     [40m¢e¢e[41m  [43m¢[41me[43m [40m   [30;45m¢e¢[40me¢e[45m¢e¢e¢e[40m¢e[45m¢e[40m¢e[45m¢e¢[40me¢[45me¢e[40m¢e[45m¢e[40m¢e[45m¢e[m  [m[1;30m¡·FongChen¡·[m
+
+--
+ [1;43m¢~[46m¢q[m Origin: [41m ¤¤­ì¤j¾Ç£»¼Æ¾Ç¤§®a [32;47m bbs.math.cycu.edu.tw [m
+ [1;44m¢q[41m¢£[m Author: [1;33mhialan [30m±q [35m203-67-154-247.adsl.dynamic.seed.net.tw[30m µoªí[m
+--

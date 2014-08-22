@@ -1,0 +1,169 @@
+§@×ּ: itoc (cygreadline4.dll) ¯¸₪÷: plan
+¼׀ֳD: [¥\¯א] QKMJ ³ֲ±N
+®ֹ¶¡: 2004/05/21 Fri 08:53:06                           Updated: 2004/05/21
+
+: menu.c:menu_net[]
+
++ "bin/xyz.so:x_qkmj", PERM_INTERNET, - M_GAME,
++ "QKMJ       ¡ס °ך÷י³ֲ±N ¡נ",
+
+: etc/game/qkmj
+
+  ¥h ftp://ftp.csie.nctu.edu.tw/pub/CSIE/qkmj/ §ל qkmj ×÷°ץ¦זְֹ
+  ­n§ל¾A·ם×÷ OS ×©¥»
+
+: xyz.c ¥[₪W³o₪@¾ד¬q
+
+/* ----------------------------------------------------- */
+/* QKMJ ÷פ¸פ³ֲ±N                                         */
+/* ----------------------------------------------------- */
+/* author : visor.bbs@bbs.yzu.edu.tw                     */
+/*-------------------------------------------------------*/
+
+#define QKMJ_SERVER     "140.113.209.32 7001"
+
+
+/* itoc.010825: ¨ה¥L×÷×©¥»½׀¦Ü ftp://ftp.csie.nctu.edu.tw/pub/CSIE/qkmj/
+   §ל¨ת¡A©ס¦b etc/game/¡A¨ֳ§ף¦W¬° qkmj (×`·N­n chmod ¥i°ץ¦ז) */
+
+#if defined(LINUX)
+#define QKMJ_EXECUTE    "etc/game/qkmj95p5-linux"
+#elif defined(BSD44)
+#define QKMJ_EXECUTE    "etc/game/qkmj95p5-freebsd"
+#else
+#define QKMJ_EXECUTE    "etc/game/qkmj"    /* ½׀¦Û¦ז§ל¾A·ם×©¥»×÷°ץ¦זְֹ */
+#endif
+
+int
+x_qkmj()                /* itoc.010825: QKMJ -- ³s½u¥´³ֲ±N */
+{
+  int size, fd, nfds;
+  char buf[256];
+  FILE *fp;
+  fd_set rd;
+  struct timeval to;
+
+  /* itoc.010825.µש¸ׁ: qkmj ¦³­׃°ÝֳD¬O­n«צ ^C µ²§פ¡A¥i¬O popen() ¸ּ­±₪£¯א¥־
+     ^C¡A¥u¦n¥־ "/quit"¡A¦‎¬O₪@¶i₪J qkmj ¿י₪J ID ®ֹµL×k¥H ^C ©־ "/quit"
+     ֲק¶}¡A¥u¦nµש¥U₪@­׃ ID ¨׃×±¡A¦A "/quit" ֲק¶}
+     ©ׂ¥H¦b₪@¶}©l×÷®ֹ­װ´N½T©w×±®a¯u×÷­n°ץ¦ז QKMJ ³s½u¡A³s¥h qkmj server  */
+
+  if (vans("¬O§_³s½u¶}¥´³ֲ±N(Y/N)¡H[N] ") != 'y')
+    return XEASY;
+
+  more("etc/game/qkmj.welcome", NULL);
+
+  if (fp = popen("env HOME=" BBSHOME " TERM=vt100 "
+    QKMJ_EXECUTE " " QKMJ_SERVER, "r+"))
+  {
+    cutmp->status |= STATUS_REJECT;   /* ×±³ֲ±N®ֹ₪£¦¬₪פ²y */
+    fd = fileno(fp);
+
+    while(1)
+    {
+      FD_ZERO(&rd);
+      FD_SET(fd, &rd);
+      FD_SET(0, &rd);
+      to.tv_sec = 10;
+      to.tv_usec = 0;
+
+      nfds = fd;
+      nfds = select(nfds + 1, &rd, NULL, NULL, &to);
+
+      if (nfds <= 0)
+        continue;
+
+      if (FD_ISSET(0, &rd))
+      {
+        if (size = read(0, buf, sizeof(buf)))
+          write(fd, buf, size);
+        else
+          break;
+      }
+      else if (FD_ISSET(fd, &rd))
+      {
+        if (size = read(fd, buf, sizeof(buf)))
+          write(0, buf, size);
+        else
+          break;
+      }
+    }
+
+    close(fd);
+    pclose(fp);
+    cutmp->status ^= STATUS_REJECT;
+  }
+  return 0;           /* ­n redraw screen */
+}
+
+: etc/game/qmkj.welcome ·s¼W³oְֹ®׳
+
+¢~שששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששש¢¡
+שר                                                                          שר
+שר ¡¹ ֲק¶}¹Cְ¸                                                              שר
+שר                                                                          שר
+שר   ±zµL×k¥H CTRL-C ֲק¶}¡A½׀¸ױ¸ױ "[1;33m/quit[m"¡C                                 שר
+שר                                                                          שר
+שר ¡¹ ­n¦p¦ף¶}©l¥´µP¡H                                                      שר
+שר                                                                          שר
+שר   ¦b QKMJ ₪₪¡A₪@©w­n´ך¨¬¥|₪H₪@®א₪~¯א¶}©l¥´µP¡C±z­n´ך¨¬₪@®א¡A¦³¨ג÷״₪ט¦¡¡G שר
+שר                                                                          שר
+שר   ₪@¡B¥[₪J©|¥¼´ך÷¡¥|₪H×÷®א                                               שר
+שר         ±z¥i¥H¥´ "/free" ¬d¬Ý¥״«e÷פ¸פ₪W¦³­‏¨ַ₪W¥¼´ך÷¡¥|₪H×÷®א¡A§ה¨ל¥H«ב  שר
+שר       ´N¥i¥´ "/join <®א×ר¦W÷Ù>" ¨׃¥[₪J¦¹®א¡C                             שר
+שר                                                                          שר
+שר   ₪G¡B¦Û₪v¶}®אµ¥§O₪H¥[₪J                                                 שר
+שר         ¦p×G±z§ה₪£¨ל©|¥¼´ך÷¡¥|₪H×÷®א¡A₪]¥i¥H¥´ "/serv" ¦Û₪v¶}₪@®אµ¥§O₪H  שר
+שר       ¥[₪J¡A¦¹®ֹ±z´N¬O®א×ר¡A¾ײ¦³±N¦¹®א×÷¨ֿ¥־×ּ½נ¥X¥h×÷ֵv₪O¡C             שר
+שר         ¦b¶}®א®ֹ¡A±z¥i¥H¥־ "/note <₪½§i₪÷®e>" ¨׃³]©w³o®א×÷₪½§i¡Aֵ‎§O₪H   שר
+שר       ×¾¹D³o®א×÷₪@¨ַ³W©w¡C                                               שר
+שר         ·ם±z¦Û₪v¶}®א₪§«ב¡A´N­@₪ß×÷µ¥«Ý§O₪H×÷¥[₪J. ¦p×G¥״«e₪W½u×÷₪H¼ֶ¦³   שר
+שר       ´X₪Q­׃₪H×÷¸Ü¡A³q±`«Ü§ײ´N¯א´ך÷¡₪@®א¡C                               שר
+שר                                                                          שר
+שר   ·ם₪@®א×÷₪H¼ֶ´ך÷¡¥|₪H₪§«ב¡Aµe­±´N·|¦Û°ÊֵÜ¦¨¥´µP¼ׂ¦¡¡C¦b³o­׃¼ׂ¦¡₪U¡A±z   שר
+שר   ¥i¥H¥־ <TAB> ֱה¨׃₪ֱ´«­n¥´µP©־©M§O₪H¥ז½ֽ¡C½ü¨ל±z¥´µP®ֹ¡A±z¥i¥H¥־₪ט¦Vֱה  שר
+שר   ¿ן¾Ü¦Û₪v©ׂ·Q¥´×÷µP¡A¦A«צ <Space> ©־ <Enter> ¥´¥X¥h¡A©־×ּ±z₪]¥i¥H«צ₪U   שר
+שר   ¨÷±iµP×÷¥N¸¹¡A´N×½±µ¥´¥X¥h¡C                                           שר
+שר                                                                          שר
+שר ¡¹ µe­±»¡©ת                                                              שר
+שר                                                                          שר
+שר   ·ם±z¶i₪J¥´µPµe­±®ֹ¡A±z·|¬Ý¨לµe­±₪₪¥¡¬O¨C­׃₪H×÷µP¡A₪U­±¬O¥ז½ֽµרµ¡¡Cµe   שר
+שר   ­±×÷¥k₪W¨₪¦³¥|­׃₪pִז¦ל¡A¬O¥״«e°י­·¡B×ש­·¡B³s²ר¼ֶ₪־¥״«eֲק®ü©³ֱÙ³ׁ´X±i   שר
+שר   µP¡C¥kֳה₪₪¶¡©ׂ×ם¥Ü×÷¬O¨C­׃₪H¦ל¸m¡B¥N¸¹¥H₪־¥L¥״«e©ׂ¾ײ¦³×÷×קֳB¡C¦b²ר®a   שר
+שר   ×÷¦W¦r¥kֳה·|¦³₪@­׃₪ֿ¥ױ×÷ "²ר"¡A¥N×ם¥L¥״«e¬O²ר®a¡C                      שר
+שר                                                                          שר
+שר   µe­±¥k₪U¨₪©ֵׂד¥Ü×÷¬O¥|®a×÷¬Ûֳצ¦ל¸m¡A±z¥i¥H©M₪W­±×÷¦ל¸m¡B¥N¸¹₪ס¹ן¡A¨׃   שר
+שר   §ה¥X½ײ§₪¦b­‏₪@ֳה¡C¦b¨C®a×÷®ֳַהֱÙ¦³ֵד¥Ü¼ֶ¦r¡A¥N×ם¨C­׃₪H¥´µP©ׂ×ב×÷®ֹ¶¡¡C שר
+שר   ³o­׃®ֹ¶¡¬O½ü¨ל±z¥´µP×÷®ֹ­װ₪~¶}©l­p÷ג¡C³o¼ֻ₪j®a¦b₪@°_¥´×÷®ֹ­װ¡A´N×¾¹D   שר
+שר   ½ײ¥´±o§ײ¡A½ײ¥´±o÷C₪F¡C                                                 שר
+שר                                                                          שר
+שר   ¥k₪U¨₪¬°¨C₪H¥´µP³t«׳¡A¹J¨ל¶ֳ½X®ֹ½׀₪ֱ´«¦Ü¥t₪@µe­±¦A₪ֱ¦^¨׃               שר
+שר                                                                          שר
+שר ¡¹ «ü¥O»¡©ת                                                              שר
+שר                                                                          שר
+שר   «ü¥O¦C×ם½׀¶i QKMJ «ב¥´ "[1;33m/help[m" ¬d¬Ý                                    שר
+שר                                                                          שר
+שר   ¥×¥kֱה©־ ',' & '.'      ¿ןµP                                           שר
+שר   <TAB>                   ₪ֱ´«¹ן¸Ü©־¥´µP                                 שר
+שר   Ctrl-U                  ²M°£¹ן¸Ü½w½ִ°ֿ                                 שר
+שר   Ctrl-C                  ֲק¶}                                           שר
+שר   Ctrl-L                  ­«ֳ¸¿ֳ¹ץ  (¹J¨לµe­±¶ֳ±¼®ֹ¨ֿ¥־)                 שר
+שר   ₪W₪Uֱה©־ Ctrl-P,Ctrl-N  ´M§ה¥H«e¥־¹L×÷©R¥O                             שר
+שר   Ctrl-A                  ¸ץ¨ל₪@¦ז³ּ«e÷Ý                                 שר
+שר   Ctrl-E                  ¸ץ¨ל₪@¦ז³ּ¥½÷Ý                                 שר
+שר                                                                          שר
+שר ¡¹ µש¥U·s±b¸¹                                                            שר
+שר                                                                          שר
+שר   ·ם±z¶i¥h QKMJ ₪§«ב¡A­÷¥‎¿י₪J±z×÷¦W÷Ù [ID]¡C³o®ֹ­װ¨t²־·|ְֻ¬d±z×÷¦W÷Ù¬O  שר
+שר   §_¦b¸ך®ֶ®w₪₪¡C¦p×G§ה₪£¨ל¡A´N·|»{¬°±z¬O·s×÷¨ֿ¥־×ּ¡A­n±z¿י₪J©ׂ·Q­n×÷±K   שר
+שר   ½X¡C³o¼ֻ´N÷ג§¹¦¨µש¥U₪F¡C                                               שר
+שר                                                                          שר
+שר   ¦p×G±z¬O²ִ₪@¦¸₪W QKMJ¡A¨t²־´N°Ý±z±K½X¡A¨÷×ם¥Ü³o­׃±b¸¹₪w¸g¦³₪H¥־₪F¡A½׀  שר
+שר   ´«₪@­׃¦W÷Ù¡C                                                           שר
+שר                                                                          שר
+¢¢שששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששששש¢£
+
+
+
+--
+[1;37m¡¼ ¥»₪ו³¹¥ׁ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µo×ם[m

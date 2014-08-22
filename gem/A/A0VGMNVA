@@ -1,0 +1,41 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: itoc
+¼Ð  ÃD: [¤å¥ó] ºëµØ°Ïªº½g¼Æ¤W­­©M®e¶q¤W­­
+µo«H¯¸: Àº¤Ñ±^ (Sun, 06 Jul 2003 15:21:41 +0800 (CST))    Updated: 2003/07/15
+
+  (2) Âà´« .BRD
+
+  ­º¥ýÃö¯¸
+
+: src/util/tran/transbrd.c:NEW
+
+struct NEW                      /* ­n©M·sª©µ{¦¡ struct ¤@¼Ë */
+{
+  ...
+  ...
+  int bpost;                    /* ¦@¦³´X½g post */
+  time_t blast;                 /* ³Ì«á¤@½g post ªº®É¶¡ */
++ int gemsize_n;                /* ºëµØ°Ï½g¼Æ¤W­­ */
++ int gemsize_k;                /* ºëµØ°Ï®e¶q¤W­­ */
+}       NEW;
+
+: src/util/tran/transbrd.c:main()
+
+    new.bpost = 0;
+    new.blast = 0;
++   new.gemsize_n = 10000;       /* ¬ÝªOºëµØ°Ï¹w³]¤W­­ 10000 ½g */
++   new.gemsize_k = 1000 << 10;  /* ¬ÝªOºëµØ°Ï¹w³]¤W­­ 1000 KB */
+
+
+  µM«á compile transbrd.c ¨Ã°õ¦æ transbrd
+
+: include/struct.h:struct BoardHeader:BRDªºµ²ºc
+
+  int bpost;                    /* ¦@¦³´X½g post */
+  time_t blast;                 /* ³Ì«á¤@½g post ªº®É¶¡ */
++ int gemsize_n;                /* ºëµØ°Ï½g¼Æ¤W­­ */
++ int gemsize_k;                /* ºëµØ°Ï®e¶q¤W­­ */
+}           BRD;
+
+--
+[1;31m|[33m Origin [31m| [;37;45m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [35;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m218-163-206-115.HINET-IP.hinet.net[m

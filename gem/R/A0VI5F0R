@@ -1,0 +1,175 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] "--" ¥H¤UªºªF¦è¥þ³¡µLªk­×§ï
+®É¶¡: Sun Jul 27 01:26:18 2003                          Updated: 2005/06/30
+
+¡° ¤Þ­z¡mxeon.bbs@xeon.tfcis.org (Xeon Chen)¡n¤§»Ê¨¥¡G
+> "--" ¥H¤UªºªF¦è¥þ³¡µLªk­×§ï
+
+  1. ±À¤å«á¡A§@ªÌ¥i¥H­×§ï¤å³¹¡A¦ý¤£¯à­×§ï±À¤å
+  2. ¾ú¦¸­×§ïªº®É¶¡°O¿ý§¡·|«O¯d¤U¨Ó
+
+: modes.h
+
+#define EDIT_ANONYMOUS  0x10    /* °Î¦W¼Ò¦¡ */
+#define EDIT_RESTRICT   0x20    /* ¥[±K¦sÀÉ */
++ #define EDIT_MODIFYPOST 0x40    /* ¸T¤î­×§ï -- ¥H¤Uªº¤å¦r */
+
+: post.c:post_edit()
+
+  /* ­ì§@ªÌ­×§ï */
+  else if (!strcmp(hdr->owner, cuser.userid) && HAS_PERM(PERM_POST))
+  {
++   curredit = EDIT_MODIFYPOST;
+    if (!vedit(fpath, 0))       /* ­Y«D¨ú®ø«h¥[¤W­×§ï¸ê°T */
+    {
+      if (fp = fopen(fpath, "a"))
+      {
+        ve_banner(fp, 1);
+        fclose(fp);
+      }
+    }
++   curredit = 0;
+
+: edit.c
+
+typedef struct textline
+{
+  struct textline *prev;
+  struct textline *next;
++ char startq;              /* 1: -- ¶}©l */
+  int len;
+  uschar data[ANSILINELEN];
+}       textline;
+
+: edit.c:ve_forward()
+
+  while (n--)
+  {
+-   if (!(tmp = cur->next))
++   /* itoc.030727: PGDN Â½­¶³Ì¦h²¾¨ì -- ¶}©l */
++   if (!(tmp = cur->next) || cur->startq)
+      break;
+
+: edit.c:ve_alloc()
+
+  if (p = (textline *) malloc(sizeof(textline)))
+  {
+    p->prev = NULL;
+    p->next = NULL;
++   p->startq = 0;
+    p->len = 0;
+    p->data[0] = '\0';
+    return p;
+  }
+
+: edit.c:ve_load()
+
+  uschar *str;
+  textline *next;
++ textline *tmp;
+
+  next = this->next;
++ tmp = this;
+
+  mgets(-1);
+
+  while (str = mgets(fd))
+  {
+    this = ve_line(this, str);
+
++   /* itoc.030727: -- ¶}©l */
++   if ((curredit & EDIT_MODIFYPOST) && !strcmp(str, "--"))
++   {
++     /* §ä³Ì«á¤@­Ó "--" */
++     tmp->startq = 0;
++     tmp = this;
++     this->startq = 1;
++   }
+  }
+
+: edit.c:tbf_read()
+
+static inline void
+tbf_read()
+{
+  int fd;
+  char fpath[80];
+
++ /* itoc.030727: -- ¶}©l¥H«á«K¤£¯à¸ü¤J¼È¦sÀÉ */
++ if (vx_cur->startq)
++   return;
+
+: edit.c:vedit() ªºµù¸Ñ
+
+/* ----------------------------------------------------- */
+/* ve_op:                                                */
+/*  0 => ¯Âºé½s¿èÀÉ®×                                    */
+/* -1 => ½s¿è¦ý¤£¯àÀx¦s¡A¥Î¦b½s¿è§@ªÌ¤£¬O¦Û¤vªº¤å³¹      */
+/*  1 => ¤Þ¤å¡B¥[Ã±¦WÀÉ¡A¨Ã¥[¤WÀÉÀY¡A¥Î¦bµoªí¤å³¹/¯¸¤º«H */
+/*  2 => ¤Þ¤å¡B¥[Ã±¦WÀÉ¡A¤£¥[¤WÀÉÀY¡A¥Î¦b±H¯¸¥~«H        */
+/* ----------------------------------------------------- */
+/* ­Y ve_op ¬O 1 ©Î 2 ®É¡A¶i¤J vedit «eÁÙ±o«ü©w curredit */
++ /* ­Y ve_op ¬O 0¡A­Y­n¸T¤î­×§ï -- ¥H¤Uªº¤å¦r¡A¶i¤J vedit */
++ /* «eÁÙ±o«ü©w curredit ¬° EDIT_MODIFYPOST                */
+/* ----------------------------------------------------- */
+
+: edit.c:vedit()
+
+    cc = vkey();
+
++   if (vln->startq)
++   {
++     /* itoc.030727: -- ¶}©l¥H«á¡A¥u¯à«ö¥H¤U«öÁä */
++     if (cc != KEY_INS && cc != KEY_LEFT && cc != KEY_UP &&
++       cc != Ctrl('P') && cc != KEY_PGUP && cc != Ctrl('B') &&
++       cc != KEY_PGDN && cc != Ctrl('F') && cc != Ctrl('O') &&
++       cc != Ctrl('T') && cc != Ctrl('S') && cc != Ctrl('V') &&
++       cc != Ctrl('X') && cc != Ctrl('Z'))
++     goto ve_key;
++   }
+
+: edit.c:vedit()
+
+      case Ctrl('O'):           /* delete to end of file */
+
+        /* vln->len = ve_col = cc = 0; */
+        tmp = vln->next;
+        vln->next = NULL;
+        while (tmp)
+        {
+-         vln = tmp->next;
+-         free(tmp);
+-         tmp = vln;
++         textline *tmp2;
++         /* yiting: ­Y¤U¤@¦æ¬O"--"¡A«h§â¥¦±µ¨ì¥Ø«e³o¦æªº¤U­± */
++         if ((curredit & EDIT_MODIFYPOST) && (tmp->startq))
++         {
++           vln->next = tmp;
++           tmp->prev = vln;
++           break;
++         }
++         tmp2 = tmp->next;
++         free(tmp);
++         tmp = tmp2;
+        }
+        ve_mode = mode | VE_REDRAW;
+        continue;
+
+: edit.c:ve_edit()
+
+      case Ctrl('D'):
+      case KEY_DEL:             /* delete current character */
+
+        cc = vln->len;
+        if (cc == col)
+        {
++         /* ­Y¤U¦æ¬O --¡A¤£¯à DEL */
++         if ((curredit & EDIT_MODIFYPOST)&&(tmp = vln->next)&&(tmp->startq))
++           goto ve_key;
+          join_up(vln);
+          ve_mode = mode | VE_REDRAW;
+        }
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

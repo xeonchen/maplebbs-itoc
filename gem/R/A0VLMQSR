@@ -1,0 +1,124 @@
+µo«H¤H: SnowWolf.bbs@xeon.tfcis.org (ÀR©]) ¬ÝªO: plan
+¼Ð  ÃD: [¤å¥ó] BLog for itoc-maple ¨t²Î¦w¸Ë----1
+µo«H¯¸: °Ê¤O®Ö¤ß (Sun, 07 Sep 2003 23:13:16 +0800 (CST))  Updated: 2004/03/11
+
+³o½g¤å³¹¦b´y­z«ç»ò¬[³] PttBlog, ³Ì«á¤@¦¸­×¥¿ªº®É¶¡¬°:
+$Id: INSTALL,v 1.4 2003/07/06 03:58:43 in2 Exp $
+
+½Ðª`·N,  PttBlog¥»¨Ó¥D­n¬O³]­pµ¹ Ptt2 ¯¸¥x¨Ï¥Î, ¥Ø«e¥¿¦b¶}µo¶¥¬q,
+¨Ã¥¼±µ¨üÄY±Kªº´ú¸Õ, ¥i¯àÁÙ¯Ê¤Ö«Ü¦h¥\¯à, ¥H¤Î¥i¯à¦³³\¦hªº bug.
+
+±z¥i¥H«ö·Ó¤U¦Cªº¨BÆJ¦w¸Ë¦n PttBlog.
+1.¦w¸Ë¦n¤U¦CªºªF¦è, §Ú­Ì¨Ã¦P®É¦C¤W FreeBSD ports¤ºªº¥Ø¿ý:
+        apache          /usr/ports/www/apache13/
+        perl            /usr/ports/lang/perl5.8/
+
+  ¦w¸Ëmod_perl¥ý¥Îperl -v½T»{¤@¤Uª©¥»¬O§_¬O5.8.0
+
+        mod_perl        /usr/ports/www/mod_perl/
+        mysql           /usr/ports/databases/mysql323-server/
+
+  ¥H¤Î¤U¦Cªº module
+
+        Template        /usr/ports/www/p5-Template-Toolkit/
+        Date::Calc      /usr/ports/devel/p5-Date-Calc/
+        DBI             /usr/ports/databases/p5-DBI/
+        DBD::mysql      /usr/ports/databases/p5-DBD-mysql/
+        MD5             /usr/ports/security/p5-MD5/
+        Mail::Sender    /usr/ports/mail/p5-Mail-Sender/
+        OurNet::FuzzyIndex (ÁÙ¨S¦³¶i ports, ½Ð¥Î cpan ¸Ë)
+
+     [ª`·N]½Ð½T»{§A¦w¸Ëmodule®É¬O¥Îperl 5.8.0
+
+2.³]©w apache ¥i¥Hª½±µ³z¹L mod_perl ¨Ó¶] perl script .
+  ¦b±zªº apache.conf (or httpd.conf)¤¤, À³¸Ó·|¦³:
+        LoadModule perl_module        libexec/apache/libperl.so
+        AddModule mod_perl.c
+  ¦b<IfModule mod_mime.c></IfModule>¤¤¶¡, ¥[¤W³o¨â¦æ:
+        AddHandler perl-script .pl
+        PerlHandler Apache::Registry
+
+3.¥H bbs ¨­¤À«Ø¥ß¤U¦C¥Ø¿ý
+
+        mkdir /home/bbs/blog
+        mkdir /home/bbs/blog/web
+        mkdir /home/bbs/blog/data
+        mkdir /home/bbs/blog/cache
+
+    web¬O­napache¥i¥HÅª¨ú
+    cache¬O­napache¥i¥HÅª¨ú¡B¼g¤J
+    data¬O­napache¥i¥HÅª¨ú
+
+    ¥i¬Odata¸Ì­±ªº¸ê®Æ¬Obbs¥Îbuilddb.pl²£¥Íªº
+    Åv­­³q±`¬O700 ³o­Ó¦a¤è­n¦A­×§ï¤@¤Uµ{¦¡ ©Î¬OÃi¤@ÂI°®¯Ü
+    §â Apache ªº user/group ³£§ï¦¨bbs @_@
+
+  ¨ä¤¤ blog/web ¸Ì­±¦Ü¤Ö­n¦³ index.pl, blog.pl, LocalVars.pm
+   (¨ä¤¤ LocalVars.pm «ØÄ³¥Î symbolic link ¨ì /home/bbs/bin/ªº¨º¤@¥÷)
+  ¨ä¤¤ *.pl ªºÅv­­­n¬O¥i¥H°õ¦æªº (ex: chmod 755 *.pl)
+
+4.³]©w apache «ü¨ì blog ªº¥Ø¿ý. ¨Ã±N¸Ó¥Ø¿ý¶}©l ExecCGIªº option.
+  ¨Ò¦p¨Ï¥Î Virtual Host :
+
+   NameVirtualHost *
+   <VirtualHost *>
+       ServerName    blog.xxxx
+       DocumentRoot  /home/bbs/blog/web
+     <Directory "/home/bbs/blog/web">
+       Options ExecCGI
+     </Directory>
+   </VirtualHost>
+
+
+  ¦pªG§A¦³¨â­ÓServerName¡A¤]¥i¥H¥Î
+
+    NameVirtualHost *
+
+    <VirtualHost *>
+        ServerName    blog.xxxx
+        DocumentRoot  /usr/local/www/data
+    </VirtualHost>
+
+    <VirtualHost *>
+        ServerName    blog2.xxxx
+        DocumentRoot  /home/bbs/blog/web
+      <Directory "/home/bbs/blog/web">
+        Options ExecCGI
+      </Directory>
+    </VirtualHost>
+
+  ³o¼Ëblog.xxxx¸òblog2.xxxx´N¥i¥H¤À§O³s¨ì¤£¦P¥Ø¿ý
+
+  ÁÙ¦³ <IfModule mod_dir.c> ³o­Ó¦a¤è°O±o§âindex.pl¥[¤J
+
+5.±N builddb.pl, BBSFileHeader.pm «þ¨©¶i ~bbs/bin
+  ±z¥i¥H¹Á¸Õ¥Î perl -c ~bbs/bin/builddb.pl  ´ú¸Õ¬Ý¬Ý¯à¤£¯à¹L.
+  ­Y¤£¦æªº¸Ü, ³q±`¬O LocalVars.pm ¸Ì­±¤ÖªF¦è,
+  ½Ð°Ñ¦Ò pttbbs/sample/LocalVars.pm ªº blog °Ï.
+
+  [ª`·N]´Nºâ³q¹L´ú¸ÕApacheÅª¨ú®É¤]¥i¯à¥X²{°ÝÃD¡AApache¦pªG¤£¯à¥¿±`¹B§@perl
+
+        ½ÐÀË¬dhttp°O¿ýÀÉ¡A¥i¯à¬O¦³moduleº|¸Ë¤F¡A©Î¬O¸ü¤Jmodule¥X²{°ÝÃD
+
+6.Ãö©ó Mysql¦@¶·­n¤U­±¨â­Ó table (¥i¥Hª½±µ½Æ»s¹L¥h¶])
+        CREATE TABLE `comment` (
+          `brdname` varchar(13) NOT NULL default '',
+          `artid` int(11) NOT NULL default '0',
+          `name` varchar(32) NOT NULL default '',
+          `mail` varchar(64) NOT NULL default '',
+          `content` text NOT NULL,
+          `mtime` int(11) NOT NULL default '0',
+          `hash` varchar(32) NOT NULL default ''
+        ) TYPE=MyISAM;
+
+        CREATE TABLE `counter` (
+          `k` char(32) NOT NULL default '',
+          `v` int(11) NOT NULL default '0',
+          `mtime` int(11) NOT NULL default '0',
+          PRIMARY KEY  (`k`)
+        ) TYPE=MyISAM;
+
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m     [31m°[1mÊ¤[0;31mO®[1mÖ¤[0;31mß [1mprocessor.tfcis.org    [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[ [1m    140.127.38.223                  [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

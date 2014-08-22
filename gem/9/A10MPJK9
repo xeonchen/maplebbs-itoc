@@ -1,0 +1,30 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬İªO: itoc
+¼ĞÃD: Re: ºëµØ°Ï¤¤ªº¸T¤î guest µn¤J
+®É¶¡: 2004/10/13 Wed 11:30:49                           Updated: 2004/10/13
+
+¡° ¤Ş­z¡mimd.bbs@wretch.twbbs.org (ºN¯Á¤¤)¡n¤§»Ê¨¥¡G
+> ¥i¥H§ï¦¨­­©w¬Y¨Ç®É¬q
+> ¸T¤î guest ¤W½u¶Ü
+> ¨Ò¦p±ß¤W9ÂI¦Ü¹j¤Ñ­â±á1ÂI
+
+: bbsd.c:login_user()
+
+    else
+    {                           /* guest */
++     struct tm *ptime;
++     ptime = localtime(&ap_start);
++     if (ptime->tm_hour >= 21 || ptime->tm_hour <= 1) /* ±ß¤W9ÂI¦Ü­â±á1ÂI */
++     {
++       vmsg(STR_GUEST " ¤£¯à¦bÄA®p®É¬q¤W¯¸");
++       continue;
++     }
+
+      if (acct_load(&cuser, uid) < 0)
+      {
+        vmsg(err_uid);
+        continue;
+      }
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

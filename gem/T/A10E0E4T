@@ -1,0 +1,55 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: brdmail ¦ü¥G¨SÔ£­­¨î
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/06/28 Mon 22:39:50)                Updated: 2004/06/28
+
+¡° ¤Þ­z¡mTroyLee.bbs@bbs.cse.ttu.edu.tw (What is life and dream?)¡n¤§»Ê¨¥¡G
+> §Ú¥i¥H³z¹Lbrdmail¶K¤å³¹¨ì¥ô¦óª©­C....
+> ¤@¯ë¬ÝªO ¦n¤Íª© ¯¦±Kª© °Î¦Wª© ¯S®íÅv­­ª©(¯¸ªø°Q½×¥Î)
+> ³£¥i¥H.......
+
+  ¬O¨S¿ù¡A¦pªG§A¤£³ßÅw³o¼Ëªº¸Ü
+
+: bmtad.c:getbrdname()
+
+static int                      /* 1: §ä¨ì¤F³o­ÓªO¡A¥BªO¦W¦b brdname */
+getbrdname(brdname)
+  char *brdname;
+{
+  BRD *brd;
+
+- if (brd = brd_get(brdname))
++ if ((brd = brd_get(brdname)) &&
++   ((brd->readlevel | brd->postlevel) < (PERM_VALID << 1)))
+  {
+    strcpy(brdname, brd->brdname);      /* ´«¦¨¥¿½Tªº¤j¤p¼g */
+    return 1;
+  }
+  return 0;
+}
+
+: brdmail.c:brd_get()
+
+static BRD *
+brd_get(bname)
+  char *bname;
+{
+  BRD *bhdr, *tail;
+
+  bhdr = bshm->bcache;
+  tail = bhdr + bshm->number;
+  do
+  {
+    if (!str_cmp(bname, bhdr->brdname))
++   {
++     if ((bhdr->readlevel | bhdr->postlevel) < (PERM_VALID << 1))
+        return bhdr;
++     return NULL;
++   }
+  } while (++bhdr < tail);
+  return NULL;
+}
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

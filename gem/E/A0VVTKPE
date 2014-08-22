@@ -1,0 +1,43 @@
+µo«H¤H: peterkim.bbs@processor.tfcis.org (¡Ã¡¾¡Ã||..§Ú¬O¤Ñ ¬ÝªO: plan
+¼Ð  ÃD: Re: [¶¢²á] TFCIS.personal.itoc ªººëµØ°Ï
+µo«H¯¸: XEON (Thu, 27 Mar 2003 08:26:31 +0800 (CST))
+
+  §Ú­Ìªº®É°Ï¬O CST¡A¦pªG³]©w¿ùªº¸Ü date ¸òÀÉ®×«Ø¥ßªº®É¶¡¬Ý°_¨Ó´N·|«Ü©Ç¡C
+
+  ¨Ï¥Î tzsetup ¨Ó­×§ï¡G
+
+    ­º¥ý¦w¸Ëµ{¦¡·|°Ý¡A±zªº CMOS ®É¶¡¬O§_¬O®æªL«Âªv®É¶¡(UTC)¡A §Ú­Ìªº CMOS
+    ³q±`³£¬O³]¬°·í¦aªº®É¶¡¡A©Ò¥H½Ð¿ï ¡yNO¡z¡C ±µ¤U¨Ó­n¿ï®É°Ï¡A§Ú­Ì¿ï¡y5Asia¡z¡B
+    ¡y43 Taiwan¡z¡C ©Î¬Oª½±µ¥H root ¨Ï¥Î¥H¤Uªº«ü¥O¡C
+
+    tzsetup /usr/share/zoneinfo/Asia/Taipei
+
+
+  ¥t¥~¤]¥i¥H§Q¥Î ntpdate ¨Ó»Pºô¸ô®É¶¡¨ó©w (NTP) ¦øªA¾¹¹ï®É¡C
+
+    ntpdate tick.stdtime.gov.tw
+
+  ¨ä¥L¹ï®É¦øªA¾¹ÁÙ¦³
+
+    ®É¶¡»PÀW²v°ê®a¼Ð·Ç¹êÅç«Ç
+    time.stdtime.gov.tw
+    clock.stdtime.gov.tw
+    tick.stdtime.gov.tw
+    tock.stdtime.gov.tw
+    watch.stdtime.gov.tw
+
+    ¬ü°êUSNO
+    tick.usno.navy.mil
+    tock.usno.navy.mil
+
+    ¬ü°êNIST
+    time.nist.gov
+    time-a.nist.gov
+
+    ´N·|¦Û°Ê§ó¥¿®É¶¡¡A¥i¥H©ñ¦b crontab ¶]¡C
+
+    ½Ð°Ñ¦Ò http://www.stdtime.gov.tw/
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44m163.25.118.33                            [m

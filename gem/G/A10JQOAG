@@ -1,0 +1,183 @@
+§@ªÌ: itoc (test) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¤å³¹µû¤À¥\¯à
+®É¶¡: Sun Aug 18 14:45:05 2002                          Updated: 2005/05/19
+
+  µû¤À±Æ¦æº]
+
+: crontab -e
+
+# ¨C¤Ñ°µ¤@¦¸±Æ¦æº]²Î­p
+28 3 * * * bin/topgem > /dev/null 2>&1
+30 3 * * * bin/topsong > /dev/null 2>&1
++ 32 3 * * * bin/topscore > /dev/null 2>&1
+34 3 * * * bin/topusr > /dev/null 2>&1
+
+: BBS ¯¸¤W (A)nnounce ¸Ì­±ªº {±Æ¦æ} ²Î­p¸ê®Æ
+
+  Ctrl+P ·s¼W (D)¸ê®Æ
+  ¼ÐÃD¡Gµû¤À¦¸¼Æ²Î­p
+  ÀÉ¦W¡G-topscore
+
+: src/util/Makefile ¥[¤J topscore
+
+TOOL =  ... \
+        ... \
+        ... topgem [1;33mtopscore[m topsong ...
+
+: src/util/topscore.c ·s¼W³oµ{¦¡¡A¤º®e¦p¤U
+
+/*-------------------------------------------------------*/
+/* util/topscore.c      ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ¤å³¹µû¤À±Æ¦W                                 */
+/* create : 03/04/26                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+/* syntax : topscore                                     */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define FN_RUN_SCOREUSIES       "run/score_usies"       /* µû¤À°O¿ý */
+#define OUTFILE_TOPSCORE        "gem/@/@-topscore"
+
+
+typedef struct
+{
+  char brdname[BNLEN + 1];
+  char owner[IDLEN + 1];
+  char title[TTLEN + 1];
+  char score;
+} SCOREDATA;
+
+
+/*-------------------------------------------------------*/
+/* §â©Ò¦³³Qµû¤Àªº¤å³¹§ä¥X¨Ó                              */
+/*-------------------------------------------------------*/
+
+
+static void
+do_find(brdname)
+  char *brdname;
+{
+  int i, size, fd;
+  char fpath[64];
+  struct stat st;
+  HDR *hdr;
+  SCOREDATA score;
+  time_t due;
+
+  brd_fpath(fpath, brdname, FN_DIR);
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    fstat(fd, &st);
+    size = st.st_size;
+    hdr = (HDR *) malloc(size);
+    read(fd, hdr, size);
+    close(fd);
+
+    due = time(NULL) - 86400 * 10;      /* ³Ì¦h²Î­p¨ì¤Q¤Ñ«eªº¤å³¹ */
+
+    size /= sizeof(HDR);
+    for (i = 0; i < size; i++)
+    {
+      if (hdr[i].score > 0 && hdr[i].chrono >= due)
+      {
+        strcpy(score.brdname, brdname);
+        strcpy(score.owner, hdr[i].owner);
+        strcpy(score.title, hdr[i].title);
+        score.score = hdr[i].score;
+        rec_add(FN_RUN_SCOREUSIES, &score, sizeof(SCOREDATA));
+      }
+    }
+
+    free(hdr);
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* »s§@±Æ¦W                                              */
+/*-------------------------------------------------------*/
+
+
+static void
+write_data(score, num)
+  SCOREDATA *score;
+  int num;
+{
+  int n;
+  FILE *fp;
+
+  if (!(fp = fopen(OUTFILE_TOPSCORE, "w")))
+    return;
+
+  fprintf(fp, "\033[37m¦W¦¸\033[36m¢w\033[37m¬ÝªO\033[36m¢w¢w¢w¢w"
+    "\033[37m§@ªÌ\033[36m¢w¢w¢w¢w¢w\033[37m¼Ð  ÃD\033[36m¢w¢w¢w¢w"
+    "¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w\033[37m¤À¼Æ\033[36m¢w\033[m\n");
+
+  for (n = 0; n < 50 && n < num; n++)           /* ¥u¨ú«e 50 ¦W */
+  {
+    fprintf(fp, "%3d. %-13.13s%-13.13s%-38.38s %4d ¦¸\033[m\n",
+      n + 1, score[n].brdname, score[n].owner, score[n].title, score[n].score);
+  }
+
+  fclose(fp);
+}
+
+
+static int
+count_cmp(b, a)
+  SCOREDATA *a, *b;
+{
+  return (a->score - b->score);
+}
+
+
+int
+main()
+{
+  int fd, size;
+  struct stat st;
+  SCOREDATA *score;
+  BRD brd;
+
+  chdir(BBSHOME);
+
+  unlink(FN_RUN_SCOREUSIES);
+
+  size = 0;
+  while (!rec_get(FN_BRD, &brd, sizeof(BRD), size))
+  {
+    if ((brd.readlevel | brd.postlevel) < (PERM_VALID << 1)) /* ÁôÂÃªO¤£²Î­p */
+      do_find(brd.brdname);
+    size++;
+  }
+
+  if ((fd = open(FN_RUN_SCOREUSIES, O_RDWR)) < 0)
+    return 0;
+
+  if (!fstat(fd, &st) && (size = st.st_size) >= sizeof(SCOREDATA))
+  {
+    score = (SCOREDATA *) malloc(size);
+    size = read(fd, score, size);
+
+    qsort(score, size / sizeof(SCOREDATA), sizeof(SCOREDATA), count_cmp);
+
+    lseek(fd, 0, SEEK_SET);
+    write(fd, score, size);
+    ftruncate(fd, size);
+
+    write_data(score, size / sizeof(SCOREDATA));
+    free(score);
+  }
+
+  close(fd);
+  return 0;
+}
+
+--
+[1;32m¡¼ Origin: [33m°Ê¤O®Ö¤ß [37mxeon.tfcis.org  [31m¡¼ From: [36mitoc.Dorm-GD2.NCTU.edu.tw[m

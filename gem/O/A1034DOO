@@ -1,0 +1,386 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶(Skyl ¬ÝªO: plan
+¼Ð  ÃD: [¤å¥ó] Âù¤H¶¤«³¾ÔÁZ²Î­p
+µo«H¯¸: Àº¤Ñ±^ (2004/01/11 Sun 01:22:09)                  Updated: 2005/06/11
+
+: src/util/Makefile
+
+EXE =   ... [1;33mtopbwboard[m
+
+: ·s¼W util/topbwboard.c
+
+/*-------------------------------------------------------*/
+/* util/topboard.c      ( NTHU CS MapleBBS Ver 3.00 )    */
+/*-------------------------------------------------------*/
+/* target : ¨Ï¥ÎªÌ¸ê®Æ²Î­p¤Î±Æ¦W                         */
+/* create : 99/03/29                                     */
+/* update : 01/10/01                                     */
+/* modify : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define OUTFILE_BW_A_W  BBSHOME"/gem/@/@-bwaw"
+#define OUTFILE_BW_A_L  BBSHOME"/gem/@/@-bwal"
+#define OUTFILE_BW_B_W  BBSHOME"/gem/@/@-bwbw"
+#define OUTFILE_BW_B_L  BBSHOME"/gem/@/@-bwbl"
+#define OUTFILE_BW_C_W  BBSHOME"/gem/@/@-bwcw"
+#define OUTFILE_BW_C_L  BBSHOME"/gem/@/@-bwcl"
+#define OUTFILE_BW_D_W  BBSHOME"/gem/@/@-bwdw"
+#define OUTFILE_BW_D_L  BBSHOME"/gem/@/@-bwdl"
+#define OUTFILE_BW_E_W  BBSHOME"/gem/@/@-bwew"
+#define OUTFILE_BW_E_L  BBSHOME"/gem/@/@-bwel"
+
+
+#define TOPNUM          36
+#define TOPNUM_HALF     (TOPNUM / 2)
+
+
+typedef struct
+{
+  char userid[IDLEN + 1];
+  char username[UNLEN + 1];
+  int num;
+}       DATA;
+
+
+typedef struct
+{
+  int al;
+  int aw;
+  int bl;
+  int bw;
+  int cl;
+  int cw;
+  int dl;
+  int dw;
+  int el;
+  int ew;
+}       BWBOARD;
+
+
+static DATA topbwaw[TOPNUM], topbwal[TOPNUM], topbwbw[TOPNUM],
+            topbwbl[TOPNUM], topbwcw[TOPNUM], topbwcl[TOPNUM],
+            topbwdw[TOPNUM], topbwdl[TOPNUM], topbwew[TOPNUM],
+            topbwel[TOPNUM];
+
+
+static int
+sort_compare(p1, p2)
+  const void *p1;
+  const void *p2;
+{
+  int k;
+  DATA *a1, *a2;
+
+  a1 = (DATA *) p1;
+  a2 = (DATA *) p2;
+
+  k = a2->num - a1->num;
+  return k ? k : str_cmp(a1->userid, a2->userid);
+}
+
+
+static void
+fill_username(src)
+  DATA *src;
+{
+  int i, fd;
+  char fpath[64];
+  ACCT acct;
+  DATA *p;
+
+  for (i = 0; i < TOPNUM; i++)
+  {
+    p = src + i;
+    if (!strlen(p->userid))
+      continue;
+    usr_fpath(fpath, p->userid, FN_ACCT);
+    if ((fd = open(fpath, O_RDONLY)) < 0)
+      continue;
+    read(fd, &acct, sizeof(ACCT));
+    close(fd);
+    str_ncpy(p->userid, acct->userid, sizeof(p->userid));
+    str_ncpy(p->username, acct->username, sizeof(p->username));
+  }
+}
+
+
+static DATA *
+findmin(src)
+  DATA *src;
+{
+  int i;
+  DATA *p;
+
+  p = src;
+  for (i = 0; i < TOPNUM; i++)
+    if (src[i].num < p->num)
+      p = src + i;
+  return (p);
+}
+
+
+static void
+merge_id_nick(dst, userid, nick)
+  char *dst;
+  char *userid;
+  char *nick;
+{
+  if (*userid)
+  {
+    sprintf(dst, "%s (%s)", userid, nick);
+
+    if (strlen(dst) > 25)
+      dst[25] = 0;
+  }
+  else
+    dst[0] = 0;
+}
+
+
+static void
+write_data(fpath, title, data, wl)
+  char *fpath;
+  char *title;
+  DATA *data;
+  char wl;
+{
+  FILE *fp;
+  char buf[256];
+  int i, num1, num2;
+
+  if (!(fp = fopen(fpath, "w")))
+    return;
+
+  i = 12 - (strlen(title) >> 1);
+  sprintf(buf, " \033[1;33m¡³ ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¡÷ "
+    "\033[41m%%%ds%%s%%%ds\033[40m ¡ö¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w ¡³\033[m\n\n",
+    i, i);
+  fprintf(fp, buf, "", title, "");
+
+  fprintf(fp,
+    "\033[1;37m¦W¦¸  \033[33m¥N¸¹(¼ÊºÙ)                \033[36m%s\033[m   "
+    "\033[1;37m¦W¦¸  \033[33m¥N¸¹(¼ÊºÙ)                \033[36m%s\033[m\n"
+    "\033[1;32m%s\033[m\n",
+    wl ? "³Ó³õ" : "±Ñ³õ", wl ? "³Ó³õ" : "±Ñ³õ", MSG_SEPERATOR);
+
+  for (i = 0; i < TOPNUM_HALF; i++)
+  {
+    char buf1[80], buf2[80];
+
+    merge_id_nick(buf1, data[i].userid, data[i].username);
+    merge_id_nick(buf2, data[i + TOPNUM_HALF].userid,
+      data[i + TOPNUM_HALF].username);
+
+    /* itoc.010408: ¸Ñ¨M¿ú¤Ó¦h¡Aµe­±Ãz±¼ªº°ÝÃD */
+    num1 = data[i].num / 1000000;
+    num2 = data[i + TOPNUM_HALF].num / 1000000;
+    if (num2)                   /* ¨º»ò data[i].num ¤]¥²©w > 10^6 */
+    {
+      fprintf(fp, "[%2d] %-25s %5dM  [%2d] %-25s %5dM\n", i + 1, buf1, num1,
+        i + 1 + TOPNUM_HALF, buf2, num2);
+    }
+    else if (num1)
+    {
+      fprintf(fp, "[%2d] %-25s %5dM  [%2d] %-25s %6d\n", i + 1, buf1, num1,
+        i + 1 + TOPNUM_HALF, buf2, data[i + TOPNUM_HALF].num);
+    }
+    else
+    {
+      fprintf(fp, "[%2d] %-25s %6d  [%2d] %-25s %6d\n", i + 1, buf1,
+        data[i].num, i + 1 + TOPNUM_HALF, buf2, data[i + TOPNUM_HALF].num);
+    }
+  }
+
+  fprintf(fp, "\n");
+  fclose(fp);
+}
+
+
+static inline void
+topusr(userid, bwboard)
+  char *userid;
+  BWBOARD *bwboard;
+{
+  DATA *p;
+
+  if ((p = findmin(&topbwaw))->num < bwboard->aw)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->aw;
+  }
+
+  if ((p = findmin(&topbwal))->num < bwboard->al)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->al;
+  }
+
+  if ((p = findmin(&topbwbw))->num < bwboard->bw)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->bw;
+  }
+
+  if ((p = findmin(&topbwbl))->num < bwboard->bl)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->bl;
+  }
+
+  if ((p = findmin(&topbwcw))->num < bwboard->cw)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->cw;
+  }
+
+  if ((p = findmin(&topbwcl))->num < bwboard->cl)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->cl;
+  }
+
+  if ((p = findmin(&topbwdw))->num < bwboard->dw)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->dw;
+  }
+
+  if ((p = findmin(&topbwdl))->num < bwboard->dl)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->dl;
+  }
+
+  if ((p = findmin(&topbwew))->num < bwboard->ew)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->ew;
+  }
+
+  if ((p = findmin(&topbwel))->num < bwboard->el)
+  {
+    str_ncpy(p->userid, userid, sizeof(p->userid));
+    p->num = bwboard->el;
+  }
+}
+
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+int
+main()
+{
+  char c;
+
+  memset(&topbwaw, 0, sizeof(topbwaw));
+  memset(&topbwal, 0, sizeof(topbwal));
+  memset(&topbwbw, 0, sizeof(topbwbw));
+  memset(&topbwbl, 0, sizeof(topbwbl));
+  memset(&topbwcw, 0, sizeof(topbwcw));
+  memset(&topbwcl, 0, sizeof(topbwcl));
+  memset(&topbwdw, 0, sizeof(topbwdw));
+  memset(&topbwdl, 0, sizeof(topbwdl));
+  memset(&topbwew, 0, sizeof(topbwew));
+  memset(&topbwel, 0, sizeof(topbwel));
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    char buf[64];
+    struct dirent *de;
+    DIR *dirp;
+
+    sprintf(buf, BBSHOME "/usr/%c", c);
+    chdir(buf);
+
+    if (!(dirp = opendir(".")))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      BWBOARD bwboard;
+      int fd;
+      char *fname;
+
+      fname = de->d_name;
+      if (*fname <= ' ' || *fname == '.')
+        continue;
+
+      sprintf(buf, "%s/bwboard", fname);
+      if ((fd = open(buf, O_RDONLY)) < 0)
+        continue;
+
+      read(fd, &bwboard, sizeof(BWBOARD));
+      close(fd);
+
+      bwboard.al -= bwboard.aw;
+      bwboard.bl -= bwboard.bw;
+      bwboard.cl -= bwboard.cw;
+      bwboard.dl -= bwboard.dw;
+      bwboard.el -= bwboard.ew;
+
+      topusr(fname, &bwboard);
+    }
+
+    closedir(dirp);
+  }
+
+  chdir(BBSHOME);
+  fill_username(&topbwaw);
+  fill_username(&topbwal);
+  fill_username(&topbwbw);
+  fill_username(&topbwbl);
+  fill_username(&topbwcw);
+  fill_username(&topbwcl);
+  fill_username(&topbwdw);
+  fill_username(&topbwdl);
+  fill_username(&topbwew);
+  fill_username(&topbwel);
+
+  qsort(topbwaw, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_A_W, "¶Â¥Õ´Ñ³Ó³õ­^¶¯º]", &topbwaw, 1);
+
+  qsort(topbwal, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_A_L, "¶Â¥Õ´Ñ±Ñ³õª¯ºµº]", &topbwal, 0);
+
+  qsort(topbwbw, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_B_W, "¤­¤l´Ñ³Ó³õ­^¶¯º]", &topbwbw, 1);
+
+  qsort(topbwbl, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_B_L, "¤­¤l´Ñ±Ñ³õª¯ºµº]", &topbwbl, 0);
+
+  qsort(topbwcw, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_C_W, "³ò´Ñ³Ó³õ­^¶¯º]", &topbwcw, 1);
+
+  qsort(topbwcl, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_C_L, "³ò´Ñ±Ñ³õª¯ºµº]", &topbwcl, 0);
+
+  qsort(topbwdw, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_D_W, "­x´Ñ³Ó³õ­^¶¯º]", &topbwdw, 1);
+
+  qsort(topbwdl, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_D_L, "­x´Ñ±Ñ³õª¯ºµº]", &topbwdl, 0);
+
+  qsort(topbwew, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_E_W, "·t´Ñ³Ó³õ­^¶¯º]", &topbwew, 1);
+
+  qsort(topbwel, TOPNUM, sizeof(DATA), sort_compare);
+  write_data(OUTFILE_BW_E_L, "·t´Ñ±Ñ³õª¯ºµº]", &topbwel, 0);
+
+  return 0;
+}
+
+
+µM«á¦b¨t²ÎºëµØ°Ï¤¤¥[¤J @-bwaw ¡B @-bwal ¡B @-bwbw ¡B @-bwbl ¡B @-bwcw ¡B
+@-bwcl ¡B @-bwdw ¡B @-bwdl ¡B @-bwew ¡B @-bwel §@¬°¸ê®Æ¡I
+
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mBioStar [30m±q [35mxman.bio.ncue.edu.tw [30mµoªí[m

@@ -1,0 +1,42 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¶}·s¬ÝªO¬ö¿ý
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/08/31 Wed 00:39:29)                Updated: 2007/04/29
+
+¡° ¤Þ­z¡mroofyu (roofyu)¡n¤§»Ê¨¥¡G
+> ¤£ª¾¹D­n«ç¼ËÅý¯¸ªø¶}·s¬ÝªO®É ¥i¥H²£¥Í¤½§i¦b¯S©w¬ÝªO
+
+  ¥ý°µºëµØ°Ï³o½g
+  [¥\¯à] post.c µo¤å¨ì¬ÝªO
+
+: acct.c:brd_new()
+
+  int bno;
+  char fpath[64];
++ char title[TTLEN + 1];
+
+  ...
+  ...
+
+  bshm_reload();
+
++ sprintf(title, "·sªO¦¨¥ß %s", brd->brdname);
++ add_post("newboard", "etc/newboard", title);    [1;44m// ¤½§i¬ÝªO¦Û©w [m
++ add_post(brd->brdname, "etc/newboard", title);  [1;44m// ¤½§i¦b³o­Ó·s¶}ªºªO [m
+
+: ~/etc/newboard ·s¼W¦¹ÀÉ®×
+
+§@ªÌ: SYSOP (¯¸ªø) ¯¸¤º: [¨t²Î¤½§i]
+¼ÐÃD: ·sªO¦¨¥ß
+®É¶¡: ´N¬O²{¦b
+
+ ¤j®a¦n¡G
+
+     ¥»¯¸¤S¦¨¥ß¤F¤@­Ó·s¬ÝªO¡A½Ð¤j®a¦h¦h¥h¥úÁ{³á¡C
+
+--
+                                          ¯¸°ÈºÞ²z­û ¢á¢ç¢á¢Ý¢Þ
+
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m itoc.dorm11.nctu.edu.tw  [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

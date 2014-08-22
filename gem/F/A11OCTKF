@@ -1,0 +1,139 @@
+µo«H¤H: LHD.bbs@bbs.cs.nctu.edu.tw (¤£°È¥¿·~) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] ¥¿±`Åª¨ú«D Big5 ¤¤¤å½s½X
+µo«H¯¸: ¦¸¥@¥N¢Ð¢á¢± (2005/11/25 Fri 02:32:13)          Updated: 2005/11/25
+
+ºëµØ°Ï²{¦³ªº¤å¥ó¦³¤@¨Ç¤£§¹µ½ªº¦a¤è:
+
+1. Subject ¥u°µ decode ¦ý¨S¦³ conv
+   ¸Ñ¨M¤èªk¬O§â PaulLiu ¤j¤j·íªì po ªº patch ©ñ¶i¥h
+2. ¥Ø«e¤º¤å¥u¦³¦b³Q QP ©Î base64 ½s½X®É¡A¤~·|°µ conv ªº°Ê§@
+   ­ì¦]À³¸Ó¬O mm_getencode §â 8bit µø¦Ó¤£¨£
+   ¸Ñ¨M¤èªk¬O mm_getencode §â 8bit ¤]ºâ¤@­Ó encode
+   µM«á¦b mmdecode ®É¡Acase '8' ¦^¶Ç strlen(src) + 1;
+   ·íµM­Y¬O·Q§â¨S¼g encode ªº³£·í°µ 8bit¡A´N¤£¥Î°Ê¨ì str_decode.c
+   ¦Ó¬O¤À§O¦b bbsmail/rec_article.c §ï¡A¦ý code ¤]§ï¤ñ¸û¦h
+   ¥H¤Uªº¼gªk¬O«áªÌ¡A¦ý§Ú§Æ±æ«eªÌ¯à¦¨¬°¥¿¦¡ release @@~
+3. bbsmail/brdmail ¤£¤ä´©¦h¦æ header (¤W¦¸¤~¥[¤W RFC2047 Subcect ¦h¦æ¤ä´©)
+   ©Ò¥H charset ¥i¯à·|§ì¤£¨ì¡A¦p
+   Content-Type: text/plain;
+        charset="utf-8";
+   innbbsd ¥»¨Ó´N¦³¤ä´©¡A´N¤£¥Î§ï¤F¡C
+
+¤U­±¬O¨Ì³Ì·sªºµ{¦¡½X + ºëµØ°Ï¦A patch
+PS. bmtad §Ú«Ü¤[¨S¥Î¡A´NÃi±o¼g¤F
+
+
+: lib/str_decode.c::str_decode() ²¾¨ì str_conv() «á¨Ã­×§ï
+
++#ifndef    MYCHARSET
++#define    MYCHARSET   "big5"
++#endif
+
+void
+str_decode(str)
+  unsigned char *str;
+{
+  int adj;
++ int i;
+  unsigned char *src, *dst;
+  unsigned char buf[512];
++ unsigned char charset[32];
+
+.....
+
+   else                        /* Thor: *src == '=' */
+    {
+      unsigned char *tmp = src + 1;
+      if (*tmp == '?')          /* Thor: =? coded */
+      {
+        /* "=?%s?Q?" for QP, "=?%s?B?" for BASE64 */
+        tmp++;
++       i = 0;
+        while (*tmp && *tmp != '?')
++       {
++         /* PaulLiu: §â =?%s? ¤¤ªº %s ¦s¨ì charset ¸Ì */
++         if (i + 1 < sizeof(charset))
++           charset[i++] = *tmp;
+          tmp++;
++       }
++       charset[i] = '\0';
+        if (*tmp && tmp[1] && tmp[2] == '?')    /* Thor: *tmp == '?' */
+        {
+!         i = mmdecode_header(tmp + 3, tmp[1], dst);
++         str_conv(charset, MYCHARSET, dst, i);
+          if (i >= 0)
+
+
+: util/bbsmail.c ¤Î brdmail.c
+
+    else if (!memcmp(buf, "Content-Type: ", 14))
+    {
+      str = buf + 14;
+
+#ifdef ANTI_HTMLMAIL
+....
+#endif
++     if (!strstr(str, "charset=") && fgets(buf, sizeof(buf), stdin))
++     {
++       if (*buf == ' ' || *buf == '\t')    /* charset ¦b¤U¤@¦C */
++         str = buf;
++       else
++         goto start;
++     }
+      mm_getcharset(str, charset, sizeof(charset));
+#ifdef ANTI_NOTMYCHARSETMAIL
+
+  ...
+  ...
+
+  while (fgets(buf, sizeof(buf), stdin) && buf[0])
+  {
+    if (decode && ((fd = mmdecode(buf, decode, buf)) > 0))
+      buf[fd] = '\0';
++   else    /* 8bit ©Î®Ú¥»¨Sµù©ú encode */
++     fd = strlen(buf) + 1;     /* ¥]¬A '\0' */
+
++   if (*charset)
++     str_conv(charset, MYCHARSET, buf, fd);
+
+    fputs(buf, fp);
+  }
+
+: innbbsd/rec_article.c::receive_article()
+
+  /* Âà charset */
+  mm_getencode(CONTENTENCODE, &decode);
+  cc = mmdecode(BODY, decode, BODY);
+  mm_getcharset(CONTENTTYPE, charset, sizeof(charset));
+  if (!*charset)
+    strcpy(charset, nf->charset);
+
+/* ÁöµM str_conv ·|§PÂ_ charset ¬Û¦P®É´N¤£°µ
+  ¦ý¦]¬° BODY ¥i¯à«Üªø¡A©Ò¥H´N¥ý§PÂ_ charset ¬O§_¬Ûµ¥
+  §K±o°µ strlen ªº¥Õ¤u */   /* ³o­Óµù¸Ñ¥u¬O¦b¦¹»¡©ú À³¸Ó¤£¥Î¥[.. */
++ if (str_cmp(charset, MYCHARSET))
++ {
++   if (cc < 0)
++     cc = strlen(BODY) + 1;
+    str_conv(charset, MYCHARSET, BODY, cc);
++ }
+
+  if (!str_cmp(charset, "gb2312"))
+  {
+    gb2b5(FROM);
+    gb2b5(SUBJECT);
+    if (SITE)
+      gb2b5(SITE);
+  }
+---
+¨ä¹êÁÙ¬O¦³¤@¨Ç¤p°ÝÃD
+¦p¼ÐÃD¬° GB2312 + RFC2047
+´N·|¦h°µ¤@¦¸ gb2b5 ¤Ï¦ÓÅÜ¶Ã½X
+¦ý¤j³° BBS ´X¥G¤£¨Ì RFC2047,³sOE°e¥XGB2312«H¥ó®É¤]¤£·|°µ(UTF-8·|)
+©Ò¥HÀ³¸ÓÁÙ¦n~
+
+--
+[1;34m¢e¢e¢e¢e¢e¢e¢e        ¢e¢e¢e¢e  ¢e¢e¢e¢e¢e¢e[;1m  ¡Õtelnet://bbs.cs.nctu.edu.tw¡Ö[m
+[1;34m  ¢i¢e¢e¢e¢e¢i        ¢i        ¢e¢e¢e¢e¢e¢i [;30;47mPlayer: [32mLHD                      [m
+[1;36m¢e¢i¢e¢e¢e¢e¢i  ¢e¢e¢e¢i        ¢i¢e¢e¢e¢e¢e [;30;47mFrom: [31mbsd3.cis.nctu.edu.tw       [m
+¡¸ ¦¸¥@¥N¢Ð¢á¢± ¡¸ ¥i¥Ó½Ð­Ó¤HªO [1m150MB ¶W¤j¬ÛÃ¯ http://pic.bs2.to ¸ê°T¤H 250MB[m

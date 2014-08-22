@@ -1,0 +1,151 @@
+µo«H¤H: chwaian.bbs@processor.tfcis.org (µL¨¥) ¬ÝªO: Maple_itoc
+¼Ð  ÃD: [¥\¯à]·s»D¼ÐÃD©ñ¨ì°ÊºA¬ÝªO
+µo«H¯¸: °Ê¤O®Ö¤ß (04/26/04 16:54:39 Mon)                  Updated: 2004/04/26
+
+  ­n¥ý°µºëµØ°Ï³o½g
+  [¥\¯à] enews-open.c ©_¼¯·s»DÂà¦Ü¬ÝªO
+
+
+idea±qWDªºcna¦Ó¨Ó
+
+¤£¹L«á¨Ó§Úµo²{³o­Ó¥\¯à ­n¦bitocªºª©¥»¤W¹ê²{
+
+ÁÙÆZ®e©öªº ¦]¬°itocªºª©¥»¥»¨Ó´N¦³§ì·s»Dªº¥\¯à
+
+¥u­n±qÂÂ¦³µ{¦¡ ®³¥X¨Ó¥Î§Y¥i
+
+: crontab -e ¥[¤J³o¤@¦æ
+
+20 * * * * bin/cna > /dev/null 2>&1
+
+: src/util/Makefile
+
+EXE =   ..... [1;33mcna[m
+
+: src/util/cna.c ·s¼W³oµ{¦¡
+
+/*-------------------------------------------------------*/
+/* cna.c    ( NTHU CS MapleBBS Ver 3.10 )                */
+/*-------------------------------------------------------*/
+/* target : ·s»D¼ÐÃD©ñ¨ì°ÊºA¬ÝªO                         */
+/* create : 02/01/27                                     */
+/* update :   /  /                                       */
+/* author : chwaian.bbs@processor.tfcis.org              */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define MAX_ENEWS   16
+
+static char title[MAX_ENEWS][TTLEN + 1];    /* ¥»¤ÀÃþ·s»Dªº©Ò¦³¼ÐÃD */
+
+
+static void
+enews_fpath(fpath, kind, fname)
+  char *fpath;
+  char kind;
+  char *fname;
+{
+  sprintf(fpath, "run/kimo/%c/%s", kind, fname);
+}
+
+
+int
+main()
+{
+  char kind;
+  char fpath[64];
+  char class[12][5] =
+  {
+    "¬Fªv", "ªÀ·|", "°ê»Ú", "¨â©¤", "°]¸g", "¼vµø",
+    "Åé¨|", "¥Í¬¡", "¥ð¶¢", "°·±d", "¬ì§Þ", "·s©_"
+  };
+  [1;44m// ¥ý¦b note ºëµØ°Ïªº°ÊºA¬ÝªO·s¼W¤Q¤G½g¤å³¹¡A¨Ã«ö S ±oª¾ÀÉ®×¦WºÙ¡A§Û¨Ó³o¸Ì [m
+  char filename[12][11] =
+  {
+    "5/A108NLL5", "L/A108NLLL", "A/A108NLMA", "M/A108NLMM",
+    "3/A108NLN3", "G/A108NLNG", "S/A108NLNS", "6/A108NLO6",
+    "H/A108NLOH", "S/A108NLOS", "7/A108NLP7", "J/A108NLPJ"
+  };
+
+  FILE *fp, *fp2;
+  ENEWS enews;
+  struct tm *ptime;
+  time_t now;
+  int color, i, j;
+
+  chdir(BBSHOME);
+
+  for (kind = 'A'; kind <= 'L'; kind++)
+  {
+    color = 1;
+    j = 0;
+
+    enews_fpath(fpath, kind, ".ENEWS");
+
+    if (!(fp = fopen(fpath, "r")))
+      return;
+
+    while (fread(&enews, sizeof(ENEWS), 1, fp) == 1 && j < MAX_ENEWS)
+    {
+      strcpy(title[j], enews.title);
+      j++;
+    }
+
+    sprintf(fpath, "gem/brd/%s/%s", BN_CAMERA, filename[kind - 'A']);
+
+    if ((fp2 = fopen(fpath, "w+")) != NULL)
+    {
+      time(&now);
+
+      i = now % 8 ;
+
+      ptime = localtime(&now);
+      fprintf(fp2, "\033[1;37m¡º\033[36m¢w¢w\033[33;41m©_¼¯·s»D§Ö³ø"
+        "\033[36;40m¢w¢w¤µ¤é\033[37m%s\033[36mÃþ·s»D¢w¢w¢w¢w¢w\033[31m"
+        "³Ì«á§ó·s®É¶¡:\033[37m%02d/%02d %02d:%02d\033[36m¢w\033[37m¡º\033[m\n",
+        class[kind - 'A'], ptime->tm_mon + 1,ptime->tm_mday,
+        ptime->tm_hour, ptime->tm_min);
+
+      for(j = 0 ; j < 9 ; j++)
+      {
+        fprintf(fp2, "\033[1;3%dm  %d  %s\033[m\n", color, j + 1, title[i]);
+        color = ((color+1)%7) + 1 ;
+        i++ ;
+      }
+
+      fprintf(fp2,"\033[1;37m¡º\033[36m¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w"
+        "\033[33;42m±ýª¾¸Ô²Ó·s»D¤º®e,½Ð¨£ \033[36m%s \033[33mªO\033[36;40m¢w"
+        "\033[37m¡º\033[m\n",
+        "Kimo_News");
+      fclose(fp2);
+    }
+
+    fclose(fp);
+  }
+
+  return 0;
+}
+
+
+
+´N·|¦b°ÊºA¬ÝªO¤Wshow¥X·s»D¼ÐÃD
+
+
+[m[1m¡º[36m¢w¢w[33;41m©_¼¯·s»D§Ö³ø[36;40m¢w¢w¤µ¤é[37mÅé¨|[36mÃþ·s»D¢w¢w¢w¢w¢w[31m³Ì«á§ó·s®É¶¡:[37m04/26 16:45[36m¢w[37m¡º[m
+[1;31m  1  BALCO©Ó»{´£¨Ñ¸TÃÄµ¹¨¹´µ[m
+[1;33m  2  ­^¶W-ªü´Ë¯Ç®g¤â¦ë§Q³sÄò²Ä¤G¦~·í¿ïPFA¦~«×³Ì¨Î²y­û[m
+[1;35m  3  ·N¥Ò-¤@²y°g¦b°ê¦ÌÁÉ«á±q¸t¦èÃ¹²y³õ¤T¼h¬Ý¥x¶^¸¨¨­¤`[m
+[1m  4  NBA-©¬§Jµo«Â²v°¨¨ë4-0²^¨O¦Çºµ,²v¥ýÅE¨­¦è³¡Áp·ù¥|±j[m
+[1;32m  5  NBA¡n°¨Às§Ö»¼30¤À ´ò¤HÅ¥µP[m
+[1;34m  6  NBA¡nÄxºô¡B·È°¨¡B°¨«f ª½¸¨¥|®Ê¤G½ü[m
+[1;36m  7  NBA¡n¦~«×²Ä¤@¶¤ ¾HªÖ³s¤C¤Wº][m
+[1;31m  8  ®È¬ü²y¬P¡n¤C§½10KµL¥¢¤À ¤ý«Ø¥Á­º³Ó[m
+[1;33m  9  NBA-°¨¤B¡B°ò¼w¶Õ¤£¥i·í,Äxºô4-0¾î±½¥§§J®Ê¯ÅªF³¡·Ç¨MÁÉ[m
+[1m¡º[36m¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w[33;42m±ýª¾¸Ô²Ó·s»D¤º®e,½Ð¨£ [36mKimo_News [33mªO[36;40m¢w[37m¡º[m
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mchwaian [30m±q [35m61-216-218-91.dynamic.hinet.net [30mµoªí[m

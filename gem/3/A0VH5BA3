@@ -1,0 +1,65 @@
+µo«H¤H: LHD.bbs@YoMin.twbbs.org (§Ú²Ö¤F) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¾ã¦æ¥ú´Î(6)¡Ðmail.c «H½c¦Cªí
+µo«H¯¸: ¹C¥Á¤§®a (Mon, 14 Jul 2003 17:32:32 +0800 (CST))  Updated: 2004/03/06
+
+[1;31m¥²»Ý¥ý°µpost.cªº hdr_outs_bar();[m
+
+: mbox_item_bar() ©ñ¦b mbox_item() «á­±
+
+#ifdef HAVE_LIGHTBAR
+static int
+mbox_item_bar(xo, mode)
+  XO *xo;                       /* sequence number */
+  int mode;
+{
+  HDR *hdr;
+#ifdef OVERDUE_MAILDEL
+  int xmode;
+#endif
+
+  hdr = (HDR *) xo_pool + xo->pos - xo->top;
+
+#ifdef OVERDUE_MAILDEL
+  xmode = hdr->xmode;
+  prints(xmode & MAIL_DELETE ?
+    (mode ? "\033[1;44m%6d \033[5;37;41m%c\033[0;1;44m " :
+      "%6d \033[1;5;37;41m%c\033[m ") :
+    (mode ? "\033[1;44m%6d %c " :
+      "%6d %c "),
+    xo->pos + 1, mbox_attr(xmode));
+#else
+  prints("%s%6d %c ",
+    mode ? "\033[1;44m" : "", xo->pos + 1, mbox_attr(hdr->xmode));
+#endif
+
+  if (mode)
+    hdr_outs_bar(hdr, 47);
+  else
+    hdr_outs(hdr, 47);
+
+  return XO_NONE;
+}
+#endif
+
+: mail.c:mbox_cb[]
+
+static KeyFunc mbox_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, mbox_item_bar,
+#endif
+...
+
+: mail.c:xmbox_cb[]
+
+KeyFunc xmbox_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, mbox_item_bar,
+#endif
+...
+
+--
+[m¢d¢e¢f¢g¢h¢f¢e¢d¢c¢b                [33m¢©  ¢¨      ¢i¢©¢¨¢i ¡´   [1;30mbbs.cis95.net[m
+[30;47m¢h¢f¢e¢c¢b¡Å¢d¢f¢g[0;35m   ©~µL©w©Òªº¶³   [33m¢ª¢i¢« ¢«¢ª ¢i¢ª¢«¢i ¡¶ ¢i¢h¢© [0;1m¹C¥Á¤§®a[m
+[1;34mÄÆ¦Û [31mcismpc19.cis.nctu.edu.tw         [0;33m¢i   ¢©¢¨ ¢i    ¢i ¢i ¢i  ¢i¡Etwbbs¡Eorg[m

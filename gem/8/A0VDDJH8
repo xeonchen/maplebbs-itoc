@@ -1,0 +1,95 @@
+§@ªÌ: itoc (test) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¤å³¹µû¤À¥\¯à
+®É¶¡: Sun Aug 18 14:45:05 2002                          Updated: 2004/12/18
+
+  ³Qµû¤Àªº¤å³¹·|ÅÜ¥¼¾\Åª
+
+  ¤èªk¬O½á¤©³Q±À¤åªº¤å³¹·sªº chrono/xname
+
+
+  [Äµ§i] ¦pªG§A°µ¤F³o­Ó patch¡A·|³y¦¨¥H¤U«á¿ò¯g¡G
+
+  1) hdr.date ©M hdr.chrono ¤£¦P¨B ¡Ð ³o­Ó¤£·|«ç»ò¼Ë¡A¤Ï¥¿ date ³oÄæ¦ì¥u¨Ñ
+     Åã¥Ü¥Î¡A¹³Âà«HªOªº¤å³¹³£¬O¤£¦P¨Bªº¡C
+
+  2) ¬ÝªO¤ºªº hdr.chrono ¤£¨Ì§Ç±Æ¦C ¡Ð ­ì¥»¬ÝªO¤¤¤å³¹ªº chrono ¬O¥Ñ¤p±Æ¨ì¤j
+     ªº¡A¦pªG§ï¤F³o patch¡A±N·|³Q¤£¨Ì§Ç±Æ¦C¡C¥Ø«eÀ³¸Ó¬O¤£·|¦³¤°»ò°ÝÃD¡A¥¼¨Ó
+     ·|¦³¤°»ò³W¹º´N¤£¤@©w¤F¡C
+
+: post.c:addscore()
+
+static int curraddscore;
++ static int newchrono;
++ static char *newxname;
+
+
+static void
+addscore(hdd, ram)
+  HDR *hdd, *ram;
+{
++ /* itoc.030618: ³y¤@­Ó·sªº chrono ¤Î xname */
++ hdd->chrono = newchrono;
++ strcpy(hdd->xname, newxname);
+
++ if (curraddscore)
++ {
+    hdd->xmode |= POST_SCORE;
+    hdd->score += curraddscore;
++ }
+}
+
+: post.c:post_score()
+
+static int
+post_score(xo)
+  XO *xo;
+{
+  HDR *hdr;
++ HDR post;
+  int pos, cur, ans;
+
+  ....
+  ....
+
+- if (curraddscore)
+- {
+-   currchrono = hdr->chrono;
+-   rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+-     hdr->xid : pos, cmpchrono, addscore);
+-   return XO_LOAD;
+- }
+
+- return XO_FOOT;
+
++ /* ­««Ø¤@­Ó post */
++ hdr_fpath(fpath, dir, hdr);
++ hdr_stamp(dir, HDR_LINK | 'A', &post, fpath);
+
++ /* ¤£¬å±¼­ì¥ýªº¤å³¹ÀÉ®×¡A¦pªG¨ä¥L¤H xo_pool ¬OÂÂªº¡A¤]¤£·|¥X²{¼È®É©Ê¥ÛÀY¤å¡F
++    ¤SÂà«H out.bntp ¤¤¼gªºÀÉ¦W¤]¬OÂÂ¦W¡A©Ò¥H«O¯dÂÂÀÉ¥i¨ÏÂà«H¦¨¥\¡F
++    ¦ý³o¼Ë·|¯d¤U .DIR ¤¤¨S¦³«ü¦VªºÂÂÀÉ¡A¥u¦n¦b expire.c ¤¤²M°£¡C */
++ /* unlink(fpath); */
+
++ currchrono = hdr->chrono;
++ newchrono = post.chrono;
++ newxname = post.xname;
++ rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
++   hdr->xid : pos, cmpchrono, addscore);
+
++ /* ¥[¤J¦Û¤vªº¾\Åª°O¿ý */
++ brh_add(newchrono, newchrono, newchrono);
++ btime_update(currbno);
+
++ return XO_LOAD;
+}
+
+: post.c:post_history()
+
++ /* wretch.030404: °t¦X±µ¤å³¹ªºchrono¡A¦³¥i¯à prev > chrono»Pnext < chrono */
++ if (prev > chrono || next < chrono)
++   prev = next = chrono;
+
+  brh_add(prev, chrono, next);
+
+--
+[1;32m¡¼ Origin: [33m°Ê¤O®Ö¤ß [37mxeon.tfcis.org  [31m¡¼ From: [36mitoc.Dorm-GD2.NCTU.edu.tw[m

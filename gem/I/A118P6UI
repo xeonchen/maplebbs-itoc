@@ -1,0 +1,25 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¼W¥[Äæ¦ì»¡©ú
+®É¶¡: Sun Aug 17 16:08:35 2003                          Updated: 2005/05/19
+
+  ­Y¦³ÅÜ°Ê struct BRD ³£»Ý­nÂà´« .BRD
+  Âà´«ªº¤è¦¡¦p¤U¡G
+
+  1. Ãö¯¸ (Ãö bbsd ¤Î²M shm)
+
+  2. ³Æ¥÷ .BRD
+
+  3. ±N src/include/struct.h:struct BRD ·Ó§Û¥h
+     src/util/tran/transbrd.c:struct OLD
+
+  4. ·Ó patch ¸Ì­±©Ò¼gªº¡A¹ïµ{¦¡°µ­×§ï
+
+  5. ±N²§°Ê¹L«áªº src/include/struct.h:struct BRD ·Ó§Û¥h
+     src/util/tran/transbrd.c:struct NEW
+
+  6. ­«·s½sÄ¶µ{¦¡¡A¨Ã°õ¦æ bin/transbrd
+
+  7. ¶}¯¸ (­«·s¶}¾÷)
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

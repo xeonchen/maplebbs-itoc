@@ -1,0 +1,64 @@
+µo«H¤H: waynesan.bbs@csc241.twbbs.org («z²Óªüªê) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] talk.c ¥¼»{ÃÒªÌ¤]¯à¶Ç°Tµ¹¯¸ªø
+µo«H¯¸: °g¤Û°ê«× (2004/08/13 Fri 22:43:18)                Updated: 2004/10/07
+
+«ØÄ³¥ý·s¼W³o­Ó¥\¯à
+  ¡uulist.c ¨Ï¥ÎªÌ¦W³æ¼Ð¥Ü¯¸ªø¡v
+
+--------------------------------------------------------------------------
+
+: bmw.c:bmw_write()
+
+static int
+bmw_write(xo)
+  XO *xo;
+{
+- if (HAS_PERM(PERM_PAGE))
+- {
+    int userno;
+    UTMP *up;
+    BMW *bmw;
+
+    bmw = (BMW *) xo_pool + (xo->pos - xo->top);
+
+    /* itoc.010304: Åý¶Ç°Tªº bmw ¤]¥i¥H¦^ */
+    /* §Ú°e¤ô²yµ¹§O¤H¡A¦^µ¹¦¬°TªÌ¡F§O¤H°e¤ô²yµ¹§Ú¡A¦^µ¹°e°TªÌ */
+    userno = (bmw->sender == cuser.userno) ? bmw->recver : bmw->sender;
+    if (!userno)
+      return XO_NONE;
+
+    if (up = utmp_find(userno))
++   {
++     if (HAS_PERM(PERM_PAGE) || (up->userlevel & PERM_ALLADMIN))
+        do_write(up);
++   }
+- }
+  return XO_NONE;
+}
+
+: ulist.c:ulist_write()
+
+static int
+ulist_write(xo)
+  XO *xo;
+{
+- if (HAS_PERM(PERM_PAGE))
+- {
+    UTMP *up;
+
+    if (up = ulist_pool[xo->pos])
++   {
++     if (HAS_PERM(PERM_PAGE) || (up->userlevel & PERM_ALLADMIN))
+        do_write(up);
++   }
+- }
+  return XO_NONE;
+}
+
+--
+    [1;31m¡Z¡Z[m
+  [1;31m¡þ  [37m¡þ[34m¢v¢v¢@  [31m°g[34m¤Û[37m°ê«×[31m Charming [34mShadow [37mCountry[m
+[1;31m¢y  [37m¡þ[31m  [37m¡þ¢@  [34m¢j[33m¤J¹Ò¦ì§} csc241.twbbs.org[m
+[1;31m¢y  [37m¢@¡þ[31m  [37m¡þ  [34m¢j[32m¦ì§}¥N½X 203.71.212.241[m
+[1;31m  ¢@¡Z¡Z[37m¡þ[31m  [34m¡þ  [36m¨Ó·½¥À°ê 218-163-192-153.dynamic.hinet.net[m
+[1;31m  [4m¡þ¡@¡@[34m¢v¢v¢@[;1;31m  µoªí®É¶¡ 2004/08/13 Fri 22:40:23[m

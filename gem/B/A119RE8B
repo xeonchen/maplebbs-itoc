@@ -1,0 +1,379 @@
+µo«H¤H: vyvian.bbs@bbs.ee.ncnu.edu.tw (¦n¤s¦n¤ô¯d¤l®]) ¬ÝªO: plan
+¼Ð  ÃD: ¦Û°Ê§ó·s­ì©lÀÉ
+µo«H¯¸: º[¤j¹q¾÷º}¯B¹q¤l (2004/03/16 Tue 20:42:14)
+
+§Ú¼g¤F¤@°¦script¥i¥H¨Ó¦Û°ÊÀË¬d¤Î§ó·s~/src©³¤UªºÀÉ®×¡C
+
+¸Ô²Óªº¥Îªk½Ð°Ñ¦Ò¥»µ{¦¡¶}ÀYªº»¡©ú¡A¾A¦X¤Ö¶q¦Û¤vpatchªº¯¸¡C
+
+¤À¨Éµ¹¦U¦ì¨¯­Wªº¯¸ªø¡C
+
+¤U¸üÂI¡G
+
+http://studentweb.ncnu.edu.tw/92323540/bash/fullupgrade.sh
+
+
+#!/bin/bash
+#       ¥»µ{¦¡´£¨ÑBBS­ì©lÀÉ°µ¥þ­±©Ê¦Û°Ê¤Æ§ó·sªº¤u§@
+#
+# ¥»µ{¦¡¶}µoÀô¹Ò¡GLinux + bash 2.05b
+#
+# **µ{¦¡­ì²z¦p¤U¡G
+#
+#   1. ¥uÀË¬d¨º¨Ç¤â°Êpatch¹LªºÀÉ®×©M³Ì·sª©¥»ªºÀÉ®×¬O§_¦³¤£¦P¡A¦pªG¤£¦Pªº
+#      ¸Ü«h´£¥XÄµ§i¡C
+#   2. ¨Ã¥BÅýºÞ²zªÌ¿ï¾Ü­×¥¿ªº¤è¦¡¡A¥i¥H¥Î·sª©ªº©ÎªÌ¥ÎÂÂª©ªºÀÉ®×¡C
+#   3. ¦pªG·sª©ªºÀÉ®×¨Ã¨S¦³°Ê¹L§A¦Û¤vpatch¹Lªº¨º¨ÇÀÉ®×¡A«h§â©Ò¦³ÂÂªº­ì©l
+#      ½X´«¦¨³Ì·sª©¡C
+#   4. ¦b§â§A¤â°Êpatch¹LªºÀÉ®×ÂÐ»\¦^¥h¡A­«·scompiler¡C
+#
+# **¨Ï¥Î¤èªk¦p¤U:
+#
+#   1. ¦pªG¬O²Ä¤@¦¸¨Ï¥Î¡A§â©Ò¦³´¿¸g¤â°Êpatch¹Lªº­ì©l½Xcopy¨ì ~/manage/patch
+#      ³o­Ó¸ê®Æ§¨
+#   2. ÀÉ®×¦b°µ¥ô¦ópatch¤§«e¡A¥ý±N­ì©lÀÉ¥ýcopy¨ì~manage/src¸Ì­±
+#       (¦P¤@­ÓÀÉ®×¥u¦³¦b°µ²Ä¤@¦¸patch®É¤~»Ý­n°µ³o­Ó°Ê§@¡C)
+#
+#   3. ±Npatch¤§«áªºÀÉ®×copy¨ì~/manage/patch¸Ì­±
+#       (¤W­±³o¨â­Ó°Ê§@«D±`­«­n¡A§_«hµLªk§PÂ_¨º¨ÇÀÉ®×³Q§A¦Û¤v­×§ï¹L¡C)
+#       (½Ð¤£­n²¾°£¤U¸ü¦^¨ÓªºÀ£ÁYÀÉ¡A¥H°µ¬°ª©¥»§PÂ_¤§¥Î¡C)
+#   4. «Ø¥ß¤@­Ó·s¥Ø¿ý¡AEx: /home/bbs/manage
+#   5. ±N¥»µ{¦¡©ñ¦b©Ò«Ø¥ßªº¥Ø¿ý¤º
+#   6. °õ¦æ /home/bbs/manage/fullupgrade.sh
+#   7. ½Ð½T»{±zªº¨t²Î¦³¸Ëbash, sed, awk, lynx
+#
+# ¹ï¥»µ{¦¡¦³¥ô¦ó°ÝÃD¡AÅwªïmailµ¹§Ú   s2323540@ncnu.edu.tw
+#
+basedir=/home/bbs/manage    #³]©w¤u§@¥Ø¿ý¡A¤]¬O¥»µ{¦¡Â\©ñªº¦ì¸m¡C
+#
+prog='bash tar gzip sed awk lynx'
+for exim in $prog
+do
+    which $exim > /dev/null 2>&1
+    if [ "$?" != "0" ]; then
+        echo "±zªº¨t²Î¨S¦³¦w¸Ë$exim¡A½Ð±N$exim¦w¸Ë¨ì¨t²Î¤W¡C"
+        exit
+    fi
+done
+if [ ! -d "$basedir/src" ]; then
+    mkdir -p $basedir/src
+fi
+if [ ! -d "$basedir/patch" ]; then
+    mkdir -p $basedir/patch
+fi
+oldfile=`ls $basedir|grep MapleBBS`
+file=`lynx --dump http://processor.tfcis.org | grep "PACK"|awk '{print $2}'`
+filename=${file##*/}
+if [ -f "$oldfile" ]; then
+    tmp=${oldfile%-*}
+    oldfiledate=${tmp##*-}
+    tmp1=${filename%-*}
+    newfiledate=${tmp1##*-}
+    if [ "$oldfiledate" == "$newfiledate" ]; then
+        echo "¥Ø«eªº­ì©lÀÉ¬O³Ì·sª©¥»¡C"
+        echo "It's already up to date."
+    else
+        rm $basedir/$oldfile
+        rm -rf $basedir/bbs
+        rm -rf $basedir/filechange
+        lynx --dump "$file" > "$basedir"/"$filename"
+        tar -zxf "$basedir"/"$filename"
+        if [ $? -ne 0 ]; then
+            echo "Cann't unzip source file"
+            exit
+        fi
+    fi
+else
+    if [ -d "$basedir/bbs" ]; then
+        rm -rf $basedir/bbs
+    fi
+    if [ -f "$basedir/filechange" ]; then
+        rm -rf $basedir/filechange
+    fi
+    lynx --dump "$file" > "$basedir"/"$filename"
+    tar -zxf "$basedir"/"$filename"
+    if [ $? -ne 0 ]; then
+        echo "Cann't unzip source file"
+        exit
+    fi
+fi
+files=`ls -l $basedir/src|grep "^-"|awk '{print $9}'`
+for file in $files
+do
+    path=`find "$basedir/bbs/src" -type f -name "$file"`
+    chksum1=`md5sum "$basedir/src/$file"|awk '{print $1}'`
+    chksum2=`md5sum "$path"|awk '{print $1}'`
+    if [ "$chksum1" == "" ]||[ "$chksum2" == "" ]; then
+        echo "$file does not exit !!"
+        echo "$file ¦b·sª©¥»¤¤¤w¸g¤£¦s¦b¤F¡A±z¥i¥H±q¨t²Î¤¤²¾°£"
+        echo -n "¬O§_­n²¾°£$file \(yes/no\)?"
+        read answer
+        while [ ! "$answer" == "yes" ]&&[ ! "$answer" == "no" ]
+        do
+            echo -n "½Ð¦^µªyes ©Î no:"
+            read answer
+        done
+        if [ "$answer" == "yes" ]; then
+            rm -f "$basedir/src/$file"
+            rm -f "$basedir/patch/$file"
+        else
+            echo "$file©|¥¼²¾°£"
+            echo " "
+            flag=1
+        fi
+    else
+        if [ ! "$chksum1" == "$chksum2" ]; then
+            echo "$file is different !!"
+            echo "$file ³o­ÓÀÉ®×±z´¿¸gpatch¹L¡A¦Ó·sªºª©¥»¤]­×§ï¹L³o­ÓÀÉ®×¡C"
+            echo "½Ð°Ñ¾\filechange¡A¸Ì­±·|Åã¥Ü­ì¥»ªºÀÉ®×©M·sª©ÀÉ®×ªº¤£¦P³B"
+            echo "½Ð®Ú¾Úfilechange¸Ì­±ªº¸ê°T°µ¾A·íªºpatch"
+            echo "­Y±z©|¥¼¬Ý¹Lfilechange¡A¤U­±ªº°ÝÃD½Ð³£¦^µªq)²¤¹L"
+            echo -n '½Ð¿ï¾Ü 1)¥Î·sªºÀÉ®× 2)¥Î¦Û¤vpatchªºÀÉ®× q)²¤¹L [q]¡H'
+            read answer1
+        case $answer1 in
+        1 )
+            cp -f $path $basedir/src/$file
+            if [ -f "$basedir/patch/$file" ]; then
+                mv $basedir/patch/$file $basedir/patch/"$file".bak
+            fi
+            echo "Use new file" ;;
+        2 )
+            cp -f $path $basedir/src/$file
+            echo "Use patched file" ;;
+        * )
+            flag=1
+            echo "Ignore !!" ;;
+        esac
+            diff -c "$basedir/src/$file" "$path" >> $basedir/filechange
+            echo " "    >> $basedir/filechange
+            echo "====================================" >> $basedir/filechange
+            echo " "    >> $basedir/filechange
+            echo " "
+        fi
+    fi
+done
+if [ "$flag" == "1" ]; then
+    echo "patch¹Lªº­ì©lÀÉ¦³°µ¹L­×§ï"
+    echo "±z¥i¥H¿ï¾Ü¥Î·sª©ªºµ{¦¡¡A¦A¤â°Ê¥[¤Wpatch¡C"
+    echo "©ÎªÌ¥Î­ì¥»patch¹LªºÀÉ®×¦A¤â°Ê¥[¤W·sª©ªº¥\¯à¡C"
+    echo "½Ð°Ñ¦Òfilechangeªº¤º®e¡A­×¥¿¤§«á¦A­«·s¶]¤@¦¸¥»µ{¦¡"
+else
+    echo "©Ò¦³ªºÀË¬d³£¤w¸g§¹¦¨¡A±z¤w¸g¥i¥H¶i¦æ¤É¯Åªº°Ê§@....."
+    echo "¥H¤U·|§â­ì©lÀÉ³Æ¥÷¨ì/home/bbs/bak¸Ì­±¡A¨Ã´À´«¦¨·sªºÀÉ®×"
+    echo -n '±z¬O§_­n¶i¦æ¤É¯Åªº°Ê§@(yes/no)?'
+    read check
+    while [ ! "$check" == "yes" ]&&[ ! "$check" == "no" ]
+    do
+        echo -n "½Ð¦^µªyes ©Î no:"
+        read check
+    done
+    if [ "$check" == "no" ]; then
+        echo "Stop Full upgrade."
+        exit
+    fi
+    cd ~
+    tar cf - ./src |gzip > ~/bak/src.tar.gz
+    if [ $? -ne 0 ]; then
+        echo "Backup source file Failure!!"
+        exit
+    fi
+    cd $basedir
+    rm -rf ~/src/*
+    cp -r $basedir/bbs/src/* ~/src
+    if [ $? -ne 0 ]; then
+        echo "Error !! Can't not copy newfile to ~/src"
+        exit
+    fi
+
+    patch=`ls -l $basedir/patch|grep "^-"|awk '{print $9}'`
+    for file in $patch
+    do
+        judge=${file##*.}
+        if [ ! "$judge" == "bak" ]; then
+            path=`find ~/src -type f -name "$file"`
+            cp -f $basedir/patch/$file $path
+            if [ $? -ne 0 ]; then
+                echo "Error !! Can't not copy patch file $file to $path"
+                exit
+            fi
+        fi
+    done
+    echo "~/src¸Ì­±ªºÀÉ®×¤w§ó·s¡A¦pªG±z¨S¦³­n¶i¦æ¥ô¦ópatch¡A¥i¥ß¨è­«·scompiler"
+    echo -n '±z¬O§_­n°¨¤W­«·scompiler?(yes/no)'
+    read answer3
+    while [ ! "$answer3" == "yes" ]&&[ ! "$answer3" == "no" ]
+    do
+        echo -n "½Ð¦^µªyes ©Î no:"
+        read answer3
+    done
+    if [ "$answer3" == "yes" ]; then
+        cd ~/src
+        make clean linux install
+        echo " "
+        echo " "
+        echo "Full upgrated Successful. Plesae reboot your BBS."
+        echo "¤É¯Å§¹¦¨¡A½Ð±N¥D¾÷­«·s¶}¾÷¡C"
+    else
+        echo "patch§¹¤§«á¥i­«·s°õ¦æ¥»µ{¦¡¨Ó­«·scompiler"
+    fi
+fi
+
+: ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w :
+
+md5sum¬O¬°¤FÀË¬dÀÉ®×¬O§_³Q§ó°Ê¹L¡A
+
+¦pªG§Aªº¯¸§¹¥þ¨S¦³¦Û¤v¤â°Ê­×§ï¹Lcodeªº¸Ü¡A·Qª½±µ§¹¥þ¥Î·sª©ªºcode
+
+¥i¥H¥Î¤U­±³o¤äµ{¦¡¡A³o¬OºëµØ°Ï¨º°¦ªºÂ²³æª©(¤£°µ¤â°ÊpatchªºÀË¬d)
+
+http://bbs.ee.ncnu.edu.tw/download/update.sh
+
+¤£¹L§Aªºconfig.hÀ³¸Ó­n¦Û¤v³Æ¥÷°_¨Ó¡AµM«á¦A©ñ¦^­ì¥»ªº¥Ø¿ý¥h½sÄ¶¡C
+
+#!/bin/bash
+#       ¥»µ{¦¡´£¨ÑBBS­ì©lÀÉ°µ¥þ­±©Ê¦Û°Ê¤Æ§ó·sªº¤u§@
+#¥»µ{¦¡¶}µoÀô¹Ò¡GLinux + bash 2.05b
+#¥»µ{¦¡³Ìªñ§ó·s¤é´Á 2004/9/24
+#
+# **¨Ï¥Î¤èªk¦p¤U:
+#
+#   1. «Ø¥ß¤@­Ó·s¥Ø¿ý¡AEx: /home/bbs/manage
+#   2. ±N¥»µ{¦¡©ñ¦b©Ò«Ø¥ßªº¥Ø¿ý¤º
+#   3. °õ¦æ /home/bbs/manage/update.sh
+#   4. ½Ð½T»{±zªº¨t²Î¦³¸Ëbash, sed, awk, lynx
+#   5. ¸U¤@§ó·s§¹¤§«ácopmile¥X°ÝÃD¡A·Q´«¦^­ì¥»ªºµ{¦¡¡A½Ð°õ¦æ
+#      /home/bbs/manage/update.sh rescue
+basedir=/home/bbs/manage    #³]©w¤u§@¥Ø¿ý¡A¤]¬O¥»µ{¦¡Â\©ñªº¦ì¸m¡C
+#---------------------------------
+#¹ï¥»µ{¦¡¦³¥ô¦ó°ÝÃD¡AÅwªïmailµ¹§Ú   s2323540@ncnu.edu.tw
+funcrese () {
+    rm -rf ~/src
+    tar zxvf ~/bak/src.tar.gz -C ~
+    if [ "$?" != "0" ]; then
+        echo "¤w¸g´«¦^­ì¥»ªºµ{¦¡¤F"
+        echo "¦pªG±zªº~/bin¸Ì­±ªºÀÉ®×³Q§ï±¼ªº¸Ü¡A½Ð­«·scompile"
+    fi
+}
+if [ "$1" == "rescue" ]; then
+    echo -n '±z¬O§_­n´«¦^­ì¥»ªºµ{¦¡(yes/no)?'
+    read ans
+    while [ ! "$ans" == "yes" ]&&[ ! "$ans" == "no" ]
+    do
+        echo -n "½Ð¦^µªyes ©Î no:"
+        read ans
+    done
+    if [ "$ans" == "yes" ]; then
+        funcrese
+    fi
+    exit
+fi
+prog='bash tar gzip sed awk lynx'
+for exim in $prog
+do
+    which $exim > /dev/null 2>&1
+    if [ "$?" != "0" ]; then
+        echo "±zªº¨t²Î¨S¦³¦w¸Ë$exim¡A½Ð±N$exim¦w¸Ë¨ì¨t²Î¤W¡C"
+        exit
+    fi
+done
+if [ ! -d "$basedir/src" ]; then
+    mkdir -p $basedir/src
+fi
+if [ ! -d "$basedir/patch" ]; then
+    mkdir -p $basedir/patch
+fi
+oldfile=`ls $basedir|grep MapleBBS`
+file=`lynx --dump http://processor.tfcis.org | grep "PACK"|awk '{print $2}'|ta
+il -1`
+filename=${file##*/}
+if [ -f "$oldfile" ]; then
+    tmp=${oldfile%-*}
+    oldfiledate=${tmp##*-}
+    tmp1=${filename%-*}
+    newfiledate=${tmp1##*-}
+    if [ "$oldfiledate" == "$newfiledate" ]; then
+        echo "¥Ø«eªº­ì©lÀÉ¬O³Ì·sª©¥»¡C"
+        echo "It's already up to date."
+        rm -rf $basedir/filechange
+    else
+        mv $basedir/$oldfile ~/tmp/$oldfile
+        rm -rf $basedir/bbs
+        rm -rf $basedir/filechange
+        echo "Downloading.........."
+        lynx --dump "$file" > "$basedir"/"$filename"
+        tar -zxf "$basedir"/"$filename"
+        if [ $? -ne 0 ]; then
+            echo "Cann't unzip source file"
+            exit
+        fi
+    fi
+else
+    if [ -d "$basedir/bbs" ]; then
+        rm -rf $basedir/bbs
+    fi
+    if [ -f "$basedir/filechange" ]; then
+        rm -rf $basedir/filechange
+    fi
+    echo "Downloading........."
+    lynx --dump "$file" > "$basedir"/"$filename"
+    tar -zxf "$basedir"/"$filename"
+    if [ $? -ne 0 ]; then
+        echo "Cann't unzip source file"
+        exit
+    fi
+fi
+    echo "©Ò¦³ªºÀË¬d³£¤w¸g§¹¦¨¡A±z¤w¸g¥i¥H¶i¦æ¤É¯Åªº°Ê§@....."
+    echo "¥H¤U·|§â­ì©lÀÉ³Æ¥÷¨ì/home/bbs/bak¸Ì­±¡A¨Ã´À´«¦¨·sªºÀÉ®×"
+    echo -n '±z¬O§_­n¶i¦æ¤É¯Åªº°Ê§@(yes/no)?'
+    read check
+    while [ ! "$check" == "yes" ]&&[ ! "$check" == "no" ]
+    do
+        echo -n "½Ð¦^µªyes ©Î no:"
+        read check
+    done
+    if [ "$check" == "no" ]; then
+        echo "Stop Full upgrade."
+        exit
+    fi
+    cd ~
+    tar cf - ./src |gzip > ~/bak/src.tar.gz
+    if [ $? -ne 0 ]; then
+        echo "Backup source file Failure!!"
+        exit
+    fi
+    cd $basedir
+    rm -rf ~/src/*
+    cp -r $basedir/bbs/src/* ~/src
+    if [ $? -ne 0 ]; then
+        echo "Error !! Can't not copy newfile to ~/src"
+        exit
+    fi
+    echo "~/src¸Ì­±ªºÀÉ®×³£¤w¸g§ó·s¡A¦pªG±z¨S¦³­n¶i¦æ¥ô¦ópatch¡A¥i¥ß¨è­«·scompile
+r"
+    echo -n '±z¬O§_­n°¨¤W­«·scompiler?(yes/no)'
+    read answer3
+    while [ ! "$answer3" == "yes" ]&&[ ! "$answer3" == "no" ]
+    do
+        echo -n "½Ð¦^µªyes ©Î no:"
+        read answer3
+    done
+    if [ "$answer3" == "yes" ]; then
+        cd ~/src
+        make clean linux install
+        if [ "$?" == "0" ]; then
+            echo " "
+            echo " "
+            echo "Full upgrated Successful. Plesae reboot your BBS."
+            echo "¤É¯Å§¹¦¨¡A½Ð±N¥D¾÷­«·s¶}¾÷¡C"
+        else
+            echo "µ{¦¡½sÄ¶¥¢±Ñ¡A­Y­n§ï¦^ÂÂµ{¦¡¡A½Ð°õ¦æ¤U¦C³o¤@¦æ"
+            echo "/home/bbs/manage/fullupgrade.sh rescue"
+        fi
+    else
+        echo "patch§¹¤§«á¥i­«·s°õ¦æ¥»µ{¦¡¨Ó­«·scompiler"
+    fi
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m º[¤j¹q¾÷£»º}¯B¹q¤l [35;47m bbs.ee.ncnu.edu.tw [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mvyvian [30m±q [36mip169.puli24.ncnu.edu.tw [30mµoªí[m

@@ -1,0 +1,49 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (·x¤ß·x¤â·x·x¥]..*^^*) ¬ÝªO: itoc
+¼Ð  ÃD: Re: ·Q­­¨î¬Y¨ÇªOªº©Ê½è¤£ÅýªO¥DÅÜ§ó
+µo«H¯¸: ¤¤¿³¸ê¬ì (Fri, 12 Dec 2003 21:34:51 +0800 (CST))  Updated: 2004/09/30
+
+¡° ¤Þ­z¡mcyanofox.bbs@bbs.cs.nchu.edu.tw (§Ú¬O¦n¤H¤@±Úªº:()¡n¤§»Ê¨¥¡G
+> ´N¬O¥Ñ¯¸ªø³]©w¬Y­ÓªOªº ¤@¯ë/¦n¤Í/¯µ±K
+> ¦Ó¦¹ªOªO¥D¨S¿ìªkÅÜ§ó
+
+: battr.h
+
+#define BRD_ANONYMOUS   0x20    /* °Î¦W¬ÝªO */
++ #define BRD_NOCHANGE  0x40    /* ªO¥D¤£¯à­×§ï¬ÝªOÅv­­ */
+
+  ...
+  ...
+
+- #define NUMBATTRS       6
++ #define NUMBATTRS       7
+
+- #define STR_BATTR       "zTcsvA"
++ #define STR_BATTR       "zTcsvAC"
+
+: battr.h:battr_tbl[]
+
+  "°Î¦W¬ÝªO",           /* BRD_ANONYMOUS */
++ "ªO¥D¤£¯à­×§ï¬ÝªOÅv­­", /* BRD_NOREPLY */
+
+: manage.c:post_brdlevel()
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
++ if (newbrd.battr & BRD_NOCHANGE)  /* qazq.031212: ­­¨î¬Y¨Ç¬ÝªO¤£¯à­×§ïÄÝ©Ê */
++   return XO_FOOT;
+
+  switch(vans("1)¤½¶}¬ÝªO 2)¯µ±K¬ÝªO 3)¦n¤Í¬ÝªO¡H[Q] "))
+
+> ­n«ç»ò¼ËÅý·s¬ÝªO¶}±Ò®É¡A
+> ¹w³]´N¬O"¤£¯à§ïÅv­­"
+
+: board.c:class_newbrd()
+: newbrd.c:nbrd_newbrd()
+
+- newboard.battr = BRD_NOTRAN;
++ newboard.battr = BRD_NOTRAN | BRD_NOCHANGE;
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-136-225.HINET-IP.hinet.net [30mµoªí[m

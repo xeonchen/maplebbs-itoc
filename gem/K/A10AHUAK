@@ -1,0 +1,52 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ½Ð°Ý¦p¦óÅý¨Ï¥ÎªÌ¦bµù¥U®É¿é¤J¥Í¤é¡B©Ê§O
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/05/17 Mon 18:37:38)                Updated: 2004/05/18
+
+¡° ¤Þ­z¡mTOTO (£|£°£¾£|£°£½)¡n¤§»Ê¨¥¡G
+> ¥i¤£¥i¥H½Ð°Ý¤@¤U,³o¤@½gªº­×§ï¦b²{¦bªº¨t²Î¤WÀ³¸Ó«ç»ò°µ?
+> ¦]¬°§Úmakeªº®É­Ô¥X²{fpath¥¼«Å§iªº¿ù»~°T®§@@"
+
+ ¨C¦¸¤W¯¸³£ÀË¬d¬O§_¦³¶ñ¥Í¤é¤Î©Ê§O
+
+: bbsd.c:tn_motd()
+
+static void
+tn_motd()
+{
+  usint ufo;
++ char ans[4];
+
+  ...
+  ...
+
+#ifdef HAVE_FORCE_BOARD
+  brd_force();  /* itoc.000319: ±j¨î¾\Åª¤½§iªO */
+#endif
+
++ while (cuser.year < 1 || cuser.year > 99)
++ {
++   vget(22, 0, "¥X¥Í¦~¥÷¡G", ans, 3, DOECHO);
++   cuser.year = (ans[0] - '0') * 10 + (ans[1] - '0');
++ }
+
++ while (cuser.month < 1 || cuser.month > 12)
++ {
++   vget(22, 0, "¥X¥Í¤ë¥÷¡G", ans, 3, DOECHO);
++   cuser.month = (ans[0] - '0') * 10 + (ans[1] - '0');
++ }
+
++ while (cuser.day < 1 || cuser.day > 31)
++ {
++   vget(22, 0, "¥X¥Í¤é´Á¡G", ans, 3, DOECHO);
++   cuser.day = (ans[0] - '0') * 10 + (ans[1] - '0');
++ }
+
++ while (cuser.sex != 0  && cuser.sex != 1 && cuser.sex != 2)
++ {
++   cuser.sex = vget(22, 0, "©Ê§O (0)¤¤©Ê (1)¨k©Ê (2)¤k©Ê¡G", ans, 2, DOECHO) - '0';
++ }
+}
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mpc512-12.ee.nctu.edu.tw [30mµoªí[m

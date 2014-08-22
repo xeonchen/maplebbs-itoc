@@ -1,0 +1,66 @@
+§@ªÌ: itoc (¤£¤Óµo®i¹êÅç«Ç) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] menu.c ¯d¨¥ªO¥[¤W header logo
+®É¶¡: Mon Sep  2 17:14:36 2002                          Updated: 2002/10/17
+
+  ¦pªG­n¥[¤W¤@­Ó logo ªº¸Ü¡A§ï³o¸Ì
+
+: menu.c pad_view()
+
+    if (!pad)
+    {
+      vmsg(NULL);
+      break;
+    }
++   else if (!count)        /* header logo ¥u»Ý­nµe¤@¦¸ */
++   {
++     clear();
++     outs("Logo line 1\n");
++     outs("Logo line 2\n");
++     outs("Logo line 3\n");
++     outs("Logo line 4\n");
++     outs("Logo line 5\n");
++     outs("Logo line 6\n");    /* Logo ¬O¤»¦æ§ï¤ñ¸û¤Ö */
++   }
+-   else if (!(count % 5))      /* itoc.020122: ¦³ pad ¤~¦L */
++   else if (!(count % 4))      /* itoc.020122: ¦³ pad ¤~¦L */
+    {
+-     clear();
+-     move(0, 23);
+-     prints("¡i »Ä ²¢ ­W »¶ ¯d ¨¥ ªO ¡j                ²Ä %d ­¶\n\n",
+-       count / 5 + 1);
++     move(6, 0);
++     clrtobot();
+    }
+
+    outs(pad->msg);
+    count++;
+
+-   if (!(count % 5))
++   if (!(count % 4))
+    {
+      move(b_lines, 0);
+
+
+  ¦pªGÁÙ­n§ï¸Ì­±ªº®æ¦¡ªº¸Ü¡A§ï³o¬q
+
+: menu.c:pad_draw()
+
+  sprintf(str, "¢~¢t\033[1;46m %s ¡Ð %s \033[m¢u", cuser.userid, cuser.username);
+
+  for (cc = strlen(str); cc < 60; cc += 2)
+    strcpy(str + cc, "¢w");
+  if (cc == 60)
+    str[cc++] = ' ';
+
+  sprintf(str + cc,
+    "\033[1;44m %s \033[m¢¡\n"
+    "¢x  \033[1;%dm%-70s\033[m  ¢x\n"
+    "¢x  \033[1;%dm%-70s\033[m  ¢x\n"
+    "¢¢  \033[1;%dm%-70s\033[m  ¢£\n",
+    Btime(&(pad.tpad)),
+    pcolors[color], buf[0],
+    pcolors[color], buf[1],
+    pcolors[color], buf[2]);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-5.EE.NCTU.edu.tw[37m µoªí[m

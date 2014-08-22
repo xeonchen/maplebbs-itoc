@@ -1,0 +1,75 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: ©Ú¦¬¯¸¥~«H¥ó
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/04/06 Thu 12:33:53)                Updated: 2006/05/17
+
+¡° ¤Þ­z¡mguessi.bbs@bbs.wretch.cc¡n¤§»Ê¨¥¡G
+> °O±o¥H«e¦³³ofunction
+> ½Ð°Ý­n«ç»ò§ï ? Åý¨Ï¥ÎªÌ¦Û­q¬O§_¦¬¨ú¯¸¥~«H¥ó
+> ¼s§i«H¾×¤£§¹ ¦ý¦³¨Ç¤H¥u¬O¦¬¯¸¤º«H ¤£·Q¦¬¯¸¥~«H¥ó
+> ½Ð°Ý¸Ó«ç»ò°µ­×§ï ? (§Æ±æ¯à°µ¦¨³ß¦n³]©w)
+
+: ufo.h
+
+- #define UFO_NOUSE20     BFLAG(20)
++ #define UFO_NOINCOME    BFLAG(20)
+
+: ufo.h
+
+- #define NUMUFOS_USER    20      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 20 ­Ó ufo */
++ #define NUMUFOS_USER    21      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 21 ­Ó ufo */
+
+- #define STR_UFO         "-mpsnemPBQFANbwtSH-J----CHA"
++ #define STR_UFO         "-mpsnemPBQFANbwtSH-JM---CHA"
+
+: ufo.h
+
+- "«O¯d",
++ "©Ú¦¬¯¸¥~«H¥ó    (¤£¦¬/­n¦¬)",    /* UFO_NOINCOME */
+
+: bmtad.c:is_rcpt()
+
+    if (!str_cmp(str, ".bbs"))
+    {
+      if (len <= IDLEN + 4)
+      {
++       ACCT acct;
+
+        *str = '\0';
+        str_lower(rcpt, rcpt);
+        sprintf(fpath, "usr/%c/%s/@", *rcpt, rcpt);
++       if ((len = acct_fetch(rcpt, &acct)) >= 0)
++       {
++         close(len);
++         if (acct.ufo & UFO_NOINCOME)
++           return -1;
++       }
+        if (dashd(fpath))
+        {
+          *letter = 1;
+          return 0;
+        }
+      }
+    }
+
+: bbsmail.c:mail2bbs()
+
+  int fd;
+  FILE *fp;
++ ACCT acct;
+
++ usr_fpath(folder, userid, FN_ACCT);
++ if ((fd = open(folder, O_RDONLY)) >= 0)
++ {
++   read(fd, &acct, sizeof(ACCT));
++   close(fd);
++   if (acct.ufo & UFO_NOINCOME)
++   {
++     sprintf(buf, "BBS user <%s> no income mail", userid);
++     mailog(buf);
++     return EX_NOUSER;
++   }
++ }
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m  pc512-1.ee.nctu.edu.tw  [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

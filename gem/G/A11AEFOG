@@ -1,0 +1,190 @@
+µo«H¤H: tsaikd.bbs@tsaikd.twbbs.org (¤d¤H±Ù) ¬ÝªO: plan
+¼Ð  ÃD: Re: [µ{¦¡] script §Ö³tªº¸ò ITOC BBS ªº¤½ª©¦P¨B§ó·s
+µo«H¯¸: ¦a¤U´cÅ]«° (2005/06/11 Sat 12:37:41)
+
+#!/bin/bash
+# ========================================================================
+# µ{¦¡¥Øªº¡G
+#     Åý BBS Code ºÞ²zªÌ¥i¥H§Ö³tªº¸ò ITOC BBS ªº¤½ª©¦P¨B§ó·s
+#
+# µ{¦¡»Ý¨D¡G
+#     bash      >= 3.0-r11  ( for shell )
+#     wget      >= 1.9.1-r5 ( for wget )
+#     grep      >= 2.5.1-r7 ( for grep )
+#     gawk      >= 3.1.3-r2 ( for awk )
+#     patch     >= 2.5.9    ( for patch )
+#     diffutils >= 2.8.7-r1 ( for diff )
+#     coreutils >= 5.2.1-r6 ( for basename mkdir head tail cat cut ls cp mv rm)
+#
+# ¨Ï¥Î»¡©ú¡G
+#     01. ½Ð¥ý±N¥» script ªºÅv­­§ó§ï¬°¥i°õ¦æ¡G
+#           chmod 700 merge_itoc_bbs.sh
+#     02. ¦b¨Ï¥Î¥» script ¤§«e
+#         ½Ð¥ý½T©w ~bbs/tmp/ ¤¤¦³¨â­Ó¥H¤Wªº ITOC BBS ªº sources
+#         ¤@­Ó¬O·sªº¡A¤@­Ó¬OÂÂªº
+#         ¥» script ¥u·|ÀË¬d³Ì·sªº¨â­Ó sources code
+#         ¦Ó¥B¨ä¸ê®Æ»Ý©ñ¦b ~bbs/tmp/bbs_XXXXXXXX ( XXXXXXXX ¬°ª©¥»¤é´Á )
+#         ( «ØÄ³¥ý°õ¦æ¥» script ªº©j©f§@ get_itoc_bbs.sh ¥H½T©w®æ¦¡¬Û®e )
+# ========================================================================
+# ª©Åv«Å§i¡G
+#     ¥»µ{¦¡¬°§K¶O³nÅé
+#     Åwªï¥H¥ô¦ó§Î¦¡´²§G
+#     ½Ð¤Å°µ°Ó·~¦æ¬°
+# ¼g§@Àô¹Ò¡G
+#     Gentoo Linux
+#     Kernel 2.6.10-gentoo-r6
+# ¯äÂÎ¦^³ø¡G
+#     tsaikd <tsaikd@gmail.com>
+# ¾ú¥v¬ö¿ý¡G
+#     2005/06/01 tsaikd         ­º¦¸ÄÀ¥X
+#     2005/06/07 tsaikd         ­×¥¿¤@¨Ç³y¦¨ªÅ¦r¦êªº bug
+#     2005/06/08 tsaikd         ·s¼W¥²­nµ{¦¡¦Û§ÚÀË´ú¾÷¨î
+#     2005/06/10 tsaikd         ¼W¥[¤@¨Ç¤H©Ê¤Æªº±±¨î¡A¨¾¤î¤G«×§ó·s
+# ========================================================================
+#                               µ{¦¡¦Û§ÚÀË´ú
+# ========================================================================
+PROGRAM_LIST="bash grep awk patch diff basename mkdir head tail cat cut ls cp mv rm"
+for i in $PROGRAM_LIST ; do
+  if [ -z "$(type -p $i)" ] ; then
+    echo "[ERROR] Can't find $i in your system"
+    exit 1
+  fi
+done
+# ========================================================================
+#                                  ³]©w°Ï
+# ========================================================================
+START_LINE="vvvvvvvvvvvvvvvvvvvvv==== start ====vvvvvvvvvvvvvvvvvvvvvvvvv"
+  END_LINE="^^^^^^^^^^^^^^^^^^^^^====  end  ====^^^^^^^^^^^^^^^^^^^^^^^^^"
+# ========================================================================
+#                                 µ{¦¡¶}©l
+# ========================================================================
+
+cd
+HOME="$(pwd)"
+[ ! -d "${HOME}/tmp" ] && mkdir "${HOME}/tmp"
+cd "${HOME}/tmp"
+
+FILE_LIST="$(ls -dr bbs_*)"
+declare -i NUM=0
+unset NEW_BBS
+unset OLD_BBS
+for i in $FILE_LIST ; do
+  ((NUM++))
+  if [ "$NUM" -eq 1 ] ; then
+    NEW_BBS="$i"
+  elif [ "$NUM" -eq 2 ] ; then
+    OLD_BBS="$i"
+  else
+    break
+  fi
+done
+
+if [ -z "$NEW_BBS" ] || [ -z "$OLD_BBS" ] ; then
+  echo "[ERROR] Cannot find more than one BBS source directory!"
+  exit 1
+fi
+
+diff -ruN "$OLD_BBS" "$NEW_BBS" | grep diff > merge_bbs.list.tmp
+
+BUF="$(tail -n 1 merge_bbs.list.tmp)"
+while [ -n "$BUF" ] ; do
+  if [ -n "$(echo "$BUF" | grep -E "^Files .* and .* differ$")" ] ; then
+    MERGE_FILE="$(echo "$BUF" | awk '{print $2}' | cut -c 13-)"
+    MERGE_FILE_NAME="$(basename "$MERGE_FILE")"
+    OLD_BBS_FILE="${HOME}/tmp/${OLD_BBS}${MERGE_FILE}"
+    NEW_BBS_FILE="${HOME}/tmp/${NEW_BBS}${MERGE_FILE}"
+    SRC_BBS_FILE="${HOME}${MERGE_FILE}"
+
+    echo "$BUF"
+    printf "Do you want to update the file ? [y/n] " ; read ANS
+    cp -f "$NEW_BBS_FILE" "$SRC_BBS_FILE"
+  else
+    MERGE_FILE="$(echo "$BUF" | awk '{print $3}' | cut -c 13-)"
+    MERGE_FILE_NAME="$(basename "$MERGE_FILE")"
+    OLD_BBS_FILE="${HOME}/tmp/${OLD_BBS}${MERGE_FILE}"
+    NEW_BBS_FILE="${HOME}/tmp/${NEW_BBS}${MERGE_FILE}"
+    SRC_BBS_FILE="${HOME}${MERGE_FILE}"
+
+    if [ -z "$(diff -ruN "$SRC_BBS_FILE" "$NEW_BBS_FILE")" ] ; then
+      echo
+      echo "$SRC_BBS_FILE is updated!"
+    elif [ -z "$($BUF > merge_bbs.patch.tmp ; \
+                 cp -f "$SRC_BBS_FILE" "$MERGE_FILE_NAME" ; \
+                 patch "$MERGE_FILE_NAME" merge_bbs.patch.tmp &>/dev/null ; \
+                 diff -ruN "$SRC_BBS_FILE" "$NEW_BBS_FILE")" ] ; then
+      echo
+      echo "$SRC_BBS_FILE is updated!"
+    else
+      $BUF > merge_bbs.patch.tmp
+      cp -f "$SRC_BBS_FILE" "$MERGE_FILE_NAME"
+
+      echo
+      echo "Between \"$OLD_BBS_FILE\" \"$NEW_BBS_FILE\""
+      printf "Do you want to read patch contents ? [y/n] " ; read ANS
+      if [ "$ANS" == "y" ] ; then
+        echo "$START_LINE"
+        cat merge_bbs.patch.tmp
+        echo "$END_LINE"
+      fi
+
+      echo
+      printf "Do you want to merge it automatically ? [y/n] " ; read ANS
+      if [ "$ANS" == "y" ] ; then
+        patch "$MERGE_FILE_NAME" merge_bbs.patch.tmp
+        if [ "$?" -ne 0 ] ; then
+          echo "[ERROR] when merge $MERGE_FILE_NAME"
+          echo "Press 'Enter' to continue ..." ; read
+        fi
+
+        echo
+        echo "Between \"$NEW_BBS_FILE\" \"merged $MERGE_FILE_NAME\""
+        if [ -z "$(diff -ruN "$NEW_BBS_FILE" "$MERGE_FILE_NAME")" ] ; then
+          echo "They are the same files. And update it automatically!"
+          mv -f "$MERGE_FILE_NAME" "$SRC_BBS_FILE"
+        else
+          printf "Do you want to read the differences ? [y/n] " ; read ANS
+          if [ "$ANS" == "y" ] ; then
+            echo "$START_LINE"
+            diff -ruN "$NEW_BBS_FILE" "$MERGE_FILE_NAME"
+            echo "$END_LINE"
+          fi
+
+          echo
+          echo "After merging \"$SRC_BBS_FILE\","
+          printf "Do you want to update it automatically ? [y/n] " ; read ANS
+          if [ "$ANS" == "y" ] ; then
+            mv -f "$MERGE_FILE_NAME" "$SRC_BBS_FILE"
+          else
+            echo "$MERGE_FILE_NAME is keeping in ~/tmp"
+          fi
+        fi
+      fi
+    fi
+  fi
+  head -n -1 merge_bbs.list.tmp > merge_bbs.list.tmp2
+  mv -f merge_bbs.list.tmp2 merge_bbs.list.tmp
+  BUF="$(tail -n 1 merge_bbs.list.tmp)"
+done
+
+rm -f merge_bbs.patch.tmp
+rm -f merge_bbs.list.tmp
+
+echo
+echo "**** == Remember to compile your BBS again !! == ****"
+echo
+
+# ========================================================================
+#                                 µ{¦¡µ²§ô
+# ========================================================================
+
+
+--
+ [7;30;41m¤d        ¤H         ±Ù    KD !![m [1;31m¦a¤U´cÅ]«° [32mtelnet://bbs.tsaikd.twbbs.org[m
+ [1;37;44mK[m [1;37;44mD[melete         ±þ±þ±þ [31m±þ¨ì§A²æ¿Ç¤l "©ñ§¾" !![m
+ i    ~~ [1;31m¡´[m     [1;5;33m¢e¢d¢c¢b[m       ¡s¡·    ¡s¡·    ¡s¡· §Ö°k°Ú!!
+ l    ~~ ¢«¡Ã¡Ã                  ¢«¡t    ¢«¡t    ¢«¡t
+ o   ~ ¡þ¡ý                  ..¡t¡r....¡t¡r....¡t¡r[m
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m ¦¨¤j¸ê°T£»¦a¤U´cÅ]«° [36;47m tsaikd.twbbs.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mtsaikd [30m±q [31mtsaikd.v1.dorm.ncku.edu.tw [30mµoªí[m

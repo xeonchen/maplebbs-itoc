@@ -1,0 +1,125 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý¦Û°Êªi¤å³¹
+µo«H¯¸: °Ê¤O®Ö¤ß (2003/12/23 Tue 20:20:38)                Updated: 2004/05/08
+
+¡° ¤Þ­z¡mmaya (º¿¶®)¡n¤§»Ê¨¥¡G
+>     §Ú±N¨º½gªº¤º®eáà¨ì¤@­Ó .c ÀÉ¸Ì­±
+
+: src/util/Makefile ¥[¤J addpost
+
+EXE =   account acl-sort [1;33maddpost[m bbsmail ...
+
+: src/util/addpost.c ·s¼Wµ{¦¡¦p¤U
+
+/*-------------------------------------------------------*/
+/* util/addpost.c   ( NTHU CS MapleBBS Ver 3.00 )        */
+/*-------------------------------------------------------*/
+/* target : ¨t²Î¦Û°Êµo¤å¨ì¬ÝªO                           */
+/* create : 03/12/23                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+static char *userid;
+static char *username;
+
+static void
+out_post(hdr, board)
+  HDR *hdr;
+  char *board;
+{
+  bntp_t bntp;
+
+  memset(&bntp, 0, sizeof(bntp_t));
+  strcpy(bntp.board, board);
+  strcpy(bntp.xname, hdr->xname);
+  strcpy(bntp.owner, hdr->owner);
+  strcpy(bntp.nick, hdr->nick);
+  strcpy(bntp.title, hdr->title);
+  rec_add("innd/out.bntp", &bntp, sizeof(bntp_t));
+}
+
+
+static void
+add_post(brdname, fpath, title)           /* µo¤å¨ì¬ÝªO */
+  char *brdname;        /* ±ý post ªº¬ÝªO */
+  char *fpath;          /* ÀÉ®×¸ô®| */
+  char *title;          /* ¤å³¹¼ÐÃD */
+{
+  HDR hdr;
+  char folder[64];
+
+  brd_fpath(folder, brdname, FN_DIR);
+  hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
+  strcpy(hdr.owner, userid);
+  strcpy(hdr.nick, username);
+  strcpy(hdr.title, title);
+  hdr.xmode = POST_OUTGO;
+  rec_add(folder, &hdr, sizeof(HDR));
+
+  out_post(&hdr, brdname);
+}
+
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  char *fpath, *brdname, *title, *fname;
+  FILE *fp;
+
+  if (argc != 6)
+  {
+    printf("Usage: %s brdname userid username title filepath\n", argv[0]);
+    return -1;
+  }
+
+  chdir(BBSHOME);
+
+  fpath = "tmp/addpost.tmp";    /* ¼È¦sÀÉ */
+  brdname = argv[1];
+  userid = argv[2];
+  username = argv[3];
+  title = argv[4];
+  fname = argv[5];
+
+  if (fp = fopen(fpath, "w"))
+  {
+    fprintf(fp, "%s %s (%s) %s %s\n",
+      STR_AUTHOR1, userid, username, STR_POST2, brdname);
+    fprintf(fp, "¼ÐÃD: %s\n®É¶¡: %s\n\n", title, Now());
+
+    f_suck(fp, fname);
+    fprintf(fp, "\n--\n¡° ¥»¤å¥Ñ¦Û°Êµo¤å¨t²Î©Òµoªí\n");
+
+    fclose(fp);
+
+    add_post(brdname, fpath, title);
+    unlink(fpath);
+  }
+
+  return 0;
+}
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+: tmp/apple ·s¼W³oÀÉ®×
+: ÀÉ¦W¸ô®|¬OÀH«Kªº¡Abbs ¨­¤À¥iÅª¨ú¡A¤º®e¬O§A­nµoªíªº¤å³¹
+
+  ¤j®a¦n¡A¥»¶g¥|©w´Áªº½m²ß¬¡°Ê·Ó±`Á|¦æ
+  ½Ð¤j®a­n°O±o¨Ó°Ñ¥[³á
+
+: crontab -e
+: addpost ¬ÝªO §@ªÌ ¼ÊºÙ ¼ÐÃD ÀÉ¦W¸ô®|
+: ³Ì«á§ï crontab¡A¬Ý§A¦h¤[­n¤½§i¤@¦¸
+
+# ¨C¬P´Á¤T¤U¤Èµo¤@¦¸¤½§i
+50 15 * * 3 bin/addpost test "¶¤ªø" "¶¤ªø" "½m²ß¡I" tmp/apple > /dev/null 2>&1
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

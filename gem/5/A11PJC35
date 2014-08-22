@@ -1,0 +1,169 @@
+ß@™Ã: itoc (Æ÷§ﬂ∞ §O) ¨›™O: itoc
+º–√D: Re: [∞›√D] √ˆ©Û BBSNET.C
+Æ…∂°: 2005/12/08 Thu 20:47:10                           Updated: 2005/12/09
+
+°∞ §ﬁ≠z°mroga (•Ù© )°n§ßª ®•°G
+> §pßÃ≠n¶b¶P§@•xæ˜æπ§W≠±¨[®‚≠” BBS °A
+> ∑Q≈˝®œ•Œ™Ã≥zπL port 23 ≥s§W´·°A
+> ¶A≈˝•LøÔæ‹•L≠n≥s≥o•xæ˜æπ§W™∫≠˛≠” BBS °C
+> ©“•H¶≥øÏ™kß‚≥o≠”•\Ø‡∞µ¶b•D BBS ™∫∂}¿Yµe≠±°AµM´·≈˝®œ•Œ™Ã¶€•—øÔæ‹
+> ≠n≥s®Ï ≤ƒ§G≠” BBS ©Œ™Ã¨O™Ω±µ∂i§J•D BBS °C
+
+  ≠n¶b¶P§@•x•Dæ˜§W°A¨[§G≠” BBS Ø∏°AΩ–∞—¶“∫Îµÿ∞œ
+  [¶w∏À] §@•x•Dæ˜¨[§G≠” BBS Ø∏
+
+  •H§U°A©“ø◊
+  °u•ªØ∏°v´¸™∫¨O∂}¶b port 23 ™∫®∫≠”Ø∏
+  °u§G∏πØ∏°v°B°u§T∏πØ∏°v´¸™∫¨O¨[¶b¶P§@•xæ˜æπ§W°A¶˝∂}¶b§£¶P port ™∫®∫®«Ø∏
+
+: •ªØ∏≠n•[§J BBSNet ™∫•\Ø‡
+
+  Ω–∞—¶“∫Îµÿ∞œ
+  [∫Ù∏Ù] bbsnet.c BBS-Net
+
+: ßÔ•ªØ∏™∫ bbsnet.c
+
+  ∑sºW§@≠” x_bbsnet2() ¶b x_bbsnet() ´·≠±
+  §∫Æe∑”ß€ x_bbsnet()
+
+: ßÔ•ªØ∏™∫ bbsnet.c:x_bbsnet2()
+
+int
+x_bbsnet2()
+{
+  int fd, i, j;
+- char buf[80];
++ char buf[256];
+
+  ...
+  ...
+
+- cutmp->status |= STATUS_REJECT;       /* bbsnet Æ…§£¶¨ºˆ∞T */
+
+- while (1)
+- {
+    ...
+    ...
+
+    else
+    {
+-     break;
++     return 0;
+    }
+
+    vs_bar("¿ÙÆqÆ»¶Ê");
+
+    ...
+    ...
+
+    vget(b_lines, 0, "Ω–øÔæ‹§@≠”≥sΩuØ∏•x°G[Q] ", buf, 3, DOECHO);
+    i = atoi(buf) - 1;
+-   if (i >= 0 && i < j)
++   if (i == 0)
++   {
++     return 0;
++   }
++   else if (i >= 1 && i < j)
+    {
+-     sprintf(buf, "%s %s enter %s", cuser.userid, Now(), connlist[i].name);
++     sprintf(buf, "%s %s enter %s", fromhost, Now(), connlist[i].name);
+      blog("BBSNET", buf);
+      telnet(connlist[i].host, connlist[i].port);
+-     sprintf(buf, "%s %s leave %s", cuser.userid, Now(), connlist[i].name);
++     sprintf(buf, "%s %s leave %s", fromhost, Now(), connlist[i].name);
+      blog("BBSNET", buf);
+    }
+-   else
+-   {
+-     break;
+-   }
+- }
+
+- cutmp->status ^= STATUS_REJECT;
+- return 0;
++ abort_bbs();
+}
+
+: ßÔ•ªØ∏™∫ bbsd.c:tn_main()
+
+static inline void
+tn_main()
+{
+  clear();
+
+#ifdef HAVE_LOGIN_DENIED
+  if (acl_has(BBS_ACLFILE, "", fromhost))
+    login_abort("\n∂Qæ˜æπ©Û§£≥Q±ÕØ∏±µ®¸");
+#endif
+
++ DL_func("bin/bbsnet.so:x_bbsnet2");
+
+: ßÔ•ªØ∏™∫ etc/connlist
+: ≤ƒ§@¶Êºg•ªØ∏
+: ≤ƒ§G¶Êºg§G∏πØ∏
+: ≤ƒ§G¶Êºg§T∏πØ∏ (¶p™G¶≥™∫∏‹)
+: Ωd®“
+
+xx.yy.zz:23:•ªØ∏™∫Ø∏¶W
+xx.yy.zz:3456:§G∏πØ∏™∫Ø∏¶W
+xx.yy.zz:4567:§T∏πØ∏™∫Ø∏¶W
+
+> µM´·°A®œ•Œ™Ã™∫ IP ¡Ÿ¨O§@ºÀ¨O≠Ï•ª§WØ∏™∫ IP
+> §£∑|≈‹¶®¥£®— bbsnet ™∫•Dæ˜™∫ IP °A≥oºÀ¶≥øÏ™kπF¶®∂‹°H
+
+  •H§Wß@™k
+  ≥s•ªØ∏∑|¨O®œ•Œ™Ã®”∑Ω IP
+  ≥s§G∏πØ∏°B§T∏πØ∏™∫®”∑Ω≥£∑|≈‹¶®•Dæ˜ IP
+
+  ≠Yß∆±Ê≥s§G∏πØ∏°B§T∏πØ∏™∫®”∑Ω≥£¨O®œ•Œ™Ã®”∑Ω IP ™∫∏‹
+  ´h¡Ÿ≠n∞µ•H§U  (•H§U≥o§Ë™k¨OΩ‚©€ :p)
+
+  ®œ•Œ•H§U≥o§Ë™k°A•≤∂∑≠n§G∏πØ∏°B§T∏πØ∏©M•ªØ∏¶b¶P§@•xæ˜æπ§W
+
+: ßÔ•ªØ∏™∫ bbsnet.c:x_bbsnet2()
+
+    else if (i >= 1 && i < j)
+    {
++     while (1)
++     {
++       if (dashf("/tmp/bbsnet"))
++       {
++         usleep(500000);
++         continue;
++       }
++       if ((fd = open("/tmp/bbsnet",
++         O_WRONLY | O_CREAT | O_APPEND, 0666)) >= 0)
++       {
++         write(fd, fromhost, strlen(fromhost));
++         close(fd);
++       }
++     }
+      sprintf(buf, "%s %s enter %s", fromhost, Now(), connlist[i].name);
+      blog("BBSNET", buf);
+      telnet(connlist[i].host, connlist[i].port);
+      sprintf(buf, "%s %s leave %s", fromhost, Now(), connlist[i].name);
+      blog("BBSNET", buf);
+    }
+
+: ßÔ §G∏πØ∏°B§T∏πØ∏™∫ bbsd.c:main()
+
+    dns_name((char *) &sin.sin_addr, fromhost);
++   if (!strcmp(fromhost, "xx.yy.zz"))      /* ®‰§§ xx.yy.zz ¨O•ªØ∏™∫ fqdn */
++   {
++     if (dashf("/tmp/bbsnet"))
++     {
++       FILE *fp;
++       if (fp = fopen("/tmp/bbsnet", "r"))
++       {
++         char buf[128];
++         if (fgets(buf, sizeof(buf), fp))
++           str_ncpy(fromhost, buf, sizeof(fromhost));
++         fclose(fp);
++       }
++       unlink("/tmp/bbsnet");
++     }
++   }
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [31m∞[1m §[;31;40mOÆ[1m÷§[;31;40mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m  pc512-1.ee.nctu.edu.tw  [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

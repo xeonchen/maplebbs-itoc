@@ -1,0 +1,22 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (¬Ý¤FÃD¥Ø´Nª¾¹D¸Ó©ñ±ó) ¬ÝªO: plan
+¼Ð  ÃD: Re: ´X­Ó°ÝÃD
+µo«H¯¸: °Ê¤O®Ö¤ß (Sun, 17 Aug 2003 09:20:57 +0800 (CST))  Updated: 2005/10/07
+
+¡° ¤Þ­z¡mgokui (gokui)¡n¤§»Ê¨¥¡G
+> ÁÙ¦³¡A¦pªG­n§â©Ò¦³¸g¥Ñ (0)Admin    £X ¨t²ÎºûÅ@°Ï £X
+> °µªº­×§ï¥þ³¡°O¿ýªº¸ÜÀ³¸Ó­n«ç»ò­×§ï¤~¦æ
+
+: user.c:x_file()
+
+  fpath = flist[--i];
+  if (mode == M_UFILES)
+    usr_fpath(buf, cuser.userid, fpath);
+  else                  /* M_XFILES */
++ {
++   alog("¨t²ÎÀÉ®×", fpath);
+    strcpy(buf, fpath);
++ }
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m     [31m°[1mÊ¤[0;31mO®[1mÖ¤[0;31mß [1mprocessor.tfcis.org    [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[ [1m    itoc.dorm11.nctu.edu.tw         [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

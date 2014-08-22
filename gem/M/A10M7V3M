@@ -1,0 +1,48 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G602) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¨Ï¥ÎªÌ¦W³æ¦C¥XªO¦ñªº­Ó¼Æ
+®É¶¡: 2004/10/06 Wed 22:08:31                           Updated: 2004/10/21
+
+  ¨Ï¥ÎªÌ¦W³æ¦C¥XªO¦ñªº­Ó¼Æ
+
+: ulist.c
+
+static int mygood_num;          /* ¹ï¤è³]§Ú¬°¦n¤Í */
+static int ogood_num;           /* §Ú³]¹ï¤è¬°¦n¤Í */
++ static int brdmate_num;       /* ¹ï¤è»P§Ú¬OªO¦ñ */
+
+: ulist.c:ulist_neck()
+
+  prints("  ±Æ¦C¤è¦¡¡G[\033[1m%s/%s\033[m] ¯¸¤W¤H¼Æ¡G%d "
+-   COLOR_MYGOOD " §Úªº¦n¤Í¡G%d " COLOR_OGOOD " »P§Ú¬°¤Í¡G%d\033[m",
++   COLOR_MYGOOD " §Úªº¦n¤Í¡G%d " COLOR_OGOOD " »P§Ú¬°¤Í¡G%d\033[m"
++   COLOR_BRDMATE " ªO¦ñ¡G%d\033[m",
+    msg_pickup_way[pickup_way],
+    cuser.ufo & UFO_PAL ? "¦n¤Í" : "¥þ³¡",
+-   total_user, mygood_num, ogood_num);
++   total_user, mygood_num, ogood_num, brdmate_num);
+
+: ulist.c:ulist_init()
+
+- mygood_num = ogood_num = 0;
++ mygood_num = ogood_num = brdmate_num = 0;
+
+  ...
+  ...
+
+      /* ºâ¦³´X­Ó¦n¤Í */
+      if (userno & (FTYPE_BOTHGOOD | FTYPE_MYGOOD))
+        mygood_num++;
+      if (userno & (FTYPE_BOTHGOOD | FTYPE_OGOOD))
+        ogood_num++;
++     /* ºâ¦³´X­ÓªO¦ñ */
++# ifdef HAVE_ANONYMOUS
++     if (up->mode == M_READA && !(currbattr & BRD_ANONYMOUS) &&
++       !strcmp(currboard, up->mateid))
++#else
++     if (up->mode == M_READA && !strcmp(currboard, up->mateid))
++#endif
++       brdmate_num++;
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

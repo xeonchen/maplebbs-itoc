@@ -1,0 +1,45 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: ½Ð°Ým¤åÃC¦â..
+®É¶¡: 2004/10/26 Tue 09:07:08                           Updated: 2005/10/24
+
+¡° ¤Þ­z¡mcentric.bbs@processor.tfcis.org (centric)¡n¤§»Ê¨¥¡G
+> m¤åÃC¦â­n¹³ÂÂª©maple¡A¤@¼Ë¬OÂÅ¦â[1;36m¢õ[m..
+> ½Ð°Ý­n§ï post.c ªº­þ³¡¤À©O??
+
+  §â mark ªº¤å³¹¤W¦â¬O¹H­I M3 ¤@¶}©l©Ò³W¹ºªº·Ç«hªº
+  ·Ç«h§Æ±æ¤£»Ý­nªº­«Ã¸´î¤Ö
+  §ïÅÜ hdr->xmode ®É¡A¥u¥Î outc(post_attr(hdr)); ¨Ó­«Ã¸¤@­Ó char
+
+  ³ÌÂ²³æ¦Ó¼É¤Oªº§ïªk¦p¤U
+  ³o¼Ë§ï·|³y¦¨ m/^Y/n/v ³o¨Ç«ü¥O®É®ö¶O­«Ã¸
+
+: post.c:post_item() ¦³¤G³B­n§ï
+
+- prints("%6d%c%c", num, tag_char(hdr->chrono), post_attr(hdr));
++ prints("%6d%c%s%c%s", num, tag_char(hdr->chrono),
++   hdr->xmode & POST_MARKED ? "\033[1;36m" : "", post_attr(hdr),
++   hdr->xmode & POST_MARKED ? "\033[m" : "");
+
+: post.c:post_mark()
+: post.c:post_refuse()
+: post.c:post_label()
+
+-   move(3 + cur, 7);
+-   outc(post_attr(hdr));
++   move(3 + cur, 0);
++   post_item(pos + 1, hdr);
+
+: post.c:post_visit()
+
+-   row = 3;
+-   do
+-   {
+-     move(row, 7);
+-     outc(post_attr(hdr++));
+-   } while (++row < max);
++   return post_body(xo);
+  }
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

@@ -1,0 +1,57 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] Â²Åé¤ä´© (4)
+®É¶¡: 2004/12/17 Fri 18:06:36                           Updated: 2004/12/17
+
+  ¤wª¾¥H¤U°ÝÃD (¦]¬°³Â·Ð¡A©Ò¥HÃi±o§ï¤F :p)
+
+  Â²Åé¤¶­±¤U¡Avedit() ­Y¤£¬O·s¼W¤å³¹·|¥X¿ù¡A¨Ò¦p¡G
+  1. ¤j E ½s¿è¤å³¹·|¥X¿ù
+  2. reply ¤å³¹®É¡A¤Þ¨¥·|¥X¿ù (±o§R°£¥þ³¡¤Þ¨¥¤~¤£·|¥X¿ù)
+  3. Åª¼È¦sÀÉ¤]·|¥X¿ù
+
+: visio.c
+
+  if (echo & GCARRY)
+  {
+    if (len = strlen(data))
++   {
+      outs(data);
++     if (trans2gb)
++       strcpy(data, b52gb(data));
++   }
+  }
+
+  ...
+  ...
+
++ if (echo && trans2gb)     /* ±K½X¤£»Ý­nÂà´« */
++   strcpy(data, gb2b5(data));
+
+  return ch;
+}
+
+: edit.c:ve_filer()
+
+#ifdef ANTI_PHONETIC
+-   if (words_check() > 2)
++   if (words_check() > 2 && !trans2gb)  /* Â²Åé¤¤¤å¤£ÀË¬dª`­µ¤å */
+    {
+      vmsg("½Ð¤Å¨Ï¥Îª`­µ¤å");
+      return VE_FOOTER;
+    }
+#endif
+
+  ...
+  ...
+
+      if (!ans)
+      {
+        msg = p->data;
+        str_trim(msg);
++       if (trans2gb)
++         msg = gb2b5(msg);
+        fprintf(fp, "%s\n", msg);
+      }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

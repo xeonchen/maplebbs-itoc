@@ -1,0 +1,18 @@
+§@ªÌ: itoc (»»·Q·í¦~ªì¶ù¤F) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] menu.c ¿ï³æÁôÂÃ«ü¥O»¡©ú
+®É¶¡: Thu Feb 28 11:28:02 2002                          Updated: 2002/12/28
+
+  ¬Û¶Ç¦³«Ü¦h¤H¤£ª¾¹D¿ï³æ¦³³o¨Ç«ü¥O
+
+> menu.c
+
+      vs_head(menu->desc, NULL);
+
++     move(MENU_XPOS - 1, 16);
++     outs("\033[30;47m  s ^S ¿ï¨ú¬ÝªO   f ^F §Úªº³Ì·R  ^Z ^U ¤Á´«  \033[m");
+
+      mode = 0;
+      do
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

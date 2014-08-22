@@ -1,0 +1,72 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]Tagger©ñ¨ìbmw
+®É¶¡: 2004/03/04 Thu 14:50:26                           Updated: 2005/06/12
+
+  °e¼s¼½µ¹³Q tag ªº³o¨Ç¤H
+
+  ¥²¶·¥ý·s¼W³o¥\¯à
+  ¡utag ©ñ¶i¨Ï¥ÎªÌ¦W³æ¡v
+
+: ulist.c:ulist_widecast() ·s¼W¦¹¨ç¦¡¦b ulist_broadcast() «á­±
+
+static int
+ulist_widecast(xo)
+  XO *xo;
+{
+  int tag, locus, pos;
+  BMW benz;
+  UTMP *up;
+  extern TagItem TagList[];
+
+  if (!HAS_PERM(PERM_PAGE))
+    return XO_NONE;
+
+  tag = AskTag("¯S©w¹ï¶H¼s¼½");
+
+  if (tag < 0)
+    return XO_FOOT;
+
+  if (!tag)     /* ¦n¤Í¼s¼½©Î¯¸ªø¥þ¯¸¼s¼½ */
+    return ulist_broadcast(xo);
+
+  benz.caller = NULL;
+  bmw_edit(NULL, "¡¹¼s¼½¡G", &benz);
+
+  if (!benz.caller)      /* bmw_edit() ¤¤¦^µª No ¤£°e¥X¼s¼½ */
+    return XO_FOOT;
+
+  /* itoc.000213: ¥[ "> " ¬°¤F»P¤@¯ë¤ô²y°Ï¤À */
+  sprintf(benz.userid, "%s> ", cuser.userid);
+
+  locus = 0;
+
+  do
+  {
+    pos = TagList[locus].recno;
+    up = ulist_pool[pos];
+    if (up->pid != TagList[locus].chrono)     /* ¸Ó¦ì¤l´«¤H¤F */
+      continue;
+
+#ifdef HAVE_NOBROAD
+    if (up->ufo & UFO_RCVER)
+      continue;
+#endif
+
+    if (can_override(up))
+    {
+      benz.recver = up->userno;
+      bmw_send(up, &benz);
+    }
+  } while (++locus < tag);
+
+  return XO_FOOT;
+}
+
+: ulist.c:ulist_cb[]
+
+- 'B', ulist_broadcast,
++ 'B', ulist_widecast,
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mpc512-2.ee.nctu.edu.tw [30mµoªí[m

@@ -1,0 +1,39 @@
+µo«H¤H: binbin.bbs@cpu.tfcis.org (»æ°®) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ½s¿èÀÉ®×¼W¥[Æ[¬Ýªº¥\¯à
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/03/12 Sun 11:05:14)                Updated: 2006/03/12
+
+> user.c : x_file()
+
+  vget(b_lines, 0, "½Ð¿ï¾ÜÀÉ®×½s¸¹¡A©Î«ö [0] ¨ú®ø¡G", buf, 3, DOECHO);
+  i = atoi(buf);
+  if (i <= 0 || i > n)
+    return;
+
+[1;33m![m n = vget(b_lines, 36, "(D)§R°£ (E)½s¿è (V)Æ[¬Ý [Q]¨ú®ø¡H", buf, 3, LCECHO);
+[1;33m![m if (n != 'd' && n != 'e' && n != 'v')
+    return;
+
+  fpath = flist[--i];
+  if (mode == M_UFILES)
+    usr_fpath(buf, cuser.userid, fpath);
+  else                  /* M_XFILES */
+    strcpy(buf, fpath);
+
+  if (n == 'd')
+  {
+    if (vans(msg_sure_ny) == 'y')
+      unlink(buf);
+  }
+[1;33m![m else if (n == 'e')
+  {
+    vmsg(vedit(buf, 0) ? "­ì«Ê¤£°Ê" : "§ó·s§¹²¦");      /* Thor.981020: ª`
+  }
+[1;33m+[m else  /* binbin.060312: ¦pªG¥u·QÆ[¬Ý ¤£¥Î¶i½s¿è¾¹ */
+[1;33m+[m {
+[1;33m+[m   more(buf, NULL);
+[1;33m+[m }
+
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m binbin.Dorm6.NCTU.edu.tw [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

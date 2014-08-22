@@ -1,0 +1,157 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¤ÈÄ±¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: [­×§ï]§â.USR©ñ¤Jshm¸Ì
+µo«H¯¸: ¤ë¤U©]·Q (2003/12/15 Mon 21:57:24)                Updated: 2003/12/15
+
+  §A¤£¤@©w­n°µ³o­×§ï¡AµM¦Ó¦pªG§Aªº¾÷¾¹±`¥X²{userno­«½ÆªÌ¡A¨º»ò§A¥i¥H¦Ò¼{°µ³o
+
+  ­×§ï¡C
+
+  ³o­×§ï¦³´X­Ó¦n³B:
+
+  1. µ¹pal_body()°µÀË¬d¥Î
+
+  2. Â²¤Æ¾ã²zusernoªº¤u§@¡AÅÜ¦¨¥u»Ý­n¼g¤@¤äÂ²³æªºutility§Y¥i§¹¤u(À³¸Ó«Ü¦n¼g¡A
+
+     ´N¬O¶}±ÒshmµM«á¶}©l³v¤@§â.USRªº¦ì¸m¶ñ¤J.ACCT¸Ì¡A¥u¦³¤£¥¿½Tªº¤~­n§ï)¡C
+
+  3. §äuserno®É¤£¦A»Ý­nÅªµwºÐ¡A¥i¥Hª½±µ¦bshm¸Ì¤ñ
+
+  SCHEMAµ²ºc16 bytes¡A§Ú­è¶]¥h¬Ý¤F¤@¤Uitocªº¯¸¥x¾ú¥v¬ö¿ý¬ù¦³¤@¸U¤Hµù¥U¡A°²³]§A
+
+  ªº¯¸¥x¦³2¸U¦n¤F¡A¤j¬ù­n¥Î±¼ 16 ¡Ñ20000 = 312.5 Kbytes¡A¤j¯¸¥xÀ³¸Ó¨S¦³°O¾ÐÅé
+
+  ¤£°÷ªºÅU¼{¡C
+
+: include / config.h
+
+#define SCHESHM_KEY     2996    /* .USR */
+
+: include / struct.h
+
+  ¦bµ²ºc©w¸qBCACHE«á­±¥[¤J³o¬q¡AMAX_SCHEMA_SHMµø§Aªº¯¸¥x³W¼Ò¦Û­q¡C
+
+#define MAX_SCHEMA_SHM 131072   /* 131072 = 1024 * 128 */
+
+typedef struct
+{
+  SCHEMA schema[MAX_SCHEMA_SHM];
+  int number;
+  time_t uptime;
+} SCACHE;
+
+: maple / cache.c
+
+  ¦butmp_search()«á­±§Û¤W³o¤@¬q
+
+/*-------------------------------------------------------*/
+/* .USR cache                                            */
+/*-------------------------------------------------------*/
+
+
+SCACHE *schema_shm;
+
+
+void
+schema_shm_init()
+{
+  SCACHE *xshm;
+  time_t *uptime;
+  int n, turn;
+
+  turn = 0;
+  xshm = schema_shm;
+  if (xshm == NULL)
+  {
+    schema_shm = xshm = shm_new(SCHESHM_KEY, sizeof(SCACHE));
+  }
+  uptime = &(xshm->uptime);
+
+  for (;;)
+  {
+    n = *uptime;
+    if (n > 0)
+      return;
+
+    if (n < 0)
+    {
+      if (++turn < 30)
+      {
+        sleep(2);
+        continue;
+      }
+    }
+
+    *uptime = -1;
+
+    if ((n = open(FN_SCHEMA, O_RDONLY)) >= 0)
+    {
+      memset(xshm->schema, 0, sizeof(SCHEMA) * MAX_SCHEMA_SHM);
+      xshm->number =
+        read(n, xshm->schema, sizeof(SCHEMA) * MAX_SCHEMA_SHM) / sizeof(SCHEMA);
+      close(n);
+    }
+
+    time(uptime);
+    blog("CACHE", "reload schema_cache");
+    return;
+  }
+}
+
+
+: maple / bbsd.c
+
+  §ïmain()
+
+  ushm_init();
+  bshm_init();
++ schema_shm_init();
+  fshm_init();
+
+: util / reaper.c
+
+  «e­±¥[¤W
+
+static int funo;
+static int max_uno;
+static SCHEMA schema;
++ static SCACHE *schema_shm;
+
+  main()«e­±§Û¤W³o¤@¬q
+
+static void
+schema_shmsync()
+{
+  int fd;
+  SCACHE *xshm;
+  time_t *uptime;
+
+  xshm = schema_shm;
+  if (xshm == NULL)
+  {
+    schema_shm = xshm = shm_new(SCHESHM_KEY, sizeof(SCACHE));
+  }
+
+  uptime = &(xshm->uptime);
+
+  if ((fd = open(FN_SCHEMA, O_RDONLY)) >= 0)
+  {
+    memset(xshm->schema, 0, sizeof(SCHEMA) * MAX_SCHEMA_SHM);
+    xshm->number =
+      read(fd, xshm->schema, sizeof(SCHEMA) * MAX_SCHEMA_SHM) / sizeof(SCHEMA);
+    close(fd);
+  }
+  time(uptime);
+}
+
+  §ïmain()
+
+#endif
+
++ schema_shmsync();
+
+  exit(0);
+}
+
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

@@ -1,0 +1,29 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¯¸¤º: itoc
+¼ÐÃD: Re: ½Ð°Ý¨â­Ó¤p°ÝÃD@@"
+®É¶¡: 2004/11/28 Sun 10:46:32                           Updated: 2004/11/28
+
+¡° ¤Þ­z¡mcentric (centric)¡n¤§»Ê¨¥¡G
+>      7 ¡½ ¥Ã¤[«O¯d±b¸¹
+>  «O¯d±b¸¹¦³¶}±Ò¡A
+>  ¤£¹L«ç»ò³Ìªñ¦³¨Ï¥ÎªÌ¶i¯¸ µo²{¨t²Î¥s¥L·Ç³Æ­n­«·s»{ÃÒ??
+>  °O±o¥h¦~ÁÙ¬O­þ®É­Ô¦³¤H°Ý¹L¡A¦n¹³¬O bbsd.c ¦³¤@­Ó¦a¤è­n§ï?
+
+: bbsd.c:login_level()
+
+-   if ((level & PERM_VALID) && (cuser.tvalid + VALID_PERIOD < ap_start))
++   if ((level & PERM_VALID) && !(level & PERM_XEMPT) &&
++     (cuser.tvalid + VALID_PERIOD < ap_start))
+    {
+      level ^= PERM_VALID;
+
+: bbsd.c:login_other()
+
+- else if (!HAS_PERM(PERM_ALLADMIN) &&
+-   (cuser.tvalid + VALID_PERIOD - 10 * 86400 < ap_start))
++ else if (!HAS_PERM(PERM_ALLADMIN | PERM_XEMPT) &&
++   (cuser.tvalid + VALID_PERIOD - 10 * 86400 < ap_start))
+     film_out(FILM_REREG, -1);
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

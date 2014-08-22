@@ -1,0 +1,71 @@
+§@ªÌ: itoc (cygreadline4.dll) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ½d¥»ºëÆF
+®É¶¡: 2004/05/21 Fri 09:42:58                           Updated: 2004/05/21
+
+  ½d¥»¤º®e¥i¥H¦Û©w
+
+: edit.c:ve_model() ·s¼W³o¤@¬q¦b vedit() «e­±
+
+/* ----------------------------------------------------- */
+/* ½d¥»ºëÆF                                              */
+/* ----------------------------------------------------- */
+
+
+static void
+ve_model()              /* itoc.010911: ½d¥»ºëÆF */
+{
+  int ch;
+  char buf[STRLEN];
+  FILE *fp;
+
+  switch (ch = vans("½Ð¿ï¾Ü½d¥» 1)·s¤â¤W¸ô 2)­«·s»{ÃÒ [Q] "))
+  {
+  case '1':
+  case '2':
+    sprintf(buf, "etc/edit/model%c", ch);
+    break;
+
+  default:
+    return;
+  }
+
+  if (!(fp = fopen(buf, "r")))
+    return;
+
+  while (fgets(buf, STRLEN, fp))
+    ve_string(buf);
+
+  fclose(fp);
+}
+
+: edit.c:vedit() ©Þ case Ctrl('F') µ¹½d¥»ºëÆF¥Î
+
+      case KEY_PGDN:
+-     case Ctrl('F'):
+
+  ...
+  ...
+
++     case Ctrl('F'):           /* ´¡¤J½d¥»ºëÆF */
+
++       ve_model();
++       break;
+
+: etc/edit
+
+  ·s¼W³o¥Ø¿ý
+
+: etc/edit/model1 ·s¼W³oÀÉ®×
+
+  ¡¹ §Ú¤w¸g»{ÃÒ³q¹L¤F¡A¬°¤°»ò¤£¯àµoªí¤å³¹¡H
+
+     ·s¤â¤W¸ô¡A¤C¤Q¤G¤p®É­­¨î¡C
+
+: etc/edit/model2 ·s¼W³oÀÉ®×
+
+  ¡¹ ¬°¤°»ò§Ú¬ðµM¤£¯àµoªí¤å³¹¤F¡H
+
+     ±zªº»{ÃÒ©|¥¼³q¹L¡A¥»¯¸¨C 180 ¤Ñ­n­«·s»{ÃÒ¤@¦¸¡C
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,52 @@
+§@ªÌ: itoc (¼g¤£§¹¤F ^^) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] §â menu ªº () §ï¬° []
+®É¶¡: Sun Aug 24 09:30:28 2003                          Updated: 2003/08/24
+
+    §â ([1;36mA[m)nnounce  £i ºëµØ§G§iÄæ £i
+  §ï¬° [[1;36mA[m]nnounce  £i ºëµØ§G§iÄæ £i
+
+: menu.c:menu()
+
+        if (mode <= max)
+        {
+          mptr = table[mode];
+          str = mptr->desc;
+-         prints("(\033[1;36m%c\033[m)", *str++);
++         prints("[\033[1;36m%c\033[m]", *str++);
+          outs(str);
+        }
+
+  ...
+  ...
+
+        if (cx <= max)
+        {
+          mptr = table[cx];
+          str = mptr->desc;
+-         prints("  (\033[1;36m%c\033[m)", *str++);
++         prints("  [\033[1;36m%c\033[m]", *str++);
+          prints("%s ", str);
+        }
+
+  ...
+  ...
+
+      move(MENU_XPOS + cc, MENU_YPOS);
+      mptr = table[cc];
+      str = mptr->desc;
+-     prints(COLOR4 "> (%c)", *str++);
++     prints(COLOR4 "> [%c]", *str++);
+      prints("%s \033[m", str);
+
+  ...
+  ...
+
+      move(MENU_XPOS + cc, MENU_YPOS);
+      mptr = table[cc];
+      str = mptr->desc;
+-     prints(COLOR4 "> (%c)", *str++);
++     prints(COLOR4 "> [%c]", *str++);
+      prints("%s \033[m", str);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,80 @@
+µo«H¤H: waynesan.bbs@csc241.tcssh.tc.edu.tw («z«Yªüªê) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] admutil.c ½u¤W­«±Ò¥Àbbsd
+µo«H¯¸: local (2004/05/20 Thu 10:26:09)                   Updated: 2004/05/20
+
+: global.h
+
++ #define FN_RUN_FILE   "run/bbs.run"   /* waynesan.040520:½u¤W­«±Òbbsd */
+
+#define FN_RUN_USIES    "run/usies"     /* BBS log */
+
+: bbsd.c:start_daemon()
+
+    sprintf(data, "%d\t%s\t%d\tinetd -i\n", getpid(), buf, port);
+    f_cat(PID_FILE, data);
+
++   sprintf(data, "%d\n", getpid());  /* waynesan.040520:½u¤W­«±Òbbsd */
++   f_cat(FN_RUN_FILE, data);
+
+    return;
+  }
+
+  ...
+  ...
+
+  /* standalone */
+  sprintf(data, "%d\t%s\t%d\n", getpid(), buf, port);
+  f_cat(PID_FILE, data);
+
++ sprintf(data, "%d\n", getpid());  /* waynesan.040520:½u¤W­«±Òbbsd */
++ f_cat(RUN_FILE, data);
+}
+
+: menu.c:menu_admin[]
+
+  "bin/admutil.so:a_resetsys", PERM_ALLADMIN, - M_SYSTEM,
+  "BBSreset   ¢« ­«¸m¨t²Î ¢¨",
+
++ "bin/admutil.so:a_rebbsd", PERM_SYSOP, - M_SYSTEM,
++ "Rebbsd     ¢« ­«±Òbbsd ¢¨",
+
+  menu_main, PERM_MENU + Ctrl('A'), M_AMENU,
+  "¨t²ÎºûÅ@"
+};
+
+: admutil.c:a_rebbsd() ·s¼W¦¹¨ç¦¡¦b a_resetsys() «á­±
+
+/* ----------------------------------------------------- */
+/* waynesan.040519½u¤W­«±Òbbsd                           */
+/* ----------------------------------------------------- */
+
+int
+a_rebbsd()
+{
+  if (vans("½T©w­n­«±Òbbsd(Y/N)¡H[N] ") == 'y')
+  {
+    FILE *fp;
+    char buf[20], tmp[10];
+
+    if (fp = fopen(FN_RUN_FILE, "r"))
+    {
+      fscanf(fp, "%s", tmp);
+      fclose(fp);
+      f_rm(FN_RUN_FILE);
+
+      sprintf(buf, "kill %s", tmp);
+      system(buf);
+      system("bin/bbsd");         /* standalone ¤~»Ý­n³o¦æ */
+      vmsg("bbsd¤w­«±Ò");
+    }
+  }
+  return XEASY;
+}
+
+--
+    [1;31m¡Z¡Z[m
+  [1;31m¡þ  [37m¡þ[34m¢v¢v¢@  [31m°g[34m¤Û[37m°ê«×[31m Charming [34mShadow [37mCountry[m
+[1;31m¢y  [37m¡þ[31m  [37m¡þ¢@  [34m¢j[33m¤J¹Ò¦ì§} csc241.twbbs.org[m
+[1;31m¢y  [37m¢@¡þ[31m  [37m¡þ  [34m¢j[32m¦ì§}¥N½X 203.71.212.241[m
+[1;31m  ¢@¡Z¡Z[37m¡þ[31m  [34m¡þ  [36m¨Ó·½¥À°ê 203.71.212.124[m
+[1;31m  [4m¡þ    [34m¢v¢v¢@[;1;31m  µoªí®É¶¡ 2004/05/20 Thu 10:04:04[m

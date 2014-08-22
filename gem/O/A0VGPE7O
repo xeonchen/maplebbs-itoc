@@ -1,0 +1,58 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¬Ý¨£Áô§Î¦W³æ
+®É¶¡: Thu Jul 10 08:49:28 2003                          Updated: 2004/01/30
+
+  ªB¤Í¦W³æ·s¼W¡u³Â¦N¡v
+
+: struct.h
+
+#define PAL_BAD         0x02    /* ¦n¤Í vs Ãa¤H */
++ #define PAL_MATE      0x04    /* ³Â¦N */
+
++ #define MATE_MASK     0x01000000
+
+: pal.c:pal_item()
+
+- prints("%6d %-3s%-14s%s\n", num, pal->ftype & PAL_BAD ? "¢æ" : "",
+-   pal->userid, pal->ship);
++ prints("%6d %-3s%-14s%s\n", num,
++   pal->ftype & PAL_BAD ? "¢æ" :
++   pal->ftype & PAL_MATE ? "¡³" : "",
++   pal->userid, pal->ship);
+
+: pal.c:pal_edit() ´«·s
+
+void
+pal_edit(pal, echo)
+  PAL *pal;
+  int echo;
+{
+  if (echo == DOECHO)
+    memset(pal, 0, sizeof(PAL));
+  vget(b_lines, 0, "¤Í½Ë¡G", pal->ship, sizeof(pal->ship), echo);
+#ifdef HAVE_BADPAL
+  if (vans("Ãa¤H(Y/N)¡H[N] ") == 'y')
+    pal->ftype = PAL_BAD;
+  else
+#endif
+  if (vans("³Â¦N(Y/N)¡H[N] ") == 'y')
+    pal->ftype = PAL_MATE;
+  else
+    pal->ftype = 0;
+}
+
+: pal.c:image_pal()
+
+      do
+      {
+-       /* ­Y¬OÃa¤H¡A¦s -userno¡F­Y¬O¦n¤Í¡A¦s +userno */
+-       *plist++ = (phead->ftype & PAL_BAD) ? -(phead->userno) : phead->userno;
++       /* ­Y¬OÃa¤H¡A¦s -userno¡F­Y¬O¦n¤Í¡A¦s +userno¡F
++          ­Y¬O³Â¦N¡A¦s userno+MASK */
++       *plist++ = (phead->ftype & PAL_BAD) ? -(phead->userno) :
++         (phead->ftype & PAL_MATE) ? phead->userno | MATE_MASK :
++         phead->userno;
+      } while (++phead < ptail);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

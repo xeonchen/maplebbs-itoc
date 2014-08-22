@@ -1,0 +1,17 @@
+§@ªÌ: itoc (i ma 11:20) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¸T¤îµn¤J
+®É¶¡: Thu Oct  2 14:47:23 2003                          Updated: 2003/10/02
+
+¡° ¤Þ­z¡msunlike.nation@Athena.infor.org (­·©M¤éÄR)¡n¤§»Ê¨¥¡G
+> §Ú·QÅýuser¤£¯àµn¤J¤]¤£¯àµù¥U
+
+: bbsd.c:tn_main()
+
++ login_abort("\nÃö¯¸ºû­×¤¤");
+
+  prints(MYHOSTNAME " ¡ó " SCHOOLNAME " ¡ó " MYIPADDR "\n"
+    "Åwªï¥úÁ{¡i\033[1;33;46m %s \033[m¡j¥Ø«e½u¤W¤H¼Æ [%d] ¤H",
+    str_site, ushm->count);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-12.EE.NCTU.edu.tw[37m µoªí[m

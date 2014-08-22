@@ -1,0 +1,44 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: Re: [¥\¯à] ²Î­p¸ê®Æ°Ï¿W¥ß¥X¨Ó¬° menu ªº¤@­Ó¿ï¶µ
+®É¶¡: Sat Jun 15 19:00:08 2002                          Updated: 2005/10/07
+
+: menu.c:menu_XoGem() ·s¼W¦¹¨ç¦¡©ó Gem() «e­±
+
+static void
+menu_XoGem(fpath, title)
+  char *fpath, *title;
+{
+  /* itoc.001109: ¬ÝªOÁ`ºÞ¦b (A)nnounce ¤U¦³ GEM_X_BIT¡A¤è«K¶}ªO */
+  XoGem(fpath, title,
+    (HAS_PERM(PERM_ALLBOARD) ? (GEM_W_BIT | GEM_X_BIT | GEM_M_BIT) : 0));
+}
+
+: menu.c:Gem() ´«·s
+
+static int
+Gem()
+{
+  menu_XoGem("gem/.DIR", "ºëµØ§G§iÄæ");
+  return 0;
+}
+
+: menu.c:menu_history() ·s¼W¦¹¨ç¦¡©ó Gem() «á­±
+
+static int
+menu_history()
+{
+  menu_XoGem("gem/S/F0TL0ORS", "²Î­p¸ê®Æ°Ï");
+  return 0;
+}
+
+  ¨ä¤¤ "gem/S/F0TL0ORS" ¬O ²Î­p¸ê®Æ°Ïªº .DIR
+  ¦U¯¸¤£¦P¡A¦Û©w
+
+
+: menu.c ¦b¾A·íªº¦a¤è¥[¤J¿ï¶µ
+
+  menu_history, 0, M_GEM,
+  "History   £^ ¾ú¥v¦^ÅU°Ï £^",
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

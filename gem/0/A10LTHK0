@@ -1,0 +1,120 @@
+µo«H¤H: tsaikd.bbs@bbs.cs.nchu.edu.tw (¤d¤H±Ù) ¬ÝªO: plan
+¼Ð  ÃD: [·s¼W¥\¯à] edit.c ²Å¸¹¿é¤J¤u¨ãµøµ¡ª©
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/10/02 Sat 21:03:49)                Updated: 2004/10/02
+
+: maple/edit.c : ­«¼ginput_tools()
+
+#ifdef INPUT_TOOLS
+
+#ifdef HAVE_POPUPMENU
+static void
+input_tools()   /* tsaikd.041002: ²Å¸¹¿é¤J¤u¨ãµøµ¡ª© */
+{
+  int ch, ch2, ch3;             /* Á`¦@­n¿ï¤T¦¸ */
+
+  char *menu[] = {"1Q",
+      "1 ¬A²Å¤è¶ô", "2 ½u±øªí®Ø", "3 ¼Æ¾Ç²Å¸¹",
+      "4 ¹Ï®×¼Æ¦r", "5 §ÆÃ¾¦r¥À", "6 ª`­µ¼ÐÂI",
+      "Q ¨ú®ø", NULL};
+
+  char *ansi1[] = {"1Q",       /* 1 ¬A²Å¤è¶ô */
+      "1 ¢b¢c¢d¢e¢f¢g¢h¢i¢¨¢©",
+      "2 ¢j¢k¢l¢m¢n¢o¢p¢ª¢«¡¼",
+      "3 ¡]¡^¡a¡b¡e¡f¡i¡j¡m¡n",
+      "4 ¡q¡r¡u¡v¡y¡z¡k¡l¡o¡p",
+      "5 ¡_¡`¡c¡d¡g¡h¡w¡x¡{¡|",
+      "Q ¨ú®ø", NULL};
+
+  char *ansi2[] = {"1Q",       /* 2 ½u±øªí®Ø */
+      "1 ùïùðùñùõùöù÷¢w¢xùù¡ü",
+      "2 ¢z¢s¢{¢u¢q¢t¢|¢r¢}¢®",
+      "3 ùÝùÞùßùàùáùâùãùäùå¡\\",
+      "4 ùæùèùéùëùìùî¢~¢¡¢¢¢£",
+      "5 ¢b¢v¢j¢y¢¬¢­¡ö¡÷¡ô¡õ",
+      "Q ¨ú®ø", NULL};
+
+  char *ansi3[] = {"1Q",       /* 3 ¼Æ¾Ç²Å¸¹ */
+      "1 ¡Ï¡Ð¡Ñ¡Ò¡Ó¡×¡Õ¡Ö¡Ø¡Ù",
+      "2 ¡Ú¡Ý¡ã¡î¡ï¡ä¡å¡Û£k¡Ô",
+      "3 £U£S¡ì¡í¡ç¡æ¡è¡é£G¢X",
+      "4 ¡­¡®¡¯¡°¢I¢C¢D¢F¢G¢H",
+      "5 ¢J¢K¢P¢Q¢R¢T¢U¢V¢W¡±",
+      "Q ¨ú®ø", NULL};
+
+  char *ansi4[] = {"1Q",       /* 4 ¹Ï®×¼Æ¦r */
+      "1 ¡³¡´¡µ¡¶¡·¡¸¡º¡»¡¼¡½",
+      "2 ¡¾¡¿¡À¡ò¡ó¤Q¢Í¤Ê¡ñ¡ð",
+      "3 ¢¯¢°¢±¢²¢³¢´¢µ¢¶¢·¢¸",
+      "4 ¢¹¢º¢»¢¼¢½¢¾¢¿¢À¢Á¢Â",
+      "5 ÆµÆ¶Æ·Æ¸Æ¹ÆºÆ»Æ¼Æ½Æ¾",
+      "Q ¨ú®ø", NULL};
+
+  char *ansi5[] = {"1Q",       /* 5 §ÆÃ¾¦r¥À */
+      "1 £D£E£F£G£H£I£J£K£L£M",
+      "2 £N£O£P£Q£R£S£T£U£V£W",
+      "3 £X£Y£Z£[£\\£]£^£_£`£a",
+      "4 £b£c£d£e£f£g£h£i£j£k",
+      "5 £l£m£n£o£p£q£r£s¢A¢B",
+      "Q ¨ú®ø", NULL};
+
+  char *ansi6[] = {"1Q",       /* 6 ª`­µ¼ÐÂI */
+      "1 £t£u£v£w£x£y£z£{£|£}",
+      "2 £~£¡£¢£££¤£¥£¦£§£¨£©",
+      "3 £ª£«£¬£­£®£¯£°£±£²£³",
+      "4 £´£µ£¶£·£¸£¹£º£½£¾£¿",
+      "5 £»¡A¡C¡B¡I¡H¡G¡F¡u¡v",
+      "Q ¨ú®ø", NULL};
+
+  char **menu_ansi[] = {ansi1, ansi2, ansi3, ansi4, ansi5, ansi6};
+
+  char buf[10][5] = {0};
+
+  char *tmp_menu[] = {"0Q",
+    buf[0], buf[1], buf[2], buf[3], buf[4],
+    buf[5], buf[6], buf[7], buf[8], buf[9],
+    "Q ¨ú®ø",NULL};
+
+  char *str;
+  int i;
+
+  /* ¿ï¤ÀÃþ */
+  ch = pans(5, 25, "²Å¸¹¿é¤J¤u¨ã", menu);
+  if (ch == 'q')       /* ¨ú®ø´Nª½±µ¸õ¦^½s¿èµe­± */
+    return;
+
+  ch2 = pans(5, 19, &menu[ch - '0'][2], menu_ansi[ch - '1']);
+  if (ch2 == 'q')      /* ¨ú®ø´Nª½±µ¸õ¦^½s¿èµe­± */
+    return;
+
+  str = &menu_ansi[ch - '1'][ch2 - '0'][2];
+
+  /* ²Ä¤T¼h¬O¨Ì²Ä¤G¼h©Ò¿ï¾Üªº¨Ó¶ñ¤J */
+  for (i = 0; i < 10; i++)    /* ¨C­Ó¤¤¤å¦r¬O 2 char */
+    sprintf(buf[i], "%d %2.2s", i, str + i * 2);
+
+  ch3 = pans(5, 28, "¿é¤J²Å¸¹", tmp_menu);
+  if (ch3 == 'q')      /* ¨ú®ø´Nª½±µ¸õ¦^½s¿èµe­± */
+    return;
+  str = &tmp_menu[ch3 - '0' + 1][2];
+
+  ve_char(*str);            /* ¦L¥X¤G­Ó char ¤¤¤å¦r */
+  ve_char(*++str);
+}
+
++ #else           /* HAVE_POPUPMENU */
+
+static void
+input_tools()   /* itoc.000319: ²Å¸¹¿é¤J¤u¨ã */
+{
+
+...
+...
+
+}
++ #endif /* HAVE_POPUPMENU */
+
+#endif
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mtsaikd [30m±q [35m140.116.104.202 [30mµoªí[m

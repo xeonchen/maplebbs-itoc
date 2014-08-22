@@ -1,0 +1,80 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ·Q­n¤@­Óµ{¦¡...
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/06 Wed 23:24:46)                Updated: 2005/06/12
+
+¡° ¤Þ­z¡mFrank.bbs@cpp.twbbs.org (¨©¨©)¡n¤§»Ê¨¥¡G
+> check ¦pªG .BRD ¸Ì¦³¥ô¦ó¤@­Ó¬ÝªO,¨S¦³¥X²{¦b newsfeeds.bbs ¤¤
+
+: src/util/Makefile ¥[¤J check_newsfeeds
+
+EXE =   account acl-sort bbsmail [1;33mcheck_newsfeeds[m ...
+
+: src/util/check_newsfeeds.c ·s¼Wµ{¦¡¦p¤U
+
+/*-------------------------------------------------------*/
+/* util/check_newsfeeds.c  ( NTHU CS MapleBBS Ver 3.10 ) */
+/*-------------------------------------------------------*/
+/* target : ÀË¬d newsfeeds.bbs ¬O§_¦³¤£Âà«Hªº¬ÝªO        */
+/* create : 04/10/06                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+static int              /* 1: brdname ¦b newsfeeds.bbs ¤º */
+in_newsfeeds(brdname)
+  char *brdname;
+{
+  newsfeeds_t nf;
+  int fd;
+  int rc = 0;
+
+  if ((fd = open("innd/newsfeeds.bbs", O_RDONLY)) >= 0)
+  {
+    while (read(fd, &nf, sizeof(newsfeeds_t)) == sizeof(newsfeeds_t))
+    {
+      if (!strcmp(nf.board, brdname))
+      {
+        rc = 1;
+        break;
+      }
+    }
+    close(fd);
+  }
+  return rc;
+}
+
+
+int
+main()
+{
+  BRD brd;
+  int fd;
+  char *str;
+
+  chdir(BBSHOME);
+
+  if ((fd = open(FN_BRD, O_RDONLY)) >= 0)
+  {
+    while (read(fd, &brd, sizeof(BRD)) == sizeof(BRD))
+    {
+      str = brd.brdname;
+
+      if (!*str)  /* ¦¹ªO¤w³Q§R°£ */
+        continue;
+
+      if (!(brd.battr & BRD_NOTRAN) && !in_newsfeeds(str))
+        printf("%s ªºÄÝ©Ê­nÂà«H¥X¥h¡A¦ý¤£¦b newsfeeds.bbs ¤¤\n", str);
+    }
+    close(fd);
+  }
+
+  return 0;
+}
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;43m¢¢[46mùñ[m [1mMo[30mdi[mfy: [1;35m2004/10/06 Wed 23:24:46[m

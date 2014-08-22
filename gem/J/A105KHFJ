@@ -1,0 +1,282 @@
+µo«H¤H: cyanofox.bbs@bbs.cs.nchu.edu.tw (§Ú¬O¦n¤H¤@±Úªº:() ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¥[±K¤å³¹¥i¨£¦W³æ
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/03/19 Fri 00:49:19)                Updated: 2006/05/09
+
+¸g¹L¦h¦¸¸òamaki¤j¤j¸ß°Ý°Q±Ð«á¡A§Ú§âºëµØ°Ï¨º½g [¥\¯à] post.c ¥[±K¤å³¹¥i¨£¦W³æ
+µ¹µy°µ­×¥¿¡A¨Ï¤§¥i¥H¾A¥Î©ó·sª©ªºitoc¤jºûÅ@ªºMaple
+©³¤U¬O§Ú¯¸¤W(cmumed.twbbs.org)ªºpatch
+µ¹¤j®a°Ñ¦Ò¡A¤]Åwªï«ü±Ð ^^"
+-----------------------------------------------------------------------------
+
+  ²Ä¤@¦¸^y®É·|¸ß°Ý¡A²Ä¤G¦¸^y®É·|¸ß°Ý¬O§_­n¸Ñ°£¥[±K¡A
+  ¸Ñ°£«á·|¬å±¼©Ò¦³¥i¨£¦W³æ¡C
+
+  ¥[±K«á¡A¤é«á­Y¬O¦³»Ý­n¦A¥[¤J·sªº¥i¨£¦W³æ¡A½Ð«ö¤jOÁä¡C
+
+: src/maple/maple.p
+
+/* pal.c */
++ int belong_pal(int *pool, int max, int userno);
+
+  ...
+  ...
+
+/* post.c */
+int cmpchrono(HDR *hdr);
++ void RefusePal_kill(char *board, HDR *hdr);   /* redfox:¥[±K¤å³¹¥i¨£¦W³æ */
++ int RefusePal_belong(char *board, HDR *hdr);  /* redfox:¥[±K¤å³¹¥i¨£¦W³æ */
+void cancel_post(HDR *hdr);
+
+: pal.c
+
+- static int
++ int
+belong_pal(pool, max, userno)
+
+: post.c ·s¼W¤U­±¨ç¦¡¡A©ñ¦bcmpchrono()«á­±
+
+static void
+RefusePal_fpath(fpath, board, mode, hdr)
+  char *fpath;
+  char *board;
+  char mode;       /* 'C':Cansee  'R':Refimage */
+  HDR *hdr;
+{
+  sprintf(fpath, "brd/%s/RefusePal_DIR/%s_%s", 
+    board, mode == 'C' ? "Cansee" : "Refimage", hdr->xname);
+}
+
+
+void
+RefusePal_kill(board, hdr)   /* amaki.030322: ¥Î¨Ó¬å¦W³æ¤pÀÉ */
+  char *board;
+  HDR *hdr;
+{
+  char fpath[64];
+
+  RefusePal_fpath(fpath, board, 'C', hdr);
+  unlink(fpath);
+  RefusePal_fpath(fpath, board, 'R', hdr);
+  unlink(fpath);
+}
+
+
+int          /* 1:¦b¥i¨£¦W³æ¤W 0:¤£¦b¥i¨£¦W³æ¤W */
+RefusePal_belong(board, hdr)
+  char *board;
+  HDR *hdr;
+{
+  int fsize;
+  char fpath[64];
+  int *fimage;
+
+  if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
+    return 1;
+
+  RefusePal_fpath(fpath, board, 'R', hdr);
+  if (fimage = f_img(fpath, &fsize))
+  {
+    fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
+    free(fimage);
+    return fsize;
+  }
+  return 0;
+}
+
+
+static void
+refusepal_cache(hdr, board)
+  HDR *hdr;
+  char *board;
+{
+  int fd, max;
+  char fpath[64];
+  int pool[PAL_MAX];
+
+  RefusePal_fpath(fpath, board, 'C', hdr);
+
+  if (max = image_pal(fpath, pool))
+  {
+    RefusePal_fpath(fpath, board, 'R', hdr);
+    if ((fd = open(fpath, O_WRONLY | O_CREAT | O_TRUNC, 0600)) >= 0)
+    {
+      write(fd, pool, max * sizeof(int));
+      close(fd);
+    }
+  }
+  else
+    RefusePal_kill(board, hdr);
+}
+
+
+static int
+XoBM_Refuse_pal(xo)
+  XO *xo;
+{
+  char fpath[64];
+  HDR *hdr;
+  XO *xt;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+  if (!(hdr->xmode & POST_RESTRICT))
+    return XO_NONE;
+
+  if (strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
+    return XO_NONE;
+
+  sprintf(fpath, "brd/%s/RefusePal_DIR", currboard);
+  if (!dashd(fpath))
+    mkdir(fpath, 0700);
+
+  RefusePal_fpath(fpath, currboard, 'C', hdr);
+  xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
+  xover(XZ_PAL);
+
+  refusepal_cache(hdr, currboard);
+  free(xt);
+  return XO_INIT;
+}
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+: post.c:post_cb[]
+
++ 'O', XoBM_Refuse_pal,
+
+: post.c:post_refuse()
+
+  if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
+  {
++   if (hdr->xmode & POST_RESTRICT)
++   {
++     if (vans("¸Ñ°£¤å³¹«O±K·|§R°£¥þ³¡¥i¨£¦W³æ¡A±z½T©w¶Ü(Y/N)¡H[N] ") != 'y')
++     {
++       move(3 + cur, 7);
++       outc(post_attr(hdr));
++       return XO_FOOT;
++     }
++     RefusePal_kill(currboard, hdr);
++   }
+
+    hdr->xmode ^= POST_RESTRICT;
+    currchrono = hdr->chrono;
+    rec_put(xo->dir, hdr, sizeof(HDR),
+      xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
+-   move(3 + cur, 7);
+-   outc(post_attr(hdr));
+
+
++   if (hdr->xmode & POST_RESTRICT)
++     return XoBM_Refuse_pal(xo);
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ÀË¬d¬O§_¬O§@ªÌ¡BªO¥Dªº³¡¤À§ï¥Î RefusePal_belong()
+
+: post.c:post_reply()
+
+-    if ((hdr->xmode & POST_RESTRICT) &&
+-     strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
++   if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+      return XO_NONE;
+
+: post.c:post_browse()
+
+-   if ((xmode & POST_RESTRICT) &&
+-     strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
++   if ((xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+      break;
+
+: post.c:post_edit()
+
+-   if ((hdr->xmode & POST_RESTRICT) && 
+-     !(bbstate & STAT_BM) && strcmp(hdr->owner, cuser.userid))
++   if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+      return XO_NONE;
+
+: post.c:post_score()
+
+- if ((hdr->xmode & POST_RESTRICT) &&
+-   strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
++ if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+    return XO_NONE;
+
+: post.c:post_forward()
+
+- if ((hdr->xmode & POST_RESTRICT) &&
+-   strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
++ if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+    return XO_NONE;
+
+: xpost.c:XoXpost()
+
+-   if ((head->xmode & POST_RESTRICT) &&
+-     strcmp(head->owner, cuser.userid) && !(bbstate & STAT_BM))
++   if ((head->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+      continue;
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  §R°£ÀÉ®×®É­n¶¶«K§R°£¥i¨£¦W³æ
+
+: post.c:post_delabel()
+
+      cancel_post(hdr);
+      hdr_fpath(fold, folder, hdr);
+      unlink(fold);
++     if (xmode & POST_RESTRICT)
++       RefusePal_kill(currboard, hdr);
+
+: post.c:delpost()
+
+  cancel_post(hdr);
+  hdr_fpath(fpath, xo->dir, hdr);
+  unlink(fpath);
++ if (hdr->xmode & POST_RESTRICT)
++   RefusePal_kill(currboard, hdr);
+
+: so/manage.c: post_terminator()
+
+      cancel_post(hdr);
+      hdr_fpath(fold, fpath, hdr);
+      unlink(fold);
++     if (xmode & POST_RESTRICT)
++       RefusePal_kill(currboard, hdr);
+
+: util/expire.c: ¦bexpire()«e·s¼W³o¤ä¨ç¦¡
+
+static void
+RefusePal_fpath(fpath, board, mode, hdr)
+  char *fpath;
+  char *board;
+  char mode;       /* 'C':Cansee  'R':Refimage */
+  HDR *hdr;
+{
+  sprintf(fpath, "%s/RefusePal_DIR/%s_%s",
+    board, mode == 'C' ? "Cansee" : "Refimage", hdr->xname);
+}
+
+: util/expire.c: expire()
+
+      *str = hdr.xname[7];
+      strcpy(fname, hdr.xname);
+      unlink(fpath);
++     if (hdr.xmode & POST_RESTRICT)
++     {
++       char fpath[64];
++
++       RefusePal_fpath(fpath, bname, 'C', &hdr);
++       unlink(fpath);
++       RefusePal_fpath(fpath, bname, 'R', &hdr);
++       unlink(fpath);
++     }
+      fprintf(flog, "\t%s\n", fname);
+      total--;
+    }
+  }
+
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mcyanofox [30m±q [35m218-170-28-125.HINET-IP.hinet.net [30mµoªí[m

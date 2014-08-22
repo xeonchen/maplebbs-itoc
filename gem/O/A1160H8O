@@ -1,0 +1,104 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ­­¨î­Ó¤H«H½c®e¶q
+µo«H¯¸: °Ê¤O®Ö¤ß (Tue, 04 Nov 2003 09:16:36 +0800 (CST))  Updated: 2005/05/17
+
+¡° ¤Þ­z¡mcpd.bbs@pitch.twbbs.org (Seasons)¡n¤§»Ê¨¥¡G
+> ´N¬O§Ú·Q­n­­¨î¨C­Ó¨Ï¥ÎªÌªº«H½c¨Ï¥Î®e¶q(­ì¥»¥u¦³­­¨î½g¼Æ)...
+> ­n¬O«H½c¨Ï¥Î¶W¹L¤W­­¡A´N­­¨î¥u¯à¨ì¶l¥ó¿ï³æ¡A°£«D§R°£¤@¨Ç«H¤~¯àÂ÷¶}¶l¥ó¿ï³æ..
+
+: config.h
+
+#define MAX_BBSMAIL     500             /* PERM_MBOX ¦¬«H¤W­­(«Ê) */
+#define MAX_VALIDMAIL   300             /* »{ÃÒ user ¦¬«H¤W­­(«Ê) */
+#define MAX_NOVALIDMAIL 100             /* ¥¼»{ÃÒ user ¦¬«H¤W­­(«Ê) */
+
++ #define MAX_BBSMAILSIZE     1024000       /* PERM_MBOX ®e¶q¤W­­(byte) */
++ #define MAX_VALIDMAILSIZE   512000        /* »{ÃÒ user ®e¶q¤W­­(byte) */
++ #define MAX_NOVALIDMAILSIZE 204800        /* ¥¼»{ÃÒ user ®e¶q¤W­­(byte) */
+
+: bbsd.c:m_overflow() ¥[¦b tn_motd() «e­±
+
+static int          /* 1:¹L¤j */
+m_overflow()
+{
+  int total_size, limit;
+  char fpath[64], *ptr, *str;
+  struct stat st;
+  struct dirent *de;
+  DIR *dirp;
+
+  usr_fpath(fpath, cuser.userid, fn_dir);
+
+  if (stat(fpath, &st))
+    return 0;
+
+  /* ¤W­­´X½g */
+  if (HAS_PERM(PERM_MBOX))
+    limit = MAX_BBSMAIL;
+  else if (HAS_PERM(PERM_VALID))
+    limit = MAX_VALIDMAIL;
+  else
+    limit = MAX_NOVALIDMAIL;
+  if (st.st_size > sizeof(HDR) * limit)
+    return 1;
+
+  ptr = (char *) strchr(fpath, '.');
+  *ptr++ = '@';
+  *ptr = '\0';
+
+  if (dirp = opendir(fpath))
+  {
+    /* ®e¶q´X byte */
+    if (HAS_PERM(PERM_MBOX))
+      limit = MAX_BBSMAILSIZE;
+    else if (HAS_PERM(PERM_VALID))
+      limit = MAX_VALIDMAILSIZE;
+    else
+      limit = MAX_NOVALIDMAILSIZE;
+
+    *ptr++ = '/';
+    total_size = 0;
+    while (de = readdir(dirp))
+    {
+      str = de->d_name;
+      if (*str <= ' ' || *str == '.')
+        continue;
+      strcpy(ptr, str);
+      if (!stat(fpath, &st))
+      {
+        total_size += st.st_size;
+        if (total_size > limit)
+        {
+          closedir(dirp);
+          return 1;
+        }
+      }
+    }
+    closedir(dirp);
+  }
+
+  return 0;
+}
+
+: bbsd:tn_motd()
+
+static void
+tn_motd()
+{
+  ...
+  ...
+
++ while (m_overflow())
++ {
++   vmsg("±zªº«H¥ó¹L¦h¡A½Ð¥´¥]¦^®a©Î§R°£³¡¤À«H¥ó");
++   m_zip();
++   xover(XZ_MBOX);
++ }
+}
+
+--
+  ³o¥\¯à«Ü¦Y I/O
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

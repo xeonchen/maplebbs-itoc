@@ -1,0 +1,146 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (  - THE END -) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¤å³¹¾\Åª\µoªí±±¨î½XÂX¼W¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Tue, 18 Nov 2003 00:56:38 +0800 (CST))  Updated: 2006/06/28
+
+        ¢°. ±N Ctrl + Q ªº¿ï¶µ¿é¤J§ï¬°µøµ¡¤Æ¿ï³æ¡C
+
+        ¢±. ÂX¼W±±¨î½XªººØÃþ¡C
+
+==============================================================================
+
+: edit.c:vedit() case Ctrl('Q'): ªº³¡¤À§ï¦¨³o¼Ë
+
+#ifdef SHOW_USER_IN_TEXT
+      case Ctrl('Q'):
++       {
++         /* qazq.031117: ¦h¼Ë¤ÆÅã¥Ü¨Ï¥ÎªÌ¸ê®Æ */
++         char *msg[] = {"10",
++                        "1  ¢×¢Ò      (**s)", "2  ¼ÊºÙ      (**n)",
++                        "3  ¤W¯¸¦¸¼Æ  (**l)", "4  µo¤å¦¸¼Æ  (**p)",
++                        "5  ª÷¹ô      (**g)", "6  »È¹ô      (**m)",
++                        "7  ²{¦b®É¨è  (**t)", "8  ½u¤W¤H¼Æ  (**u)",
++                        "9  ¥Í¤é      (**b)", "0  ¨ú®ø",
++                        NULL};
+
+-         cc = vans("Åã¥Ü¨Ï¥ÎªÌ¸ê®Æ(1)id (2)¼ÊºÙ¡H");
++         cc = pans(5, 20, "Åã¥Ü¨Ï¥ÎªÌ¸ê®Æ", msg);
+-         if (cc >= '1' && cc <= '2')
++         if (cc > '0')
+          {
+            ve_char(KEY_ESC);
+            ve_char('*');
+-           ve_char("sn"[cc - '1']);
++           ve_char("snlpgmtub"[cc - '1']);
+          }
++       }
+-       ve_mode = mode | VE_FOOTER;
+        break;
+#endif
+
+: visio.c:outx()
+
+void
+outx(str)
+  uschar *str;
+{
+  int ch;
++ char buf[20];
+
+  ...
+  ...
+
+      switch (str[2])
+      {
+      case 's':         /* **s Åã¥Ü ID */
+        outs(cuser.userid);
+        str += 3;
+        continue;
+      case 'n':         /* **n Åã¥Ü¼ÊºÙ */
+        outs(cuser.username);
+        str += 3;
+        continue;
++     case 'l':       /* **l Åã¥Ü¤W¯¸¦¸¼Æ */
++       sprintf(buf, "%d", cuser.numlogins);
++       outs(buf);
++       str += 3;
++       continue;
++     case 'p':       /* **p Åã¥Üµo¤å¦¸¼Æ */
++       sprintf(buf, "%d", cuser.numposts);
++       outs(buf);
++       str += 3;
++       continue;
++     case 'g':       /* **g Åã¥Üª÷¹ô */
++       sprintf(buf, "%d", cuser.gold);
++       outs(buf);
++       str += 3;
++       continue;
++     case 'm':       /* **m Åã¥Ü»È¹ô */
++       sprintf(buf, "%d", cuser.money);
++       outs(buf);
++       str += 3;
++       continue;
++     case 't':       /* **t Åã¥Ü¤é´Á */
++       outs(Now());
++       str += 3;
++       continue;
++     case 'u':       /* **u Åã¥Ü½u¤W¤H¼Æ */
++       sprintf(buf, "%d", total_user);
++       outs(buf);
++       str += 3;
++       continue;
++     case 'b':       /* **b Åã¥Ü¥Í¤é */
++       sprintf(buf, "%d/%d", cuser.month, cuser.day);
++       outs(buf);
++       str += 3;
++       continue;
+      }
+
+: camera.c:str_strip()
+
+      if (ch == '*')
+      {
+        ansi = 0;
+-       len += BMAX(IDLEN, UNLEN) - 1;
++       switch (str[1])
++       {
++       case 's':         /* **s Åã¥Ü ID */
++         len += IDLEN - 1;
++         break;
++       case 'n':         /* **n Åã¥Ü¼ÊºÙ */
++         outs(cuser.username);
++         len += UNLEN - 1;
++         break;
++       case 'l':       /* **l Åã¥Ü¤W¯¸¦¸¼Æ */
++         len += 5 - 1;     /* °²³]³Ì¦h¤­¦ì¼Æ */
++         break;
++       case 'p':       /* **p Åã¥Üµo¤å¦¸¼Æ */
++         len += 5 - 1;     /* °²³]³Ì¦h¤­¦ì¼Æ */
++         break;
++       case 'g':       /* **g Åã¥Üª÷¹ô */
++         len += 10 - 1;    /* °²³]³Ì¦h¤Q¦ì¼Æ */
++         break;
++       case 'm':       /* **m Åã¥Ü»È¹ô */
++         len += 10 - 1;    /* °²³]³Ì¦h¤Q¦ì¼Æ */
++         break;
++       case 't':       /* **t Åã¥Ü¤é´Á */
++         len += 23 - 1;
++         break;
++       case 'u':       /* **u Åã¥Ü½u¤W¤H¼Æ */
++         len += 5 - 1;     /* °²³]³Ì¦h¤­¦ì¼Æ */
++         break;
++       case 'b':       /* **b Åã¥Ü¥Í¤é */
++         sprintf(buf, "%d/%d", cuser.month, cuser.day);
++         len += 5 - 1;
++         break;
++       }
+
+        if (len > SCR_WIDTH)
+        {
+          *str = '\0';
+          break;
+        }
+      }
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-137-32.HINET-IP.hinet.net [30mµoªí[m

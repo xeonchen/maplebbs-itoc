@@ -1,0 +1,59 @@
+§@ªÌ: itoc (Åå­¸¶Ã¬õ¤d¤ù) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] Maple3-SNAP -> Maple3-PACK Âà´«¤â¥U
+®É¶¡: Wed Apr 24 20:05:44 2002
+
+                       [32m¡¹ SNAP ¡÷ PACK Âà´«¤â¥U ¡¹[m
+
+    ¥»¤å¥ó¬O¼gµ¹­n¦w¸Ë itoc ©ÒºûÅ@ªº bbs µ{¦¡ª©¥»©Ò¨Ï¥Îªº¡A¨Ã¤£¾A¥Î
+  ¨ä¥L bbs ª©¥»¡C
+
+    ¥Øªº¬O§â­ì©lªº Maple 3.10-SNAP ©Î Maple 3.02 Âà¦¨ itoc ©ÒºûÅ@ªº
+  bbs µ{¦¡ª©¥»¡C
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  Ãö¯¸
+
+  ³o¨Ç«O¯dÂÂ¯¸ªº (ª½±µ²¾¹L¨Ó´N¥i¥H³q¥Î¤F)
+  .BRD
+  .USR
+  brd/
+  gem/
+  innd/
+  log/
+  net/
+  usr/
+
+  ³o¨Çrm±¼ÂÂ¯¸ªº(·íµM­n³Æ¥÷)¡A±q·sª©ªºcp¹L¨Ó
+  bak/     (ÂÂ¯¸¨S¦³³o­Ó¥Ø¿ý)
+  bin/
+  doc/
+  etc/
+  run/
+  src/
+  tmp/
+
+  ¥H¤U³o¨Çµ{¦¡¸Ì­±¦³¤@¨Ç¯¸¦W/IP addressªº³]©w¡A§ï¦¨¦Û¤vªº
+
+  src/include/config.h
+
+  ¦b src/ ¤U¥´ make os  (¨Ò¦p make freebsd ©Î make linux)
+
+  °õ¦æ bin/backupacct ³Æ¥÷©Ò¦³¨Ï¥ÎªÌªº .ACCT
+
+  °õ¦æ src/util/tran/snap2usr Âà´«¨Ï¥ÎªÌ
+  (¦pªG±zªº struct ACCT ¤£¬O­ì¨Ó MapleBBS-3.10-20000606-SNAP ªº¸Ü¡A
+  ­n¦Û¤v§ï src/util/tran/snap2usr.c)
+
+  °õ¦æ src/util/tran/snap2brd Âà´« .BRD
+
+  ¶}¯¸
+
+  ¶}¯¸¥H«á¡A·|µo²{©Ò¦³¬ÝªO¤¤¤å±Ô­zªº«e¥|­Ó¦r¤¸³Q§ì¥h·í¤ÀÃþ¤F¡A¦¹®ÉÁÙ±o¤â°Ê
+  ¬°©Ò¦³¬ÝªO§ó§ï¤ÀÃþ¤Î¤¤¤å±Ô­z¡C
+
+  ³s¤W¯¸¥H«á·|¦b¶}ÀYµe­±¥H¤Î°ÊºA¬ÝªO¬Ý¨ì¡u½Ð§i¶D¯¸ªø¯ÊÀÉ®× gem/@/xxxx¡v©Î
+  ¡u½Ð§i¶D¯¸ªøÀÉ®×¤j¤p¬°¹s gem/@/xxxx¡vªº°T®§¡A¦¹®É½Ð±q·sª©ªº§ì¹L¨Ó½Æ»s¡C
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

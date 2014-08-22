@@ -1,0 +1,69 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¦³Ãö¯¸¤º¬ÝªO¤¬Âà¤å³¹
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/21 Thu 08:44:52)                Updated: 2005/04/21
+
+¡° ¤Þ­z¡mshadowofsoul (Shadow Of Soul)¡n¤§»Ê¨¥¡G
+> §Æ±æ¯à°÷post¦b¤@­ÓªO(ex. ¤½§iª©)
+> ¥L´N·|¦Û°ÊÂà«H¨ì¬Y¨Ç»Ý­n¤½§iªºª©
+¡° ¤Þ­z¡mcchhsu (AG)¡n¤§»Ê¨¥¡G
+> ¦³¨S¦³¿ìªk§ï¦¨ ...post«á´N·|¦Û°ÊÂàpo¨ì XX¤ÀÃþ¥h©O
+
+  ¯¸ªø¦b XXXX ªOªº post ·|¦Û°ÊÂà¥h¤ÀÃþ¬O [­Ó¤H] ªº©Ò¦³¬ÝªO
+
+: post.c:do_post()
+
++ if (HAS_PERM(PERM_ALLADMIN) && !strcmp(currboard, "XXXX"))   [1;44m // XXXX ¦Û­q [m
++   copy_post(&hdr, fpath);
+
+  unlink(fpath);
+
+  vmsg(NULL);
+
+: post.c:copy_post() ·s¼W¦¹¨ç¦¡¦b do_post() «e­±
+: ¦pªG¬O§Æ±æ¡u¦Û°ÊÂà¥h¤ÀÃþ¬O [­Ó¤H] ªº©Ò¦³¬ÝªO¡v¡A¨º»ò³o¼Ë§ï
+
+static void
+copy_post(hdr, fpath)
+  HDR *hdr;
+  char *fpath;
+{
+  char folder[64];
+  HDR post;
+  BRD *brdp, *bend;
+
+  brdp = bshm->bcache;
+  bend = brdp + bshm->number;
+
+  while (brdp < bend)
+  {
+    if (!strcmp(brdp->class, "­Ó¤H"))   [1;44m // ¤ÀÃþ¦Û©w [m
+    {
+      brd_fpath(folder, brdp->brdname, fn_dir);
+      hdr_stamp(folder, HDR_COPY | 'A', &post, fpath);
+      memcpy(post.owner, hdr->owner, TTLEN + 140);
+      rec_bot(folder, &post, sizeof(HDR));
+    }
+    brdp++;
+  }
+}
+
+: post.c:copy_post() ·s¼W¦¹¨ç¦¡¦b do_post() «e­±
+: ¦pªG¬O§Æ±æ¡u¦Û°ÊÂà¥h¬ÝªO YYYY¡v¡A¨º»ò³o¼Ë§ï
+
+static void
+do_post(fpath)
+  HDR *hdr;
+  char *fpath;
+{
+  char folder[64];
+  HDR post;
+
+  brd_fpath(folder, "YYYY", fn_dir);      [1;44m // ¬ÝªO¦Û©w [m
+  hdr_stamp(folder, HDR_COPY | 'A', &post, fpath);
+  memcpy(post.owner, hdr->owner, TTLEN + 140);
+  rec_bot(folder, &post, sizeof(HDR));
+}
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

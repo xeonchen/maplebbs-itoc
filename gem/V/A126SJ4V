@@ -1,0 +1,126 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: ∑s§Â≥π≥q™æ
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2006/05/20 Sat 06:58:29)                Updated: 2006/05/23
+
+°∞ §ﬁ≠z°mguessi.bbs@bbs.wretch.cc°n§ßª ®•°G
+> Ø∏§W®œ•Œ™Ã¥£•X§@≠”≠n®D [∑s§Â≥π≥q™æ]
+> ------------------------------
+> ≠Y§µ§È¢œ≥]©wßÏ®˙¢–©“±i∂K™∫§Â≥π
+> ´h¢–∂K§ÂÆ…±N§Â≥πcopy¶‹¢œ™∫´HΩc
+> ------------------------------
+
+  ¢œ¶p™G≠n¨›¢–©“±i∂K™∫§Â≥π
+  ®∫¥N≠n¢–±N¢œ≥]∂i•L™∫∑s§Â≥π≥q™æ¶W≥Ê
+
+  ¶‹©Û¢–≠n´ÁªÚ™æπD¢œ∑Q¨›•L™∫§Â≥π
+  ¥N•s¢œ™Ω±µºg´H•hµπ¢–¥N±o§F
+
+: ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ≥]©w¶W≥Ê™∫≥°§¿
+
+  ™Ω±µÆ≥ØSßO¶W≥Ê¢µ∑Ì•ißÏ§Â¶W≥Ê
+
+: pal.c:pal_list()
+
+-   switch (ch = vget(1, 0, "... (1~5)ØSßO¶W≥Ê (Q)®˙Æ¯ ...))
++   switch (ch = vget(1, 0, "... (1~6)ØSßO¶W≥Ê (Q)®˙Æ¯ ...))
+
+  ...
+  ...
+
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
++   case '6':
+
+: pal.c:pal_cite()
+
+-   "(1-5)ØSßO¶W≥Ê"
++   "(1-6)ØSßO¶W≥Ê"
+
+  ...
+  ...
+
+- else if (fd >= '1' && fd <= '5')
++ else if (fd >= '1' && fd <= '6')
+
+: pal.c:t_list()
+
+- for (n = 1; n <= 5; n++)
++ for (n = 1; n <= 6; n++)
+  {
+    move(n + MENU_XPOS - 1, MENU_YPOS - 1);
+    prints("(\033[1;36m%d\033[m) ∏s≤’¶W≥Ê.%d", n, n);
++   if (n == 6)
++     outs(" ∑s§Â≥π≥q™æ¶W≥Ê");
+  }
+
+  ...
+  ...
+
+- if (n <= 0 || n > 5)
++ if (n <= 0 || n > 6)
+
+: ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ß⁄µo™Ì§Â≥πÆ…°A≥q™æ∑s§Â≥π≥q™æ§π≥\¶W≥Ê§W≠±™∫§H
+
+: post.c:do_post()
+
+  rec_bot(folder, &hdr, sizeof(HDR));
+  btime_update(currbno);
++ list6_notice(&hdr);
+
+: post.c:list6_notice() ∑sºW¶π®Á¶°¶b do_post() §W≠±
+
+static void
+list6_notice(hdr)
+  HDR *hdr;
+{
+  int fd;
+  char fpath[64], flist[64];
+  FILE *fp;
+  PAL pal;
+  BRD *brd;
+
+  /* ∞Œ¶W§Â°B¡Ù¬√™O §£≥q™æ */
+  if (curredit & EDIT_ANONYMOUS)
+    return;
+  brd = bshm->bcache + currbno;
+  if ((brd->readlevel == PERM_BOARD) || (brd->readlevel == PERM_SYSOP))
+    return;
+
+  sprintf(fpath, "tmp/list6_notice.%s", cuser.userid);
+  if (fp = fopen(fpath, "w"))
+  {
+    fprintf(fp, "%s %s (%s)\n", str_author1, cuser.userid, cuser.username);
+    fprintf(fp, "º–√D: ∑s§Â≥π≥q™æ\nÆ…∂°: %s\n\n", Now());
+
+    /* §Â≥π§∫Æe */
+    fprintf(fp, "±z¶n°Aß⁄¶b [%s] ™Oµo™Ì§F§@Ωg∑s§Â≥π\n", currboard);
+    fprintf(fp, "§Â≥πº–√D¨O %s\n", hdr->title);
+    fprintf(fp, "≠n•h¨›≥·°I\n");
+    fclose(fp);
+
+    /* ¨›∑s§Â≥π≥q™æ¶W≥Ê¶≥≠˛®«§H°A§@§@±H´H≥q™æ */
+    usr_fpath(flist, cuser.userid, FN_LIST".6");
+    if ((fd = open(flist, O_RDONLY)) >= 0)
+    {
+      while (read(fd, &pal, sizeof(PAL)) == sizeof(PAL))
+      {
+        if (!(pal.ftype & PAL_BAD))
+          mail_him(fpath, pal.userid, "∑s§Â≥π≥q™æ", 0);
+      }
+      close(fd);
+    }
+
+    unlink(fpath);
+  }
+}
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [31m∞[1m §[;31;40mOÆ[1m÷§[;31;40mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m itoc.Dorm11.NCTU.edu.tw  [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

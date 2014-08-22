@@ -1,0 +1,21 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: Ãö©ó¯¸Ã±
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/09/17 Fri 11:39:58)                Updated: 2004/09/17
+
+¡° ¤Þ­z¡mpapago (papago)¡n¤§»Ê¨¥¡G
+>            °e¥X¥h«á¡AÅã¥Ü¹ï¥~ªº¯¸Ã±©O ?
+
+  Âà«H¹ï¥~¯¸Ã±
+
+: bbslink.c:send_outgoing()
+
++ fprintf(NNTPwfp, "--\r\n");
++ fprintf(NNTPwfp, "¹ï¥~¯¸Ã±²Ä¤@¦æ\r\n");
++ fprintf(NNTPwfp, "¹ï¥~¯¸Ã±²Ä¤G¦æ\r\n");
+
+  /* IHAVE/POST µ²§ô */
+  status = tcpcommand(".");
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

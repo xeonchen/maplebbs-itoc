@@ -1,0 +1,39 @@
+§@ªÌ: itoc (ºñ¥¨¤H¦n«È¡H) ¬ÝªO: itoc
+¼ÐÃD: [¥\¯à] ¾ã¦æ¥ú´Î(10)¡Ðvote.c §ë²¼
+®É¶¡: Tue Jul 15 10:54:09 2003                          Updated: 2004/03/06
+
+: vote.c:vote_item_bar()  ¥[¦b vote_item() «á­±
+
+#ifdef HAVE_LIGHTBAR
+static int
+vote_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:¤W¥ú´Î  0:¥h¥ú´Î */
+{
+  VCH *vch;
+
+  vch = (VCH *) xo_pool + xo->pos - xo->top;
+
+  prints("%s%6d%c%c%c%c %-9.8s%-12s %-45.45s%s",
+    mode ? "\033[44m" : "",         //³o¸Ì¬O¥ú´ÎªºÃC¦â¡A¥i¥H¦Û¤v§ï
+    xo->pos + 1, tag_char(vch->chrono),
+    vch->vsort, vch->vpercent, vch->vprivate,
+    vch->cdate, vch->owner, vch->title,
+    mode ? "\033[m" : "");
+
+  return XO_NONE;
+}
+#endif
+
+: vote.c:vote_cb[]
+
+static KeyFunc vote_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, vote_item_bar,
+#endif
+...
+
+--
+[1;31m|[33m Origin [31m| [0;45m MapleBBS-itoc °Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+[1;31m|[35m Author [31m| [36mitoc.dorm11.nctu.edu.tw[m

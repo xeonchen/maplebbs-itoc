@@ -1,0 +1,39 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: [¤å¥ó] ´_­ì³Q¬åªº±b¸¹
+®É¶¡: 2004/06/27 Sun 17:37:18
+
+  * ªø´Á¥¼¤W¯¸ªº¨Ï¥ÎªÌ¡A·|³Q reaper §R°£¡A³Q§R°£ ID ªº¸ê®Æ·|²¾¨ì usr/@/ ¤U
+
+  * ¦pªG·Q§ï¹L´Á´Á­­¡A½Ð§ï reaper.c ªº
+
+    #define DAY_NEWUSR      7       /* µn¤J¤£¶W¹L¤T¦¸ªº¨Ï¥ÎªÌ«O¯d 7 ¤Ñ */
+    #define DAY_FORFUN      90      /* ¥¼§¹¦¨¨­¤À»{ÃÒªº¨Ï¥ÎªÌ«O¯d 90 ¤Ñ */
+    #define DAY_OCCUPY      120     /* ¤w§¹¦¨¨­¤À»{ÃÒªº¨Ï¥ÎªÌ«O¯d 120 ¤Ñ */
+
+    #define VAC_NEWUSR      7       /* µn¤J¤£¶W¹L¤T¦¸ªº¨Ï¥ÎªÌ«O¯d 7 ¤Ñ */
+    #define VAC_FORFUN      180     /* ¥¼§¹¦¨¨­¤À»{ÃÒªº¨Ï¥ÎªÌ«O¯d 180 ¤Ñ */
+    #define VAC_OCCUPY      180     /* ¤w§¹¦¨¨­¤À»{ÃÒªº¨Ï¥ÎªÌ«O¯d 180 ¤Ñ */
+
+  * ¦pªG·Q§R°£¤@­Ó©|¥¼¹L´Áªº ID
+
+    ¥D¿ï³æ¡÷(0)Admin¡÷(U)ser ­×§ï¸Ó ID ªºÅv­­¡A¥[¤J N ¢i ²M°£±b¸¹
+    ¦b¤U¦¸¶] reaper ®É¡A¥L´N·|³Q¨t²Î§R°£
+
+  * ¦pªG·Q±Ï¦^¤w³Q§R°£ªº ID
+
+    1. ¥s¥L¥Ó½Ð·s±b¸¹¡A·s±b¸¹ªº ID ­n©M³Q§R°£ªº ID ¬Û¦P (¤j¤p¼g¥i¥H¤£¦P)
+    2. ¥s¸Ó ID Â÷½u
+    3. ¯¸ªø±q ¥D¿ï³æ¡÷(0)Admin¡÷(U)ser ¬Ý¥L·s±b¸¹ªº¡u¥Î¤á½s¸¹¡v
+    4. ¦b¤u§@¯¸¤W°õ¦æ
+       % rm -rf ~/usr/_/userid
+       % mv ~/usr/@/userid ~/usr/_/
+       ¨ä¤¤ _ ¬O¸Ó ID ªº²Ä¤@­Ó¦r¥ÀÅÜ¤p¼g¡Auserid ¬O¸Ó ID ÅÜ¤p¼g
+    6. ¯¸ªø±q ¥D¿ï³æ¡÷(0)Admin¡÷(U)ser §ï¥Lªº¡u¥Î¤á½s¸¹¡v¡A
+       §ï¦¨¨BÆJ 3. ¤¤©Ò°O¿ýªº¨º­Ó¼Æ¦r
+
+    ³o¼Ë´N±Ï¦^¸Ó ID ¤F¡A¦ý¬O¥Ñ©ó userno ¤wÅÜ§ó¡A©Ò¥H³]¥L¬°¦n¤Í¡B¤W¯¸³qª¾ªº
+    ¨ä¥L¤H±o­«·s³]©w¦n¤Í¡B¤W¯¸³qª¾
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mpc512-2.ee.nctu.edu.tw [30mµoªí[m

@@ -1,0 +1,403 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¨Ï¥ÎªÌ¦Û©w¥D¿ï³æ(2)
+®É¶¡: Wed Jul 16 22:13:30 2003                          Updated: 2003/07/17
+
+  ¨Ï¥ÎªÌ¦Û©w¥D¿ï³æ(2) ½s¿è¦Û©w¥D¿ï³æ
+
+: menu.c ¤@¶}©l
+
+extern UCACHE *ushm;
+
++ static int launch_set();
+
+: menu.c ¦b¾A·íªº¿ï³æ¥[¤J
+
++ launch_set, PERM_VALID, M_XMODE,
++ "Menu       ¡m ¦Û©w¿ï³æ ¡n",
+
+: menu.c ³Ì«á¥[¤J¥H¤U³o¾ã¬q
+
+/* ----------------------------------------------------- */
+/* ¨Ï¥ÎªÌ¦Û©w Quick Launch                               */
+/* ----------------------------------------------------- */
+
+
+#define MAX_LAUNCH      (22 - MENU_XPOS)
+
+static char *fn_quick = "quick";
+
+
+typedef struct
+{
+  int key;
+  void *func;
+  int umode;
+  char *desc;
+}       LaunchFunc;
+
+
+/* ­n¥[ list ªº¦b³oÃä¥[ */
+
+
+#define LAUNCHLIST_LEN  17
+
+
+static LaunchFunc quick_cb[LAUNCHLIST_LEN + 1] =
+{
+  /* ½s¸¹¤£¥Î·Ó¶¶§Ç¡A¤]¥i¥HÀH«Kµ¹¡A¥u­n¬O¤£­«ÂÐªº¾ã¼Æ§Y¥i¡A
+     ¦ý¬O½s¸¹¤£¯àÅÜ°Ê (¦]¬°·|¦s¦b user ¥Ø¿ýªº quick ÀÉ¤¤) */
+
+  /* ½s¸¹, ¨ç¦¡,  °ÊºA,     ¿ï³æ±Ô­z */
+
+   1, Boards,     M_BOARD,  "Boards     ¡ö §G§i°Q½× ¡÷",
+   2, Class,      M_BOARD,  "Class      ¡ö ¤À²Õ°Q½× ¡÷",
+   3, MyFavorite, M_MF,     "Favorite   ¡ö §Úªº³Ì·R ¡÷",
+   4, Gem,        M_GEM,    "Announce   ¡ö ºëµØ¤½§G ¡÷",
+
+ 101, XoMbox,     M_RMAIL,  "Read       ¡ö ¾\\Åª«H¥ó ¡÷",
+ 102, m_send,     M_SMAIL,  "Mail       ¡ö ¯¸¤º±H«H ¡÷",
+ 103, m_internet, M_SMAIL,  "Internet   ¡ö ±H¨Ì©f¨à ¡÷",
+
+ 201, t_pal,      M_PAL,    "GoodFriend ¡ö ¦n¤Í³]©w ¡÷",
+ 202, XoUlist,    M_LUSERS, "Users      ¡ö ¹C«È¦W³æ ¡÷",
+ 203, t_query,    M_QUERY,  "Query      ¡ö ¬d¸ßºô¤Í ¡÷",
+ 204, t_display,  M_BMW,    "Display    ¡ö ÂsÄý¤ô²y ¡÷",
+ 205, t_bmw,      M_BMW,    "Write      ¡ö ¦^ÅU¤ô²y ¡÷",
+ 206, bin/chat.so:t_chat", - M_CHAT, "Chat       ¡ö ²³¤fÅàª÷ ¡÷",
+
+ 301, u_info,     M_XMODE,  "Info       ¡ö ­Ó¤H¸ê®Æ ¡÷",
+ 302, u_setup,    M_UFILES, "Habit      ¡ö ³ß¦n¼Ò¦¡ ¡÷",
+ 303, pad_view,   M_READA,  "Note       ¡ö Æ[¬Ý¯d¨¥ ¡÷",
+
+ 401, "bin/enews.so:main_enews", - M_XMODE, "Kimo       ¡ö ©_¼¯·s»D ¡÷",
+
+  /* ³Ì«á¤@­Ó©T©w¬O 0, goodbye */
+  0, goodbye,     M_XMODE,  "Goodbye    ¡ö ¤U¦¸¦A·| ¡÷"
+};
+
+
+static int
+launch_set()
+{
+  int i, num, keylist[MAX_LAUNCH];
+  char buf[80];
+  LaunchFunc *cb;
+
+  /* ¬É­±°µ±o»á»¹¡A¥u¯à¤ä´©¨ì LAUNCHLIST_LEN = 20¡A·Q§ïªº¤H¦A¦Û¤v§ï :p */
+
+  memset(keylist, 0, sizeof(keylist));
+
+  clear();
+
+  for (i = 0; i < LAUNCHLIST_LEN; i++)
+  {
+    cb = quick_cb + i;
+    move(i + 2, 0);
+    prints("%2d %s", i + 1, cb->desc);
+  }
+
+  i = 0;
+  while (vget(b_lines, 0, "½Ð¿ï¾Ü§Ö±¶¦C¿ï¶µ¡G", buf, 4, DOECHO))
+  {
+    num = atoi(buf) - 1;
+    if (num >= 0 && num < LAUNCHLIST_LEN)
+    {
+      cb = quick_cb + num;
+      keylist[i] = cb->key;
+      move(i + 2, 40);
+      prints("±¶®| %d¡G%s", i + 1, cb->desc);
+      if (++i >= MAX_LAUNCH - 1)
+      {
+        sprintf(buf, "³Ì¦h¥u¯à¥[ %d ­Ó±¶®|¦Ó¤w", MAX_LAUNCH - 1);
+        vmsg(buf);
+        break;
+      }
+    }
+  }
+
+  if (i)
+  {
+    /* ³Ì«á¦A¸É¤W¤@­Ó±¶®|¡Ggoodbye */
+    keylist[i] = (quick_cb + LAUNCHLIST_LEN)->key;
+    usr_fpath(buf, cuser.userid, fn_quick);
+    unlink(buf);
+    rec_add(buf, keylist, sizeof(keylist));
+  }
+
+  return 0;
+}
+
+
+/* ----------------------------------------------------- */
+/* ¨Ï¥Î Quick Launch Skin                                */
+/* ----------------------------------------------------- */
+
+
+static MENU menu_launch[MAX_LAUNCH];
+
+
+static int                      /* ¦^¶Ç³]¤F´X­Ó quick launch */
+launch_load()
+{
+  int i, key, keylist[MAX_LAUNCH];
+  char fpath[64];
+  LaunchFunc *cb;
+  MENU *menu;
+
+  usr_fpath(fpath, cuser.userid, fn_quick);
+  if (rec_get(fpath, keylist, sizeof(keylist), 0))
+    return 0;
+
+  menu = menu_launch;
+  for (i = 0; i < MAX_LAUNCH; i++)
+  {
+    cb = quick_cb;
+    do
+    {
+      key = cb->key;
+      if (key == keylist[i])
+        break;
+      cb++;
+    } while (key);
+
+    menu->func = cb->func;
+    menu->umode = cb->umode;
+    menu->desc = cb->desc;
+    menu++;
+
+    if (!key)
+      break;
+  }
+
+  return i;
+}
+
+
+void
+skin()
+{
+  MENU *mptr;
+  usint mode;
+  int cc, cx;           /* current / previous cursor position */
+  int max;              /* menu max */
+  int cmd;
+  char *str;
+  int (*func) ();
+
+  if (!(max = launch_load()))
+  {
+    menu();
+    return;
+  }
+
+  mode = MENU_DRAW | MENU_FILM;
+  cmd = KEY_HOME;           /* default command */
+
+  for (;;)
+  {
+    if (mode & MENU_DRAW)
+    {
+      if (mode & MENU_FILM)
+      {
+        clear();
+        movie();
+        cx = -1;
+      }
+
+      vs_head("§Ö±¶¦C", NULL);
+
+      for (mode = 0; mode <= max; mode++)
+      {
+        move(MENU_XPOS + mode, MENU_YPOS + 2);
+        mptr = menu_launch + mode;
+        str = mptr->desc;
+        prints("(\033[1;36m%c\033[m)", *str++);
+        outs(str);
+        clrtoeol();
+      }
+    }
+
+    mode = 0;
+
+    switch (cmd)
+    {
+    case KEY_DOWN:
+      cc = (cc == max) ? 0 : cc + 1;
+      break;
+
+    case KEY_UP:
+      cc = (cc == 0) ? max : cc - 1;
+      break;
+
+    case Ctrl('A'): /* itoc.020829: ¹w³]¿ï¶µ²Ä¤@­Ó */
+    case KEY_HOME:
+      cc = 0;
+      break;
+
+    case KEY_END:
+      cc = max;
+      break;
+
+    case KEY_PGUP:
+      cc = (cc == 0) ? max : 0;
+      break;
+
+    case KEY_PGDN:
+      cc = (cc == max) ? 0 : max;
+      break;
+
+    case '\n':
+    case KEY_RIGHT:
+      mptr = menu_launch + cc;
+      cmd = mptr->umode;
+      if (cmd >= 0)
+      {
+        utmp_mode(cmd);
+        func = mptr->func;
+        mode = (*func) ();
+      }
+      else                      /* dynamic load */
+      {
+        if (func = DL_get(mptr->func))
+        {
+          utmp_mode(-cmd);
+          mode = (*func)();
+        }
+        else
+          mode = XEASY;
+      }
+
+      utmp_mode(M_0MENU);
+
+      if (mode == XEASY)
+      {
+        outz(feeter);
+        mode = 0;
+      }
+      else
+      {
+        mode = MENU_DRAW | MENU_FILM;
+      }
+
+      cmd = mptr->desc[0];
+      continue;
+
+#ifdef EVERY_Z
+    case Ctrl('Z'):
+      every_Z(0);
+      goto every_key;
+
+    case Ctrl('U'):
+      every_U(0);
+      goto every_key;
+#endif
+
+    /* itoc.010911: Select everywhere¡A¤£¦A­­¨î¬O¦b M_0MENU */
+    case 's':
+    case Ctrl('S'):
+      utmp_mode(M_BOARD);
+      Select();
+      goto every_key;
+
+#ifdef MY_FAVORITE
+    /* itoc.010911: Favorite everywhere¡A¤£¦A­­¨î¬O¦b M_0MENU */
+    case 'f':
+    case Ctrl('F'):
+      if (HAS_PERM(PERM_BASIC)) /* itoc.010407: ­nÀË¬dÅv­­ */
+      {
+        utmp_mode(M_MF);
+        MyFavorite();
+      }
+      goto every_key;
+#endif
+
+    case Ctrl('X'):
+      cuser.ufo &= ~UFO_USERSKIN;
+      vmsg("­«·s¤W¯¸«á´N·|«ì´_­ì¨Óªº¤½ª©¿ï³æ");
+      goto default_key;
+
+every_key:  /* ¯S®íÁä³B²zµ²§ô */
+      utmp_mode(M_0MENU);
+      mode = MENU_DRAW | MENU_FILM;
+      cmd = (menu_launch + cc)->desc[0];
+      continue;
+
+    case KEY_LEFT:
+    case 'e':
+      cmd = 'G';
+
+default_key:
+    default:
+
+      if (cmd >= 'a' && cmd <= 'z')
+        cmd -= 0x20;
+
+      cc = 0;
+      for (;;)
+      {
+        if ((menu_launch + cc)->desc[0] == cmd)
+          break;
+        if (++cc > max)
+        {
+          cc = cx;
+          goto menu_key;
+        }
+      }
+    }
+
+    if (cc != cx)   /* ­Y´å¼Ð²¾°Ê¦ì¸m */
+    {
+#ifdef CURSOR_BAR
+      if (cx >= 0)
+      {
+        move(MENU_XPOS + cx, MENU_YPOS);
+        if (cx <= max)
+        {
+          mptr = menu_launch + cx;
+          str = mptr->desc;
+          prints("  (\033[1;36m%c\033[m)", *str++);
+          prints("%s ", str);
+        }
+        else
+        {
+          outs("  ");
+        }
+      }
+      move(MENU_XPOS + cc, MENU_YPOS);
+      mptr = menu_launch + cc;
+      str = mptr->desc;
+      prints(COLOR4 "> (%c)", *str++);
+      prints("%s \033[m", str);
+      cx = cc;
+#else       /* ¨S¦³ CURSOR_BAR */
+      if (cx >= 0)
+      {
+        move(MENU_XPOS + cx, MENU_YPOS);
+        outc(' ');
+      }
+      move(MENU_XPOS + cc, MENU_YPOS);
+      outc('>');
+      cx = cc;
+#endif
+    }
+    else        /* ­Y´å¼Ðªº¦ì¸m¨S¦³ÅÜ */
+    {
+#ifdef CURSOR_BAR
+      move(MENU_XPOS + cc, MENU_YPOS);
+      mptr = menu_launch + cc;
+      str = mptr->desc;
+      prints(COLOR4 "> (%c)", *str++);
+      prints("%s \033[m", str);
+#else
+      move(MENU_XPOS + cc, MENU_YPOS + 1);
+#endif
+    }
+
+menu_key:
+
+    cmd = vkey();
+  }
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,192 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: redir¥i§_¤ä´©pttªº¤é´Á®æ¦¡^^"...
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/24 Sun 11:23:34)                Updated: 2005/05/15
+
+¡° ¤Þ­z¡mitoc (®Ö¤ß°Ê¤O)¡n¤§»Ê¨¥¡G
+> ¡° ¤Þ­z¡mpigco («¢)¡n¤§»Ê¨¥¡G
+> > ¥i¤£¥i¥HÅýredir³o¤äµ{¦¡¤ä´©pttªº®É¶¡®æ¦¡ XD...
+>   3. ¦pªG§A¯à¨ú±o¸Ó¯¸ªº§¹¾ã¸ê®Æ¡A¨º§A¥i¥H¥ÎÂà´«ªº
+
+  ¥ý±N¨ä¥L BBS ¯¸ªº¸ê®Æ§ì¦^¨Ã¸ÑÀ£ÁY
+  °²³]±N¥Ø¿ý¸Ñ¶}¦b /tmp/xxxx
+  /tmp/xxxx ¸Ì­±­n¦³ .DIR ¤Î M.*.A ªºÀÉ®×
+
+  µM«á°õ¦æ
+  % ~/bin/transbrd /tmp/xxxx ABCD
+  §Y¥i±N /tmp/xxxx ³o¥Ø¿ý¤Uªº¤å³¹Âà¨ì¯¸¤Wªº [ABCD] ªO (­n¥ý¦b¯¸¤W¶}³o­ÓªO)
+  ¬ÝªO [ABCD] ¥i¥H¬O¤@­Ó¥þ·sªº¬ÝªO
+  ¤]¥i¥H¬O¤@­Ó¤w¦³¤å³¹ªº¬ÝªO (¨º»ò·|±N¤å³¹¨Ö¤J¨ì³Ì«á)
+
+  Âà´«µ{¦¡¦p¤U
+
+: src/util/Makefile
+
+EXE =   ..... [1;33mtransbrd.c[m
+
+: src/util/transbrd.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/transbrd.c                                       */
+/*-------------------------------------------------------*/
+/* target : Maple Sob 2.36 ¦Ü Maple 3.02 ¬ÝªOÂà´«        */
+/* create : 05/04/24                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+/* ----------------------------------------------------- */
+/* old DIR of board struct : 128 bytes                   */
+/* ----------------------------------------------------- */
+
+struct fileheader
+{
+  char filename[33];            /* M.9876543210.A */
+  char savemode;                /* file save mode */
+  char owner[14];               /* uid[.] */
+  char date[6];                 /* [02/02] or space(5) */
+  char title[73];
+  uschar filemode;              /* must be last field @ boards.c */
+};
+typedef struct fileheader fileheader;
+
+
+static time_t
+trans_hdr_chrono(filename)
+  char *filename;
+{
+  char time_str[11];
+
+  /* M.1087654321.A ©Î M.987654321.A */
+  str_ncpy(time_str, filename + 2, filename[2] == '1' ? 11 : 10);
+
+  return (time_t) atoi(time_str);
+}
+
+
+static void
+trans_hdr_stamp(folder, t, hdr, fpath)
+  char *folder;
+  time_t t;
+  HDR *hdr;
+  char *fpath;
+{
+  FILE *fp;
+  char *fname, *family;
+  int rc;
+
+  fname = fpath;
+  while (rc = *folder++)
+  {
+    *fname++ = rc;
+    if (rc == '/')
+      family = fname;
+  }
+  fname = family + 1;
+  *fname++ = '/';
+  *fname++ = 'A';
+
+  for (;;)
+  {
+    *family = radix32[t & 31];
+    archiv32(t, fname);
+
+    if (fp = fopen(fpath, "r"))
+    {
+      fclose(fp);
+      t++;
+    }
+    else
+    {
+      memset(hdr, 0, sizeof(HDR));
+      hdr->chrono = t;
+      str_stamp(hdr->date, &hdr->chrono);
+      strcpy(hdr->xname, --fname);
+      break;
+    }
+  }
+}
+
+
+/* ----------------------------------------------------- */
+/* Âà´«¥Dµ{¦¡                                            */
+/* ----------------------------------------------------- */
+
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  int fd;
+  char *brdname, *path;
+  char fpath[64], folder[64], buf[64];
+  time_t chrono;
+  fileheader fh;
+  HDR hdr;
+
+  if (argc != 3)
+  {
+    printf("Usage: %s path brdname\n", argv[0]);
+    printf("±N path ³o¥Ø¿ý¤Uªº¸ê®Æ¨Ö¤J¬ÝªO brdname\n");
+    return 0;
+  }
+
+  chdir(BBSHOME);
+
+  brdname = argv[2];
+  brd_fpath(folder, brdname, NULL);
+  if (!dashd(folder))
+  {
+    printf("BBS ¤W¨S¦³¦¹¬ÝªO %s\n", brdname);
+    return 0;
+  }
+
+  path = argv[1];
+  sprintf(fpath, "%s/.DIR", path);
+  if (!dashf(fpath))
+  {
+    printf("%s ¦¹¥Ø¿ý¤U¨S¦³¨ä¥L BBS ¯¸ªº¤å³¹\n", path);
+    return 0;
+  }
+
+  /* Âà´«¶iªOµe­± */
+  sprintf(fpath, "%s/notes", path);
+  if (dashf(fpath))
+  {
+    brd_fpath(folder, brdname, FN_NOTE);
+    f_cp(fpath, folder, O_TRUNC);
+  }
+
+  /* Âà´«¤å³¹ */
+  sprintf(fpath, "%s/.DIR", path);
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    brd_fpath(folder, brdname, FN_DIR);
+
+    while (read(fd, &fh, sizeof(fh)) == sizeof(fh))
+    {
+      /* Âà´«¤å³¹ .DIR */
+      memset(&hdr, 0, sizeof(HDR));
+      chrono = trans_hdr_chrono(fh.filename);
+      trans_hdr_stamp(folder, chrono, &hdr, buf);
+      str_ncpy(hdr.owner, fh.owner, sizeof(hdr.owner));
+      str_ansi(hdr.title, fh.title, sizeof(hdr.title));
+      hdr.xmode = (fh.filemode & 0x2) ? POST_MARKED : 0;
+      rec_add(folder, &hdr, sizeof(HDR));
+
+      /* «þ¨©ÀÉ®× */
+      sprintf(fpath, "%s/%s", path, fh.filename);
+      f_cp(fpath, buf, O_TRUNC);
+    }
+    close(fd);
+  }
+
+  return 0;
+}
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

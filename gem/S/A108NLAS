@@ -1,0 +1,187 @@
+µo«H¤H: chwaian.bbs@processor.tfcis.org (µL¨¥) ¬ÝªO: Maple_itoc
+¼Ð  ÃD: Re: veditªºKEY_UP¡BKEY_DOWN¥i¸õ¦æÁÙ­ìve_col
+µo«H¯¸: °Ê¤O®Ö¤ß (04/19/04 00:58:36 Mon)                  Updated: 2005/03/16
+
+°²³]¤å³¹¤º¤å¬°³o¼Ë
+
+------------
+¤@¤G¤T¥|¤­
+¤@¤G¤T
+         (ªÅ¦æ)
+¤@¤G¤T¥|
+¤@¤G¤T¥|¤­
+-------------
+
+¦pªG¦b²Ä¤@¦æªº³Ì«á­±¤@ª½«öKEY_DOWN
+
+´å¼Ðªº²¾°Ê¤è¦¡¦p¤U
+
+------------
+ ¤@¤G¤T¥|¤­[1;33m_[m
+ ¤@¤G¤T[1;33m_[m
+[1;33m_[m        (ªÅ¦æ)
+[1;33m_[m¤@¤G¤T¥|
+[1;33m_[m¤@¤G¤T¥|¤­
+-------------
+
+§ï§¹³o½g«á
+
+------------
+ ¤@¤G¤T¥|¤­[1;33m_[m
+ ¤@¤G¤T[1;33m_[m
+[1;33m_ [m       (ªÅ¦æ)
+ ¤@¤G¤T¥|[1;33m_[m
+ ¤@¤G¤T¥|¤­[1;33m_[m
+-------------
+
+
+  ¦ý¬O¦b Ctrl+V ªº ansi-mode ¤§¤U¡A¤´©M¤§«e²¾°Ê¤è¦¡¤@¼Ë
+
+
+: edit.c
+
+static int ve_col;
++ static int ve_coll;    /* last cursor position (column) */
+
+: edit.c:ve_char()
+
+    if (mode & VE_ANSI)
+      col = ansi2n(n2ansi(col, p), p);
+
+-   ve_col = col;
++   ve_col = ve_coll = col;
+    return;
+  }
+  ...
+  ...
+  data[col++] = ch;
+- ve_col = col;
++ ve_col = ve_coll = col;
+  p->len = ++len;
+
+: edit.c:vedit()
+
+- ve_col = ve_row = margin = 0;
++ ve_col = ve_coll = ve_row = margin = 0;
+  ve_lno = 1;
+  ve_mode = VE_INSERT | VE_REDRAW | VE_FOOTER;
+
+  ...
+  ...
+
+      case KEY_BKSP:            /* backspace */
+        ...
+        ...
+        if (col)
+        {
+-         delete_char(vln, ve_col = --col);
++         delete_char(vln, ve_col = ve_coll = --col);
+          continue;
+        }
+
+  ...
+  ...
+
+      case KEY_DEL:             /* delete current character */
+        ...
+        ...
+            ve_col = ansi2n(n2ansi(col, vln), vln);
+        }
++       ve_coll = ve_col;
+        continue;
+
+      case KEY_LEFT:
+        ...
+        ...
+-         ve_col = (mode & VE_ANSI) ? ansi2n(pos - 1, vln) : col - 1;
++         ve_col = ve_coll = (mode & VE_ANSI) ? ansi2n(pos - 1, vln) : col - 1;
+          continue;
+
+  ...
+  ...
+
+      case KEY_RIGHT:
+
+        if (vln->len != col)
+        {
+-         ve_col = (mode & VE_ANSI) ? ansi2n(pos + 1, vln) : col + 1;
++         ve_col = ve_coll = (mode & VE_ANSI) ? ansi2n(pos + 1, vln) : col + 1;
+          continue;
+        }
+
+  ...
+  ...
+
+      case KEY_HOME:
+      case Ctrl('A'):
+
+-       ve_col = 0;
++       ve_col = ve_coll = 0;
+        continue;
+
+
+      case KEY_END:
+      case Ctrl('E'):
+
+-       ve_col = vln->len;
++       ve_col = ve_coll = vln->len;
+        continue;
+
+  ...
+  ...
+
+      case KEY_UP:
+        ...
+        ...
+          if (col > cc)
+            ve_col = cc;
++         else
++           ve_col = (cc < ve_coll) ? cc : ve_coll;  /* ÁÙ­ì¥ý«eªº ve_col */
+
+  ...
+  ...
+
+      case KEY_DOWN:
+
+          if (col > cc)
+            ve_col = cc;
++         else
++           ve_col = (cc < ve_coll) ? cc : ve_coll;  /* ÁÙ­ì¥ý«eªº ve_col */
+
+      case Ctrl('S'):           /* start of file */
+
+        vx_cur = vx_top = vx_ini;
+-       ve_col = ve_row = 0;
++       ve_col = ve_coll = ve_row = 0;
+        ve_lno = 1;
+        ve_mode = mode | VE_REDRAW;
+        continue;
+
+  ...
+  ...
+
+      case Ctrl('Y'):           /* delete current line */
+
+-       vln->len = ve_col = 0;
++       vln->len = ve_col = ve_coll = 0;
+        vln->data[0] = '\0'; /* Thor.981001: ±N¤º®e¤@¨Ö²M°£ */
+
+      case Ctrl('K'):           /* delete to end of line */
+
+        if (cc = vln->len)
+        {
+          if (cc != col)
+          {
+-           vln->len = col;
++           vln->len = ve_coll = col;
+            vln->data[col] = '\0';
+            continue;
+
+
+
+¤£ª¾¹D¦³¨S¦³º|§ï©Î¦³°ÝÃDªº¦a¤è @_@
+
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mchwaian [30m±q [35m218-171-118-64.dynamic.hinet.net [30mµoªí[m

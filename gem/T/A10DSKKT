@@ -1,0 +1,133 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ½Ð°Ý¦p¦ó¦h¤@²Õclass(Ãþ¦üWindTop±M·~°Q½×°Ï)
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/06/27 Sun 10:59:29)                Updated: 2004/06/27
+
+¡° ¤Þ­z¡mLandRover (¤j¦a­^»¨)¡n¤§»Ê¨¥¡G
+> §ï¬°itoc¥H«á¡@§Æ±æ¤´¯à¦b¥D¿ï³æ°µ¤@­Ó¡u±M·~°Q½×°Ï¡v
+
+  ¦b (A)nnounce ¸Ì­±¶}­Ó¤ÀÃþ¥s PROF §Y¥i
+
+: struct.h
+
+#define CLASS_IMGFILE_NAME      "run/classname.img"
+#define CLASS_IMGFILE_TITLE     "run/classtitle.img"
++ #define CLASS_IMGFILE_PROF    "run/classprof.img"
+
+: account.c:class_image()
+
+static void
+class_image()
+{
+  int i, times;
+  FILE *fp;
+  short len, pos[CH_MAX];
+  ClassHeader *chp;
+
+- for (times = 2; times > 0; times--)
++ for (times = 3; times > 0; times--)
+  {
+    chn = 0;
+    class_sort(times == 1 ? brdname_cmp : brdtitle_cmp);
+-   class_parse(CLASS_INIFILE);
++   class_parse(times == 3 ? "PROF" : CLASS_INIFILE);
+
+    ...
+    ...
+
+-     rename(CLASS_RUNFILE, times == 1 ? CLASS_IMGFILE_NAME :
+-       CLASS_IMGFILE_TITLE);
++     rename(CLASS_RUNFILE, times == 1 ? CLASS_IMGFILE_NAME :
++       times == 2 ? CLASS_IMGFILE_TITLE : CLASS_IMGFILE_PROF);
+    }
+  }
+
+  class_chn();
+}
+
+: board.c
+
+static char *class_img = NULL;
+static XO board_xo;
++ static int class_prof;        /* ¦b 1:Profession 0:Class ¸Ì­± */
+
+: board.c:board_main()
+
+- class_img = f_img(cuser.ufo & UFO_BRDNAME ? CLASS_IMGFILE_NAME :
+-   CLASS_IMGFILE_TITLE, &fsize);
++ class_img = f_img(class_prof ? CLASS_IMGFILE_PROF :
++   cuser.ufo & UFO_BRDNAME ? CLASS_IMGFILE_NAME : CLASS_IMGFILE_TITLE,
++   &fsize);
+
+: board.c:class_namemode()
+
+static int
+class_namemode(xo)              /* itoc.010413: ¬ÝªO¨Ì·Ó¦r¥À/¤ÀÃþ±Æ¦C */
+  XO *xo;
+{
+  static time_t last = 0;
+  time_t now;
+
++ if (class_prof)
++   return XO_NONE;
+
+: board.c:Class()
+
+int
+Class()
+{
++ if (class_prof)
++ {
++   class_prof = 0;
++   if (cuser.userlevel)
++     brh_save();
++   board_main();
++ }
+  /* XoClass(CH_END - 1); */
+  /* Thor.980804: ¨¾¤î ¥¼¥Î account ³y¥X class.img ©Î¨S¦³ class ªº±¡ªp */
+  if (!class_img || !XoClass(CH_END - 1))
+  {
+    vmsg("¥¼©w¸q¤À²Õ°Q½×°Ï");
+    return XEASY;
+  }
+  return 0;
+}
+
+: board.c:Profession() ·s¼W¦¹¨ç¦¡¦b Class() «á­±
+
+int
+Profession()
+{
+  if (!class_prof)
+  {
+    class_prof = 1;
+    if (cuser.userlevel)
+      brh_save();
+    board_main();
+  }
+  /* XoClass(CH_END - 1); */
+  /* Thor.980804: ¨¾¤î ¥¼¥Î account ³y¥X class.img ©Î¨S¦³ class ªº±¡ªp */
+  if (!class_img || !XoClass(CH_END - 1))
+  {
+    vmsg("¥¼©w¸q¤À²Õ°Q½×°Ï");
+    return XEASY;
+  }
+  return 0;
+}
+
+: maple.p
+
+int Class(void);
++ int Profession(void);
+
+: menu.c:menu_main[]
+
+  Class, 0, M_BOARD,
+  "Class     £p ¤À²Õ°Q½×¶° £p",
+
++ Profession, 0, M_BOARD,
++ "Profession£p ±M·~°Q½×¶° £p",
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

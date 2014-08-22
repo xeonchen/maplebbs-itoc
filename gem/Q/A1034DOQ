@@ -1,0 +1,230 @@
+µo«H¤H: Efen.bbs@bbs.med.ncku.edu.tw (^^) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¯î¼o¬ÝªO²Î­p¡]¿é¥X¦b²Î­p¸ê®Æ¤¤¡^
+µo«H¯¸: °j­·¨¦ (2004/02/17 Tue 20:13:27)                  Updated: 2005/05/25
+
+§ï¼g¦Û¥¼½sºëµØ°Ïªºµ{¦¡¡A
+¦p¤U¡A
+ÀÉ¦W¦Û¨ú¡A°O±o¦bMakefile¸Ì¥[¡A§Ú¬O¥Îbrdir.c¡]´N¬OºëµØ°Ï¸Ì¨º½gªº­ìÀÉ¦W¡^
+
+¦bºëµØ¤½§GÄæ¸Ì¡A·s¼W@-brd_empty¬°µL¤å³¹¬ÝªO²Î­p
+                    @-brd_overdue¬°µL·s¤å³¹¤Ñ¼Æ²Î­p
+
+µM«á¦bcrontab ¸Ì¥[¤J
+33 3 * * * bin/topbrd > /dev/null 2>&1
+¨C¤Ñ¶]¤@¦¸¡C
+
+: src/util/Makefile
+
+EXE =   ... [1;33mtopbrd[m
+
+: src/util/topbrd.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/topbrd.c        ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ­pºâ¬ÝªOµL·s¤å³¹¤Ñ¼Æ                         */
+/* create : 04/02/07                                     */
+/* update :   /  /                                       */
+/* author : Efen.bbs@bbs.med.ncku.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+#define OUTFILE_BRDEMPTY        "gem/@/@-brd_empty"
+#define OUTFILE_BRDOVERDUE      "gem/@/@-brd_overdue"
+
+
+static char nostat[MAXBOARD][BNLEN + 1]; /* ¤£¦C¤J±Æ¦æº]ªº¬ÝªO */
+static int nostat_num;                   /* nostat_num+1: ´X­ÓªO¤£¦C¤J²Î­p */
+static time_t now;
+
+
+static void
+collect_nostat()
+{
+  FILE *fp;
+  BRD brd;
+
+  nostat_num = -1;
+  if (fp = fopen(FN_BRD, "r"))
+  {
+    while (fread(&brd, sizeof(BRD), 1, fp) == 1)
+    {
+      if ((brd.readlevel | brd.postlevel) >= (PERM_VALID << 1))
+      /* (BASIC + ... + VALID) < (VALID << 1) */
+      {
+        nostat_num++;
+        strcpy(nostat[nostat_num], brd.brdname);
+      }
+    }
+
+    fclose(fp);
+  }
+}
+
+
+static int      /* 1:¥»ªO¤£¦C¤J²Î­p */
+is_nostat(brdname)
+  char *brdname;
+{
+  int i;
+
+  for (i = 0; i <= nostat_num; i++)
+  {
+    if (!strcmp(brdname, nostat[i]))
+      return 1;
+  }
+  return 0;
+}
+
+
+static char *
+whoisbm(brdname)
+  char *brdname;
+{
+  int fd;
+  BRD brd;
+  static char BM[BMLEN + 1];
+
+  BM[0] = '\0';
+
+  if ((fd = open(FN_BRD, O_RDONLY)) >= 0)
+  {
+    while (read(fd, &brd, sizeof(BRD)) == sizeof(BRD))
+    {
+      if (!strcmp(brdname, brd.brdname))
+      {
+        strcpy(BM, brd.BM);
+        break;
+      }
+    }
+    close(fd);
+  }
+
+  return BM;
+}
+
+
+typedef struct
+{
+  int day;                      /* ´X¤Ñ¨S¾ã²zºëµØ°Ï */
+  char brdname[BNLEN + 1];      /* ªO¦W */
+}       BRDDATA;
+
+
+static int
+int_cmp(a, b)
+  BRDDATA *a, *b;
+{
+  return (b->day - a->day);     /* ¥Ñ¤j±Æ¨ì¤p */
+}
+
+
+int
+main()
+{
+  BRD brd;
+  struct stat st;
+  struct tm *ptime;
+  BRDDATA board[MAXBOARD];
+  FILE *fpe, *fpo, *fp;
+  int locus, i, m, n, fd, fsize;
+  char folder[64], *brdname;
+  HDR hdr;
+
+  chdir(BBSHOME);
+
+  if (!(fp = fopen(FN_BRD, "r")))
+  return -1;
+
+  collect_nostat();     /* itoc.020127: ¦¬¶°¤£¦C¤J±Æ¦æº]ªº¬ÝªO */
+
+  time(&now);
+  ptime = localtime(&now);
+  locus = 0;
+
+  while (fread(&brd, sizeof(BRD), 1, fp) == 1)
+  {
+    brdname = brd.brdname;
+    if (!*brdname)      /* ¦¹ªO¤w³Q§R°£ */
+      continue;
+
+    if (is_nostat(brdname))
+      continue;
+
+    brd_fpath(folder, brdname, FN_DIR);
+
+    strcpy(board[locus].brdname, brdname);
+    board[locus].day = -1;
+    if ((fd = open(folder, O_RDONLY)) >= 0 && !fstat(fd, &st))
+    {
+      fsize = st.st_size;
+      while ((fsize -= sizeof(HDR)) >= 0)   /* §ä³Ì«á¤@½g¤£¬O¸m©³¤åªº®É¶¡ */
+      {
+        lseek(fd, fsize, SEEK_SET);
+        read(fd, &hdr, sizeof(HDR));
+        if (!(hdr.xmode & POST_BOTTOM))
+        {
+          board[locus].day = (now - hdr.chrono) / 86400;
+          break;
+        }
+      }
+    }
+
+    locus++;
+  }
+  fclose(fp);
+
+  qsort(board, locus, sizeof(BRDDATA), int_cmp);
+
+  fpe = fopen(OUTFILE_BRDEMPTY, "w");
+  fpo = fopen(OUTFILE_BRDOVERDUE, "w");
+
+  fprintf(fpe,
+    "         \033[1;34m-----\033[37m=====\033[41m ¬ÝªOµL¤å³¹¤§¬ÝªO "
+    "(¦Ü %d ¤ë %d ¤é¤î) \033[;1;37m=====\033[34m-----\033[m\n"
+    "           \033[1;42m ¦W¦¸ \033[44m   ¬ÝªO¦WºÙ   \033[42m      "
+    "µL¤å³¹¬ÝªO     \033[44mªO   ¥D    \033[m\n",
+    ptime->tm_mon + 1, ptime->tm_mday);
+
+  fprintf(fpo,
+    "        \033[1;34m-----\033[37m=====\033[41m ¬ÝªOµL·s¤å³¹¤Ñ¼Æ¤§¬ÝªO "
+    "(¦Ü %d ¤ë %d ¤é¤î) \033[;1;37m=====\033[34m-----\033[m\n"
+    "              \033[1;42m ¦W¦¸ \033[44m    ¬ÝªO¦WºÙ    \033[42m "
+    "¬ÝªOµL·s¤å³¹ \033[44m   ªO ¥D    \033[m\n",
+    ptime->tm_mon + 1, ptime->tm_mday);
+
+  m = 1;
+  n = 1;
+
+  for (i = 0; i < locus; i++)
+  {
+    if (board[i].day < 0)
+    {
+      fprintf(fpe, "            %3d   %12s     %s      %-20.20s\n",
+        m, board[i].brdname, "¬ÝªOµL¤å³¹", whoisbm(board[i].brdname));
+      m++;
+    }
+    else
+    {
+      if (board[i].day > 10)  //¥u²Î­p¶W¹L¤Q¤ÑµL¤å³¹¤§¬ÝªO
+      {
+        fprintf(fpo, "                %s%3d    %12s        %4d"
+          "       %-20.20s\033[m\n",
+          n <= 3 ? "\033[1m" : (n <= 10 ? "\033[1;31m" : "\033[m"),
+          n, board[i].brdname, board[i].day, whoisbm(board[i].brdname));
+        n++;
+      }
+    }
+  }
+
+  fclose(fpe);
+  fclose(fpo);
+
+  return 0;
+}
+
+--
+[0m[1;31;44m ¡y¢~¢£[33m¦¨¤jÂå¾Ç[31m¢~¢£ [32m¢ª[35m¢¨      [37m¡Ë  ¡¸ [35m¢[32mi[33m¢[36mi [32mbbs.med.ncku.edu.tw [36m¢[33mi[32m¢[35mi [37m¡¸  ¡Ê     [0m
+[0m[1;31;42m ¢~¢£[33m°j ­· ¨¦[31m¢~¢£¡z [31m¢«[34m¢© [37m¡÷From¡G[36mbackwind.g1.dorm.ncku.edu.tw               [37m¡ö[0m

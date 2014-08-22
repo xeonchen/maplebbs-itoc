@@ -1,0 +1,163 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] sinastar.c ¨Ï¥ÎªÌ¿ï³æª½±µ¬d¸ß<¤µ¤é¹B¶Õ>(1)
+µo«H¯¸: ¤¤¿³¸ê¬ì (Wed, 23 Jul 2003 18:25:11 +0800 (CST))  Updated: 2003/07/23
+
+    °½¾Ç¢Ù¢Ù¢ë¢ñ¢ü£Bªº....¨þ¨þ¡ã
+
+    ¥u¯à¬d¸ß¤µ¤é¹B¶Õ­ò¡A¦pªG­n¬d¸ß¨ä¥Lªº....¦Û¦æ­×§ï¡I
+
+------------------------------------------------------------------------------
+
+    ­º¥ý¡A­n¦b¯¸¤W¥[¤J [¥\¯à] ·s®ö¬P®y¹B¶Õ¬d¸ß
+
+
+: src/so/sinastar.c:main_sinastar()
+
+
+int
+main_sinastar()
+{
+  char sendform[256], c1, c2;
+
+- char *star[12] =
+- {
+-   "aries",     "taurus",   "gemini",
+-   "cancer",    "leo",      "virgo",
+-   "libra",     "scorpio",  "sagittarius",
+-   "capricorn", "aquarius", "pisces"
+- };                                    //²¾¥X¥h·í¥þ°ìÅÜ¼Æ
+  ....
+  ....
+}
+
+
+: sinastar.c    ¥[¤J¤U­±ªº¥þ°ìÅÜ¼Æ¦b http_conn() ¤W­±
+
+  char *star[12] =
+  {
+    "aries",     "taurus",   "gemini",
+    "cancer",    "leo",      "virgo",
+    "libra",     "scorpio",  "sagittarius",
+    "capricorn", "aquarius", "pisces"
+  };
+
+
+
+
+: sinastar.c:count_star()    ·s¼W¦b http_conn() ¤U­±
+
+
+int                     /* qazq.030723: ºâ¥X³Q¬d¸ß¤Hªº¬P®y */
+count_star(month, day)  //°½§Û topusr ªº.... :p
+  int month;
+  int day;
+{
+  switch (month)
+  {
+  case 1:
+    if (day <= 19)
+      return 9;
+    else
+      return 10;
+    break;
+  case 2:
+    if (day <= 18)
+      return 10;
+    else
+      return 11;
+    break;
+  case 3:
+    if (day <= 20)
+      return 11;
+    else
+      return 0;
+    break;
+  case 4:
+    if (day <= 19)
+      return 0;
+    else
+      return 1;
+    break;
+  case 5:
+    if (day <= 20)
+      return 1;
+    else
+      return 2;
+    break;
+  case 6:
+    if (day <= 21)
+      return 2;
+    else
+      return 3;
+    break;
+  case 7:
+    if (day <= 22)
+      return 3;
+    else
+      return 4;
+    break;
+  case 8:
+    if (day <= 22)
+      return 4;
+    else
+      return 5;
+    break;
+  case 9:
+    if (day <= 22)
+      return 5;
+    else
+      return 6;
+    break;
+  case 10:
+    if (day <= 23)
+      return 6;
+    else
+      return 7;
+    break;
+  case 11:
+    if (day <= 22)
+      return 7;
+    else
+      return 8;
+    break;
+  case 12:
+    if (day <= 21)
+      return 8;
+    else
+      return 9;
+    break;
+  default:
+    return 12;
+  }
+}
+
+
+
+: sinastar.c:query_star()   ·s¼W¦b count_star() ¤U­±
+
+
+int
+query_star(acct)
+  ACCT *acct;
+{
+  int acct_star;
+  char sendform[256];
+
+  acct_star = count_star(acct->month, acct->day);
+
+  if (acct_star == 12)
+  {
+    vmsg("¦¹¤H¬P®y¤£¥i¦Ò¡AµLªk¬d¸ß¡I");
+    return 0;
+  }
+  sprintf(sendform, "GET /west/MC-12stars/%s1.html HTTP/1.0\n\n",
+                     star[acct_star]);
+
+  http_conn(SERVER_sinastar, sendform, 0);
+
+  return 0;
+}
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-139-67.HINET-IP.hinet.net[m

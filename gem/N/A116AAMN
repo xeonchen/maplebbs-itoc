@@ -1,0 +1,91 @@
+µo«H¤H: binbin.bbs@cpu.tfcis.org (»æ°®) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] §Úªº³Ì·R±Æ§Ç
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/19 Tue 14:48:24)                Updated: 2006/04/10
+
+> favor.c : ¼W¥[¤U­±¨â­Ó¨ç¦¡
+
+static int
+mf_cmp(a, b)
+  MF *a;
+  MF *b;
+{
+  int ma, mb;
+  int na, nb;
+
+  ma = a->mftype;
+  mb = b->mftype;
+
+  /* ¨Ì§Ç¬O ¨÷©v¡B¬ÝªO¡BºëµØ°Ï±¶®|¡B¤À¹j½u */
+  na = ma & MF_FOLDER ? 1 : ma & MF_BOARD ? 2 : ma & MF_GEM ? 3 : 4;
+  nb = mb & MF_FOLDER ? 1 : mb & MF_BOARD ? 2 : mb & MF_GEM ? 3 : 4;
+
+  if (ma = na - nb)
+    return ma;
+
+  if (nb == 1)              /* ¨÷©v */
+    return str_cmp(a->xname, b->xname);
+
+  if (nb == 2 || nb == 3)   /* ¬ÝªO¡BºëµØ°Ï±¶®| */
+  {
+    na = brd_bno(a->xname);
+    nb = brd_bno(b->xname);
+
+    if (na >= 0)
+    {
+      if (nb >= 0)
+      {
+        if (cuser.ufo & UFO_BRDNAME)
+          return strcmp(a->xname, b->xname);
+
+        nb = strcmp(bshm->bcache[na].class, bshm->bcache[nb].class);
+        return nb ? nb :
+          strcmp(bshm->bcache[na].title, bshm->bcache[nb].title);
+      }
+      return -1;
+    }
+
+    if (nb >= 0)
+      return 1;
+    return str_cmp(a->xname, b->xname);
+  }
+
+  return 0;   /* ¤À¹j½u */
+}
+
+static int
+mf_sort(xo)
+  XO *xo;
+{
+  static time_t last = 0;
+  time_t now;
+
+  if (time(&now) - last < 10)
+  {
+    vmsg("¨C¤Q¬íÄÁ¥u¯à¤Á´«¤@¦¸");
+    return XO_FOOT;
+  }
+  last = now;
+
+  rec_sync(xo->dir, sizeof(MF), mf_cmp, NULL);
+  return mf_load(xo);
+}
+
+> favor.c : mf_cb[] ¥[¤J«öÁä 'S'
+
+static KeyFunc mf_cb[] =
+{
+  ...
+
+  'T', mf_title,
+  'E', mf_edit,
++ 'S', mf_sort,
+  's', mf_switch,
+  ...
+
+> theme.h
+
+#define NECKER_MF «á­±¥[¤J "... [S]±Æ§Ç ..."
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mbinbin [30m±q [31m211-74-86-40.adsl.dynamic.seed.net.tw [30mµoªí[m

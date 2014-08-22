@@ -1,0 +1,44 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] »È¦æ¤ä²¼¡Ð¥i½u¤W¶×¿ú¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Tue, 19 Aug 2003 18:00:29 +0800 (CST))  Updated: 2005/03/20
+
+    ¥u­n¦³·sªº¤ä²¼¶i¨Ó¡A·|¹³¦³«H¥ó¤@¼Ëªº¦b¥D¿ï³æ³qª¾¡C
+
+: menu.c:vs_head()
+
+  char buf[40], ttl[60];
++ static char fcheck[64];
+  int spc, len;
+
+  ...
+  ...
+
++ if (!fcheck[0])
++   usr_fpath(fcheck, cuser.userid, FN_PAYCHECK);
+
+  if (HAS_STATUS(STATUS_BIFF))
+  {
+    mid = "\033[5;41m ¶l®t¨Ó«ö¹a¤F \033[m";
+    spc = 14;
+  }
++ else if (dashf(fcheck))
++ {
++   mid = "\033[5;43m ±z¦³·s¤ä²¼³á \033[m";
++   spc = 14;
++ }
+  else
+  {
+    if ((spc = strlen(mid)) > len)
+
+: bank.c:x_give() ¤£¯àÂàµ¹ guest¡A¥H§K guest ªºµe­±¤@ª½°{
+
+- if (!vget(13, 0, "±z­n§â¿úÂàµ¹½Ö©O¡H", userid, IDLEN + 1, DOECHO))
++ if (!vget(13, 0, "±z­n§â¿úÂàµ¹½Ö©O¡H", userid, IDLEN + 1, DOECHO) ||
++   !str_cmp(userid, STR_GUEST))
+
+--
+  ³o·|¦Y I/O
+
+--
+ [1;42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m bbs.cs.nchu.edu.tw [m
+ [1;44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-251-115.HINET-IP.hinet.net [30mµoªí[m

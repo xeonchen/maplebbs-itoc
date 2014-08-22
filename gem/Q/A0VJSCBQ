@@ -1,0 +1,123 @@
+µo«H¤H: PaulLiu.bbs@processor.tfcis.org (GrandPaul) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] Ãö©ó RFC 2045 / RFC 2047
+µo«H¯¸: XEON (Tue, 01 Apr 2003 19:22:16 +0800 (CST))      Updated: 2005/08/29
+
+¡° -------------- lib ªº³¡¤À -------------- ¡°
+
+: libiconv
+
+  ¸Ë libiconv
+  ­Y¬O FreeBSD¡A¦b /usr/ports/converters/libiconv
+
+: lib/dao.p
+
+/* str_decode.c */
+char *mm_getencode(unsigned char *str, char *code);
+void mm_getcharset(const char *str, char *charset, int size);
+int mmdecode(unsigned char *src, int encode, unsigned char *dst);
+void str_decode(unsigned char *str);
++ void str_conv(unsigned char *fromcode, unsigned char *tocode,
++   char *str, int len);
+
+: lib/Makefile ­Y¬O FreeBSD ­n§ï³o­Ó
+
+CC      = gcc
+RANLIB  = ranlib
+CPROTO  = cproto -E"gcc -pipe -E" -I../include # -s -v
+! CFLAGS  = .... -I../include [1;33m-I/usr/local/include[m
+
+: lib/str_decode.c ¦b³Ì«á¥[¤J³o¤@¾ã¬q
+
+/* ³o­Ó¨ç¦¡·|±N¤@­Ó¦r¦ê (src) ±q charset=fromcode Âà¦¨ charset=tocode,
+   srclen ¬O src ªºªø«×, dst ¬O¿é¥Xªºbuffer, dstlen «h«ü©w¤F
+   dst ªº¤j¤p, ³Ì«á·|¸É '\0', ©Ò¥H­n¯d¤@­Óbyteµ¹'\0'.
+   ¦pªG¹J¨ì src ¤¤¦³«D¦r¶°ªº¦r, ©Î¬O src ¤¤¦³¥¼§¹¾ãªº byte,
+   ³£·|¬å±¼.
+*/
+
+#include <errno.h>
+#include <iconv.h>
+
+static int
+str_iconv(fromcode, tocode, src, srclen, dst, dstlen)
+  const char *fromcode; /* charset of source string */
+  const char *tocode;   /* charset of destination string */
+  char *src;            /* source string */
+  int srclen;           /* source string length */
+  char *dst;            /* destination string */
+  int dstlen;           /* destination string length */
+{
+  iconv_t iconv_descriptor;
+  int dstlen_old;
+  extern int errno;
+
+  dstlen--;                     /* keep space for '\0' */
+
+  /* Open a descriptor for iconv */
+  iconv_descriptor = iconv_open(tocode, fromcode);
+
+  if (iconv_descriptor == ((iconv_t) (-1)))     /* if open fail */
+  {
+    strncpy(dst, src, dstlen);
+    return dstlen;
+  }
+
+  dstlen_old = dstlen;
+
+  /* Start translation */
+  while (srclen > 0 && dstlen > 0)
+  {
+    if (iconv(iconv_descriptor, (void *) &src, &srclen, &dst, &dstlen))
+    {
+      switch (errno)
+      {
+      case EILSEQ:  /* invalid multibyte happened */
+      case EINVAL:  /* incomplete multibyte happened */
+        /* delete that byte */
+        *dst = *src;
+        src++;
+        srclen--;
+        dst++;
+        dstlen--;
+        break;
+
+      case E2BIG:   /* dst no rooms */
+        /* break out the while loop */
+        srclen = 0;
+        break;
+      }
+    }
+  }
+  *dst = '\0';
+
+  /* close descriptor of iconv */
+  iconv_close(iconv_descriptor);
+
+  return (dstlen_old - dstlen);
+}
+
+
+void
+str_conv(fromcode, tocode, str, len)
+  unsigned char *fromcode;
+  unsigned char *tocode;
+  char *str;        /* ±ý convert ªº¦r¦ê (¥¼¥²­n end with '\0') */
+  int len;          /* ¦r¦ê str ªºªø«× */
+{
+  char *ptr;
+
+  if (len <= 0)
+    return;
+
+  if (!str_cmp(fromcode, tocode))    /* ¬Û¦P charset ´N¤£Âà¤F */
+    return;
+
+  ptr = (char *) malloc(len);
+  strncpy(ptr, str, len);
+  str_iconv(fromcode, tocode, ptr, len, str, len);
+  free(ptr);
+}
+
+--
+    [1;32m¢~¢w Origin ¢wùß [;36;40m°[1mÊ[;36;40m¤[1mO[;36;40m®[1mÖ[;36;40m¤[1mß [31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mcnal.csie.nctu.edu.tw                    [m

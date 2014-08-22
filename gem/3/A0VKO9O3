@@ -1,0 +1,133 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¦p¦ó¨Ï¨t²Î¦Û°Ê±H¥Í¤é¯¬¶P«Hµ¹¹Ø¬P
+µo«H¯¸: Àº¤Ñ±^ (Wed, 27 Aug 2003 19:10:53 +0800 (CST))    Updated: 2003/08/27
+
+¦]¬°±Í¯¸ªº util/topusr.c ¬O¨C¤p®É¤@¦¸......
+¡]¦]¬°¬Y¨Ç¨Ï¥ÎªÌ«æ©ó¬Ý¨ì¦Û¤vªº¡uÂ×¥\°¶·~¡v¡^
+
+©Ò¥H±N³o¥\¯à¿W¥ß¦¨ util/birth.c ......
+
+: src/util/Makefile
+
+EXE = ..... birth
+
+: crontab -e ¥[¤J
+
+1 0 * * * bin/birth > /dev/null 2>&1
+
+: util/birth.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/birth.c     ( NTHU CS MapleBBS Ver 3.00 )        */
+/*-------------------------------------------------------*/
+/* target : ¨t²Î¦Û°Ê°e¥Í¤é¯¬¶P«H¥ó                       */
+/* create : 99/03/29                                     */
+/* update : 01/10/01                                     */
+/* modify : BioStar.bbs@bbs.bio.ncue.edu.tw              */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+static UCACHE *ushm;
+
+
+static inline void
+init_ushm()
+{
+  ushm = shm_new(UTMPSHM_KEY, sizeof(UCACHE));
+}
+
+
+static inline void
+bbs_biff(userid)
+  char *userid;
+{
+  UTMP *utmp, *uceil;
+  usint offset;
+
+  offset = ushm->offset;
+  if (offset > (MAXACTIVE - 1) * sizeof(UTMP))
+    offset = (MAXACTIVE - 1) * sizeof(UTMP);
+
+  utmp = ushm->uslot;
+  uceil = (void *) utmp + offset;
+
+  do
+  {
+    if (!str_cmp(utmp->userid, userid))
+      utmp->status |= STATUS_BIFF;
+  } while (++utmp <= uceil);
+}
+
+
+int
+main()
+{
+  char c;
+  int year, month, day;
+  time_t now;
+  struct tm *ptime;
+
+  now = time(NULL);
+  ptime = localtime(&now);
+
+  year = ptime->tm_year;
+  month = ptime->tm_mon + 1;
+  day = ptime->tm_mday;
+
+  init_ushm();
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    char buf[64];
+    struct dirent *de;
+    DIR *dirp;
+
+    sprintf(buf, BBSHOME "/usr/%c", c);
+    chdir(buf);
+
+    if (!(dirp = opendir(".")))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      ACCT acct;
+      int fd;
+      char *fname;
+
+      fname = de->d_name;
+      if (*fname <= ' ' || *fname == '.')
+        continue;
+
+      sprintf(buf, "%s/.ACCT", fname);
+      if ((fd = open(buf, O_RDONLY)) < 0)
+        continue;
+
+      read(fd, &acct, sizeof(ACCT));
+      close(fd);
+
+      if (acct.month == month && acct.day == day)   /* ¥»¤é¹Ø¬P */
+      {
+        HDR hdr;
+        char folder[64], lowid[IDLEN + 1];
+
+        str_lower(lowid, acct.userid);
+        sprintf(folder, "%s/.DIR", lowid);
+        hdr_stamp(folder, HDR_COPY, &hdr, BBSHOME "etc/birth");
+        strcpy(hdr.owner, STR_SYSOP);
+        strcpy(hdr.title, "¥Í¤é§Ö¼Ö");
+        hdr.xmode = 0;
+        rec_add(folder, &hdr, sizeof(HDR));
+        bbs_biff(acct.userid);
+      }
+    }
+
+    closedir(dirp);
+  }
+}
+
+--
+ [1;43m¢z[44m¢q[m Au[1mth[30mor[m: [44m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [31;47m micro.bio.ncue.edu.tw [m
+ [1;41m¢|[42m¢}[m O[1mri[30mgi[mn: [1;36mBioStar [30m±q [35m163.23.212.15 [30mµoªí[m

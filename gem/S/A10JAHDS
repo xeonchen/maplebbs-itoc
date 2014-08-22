@@ -1,0 +1,56 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: ½Ð°Ý¿ï³æ¤¶­±­n«ç»ò§ï¦¨¹³WD¨t²Î
+®É¶¡: 2004/08/31 Tue 23:58:20                           Updated: 2004/09/01
+
+¡° ¤Þ­z¡mrainphiz (¡@)¡n¤§»Ê¨¥¡G
+>     ·Q§â²{¦bªº¤¶­±§ï¦¨¹³WD¨t²Î¤@¼Ë¡A
+>     ´N¬O¥Dµe­±³Ì©³¤Uªº®É¶¡feeter²¾¨ì¤W­±¡A¦A¥[¤W¤@¦æ»¡©úªºtitle
+[1;33;44m  [36m¥D¥\¯àªí  [37;46m                       [33m´ú¸Õ¯¸                        [37m¬ÝªO [33;44m [;34;44m [1;36mNote [m
+[1;36m 22:34 08/31 ¤G [37m ½u¤W[32m 2 [37m   ID¡G sysop      »È    0M ª÷    0K [32m[©I¥s][37m¶}    [35mÁô[m
+[1;46m      ¥\  ¯à          »¡    ©ú                                               [m
+       [[1;33mA[m]nnounce      [¤Ñ¦aºëµØ]
+       [[1;33mB[m]oard         [¬ÝªO¥\¯à]
+
+: menu.c:status_foot()
+
+- outf(feeter);
++ move(0, 0);
++ prints("%s%*s\033[m\n"
++   "\033[1;46m       ¥\  ¯à          »¡    ©ú            ",
++   "                                   %*s\033[m",
++   feeter, d_cols, "", d_cols, "");
+}
+
+: menu.c:menu()
+
+      if (mode == XEASY)
+      {
+-       outf(feeter);
++       move(0, 0);
++       prints("%s%*s\033[m\n"
++         "\033[1;46m       ¥\  ¯à          »¡    ©ú            ",
++         "                                   %*s\033[m",
++         feeter, d_cols, "", d_cols, "");
+        mode = 0;
+      }
+
+: theme.h
+
+  ­º¥ý¥Î theme_wd.h ÂÐ»\ theme.h
+  % cp -f ~/src/include/theme/theme_wd.h ~/src/include/theme.h
+
+  ¦A§ï theme.h ªº©w¸q­È
+
+#define MENU_XNOTE      [1;33m14[m              /* °ÊºA¬ÝªO¥Ñ (12, 0) ¶}©l */
+#define MOVIE_LINES     [1;33m10[m              /* °Êµe³Ì¦h¦³ 11 ¦C */
+
+#define MENU_XPOS       [1;33m3[m               /* ¿ï³æ¶}©lªº (x, y) ®y¼Ð */
+#define MENU_YPOS       [1;33m((d_cols >> 1) + 5)[m
+
+: config.h
+
+#undef  COLOR_HEADER
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

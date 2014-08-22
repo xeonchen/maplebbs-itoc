@@ -1,0 +1,238 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] §R°£¹L¤[¨S¦³·s¤å³¹ªº¬ÝªO
+®É¶¡: 2005/04/05 Tue 16:13:03                           Updated: 2005/12/28
+
+¡° ¤Þ­z¡mdrewlin.bbs@bbs.seehere.org (eternity.)¡n¤§»Ê¨¥¡G
+> §Æ±æ¨t²Î¯à°÷¦Û°Ê§R°£¤T­Ó¤ë¥H¤W¨S¦³·s¤å³¹ªº¬ÝªO
+
+: global.h
+
+#define FN_RUN_PAL      "run/pal.log"   /* ªB¤Í¶W¹L¤W­­°O¿ý */
++ #define FN_RUN_EXPIREBRD "run/expirebrd" /* ¨t²Î¬å°£¬ÝªO°O¿ý */
+
+: battr.h
+
++ #define BRD_NOEXPIRE  0x80    /* ¤£·|³Q¨t²Î¬å°£ */
+
+- #define NUMBATTRS   7
++ #define NUMBATTRS   8
+
+- #define STR_BATTR   "zTcsvA%"
++ #define STR_BATTR   "zTcsvA%e"
+
+   "¤£µû¤À¬ÝªO",         /* BRD_NOSCORE */
++  "¤£³Q¨t²Î¬å°£¬ÝªO",   /* BRD_NOEXPIRE */
+
+: account.c:main()
+
+    sprintf(title, "%s±H«H°O¿ý", date);
+    keeplog(FN_RUN_MAIL_LOG, BN_SECURITY, title, 2);
+
++   sprintf(title, "%s¨t²Î¬å°£¬ÝªO°O¿ý", date);
++   keeplog(FN_RUN_EXPIREBRD, BN_SECURITY, title, 2);
+
+
+: crontab -e ¥[¤J
+
+4 4 4 * * bin/expireboard > /dev/null 2>&1
+
+: src/util/Makefile ¥[¤J expireboard
+
+EXE =   ... [1;33mexpireboard[m
+
+: src/util/expireboard.c ·s¼Wµ{¦¡¦p¤U
+
+/*-------------------------------------------------------*/
+/* util/expireboard.c   ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ¬å°£¹L¤[¨S¦³·s¤å³¹ªº¬ÝªO                     */
+/* create : 05/04/05                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+#define THRESHOLD_TIME      (40 * 86400) /* ¬å°£¶W¹L 40 ¤Ñ¨S¤å³¹ªº¬ÝªO */
+#define THRESHOLD_NOTE_TIME (30 * 86400) /* ¬åªO«e 30 ¤Ñ³qª¾ªO¥D */
+[1;44m// crontab ¸Ì expireboard ªº°õ¦æ¶g´Á­n¸ò THRESHOLD_NOTE_TIME ¦P¨B [m
+
+
+/*-------------------------------------------------------*/
+/* ³qª¾«H                                                */
+/*-------------------------------------------------------*/
+
+
+static void
+mail_to_him(userid, brdname)
+  char *userid, *brdname;
+{
+  HDR hdr;
+  char folder[64];
+
+  usr_fpath(folder, userid, NULL);
+  if (!dashd(folder))    /* Á×§K¸Ó ID ¤£¦s¦b */
+    return;
+
+  usr_fpath(folder, userid, FN_DIR);
+  hdr_stamp(folder, HDR_LINK, &hdr, "etc/expirebrd_note");
+  strcpy(hdr.owner, STR_SYSOP);
+  strcpy(hdr.nickname, SYSOPNICK);
+  sprintf(hdr.title, "[%s] ªO§Y±N³Q¬å°£", brdname);
+  rec_add(folder, &hdr, sizeof(HDR));
+}
+
+
+static void
+note_expire(brd)    /* §ä¥XªO¥D */
+  BRD *brd;
+{
+  char *ptr, *str, buf[BMLEN + 1];
+  int len, alllen;
+
+  sprintf(buf, "%s", brd->BM);
+  alllen = 0;
+  ptr = str = buf;
+
+  for (; ptr = strchr(str, '/') ;)
+  {
+    *ptr = '\0';
+    mail_to_him(str, brd->brdname);
+    len = strlen(str);
+    alllen += (len + 1);    /* ªO¥DID + '/' */
+    str = buf + alllen;
+  }
+  mail_to_him(str, brd->brdname);         /* ³Ì«á¤@µ§¸ê®Æ¥t¥~³B²z */
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+static time_t now;
+static time_t delta;      /* ³Ì«á¤@½g¤å³¹¶Z¥Ø«e´X¬í */
+static int page;          /* ¦³´X½g¤å³¹ */
+
+
+static void
+expire(brd)
+  BRD *brd;
+{
+  int fd, fsize;
+  char folder[64];
+  HDR hdr;
+  struct stat st;
+
+  brd_fpath(folder, brd->brdname, FN_DIR);
+
+  if ((fd = open(folder, O_RDONLY)) >= 0 && !fstat(fd, &st))
+  {
+    fsize = st.st_size;
+    page = fsize / sizeof(HDR);
+
+    if (page <= 0)  /* ¨S¦³¤å³¹«h¬Ý¶}ªO®É¶¡ */
+    {
+      delta = brd->bstamp;
+    }
+    else
+    {
+      lseek(fd, fsize - sizeof(HDR), SEEK_SET);
+      read(fd, &hdr, sizeof(HDR));
+      delta = hdr.chrono;
+    }
+    delta = now - delta;
+    close(fd);
+  }
+}
+
+
+static BCACHE *bshm;
+
+
+static void
+init_bshm()
+{
+  /* itoc.030727: ¦b¶}±Ò bbsd ¤§«e¡AÀ³¸Ó´N­n°õ¦æ¹L account¡A
+     ©Ò¥H bshm À³¸Ó¤w³]©w¦n */
+
+  bshm = shm_new(BRDSHM_KEY, sizeof(BCACHE));
+
+  if (bshm->uptime <= 0)        /* bshm ¥¼³]©w§¹¦¨ */
+    exit(0);
+}
+
+
+int
+main()
+{
+  int pos;
+  BRD brd, *bhdr;
+  char fpath[64];
+  FILE *fp;
+
+  chdir(BBSHOME);
+
+  if (!(fp = fopen(FN_RUN_EXPIREBRD, "w")))
+    return -1;
+
+  time(&now);
+  init_bshm();
+
+  fprintf(fp, "¤U¦C¬ÝªO¤w©ó %s ³Q¨t²Î¬å°£¡G\n\n", Btime(&now));
+
+  pos = 0;
+  while (!rec_get(FN_BRD, &brd, sizeof(BRD), pos))
+  {
+    if (*brd.brdname && !(brd.battr & BRD_NOEXPIRE))
+    {
+      expire(&brd);
+
+      if (delta >= THRESHOLD_TIME)
+      {
+        gem_fpath(fpath, brd.brdname, NULL);
+        f_rm(fpath);
+        f_rm(fpath + 4);
+
+        memset(&brd, 0, sizeof(BRD));
+        sprintf(brd.title, "[%s] deleted by <crontab>", brd.brdname);
+        rec_put(FN_BRD, &brd, sizeof(BRD), pos, NULL);
+
+        bhdr = bshm->bcache + pos;
+        memcpy(bhdr, &brd, sizeof(BRD));
+
+        fprintf(fp, "  %s\n", brd.brdname);
+      }
+      else if (delta >= THRESHOLD_NOTE_TIME)
+      {
+        note_expire(&brd);
+      }
+    }
+    pos++;
+  }
+
+  fclose(fp);
+
+  return 0;
+}
+
+: etc/expirebrd_note ·s¼W¦¹ÀÉ®×¡A¤º®e¦p¤U
+
+§@ªÌ: SYSOP (¯¸ªø) ¯¸¤º: [¨t²Î¤½§i]
+¼ÐÃD: ¬åªO³qª¾
+®É¶¡: ´N¬O²{¦b
+
+ ±z¦n¡G
+
+     ¥Ñ©ó¦¹ªO¨Ï¥Î²v¹L§C¡A©Ò¥H¦¹ªO§Y±N³Q¨t²Î¦Û°Ê¬å°£¡A­Y±z¤£§Æ±æ¬ÝªO
+ ³Q¬å°£¡A½Ð©w´Á©ó¬ÝªO¤Wµoªí¤å³¹¡C
+
+--
+                                          ¯¸°ÈºÞ²z­û ¢á¢ç¢á¢Ý¢Þ
+
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mthree.Dorm11.NCTU.edu.tw[37m µoªí[m

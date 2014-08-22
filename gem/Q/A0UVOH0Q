@@ -1,0 +1,304 @@
+§@ªÌ: itoc (¤Ó¶§ªá¨à~) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ESPN ¸`¥Øªí
+®É¶¡: Sun Dec 15 16:56:01 2002                          Updated: 2003/05/04
+
+: menu.c ¦b¾A·íªº¿ï³æ¥[¤W
+
++ "bin/espn.so:main_espn", 0, - M_XMODE,
++ "ESPN Star  ¡ñ ESPN¸`¥Ø ¡ð",
+
+: game/Makefile
+
+SO =    ... [1;33mespn.so[m
+
+: game/espn.c ·s¼W³oµ{¦¡
+
+/*-------------------------------------------------------*/
+/* espn.c   ( NTHU CS MapleBBS Ver 3.10 )                */
+/*-------------------------------------------------------*/
+/* target : EPSN ¸`¥Øªí                                  */
+/* create : 02/12/15                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#if 0
+
+ ­n¨Ï¥Î espn.c ¥²¶·¸Ë¦³ lynx¡Aª`·N lynx ªº¸ô®|­n©Mµ{¦¡§k¦X¡C
+
+ ¸ê®Æ¨Ó·½¡GESPN
+
+ URL ®æ¦¡½d¨Ò¡G
+
+ http://jws.startv.com/espn/search_act.cfm?Country=21&Channel=ESPN&
+ SportsTypes=BK&From=20021201&To=20021231&btnSubmit.x=67&btnSubmit.y=6
+
+ Country=21     => Taiwan
+ Channel=ESPN   => EPSN©Î¬OSTAR
+ SportsTypes=BK => BasketBall
+ From=20021201  => 2002/12/01
+ To=20021231    => 2002/12/31
+ btnSubmit.x=67&btnSubmit.y=6 => view
+
+#endif
+
+
+#include "bbs.h"
+
+
+#ifdef HAVE_NETTOOL
+
+
+#define LYNX_PATH       "/usr/local/bin/lynx --source"  /* lynx ªºµ´¹ï¸ô®| */
+
+
+/*-------------------------------------------------------*/
+/* ¤ÀªR html                                             */
+/*-------------------------------------------------------*/
+
+
+static char *
+strstr2(big, little)
+  char *big, *little;
+{
+  char *str;
+
+  /* ­Y¦³ strstr(big, little) §â«ü¼Ð©ñ¦b³Ì«áªº¤U¤@®æ */
+  if (str = strstr(big, little))
+    return str + strlen(little);
+
+  return NULL;
+}
+
+
+static int wlen;    /* ¥»¦æ¦³¦h¤Ö¦r */
+
+
+static int
+foutc(fp, ch)
+  FILE *fp;
+  int ch;
+{
+  if (ch == '<' || ch == '\n' || ch == '\0')
+  {
+    ch = '\0';
+  }
+  else
+  {
+    if (++wlen > 60)    /* ¤@¦æ¥u¦L 60 ¦r */
+    {
+      fprintf(fp, "\n          ");
+      wlen = 0;
+    }
+    fprintf(fp, "%c", ch);
+  }
+
+  return ch;
+}
+
+
+static void
+fouts(fp, str)      /* ¦L¥X str */
+  FILE *fp;
+  char *str;
+{
+  int ch;
+
+  wlen = 0;
+
+  while (ch = *str)
+  {
+    if (!foutc(fp, ch))
+      break;
+    str++;
+  }
+}
+
+
+static void
+fprints(fp, str)
+  FILE *fp;
+  char *str;
+{
+  static int line = 0;
+
+  line = (line + 1) % 5;
+
+  if (line == 1)    /* Date */
+  {
+    fprintf(fp, "¼·¥X®É¶¡¡G");
+    fouts(fp, str);
+  }
+  else if (line == 2)   /* Time */
+  {
+    fprintf(fp, "  ");
+    fouts(fp, str);
+  }
+  else if (line == 3)   /* Sport */
+  {
+    fprintf(fp, "  ");
+    fouts(fp, str);
+    fprintf(fp, "\n");
+  }
+  else if (line == 4)   /* Event Title */
+  {
+    fprintf(fp, "¸`¥Ø¤º®e¡G");
+    fouts(fp, str);
+    fprintf(fp, "\n");
+  }
+  else          /* Duration */
+  {
+    fprintf(fp, "¸`¥Ø¾ú®É¡G");
+    fouts(fp, str);
+    fprintf(fp, "\n" MSG_SEPERATOR "\n");
+  }
+}
+
+
+static void
+html_fetch(fpath, fpw, now, year, month)
+  char *fpath;
+  FILE *fpw;
+  time_t now;
+  int year, month;
+{
+  FILE *fpr;
+  char buf[256], *str;
+
+  if (!(fpr = fopen(fpath, "r")))
+    return;
+
+  fprintf(fpw, "§@ªÌ: %s (%s) ¯¸¤º: ESPN ¸`¥Ø\n", cuser.userid, cuser.username);
+  fprintf(fpw, "¼ÐÃD: ESPN ¸`¥Øªí (%d/%02d)\n", year, month);
+  fprintf(fpw, "®É¶¡: %s\n\n", Btime(&now));
+
+  while (fgets(buf, 256, fpr))
+  {
+    if (str = strstr2(buf, "<td nowrap class=\"TDBODY"))
+    {
+      str += 3;
+      fprints(fpw, str);
+    }
+    else if (str = strstr2(buf, "<td class=\"TDBODY"))
+    {
+      str += 3;
+      if (!str_ncmp(str, "<b>", 3)) /* ¸õ¹L </b> */
+        str += 3;
+      fprints(fpw, str);
+    }
+  }
+
+  fclose(fpr);
+
+  fprintf(fpw, "\n--\n¸ê®Æ¨Ó·½¡GESPN\n");
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+int
+main_espn()
+{
+  char fpath[64], cmd[256], *fname, *channel;
+  time_t now;
+  struct tm *ptime;
+  int year, month, kind;
+  FILE *fp;
+
+  int day[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+                                        /* 1~12 ¤ë¦U¦³´X¤Ñ */
+
+  char sports[9][3] =
+  {
+    "BK", "BB", "SO",       /* Basketball Baseball Soccer */
+    "BA", "TN", "TB",       /* Badmiton   Tennnis  Table_Tennis */
+    "VB", "BI", "GO",       /* Volleyball Billiard Golf */
+  };
+
+  time (&now);
+  ptime = localtime(&now);
+
+  year = ptime->tm_year + 1900;
+  month = ptime->tm_mon + 1;
+
+  switch (vans("¬d¸ß 1)¥»¤ë 2)¤U¤ë ªº¸`¥Øªí¡H[Q] "))
+  {
+  case '2':
+    if (month == 12)
+    {
+      year++;
+      month = 1;
+    }
+    else
+    {
+      month++;
+    }
+    break;
+  case '1':
+    break;
+  default:
+    return XEASY;
+  }
+
+  switch (vans("¬d¸ß 1)ESPN 2)STAR ªº¸`¥Øªí¡H[Q] "))
+  {
+  case '1':
+    channel = "ESPN";
+    break;
+  case '2':
+    channel = "STAR";
+    break;
+  default:
+    return XEASY;
+  }
+
+  kind = vans("²yÃþ 1)Äx 2)´Î 3)¨¬ 4)¦Ð 5)ºô 6)®à 7)±Æ 8)¼² 9)°ª [Q] ") - '1';
+  if (kind < 0 || kind > 9)
+    return XEASY;
+
+  if (month == 2)
+  {
+    if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)/* ¤G¤ë¬O¶|¤ë */
+      day[1] = 29;
+  }
+
+  outz("ºô­¶³sµ²¤¤¡A½Ðµy­Ô\033[5m...\033[m (³s¥h¬ü°ê¤ñ¸û¤[)");
+  refresh();
+
+  /* ¼È¦sÀÉ¡Gtmp/ispn.userid ¬O­ì¨Óªº html ÀÉ
+             tmp/espn.userid ¬OÂà¹Lªº¤å¦rÀÉ */
+  sprintf(fpath, "tmp/espn.%s", cuser.userid);
+  if (!(fp = fopen(fpath, "w")))
+    return XEASY;
+  fname = fpath + 4;
+  *fname = 'i';
+
+  sprintf(cmd, LYNX_PATH " \"http://jws.startv.com/espn/search_act.cfm?Country=21&Channel=%s&SportsTypes=%s&From=%d%02d01&To=%d%02d%d&btnSubmit.x=67&btnSubmit.y=6\" > %s",
+    channel, sports[kind], year, month, year, month, day[month - 1], fpath);
+  system(cmd);
+
+  html_fetch(fpath, fp, now, year, month);
+  fclose(fp);
+
+  *fname = 'e';
+  if (more(fpath, (char *) -1) >= 0)
+  {
+    if (vans("±z­n±N¬d¸ßµ²ªG±H¦^«H½c¶Ü¡H[N] ") == 'y')
+      mail_self(fpath, cuser.userid, "[³Æ §Ñ ¿ý] ESPN ¸`¥Øªí¬d¸ß", 0);
+  }
+
+  /* ²M°£¼È¦sÀÉ */
+  unlink(fpath);
+  fpath[4] = 'i';
+  unlink(fpath);
+
+  return 0;
+}
+#endif  /* HAVE_NETTOOL */
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

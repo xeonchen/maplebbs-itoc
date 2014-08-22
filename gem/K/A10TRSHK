@@ -1,0 +1,24 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¯¸¤º: itoc
+¼ÐÃD: ¤W¯¸®É­Y¿é¤J¤£¦s¦b±b¸¹¡A«hÅã¥Ü¿ù»~
+®É¶¡: 2005/01/07 Fri 10:24:31                           Updated: 2005/01/07
+
+  ­ì¥»¤W¯¸®É­Y¿é¤J¤£¦s¦b±b¸¹¡A­nµ¥¨ì¿é¤J±K½X«á¤~·|´£¥Ü¿ù»~
+  §ï¦¨¦b¿é¤J§¹¤£¦s¦bªº±b¸¹«á´N´£¥Ü¿ù»~
+
+: bbsd.c:login_user()
+
+    else if (str_cmp(uid, STR_GUEST))   /* ¤@¯ë¨Ï¥ÎªÌ */
+    {
++     usr_fpath(fpath, uid, fn_acct);
++     if (!dashf(fpath))
++     {
++       vmsg(err_uid);
++       continue;
++     }
+
+      if (!vget(b_lines - 2, 40, "[±zªº±K½X] ", passbuf, PSWDLEN + 1, NOECHO))
+        continue;       /* ¤£¥´±K½X«h¨ú®øµn¤J */
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

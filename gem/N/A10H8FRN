@@ -1,0 +1,85 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬İªO: plan
+¼Ğ  ÃD: ¶îÀn¯d¨¥ªO
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/08/07 Sat 01:50:35)                Updated: 2004/08/07
+
+  ¯d¨¥ªO§ï¦¨¦Û¥Ñ¶îÀn¦¡ªº
+  (¦]¬°¤£·Q§ï pad_view()¡A¤]¤£·Q§ï struct Pad¡A¤]Ãi±o¦n¦n¼g¡A©Ò¥H«Ü»¹ :p)
+
+: menu.c:pad_draw() §ï¦¨³o¼Ë
+
+static int
+pad_draw()
+{
+  int i, fdr, cc;
+  FILE *fpw;
+  Pad pad;
+  char fpath[64], *str, *p1, *p2, *p3;
+
+  vmsg("¶îÀn¯d¨¥ªO¡A¤@¦æ¦Ü¦h 75 ¦r¡A³Ì¦h 3 ¦æ");
+
+  sprintf(fpath, "tmp/pad_draw.%s", cuser.userid);
+  if (vedit(fpath, 0))  /* ¨ú®ø½s¿è */
+  {
+    unlink(fpath);
+    return 0;
+  }
+
+  memset(&pad, 0, sizeof(pad));
+  str = pad.msg;
+  time(&(pad.tpad));
+
+  if ((fdr = open(fpath, O_RDONLY)) >= 0)
+  {
+    read(fdr, str, sizeof(pad.msg) - 4); /* «O¯dµ¹ "\n\n\n\0" */
+    close(fdr);
+  }
+  unlink(fpath);
+
+  strcat(str, "\n\n\n");      /* ³o¼Ë«OÃÒ¦³¤T¦æ :p */
+  p1 = strchr(str, '\n');
+  p2 = strchr(p1 + 1, '\n');
+  p3 = strchr(p2 + 1, '\n');
+  *(p3 + 1) = '\0';           /* ¥u¨ú«e¤T¦æ */
+
+  /* ¦pªG¦³¬Y¦æ¶W¹L 75 ¦r¡Aª½±µ°h¥ó¤ñ¸û§Ö :p */
+  if (p1 - str >= 75 || p2 - p1 >= 75 || p3 - p2 >= 75)
+  {
+    vmsg("°Ú°Ú¤£¬O§i¶D±z¤@¦æ³Ì¦h 75 ¦r«§¡A°h¥ó°h¥ó");
+    return 0;
+  }
+
+  f_cat(FN_RUN_NOTE_ALL, str);
+
+  if (!(fpw = fopen(FN_RUN_NOTE_TMP, "w")))
+    return 0;
+
+  fwrite(&pad, sizeof(pad), 1, fpw);
+
+  if ((fdr = open(FN_RUN_NOTE_PAD, O_RDONLY)) >= 0)
+  {
+    Pad *pp;
+
+    i = 0;
+    cc = pad.tpad - NOTE_DUE * 60 * 60;
+    mgets(-1);
+    while (pp = mread(fdr, sizeof(Pad)))
+    {
+      fwrite(pp, sizeof(Pad), 1, fpw);
+      if ((++i > NOTE_MAX) || (pp->tpad < cc))
+        break;
+    }
+    close(fdr);
+  }
+
+  fclose(fpw);
+
+  rename(FN_RUN_NOTE_TMP, FN_RUN_NOTE_PAD);
+  pad_view();
+  return 0;
+}
+
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.dorm11.nctu.edu.tw [30mµoªí[m

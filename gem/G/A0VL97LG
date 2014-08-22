@@ -1,0 +1,86 @@
+µo«H¤H: Dinsam.bbs@ccudream.twbbs.org («e¥@.. o.O) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¦¬«H«Å¨¥
+µo«H¯¸: ¤¤¥¿¿v¹Ú¶é (Tue, 02 Sep 2003 21:15:24 +0800)      Updated: 2004/09/06
+
+: config.h
+
++ #define MAX_MAILHINTLINES    12      /* ¦¬«H«Å¨¥ªø«× */
+
+: mail.c:mail_hint() ·s¼W¦¹¨ç¦¡©ó hdr_reply() ¤§«e
+
+static void
+mail_hint(userid)              /* ¨q¥X userid ªº¥D¤H°Ý­Ô»y */
+  char *userid;
+{
+  int i;
+  char buf[80];
+  FILE *fp;
+
+  usr_fpath(buf, userid, "mailhint");
+  if (fp = fopen(buf, "r"))
+  {
+    clear();
+    move(2, 0);
+    prints("³o¬O %s ªº¦¬«H«Å¨¥\n", userid);
+
+    i = 0;
+    while (i++ < MAX_MAILHINTLINES && fgets(buf, sizeof(buf), fp))
+      outs(buf);
+
+    fclose(fp);
+
+    vmsg(NULL);
+  }
+}
+
+: mail.c:mbox_hint_edit() ·s¼W¦b mbox_help() ¤§«e
+
+static int
+mbox_hint_edit(xo)
+  XO *xo;
+{
+  int mode;
+  char fpath[64];
+
+  mode = vans("¦¬«H«Å¨¥ (D)§R°£ (E)­×§ï (Q)¨ú®ø¡H[E] ");
+
+  if (mode != 'q')
+  {
+    usr_fpath(fpath, cuser.userid, "mailhint");
+
+    if (mode == 'd')
+    {
+      unlink(fpath);
+      return XO_FOOT;
+    }
+
+    if (vedit(fpath, 0))      /* Thor.981020: ª`·N³Qtalkªº°ÝÃD */
+      vmsg(msg_cancel);
+    return mbox_head(xo);
+  }
+  return XO_FOOT;
+}
+
+: mail.c mail_send()
+
+  utmp_mode(M_SMAIL);
+  fpath[0] = '\0';
+  curredit = EDIT_MAIL;         /* Thor.981105: ª½±µ«ü©w¼g«H */
+
++ if (userno)
++   mail_hint(rcpt); /* ¨q¥X¦¬«H«Å¨¥ */
+
+: mail.c:mbox_cb[]
+
++ Ctrl('E'), mbox_hint_edit,   [1;44m// «öÁä¦Û­q [m
+
+--
+  ¦b¬ÝªO«ö y ¦^À³(B)¤GªÌ¬Ò¬O
+  ¨Ã¤£·|¬Ý¨ìµo«H«Å¨¥
+
+--
+[m[1;33m¡´[36m     [37m£»[36m    [37m£»[36m ¢¨¢h¢© ¢¨¢h¢© ¢h  ¢h ¢i¢h¢© ¢i¢h¢© ¢i¢h¢© ¢¨¢h¢© ¢i¢h¢p   [33m¡þ[m
+  [1m£»[m [1;33m¢­[37m         ¢i     ¢i     ¢i  ¢i ¢i  ¢p ¢i  ¢p ¢i¢g   ¢i¢g¢p ¢p¢p¢p [33m¡¹[m
+[32m¢¨[37;42m     [1;33m¡¹[37m£»     [33m¢ª¢i¢« ¢ª¢i¢« ¢ª¢i¢« ¢i¢i¢« ¢i¢ª¢g ¢i¢g¢« ¢i  ¢p ¢p¢p¢p[37m£»[;37;42m  [32;40m¢©[m
+[32;42m  [1;37m¢Ñ¢Ò¢Ð¢Ð¢á  [32m¤¤¥¿[35m¿v¹Ú¶é[36mBBS¯¸ [31mÅwªï»YÁ{°ÑÆ[[32m cd.twbbs.org  (140.123.20.230)[36m [;37;42m   [m
+[1;32m http://cd.twbbs.org[;32;40m¢ª[30;42m [1;33m [37m¡¯[32m [37mAuthor:[;30;42m Dinsam      [1;37m¡¹ From:[;30;42m 218.171.110.242 [1;32m  [33m [;32;40m¢«[m

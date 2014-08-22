@@ -1,0 +1,15 @@
+§@ªÌ: itoc (test) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¤å³¹µû¤À¥\¯à
+®É¶¡: Sun Aug 18 14:45:05 2002                          Updated: 2004/11/22
+
+  ¬°¤FÁ×§K­ì§@ªÌÂÇ¥Ñ E ­×§ï¦Û¤vªº¤å³¹¡A§â³Ì«áªºµû¤À¥h°£¡A
+  ¥i­­¨î­ì§@ªÌµLªk­×§ï¤w³Qµû¤Àªº¤å³¹
+
+: post.c:post_edit()
+
+- else if (cuser.userlevel && !strcmp(hdr->owner, cuser.userid))
++ else if (cuser.userlevel && !strcmp(hdr->owner, cuser.userid) &&
++   !(hdr->xmode & POST_SCORE))
+
+--
+[1;32m¡¼ Origin: [33m°Ê¤O®Ö¤ß [37mxeon.tfcis.org  [31m¡¼ From: [36mitoc.Dorm-GD2.NCTU.edu.tw[m

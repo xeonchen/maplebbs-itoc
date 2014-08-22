@@ -1,0 +1,148 @@
+µo«H¤H: heeroy.bbs@starlight.twbbs.org (®üÇU¨£ÆîÇrµó) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] ªO¥D¦Û­q¤ÀÃþÃC¦â
+µo«H¯¸: ¬P¥ú¡E¤ß±¡ (2005/06/16 Thu 15:43:55)              Updated: 2005/08/02
+
+±NºëµØ°Ï¤¤amaki¤jªºpatch°µ¤@ÂI­×¥¿,
+µM«á±N¥\¯à±q¬ÝªO¥DÃD¿W¥ß¥X¨Ó
+
+: transbrd.c:struct NEW
+
+ char BM[BMLEN + 1];
++char bcolor[3];
+
+: transbrd.c:main()
+
+      str_ncpy(new.BM, old.BM, sizeof(new.BM));
++     new.bcolor[0] = '1';
++     new.bcolor[1] = (old.class[3] & 7) + '0';
++     new.bcolor[2] = '0';
+      new.bvote = old.bvote;
+
+compile transbrd
+±µ¤U¨Ó½Ð±N©Ò¦³¨Ï¥ÎªÌ½ð¤U½u,Ãö¯¸,²Mshm,
+¦A°õ¦æ transbrd Âà´« .BRD, ¦A¥Î¨ä¥Lªº port ¶}¯¸´ú¸Õ,
+½T©w¤@¤Á¥¿±`¤§«á¦AÄ~Äò§ï¤U­±ªºªF¦è
+
+: struct.h:struct BRD
+
+ char BM[BMLEN + 1];
++char bcolor[3];
+
+: manage.c:post_class_color() ·s¼W¥H¤Ufunction¦bpost_brdtitle()¤§«e
+
+/* ----------------------------------------------------- */
+/* ªO¥D¥\¯à : ­×§ï¤ÀÃþÃC¦â                               */
+/* ----------------------------------------------------- */
+
+static int
+post_class_color(xo)
+  XO* xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  if (vans("­×§ï¬ÝªO¤ÀÃþÃC¦â(Y/N)¡H[N] ") == 'y')
+  {
+    do
+    {
+      newbrd.bcolor[0] = vans("«e´º«G«× 0)´¶³q 1)°ª«G¡H ");
+    } while (newbrd.bcolor[0] < '0' || newbrd.bcolor[0] > '1');
+
+    do
+    {
+      newbrd.bcolor[1] =
+        vans("«e´º 0)¶Â 1)¬õ 2)ºñ 3)¶À 4)ÂÅ 5)µµ 6)ÀQ 7)¥Õ¡H ");
+    } while (newbrd.bcolor[1] < '0' || newbrd.bcolor[1] > '7');
+
+    do
+    {
+      newbrd.bcolor[2] =
+        vans("­I´º 0)¶Â 1)¬õ 2)ºñ 3)¶À 4)ÂÅ 5)µµ 6)ÀQ 7)¥Õ¡H ");
+    } while (newbrd.bcolor[2] < '0' || newbrd.bcolor[2] > '7');
+
+    if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+    {
+      memcpy(oldbrd, &newbrd, sizeof(BRD));
+      rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+      return XO_HEAD;   /* itoc.011125: ­n­«Ã¸¤¤¤åªO¦W */
+    }
+  }
+
+  return XO_FOOT;
+}
+
+: manage.c:post_manege()
+
+    "Manager ¼W´î°ÆªO¥D",
++   "Tcolor ¦Û­q¤ÀÃþÃC¦â",
+
+  ...
+
+- char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO"
++ char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO (T)ÃC¦â"
+
+  ...
+
+  case 'm':
+    return post_changeBM(xo);
+
++ case 't':
++   return post_class_color(xo);
+
+: acct.c:brd_set()
+
+  vget(++i, 0, "¬ÝªO¥DÃD¡G", brd->title, BTLEN + 1, GCARRY);
+
++ if (brd->bcolor[0] != '0' && brd->bcolor[0] != '1')
++ {
++   /* ·s¼W¬ÝªOª½±µassign¹w³]­È */
++   sprintf(brd->bcolor, "1%d0", brd->class[3] & 7);
++ }
++ else
++ { /* ­×§ï¬ÝªO®É¦A½T»{­n¤£­n§ï¤ÀÃþÃC¦â */
++   if (vans("­×§ï¬ÝªO¤ÀÃþÃC¦â¡H[N] ") == 'y')
++   {
++     do
++     {
++       brd->bcolor[0] = vans("«e´ºÃC¦â¡G0)¤@¯ë 1)°ª«G«×¡H");
++     } while(brd->bcolor[0] > '1' || brd->bcolor[0] < '0');
++     do
++     {
++       brd->bcolor[1] =
++         vans("«e´º 0)¶Â 1)¬õ 2)ºñ 3)¶À 4)ÂÅ 5)µµ 6)ÀQ 7)¥Õ¡H ");
++     } while(brd->bcolor[1] > '7' || brd->bcolor[1] < '0');
++     do
++     {
++       brd->bcolor[2] =
++         vans("­I´º 0)¶Â 1)¬õ 2)ºñ 3)¶À 4)ÂÅ 5)µµ 6)ÀQ 7)¥Õ¡H ");
++     } while(brd->bcolor[2] > '7' || brd->bcolor[2] < '0');
++   }
++ }
+
+--
+·R¹³¸¨¦b¤ßÀYªº¤õªá,
+§â¤ß¨Æ§¹¥þÂI«G,
+²`²`¦b¥G¹ï¤è,
+´NµLªkÁôÂÃ~
+
+--
+          [5;36m¡¸[m[0;36m¬[1mP[0;36m¥[1mú[0;36m¡[1mE[0;36m¤[1mß[0;36m±[1m¡¡Î   [1;35m¡Î      [34m¡D[31mstarlight.twbbs.org[1;33m¡´[m
+          [1;30mby[5;36m¡D[;1;33mheeroy      [m¡D        [1;32m¡Î              [5;36m¡D[m
+          [1;30mfrom[32m¡Î[34mheeroy.arch.cycu.edu.tw                     [36m¡D[m
+                [1;30m¡Ä¡Å¢b¢c¢d¢e¢f¢h¢g¢f¢g¢h¢i¢i¢i¢h¢g¢f¢e¢d¢c¢b¡Å¡Ä[m
+
+--
+¹ïµÛ¬PªÅ»¡¥X§Úªº¦W¦r¬O­µ¼Ö
+¤]³\§Ú·Rªº¬O¤s»P®ü
+²oµÛ©pªº¤âµ¥«Ý¤Ñ©ú
+¦b³o¶ô¤g¦a¤W
+§Æ±æ¤@ª½³£¦s¦b
+³o¸Ì¡A¬O§Ú¥Ã»·ªº¬G¶m
+
+--
+          [5;36m¡¸[m[0;36m¬[1mP[0;36m¥[1mú[0;36m¡[1mE[0;36m¤[1mß[0;36m±[1m¡¡Î   [1;35m¡Î      [34m¡D[31mstarlight.twbbs.org[1;33m¡´[m
+          [1;30mby[5;36m¡D[;1;33mheeroy      [m¡D        [1;32m¡Î              [5;36m¡D[m
+          [1;30mfrom[32m¡Î[34mheeroy.arch.cycu.edu.tw                     [36m¡D[m
+                [1;30m¡Ä¡Å¢b¢c¢d¢e¢f¢h¢g¢f¢g¢h¢i¢i¢i¢h¢g¢f¢e¢d¢c¢b¡Å¡Ä[m

@@ -1,0 +1,59 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: ¯à¤£¯à¹³¨g¯X¦~¤Ö¤@¼Ë
+®É¶¡: 2004/01/10 Sat 19:35:07                           Updated: 2004/10/08
+
+¡° ¤Þ­z¡myenning.bbs@bbs.seehere.org (£B¢í¢ö¢ö¢ñ¢ö¢ï¡ã)¡n¤§»Ê¨¥¡G
+> ´N¬O¦¬¤åªº®É­Ô  ¼ÐÃD·|¥[¤W§@ªÌID
+
+  ¾A¥Î paste/gather
+
+  ps. ¦pªG¬O±qºëµØ°Ï c/p ¨ì§OªººëµØ°Ï
+      ¥Ñ©óºëµØ°Ï¤å³¹ªº§@ªÌ·|³Q§ï¬°ªO¥D
+      ©Ò¥Hªþ¥[ªº§@ªÌ·|¬OªO¥D
+
+: gem.c:gem_do_paste()
+
++ static int attach_author;     /* 1: ¼ÐÃDªþ¥[§@ªÌ */
+
+static void
+gem_do_paste(srcDir, dstDir, hdr, pos)
+
+  ...
+  ...
+
+  strcpy(ghdr.owner, cuser.userid);
++ if (attach_author)
++   sprintf(ghdr.title, "%-51.51s %.18s", hdr->title, hdr->owner);
++ else
+    strcpy(ghdr.title, hdr->title);
+
+: gem.c:gem_paste()
+
+  dir = xo->dir;
++ attach_author = (vans("¬O§_ªþ¥[­ì§@ªÌ¢×¢Ò©ó¼ÐÃD(Y/N)¡H[N] ") == 'y');
+
+  switch (ans = vans("¦s©ñ¦ì¸m A)¥[¨ì³Ì«á .... E)ªþ¥[ÀÉ®× Q)Â÷¶} [A] "))
+
+: gem.c:gem_gather()
+
+    case '2':
++     attach_author = (vans("¬O§_ªþ¥[­ì§@ªÌ¢×¢Ò©ó¼ÐÃD(Y/N)¡H[N] ") == 'y');
+      break;
+
+  ...
+  ...
+
+      else      /* ¤À§O«ØÀÉ */
+      {
+        hdr_stamp(folder, HDR_COPY | 'A', &ghdr, fpath);
+        strcpy(ghdr.owner, cuser.userid);       /* ¦¬¿ý¥ÎªO¥D id */
++       if (attach_author)
++         sprintf(ghdr.title, "%-51.51s %.18s", hdr->title, hdr->owner);
++       else
+          strcpy(ghdr.title, hdr->title);
+        ghdr.xmode = 0;                         /* xmode ¬O¤å³¹ */
+
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

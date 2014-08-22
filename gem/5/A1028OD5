@@ -1,0 +1,29 @@
+§@ªÌ: itoc (¯uªº«Ü¥i·R°Ú :D) ¯¸¤º: plan
+¼ÐÃD: [¤å¥ó] Âà´«µ{¦¡ªºµ²ºc
+®É¶¡: Tue Aug 13 00:37:37 2002
+
+  Âà´«µ{¦¡ªºµ²ºc´N¬O³o»òÂ²³æ
+
+#include "bbs.h"
+
+typedef struct {....} OLD;
+typedef struct {....} NEW;
+
+int main()
+{
+  int num;
+  OLD old;
+  NEW new;
+
+  num = 0;
+  while (!rec_get("old-file", &old, sizeof(OLD), num))
+  {
+    new.xxx = old.xxx;              /* ¦pªG xxx Äæ¦ì¬O int */
+    strcpy(new.yyy, old.yyy);       /* ¦pªG yyy Äæ¦ì¬O char[] */
+    rec_add("new-file", &new, sizeof(NEW));
+    num++;
+  }
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

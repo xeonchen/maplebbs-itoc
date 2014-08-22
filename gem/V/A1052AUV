@@ -1,0 +1,29 @@
+§@ªÌ: itoc (League) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¦bÂà«H¥X¥hªº¦ì§}¥[¤W NO-SPAM
+®É¶¡: 2004/03/12 Fri 11:13:34                           Updated: 2004/04/25
+
+  Âà«H¥X¥hªº¤å³¹¡AÀÉÀY·|§e²{
+
+µo«H¤H: userid.bbs@bbs.xxx.edu.tw (¼ÊºÙ) ¬ÝªO: brdname
+¼Ð  ÃD: ³o¬O¼ÐÃD
+µo«H¯¸: §Úªº¯¸¥x (2004/03/11 Thu 01:02:03)
+
+  §Æ±æ§ï¦¨
+
+µo«H¤H: userid.bbs@[1;33mNO.[mbbs.xxx.edu.tw[1;33m.SPAM[m (¼ÊºÙ) ¬ÝªO: brdname
+¼Ð  ÃD: ³o¬O¼ÐÃD
+µo«H¯¸: §Úªº¯¸¥x (2004/03/11 Thu 01:02:03)
+
+  ¨Ó´î¤Ö¼s§i«H
+
+: bbslink.c:process_article()
+
+- sprintf(FROM, "%s.bbs@" MYHOSTNAME " (%s)", userid, nickname);
++ sprintf(FROM, "%s.bbs@NO." MYHOSTNAME ".SPAM (%s)", userid, nickname);
+  sprintf(MSGID, "%s$%s@" MYHOSTNAME, filename, board);
+
+
+  ¤£¹L³o¼Ë­n cancel ¤wµo¥X¥hªº¤å³¹·|¥¢±Ñ
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

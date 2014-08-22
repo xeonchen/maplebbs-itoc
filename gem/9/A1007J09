@@ -1,0 +1,51 @@
+µo«H¤H: binbin.bbs@processor.tfcis.org (»«¤l) ¬ÝªO: itoc
+¼Ð  ÃD: [¥\¯à] ¦h­¶¦W¤ù(«O¯d¨Ï¥ÎªÌ¸ê°T)
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/01/13 Tue 16:05:53)               Updated: 2006/01/16
+
+> ¬d¸ß¨Ï¥ÎªÌ®É ¤W¤è¨Ï¥ÎªÌ¸ê°T(id, ¼ÊºÙ, °ÊºA ...)«O¯d ¤U¤è¥i´«­¶¨q¥X¦W¤ù
+> ±Ntalk.c showplans¨ç¦¡´«¦¨¥H¤U§Y¥i
+
+static void
+showplans(userid)
+  char *userid;
+{
+  int i = 0, j = 1, ch;
+  FILE *fp;
+  char buf[ANSILINELEN];
+
+  usr_fpath(buf, userid, fn_plans);
+  if (fp = fopen(buf, "r"))
+  {
+    outs("[¦W¤ù]\n");
+    while ((++i <= 1024) && fgets(buf, sizeof(buf), fp))
+    {
+      if (i != (1 + j * (b_lines-5)))
+      {
+        outx(buf);
+      }
+      else
+      {
+        outs("\033[7m--¥¼§¹--\033[m");
+        j++;
+        ch = vkey();
+        if ((ch == 'Q') || (ch =='q') || (ch == KEY_LEFT))
+          break;
+
+        move(5, 0);
+        clrtobot();
+        outx(buf);
+      }
+    }
+    fclose(fp);
+  }
+  else
+    outs("[¥Ø«e¨S¦³¦W¤ù]");
+}
+
+----
+
+½d¨Ò¦b telnet://140.115.160.160
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m binbin.dorm6.nctu.edu.tw [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

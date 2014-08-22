@@ -1,0 +1,375 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¤å³¹¸m©³
+®É¶¡: 2004/10/25 Mon 20:10:30                           Updated: 2005/12/28
+
+¡° ¤Þ­z¡mshakalaca.bbs@php.twbbs.org (¥Î¨­ÅéÃÒ©ú§Aªº¤Í±¡§a)¡n¤§»Ê¨¥¡G
+>   §Úªº¤èªk¬O¸m©³ªº®É­Ô§â¤å³¹ copy ¤@¥÷¨ì³Ì«á­± (rec_add)
+>   (·íµM­n¥Î hard/soft link ©ÎªÌ copy ¤@¥÷·í¸m©³¤å³¹ÀH§A°ª¿³)
+>   µM«á¬ÝªO¸m©³¼Æ¶q +1, ¥t¥~¼g­Ó rec_bot ªº©N©N¡AÅý¨C¦¸·s¼W¸ê®Æ
+>   (µoªí¡AÂà¿ý¡Amail2board) ªº®É­Ô³£·|§â¤å³¹´¡¨ì¾A·íªº¦ì¸m¡C
+>   ³o¼Ë¤lªº¦n³B¬O¤£¥Î¦b¥t¥~¶} index¡A¸Ñ°£¸m©³®É¥u­n§â¸Ó¤å³¹§R°£§Y¥i¡C
+>   ¯ÊÂI¬O­n§ïªº¦a¤è«Ü¦h¡Ainnbbsd¡Aboardmail¡Abbs.c¡C¡C¡C :p
+
+  ¦pªG¤£·s¶}¤@­Ó .BOTTOM¡A¨º»ò´N¬O³oºØ§@ªk
+  ±Ä¨ú³oºØ§@ªk¡Aµ{¦¡¦n¹³¤ñ¸ûÂ²³æ
+
+  1. ­Y mark/delete/rangedel/prune/title.. ­ì¤å¡A¸m©³¤å¨Ã¤£·|ÅÜ°Ê
+     ¦P²z¡A­YÅÜ°Ê¸m©³¤å¡A­ì¤å¤]¤£·|ÅÜ°Ê
+     (©Ò¥Hµû¤Àªº¤À¼Æ¨Ã¤£·|³s°Ê)
+
+  2. °ß¤@¤£º¡¨¬ 1. ªº¬O edit ³o°Ê§@
+     ½s¿è­ì¤å/¸m©³¤å¡A¤º®e·|³s°Ê (¦]¬°¥Î HDR_LINK ³s°_¨Ó)
+
+  3. ­Y­n§R°£¸m©³¤å¡A«hª½±µ d ±¼§Y¥i
+     (d/D/^D/^N ³£¥i¥H¡A¬Æ¦Ü¨ú®ø mark ³Q expire ¹L´Á²M°£¤]¬O¥i¯à)
+
+  4. ¸m©³¤å¨S¦³¾\Åª°O¿ý
+
+  5. ¸m©³¤å¸ò¤@¯ë¤å³¹§¹¥þ¤@¼Ë¡A©Ò¥H¥i¥H¦Û¥Ñ
+     tag/Âà±H/Âà¿ý/¦¬ºëµØ°Ï/¥[±K/mark...
+     (µ{¦¡¨Ã¨S¦³­­¨îªO¥D¤£¯à¥[±K¸m©³¤å¡A©Ò¥H¦pªGªO¥D«ÜµL²á¡A¤]¬O¥i¥H³o¼Ë°µ)
+     (µ{¦¡¤]¨S¦³­­¨îªO¥D¤£¯à¨ú®ø¸m©³¤åªº mark¡A¤Ï¥¿¤]¤£·|«ç»ò¼Ë)
+
+  6. ¦P¤@½g¤å³¹¥i¥H¸m©³­Ó¦n´X¦¸³£¨SÃö«Y
+
+: hdr.h
+
++ #define POST_BOTTOM   0x00002000      /* ¸m©³¤å³¹ */
+#define POST_SCORE      0x00004000      /* ¼Ð°Oµû¤À¹Lªº */
+
+: post.c:post_item() ¦³¤G³B­n§ï
+
++ if (hdr->xmode & POST_BOTTOM)
++ {
++   /* ¥Ñ©ó¸m©³¤å¨S¦³¾\Åª°O¿ý¡A©Ò¥H§Ë¦¨¤wÅª */
++   char attr = post_attr(hdr);
++   if (attr == '+')
++     attr = ' ';
++   else if (attr >= 'A' && attr <= 'Z')
++     attr |= 0x20;          /* ´«¤p¼g */
++   prints("  ­«­n%c%c", tag_char(hdr->chrono), attr);
++ }
++ else
+    prints("%6d%c%c", num, tag_char(hdr->chrono), post_attr(hdr));
+
+- if (hdr->xmode & POST_SCORE)
++ if (hdr->xmode & POST_SCORE && !(hdr->xmode & POST_BOTTOM))
++                                /* ¸m©³¤å¤£Åã¥Ü¤À¼Æ */
+
+: post.c:post_history()
+
++ if (hdr->xmode & POST_BOTTOM)     /* ¸m©³¤å¤£¥[¤J¾\Åª°O¿ý */
++   return;
+
+  chrono = hdr->chrono;
+  if (!brh_unread(chrono))      /* ¦pªG¤w¦b brh ¤¤¡A´NµL»Ý°Ê§@ */
+    return;
+
+: post.c:post_bottom() ·s¼W¦b post_mark() ¤U­±
+
+static int
+post_bottom(xo)
+  XO *xo;
+{
+  if (bbstate & STAT_BOARD)
+  {
+    HDR *hdr, post;
+    char fpath[64];
+
+    hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+    if (hdr->xmode & POST_BOTTOM)       /* ¤w¸m©³´N¤£¯à¦A¸m©³ */
+      return XO_NONE;                   /* ¨ä¹ê·Q¦A¸m©³¤@¦¸¤]¨S®t :p */
+
+    hdr_fpath(fpath, xo->dir, hdr);
+    hdr_stamp(xo->dir, HDR_LINK | 'A', &post, fpath);
+    post.xmode = POST_MARKED | POST_BOTTOM;  /* ¦Û°Ê¥[ mark */
+    strcpy(post.owner, hdr->owner);
+    strcpy(post.nick, hdr->nick);
+    strcpy(post.title, hdr->title);
+
+    rec_add(xo->dir, &post, sizeof(HDR));
+    btime_update(currbno);
+
+    return post_load(xo);       /* ¥ß¨èÅã¥Ü¸m©³¤å³¹ */
+  }
+  return XO_NONE;
+}
+
+: post.c:post_cb[]
+
++ '_', post_bottom,             [1;44m // «öÁä¦Û©w [m
+
+  'h', post_help
+
+: post.c:post_visit()
+
+  ans = vans("³]©w©Ò¦³¤å³¹ (U)¥¼Åª (V)¤wÅª (W)«e¤wÅª«á¥¼Åª (Q)¨ú®ø¡H[Q] ");
+  if (ans == 'v' || ans == 'u' || ans == 'w')
+  {
++   int pos;
+
+    row = xo->top;
+    max = xo->max - row + 3;
+    if (max > b_lines)
+      max = b_lines;
+
+    hdr = (HDR *) xo_pool;
+-   brh_visit(ans == 'w' ? hdr[xo->pos - row].chrono : ans == 'u');
++   pos = xo->pos - row;
++   /* weiyu.20041010: ¦b¸m©³¤å¤W¿ï w µø¬°¥þ³¡¤wÅª */
++   brh_visit(ans == 'w' ? hdr[pos].xmode & POST_BOTTOM ? 0 :
++                          hdr[pos].chrono : ans == 'u');
+
+    row = 3;
+
+: board.c:btime_refresh()
+
+-       /* itoc.020829: §ä³Ì«á¤@½g¥¼³Q¥[±Kªº HDR */
++       /* itoc.020829: §ä³Ì«á¤@½g¥¼³Q¥[±K¡B¤£¬O¸m©³ªº HDR */
+        while ((fsize -= sizeof(HDR)) >= 0)
+        {
+          lseek(fd, fsize, SEEK_SET);
+          read(fd, &hdr, sizeof(HDR));
+-         if (!(hdr.xmode & POST_RESTRICT))
++         if (!(hdr.xmode & (POST_RESTRICT | POST_BOTTOM)))
+            break;
+        }
+
+====================================================================
+
+  ±µ¤U¨Ó¼W¥[¤@­Ó rec_bot.c
+
+: src/lib/Makefile
+
+SRC =  ... [1;33mrec_bot.c[m
+
+OBJ =  ... [1;33mrec_bot.o[m
+
+: src/lib/dao.p
+
+/* rec_add.c */
+int rec_add(char *fpath, void *data, int size);
++ /* rec_bot.c */
++ int rec_bot(char *fpath, void *data, int size);
+
+: src/lib/rec_bot.c ·s¼W¦¹µ{¦¡
+
+#include "dao.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+
+
+static int
+is_bottompost(hdr)
+  HDR *hdr;
+{
+  return (hdr->xmode & POST_BOTTOM);
+}
+
+
+int
+rec_bot(fpath, data, size)      /* amaki.040715: ´O¤J¦¡¼gÀÉ */
+  char *fpath;
+  void *data;
+  int size;
+{
+  int fd, fsize, count;
+  void *pool, *set;
+  char set_pool[REC_SIZ];
+  struct stat st;
+
+  if ((fd = open(fpath, O_RDWR | O_CREAT, 0600)) < 0)
+    return -1;
+
+  /* flock(fd, LOCK_EX); */
+  /* Thor.981205: ¥Î fcntl ¨ú¥Nflock, POSIX¼Ð·Ç¥Îªk */
+  f_exlock(fd);
+
+  fstat(fd, &st);
+
+  count = 0;
+  set = (void *) set_pool;
+
+  if (fsize = st.st_size)
+  {
+    while ((fsize -= size) >= 0)
+    {
+      lseek(fd, fsize, SEEK_SET);
+      read(fd, set, size);
+
+      if (!is_bottompost(set))
+      {
+        if (count)
+        {
+          pool = (void *) malloc(count * size);
+
+          read(fd, pool, count * size);
+          lseek(fd, -size * count, SEEK_CUR);
+        }
+        break;
+      }
+      else if (fsize <= 0)      /* amaki.040715: ¥þ³¡³£¬O¸m©³ªºªF¦è */
+      {
+        count++;
+        pool = (void *) malloc(count * size);
+
+        lseek(fd, -size, SEEK_CUR);
+        read(fd, pool, count * size);
+        lseek(fd, -size * count, SEEK_CUR);
+        break;
+      }
+      else
+        count++;
+    }
+  }
+
+  write(fd, data, size);
+
+  if (count)
+  {
+    write(fd, pool, count * size);
+    free(pool);
+  }
+
+  /* flock(fd, LOCK_EX); */
+  /* Thor.981205: ¥Î fcntl ¨ú¥Nflock, POSIX¼Ð·Ç¥Îªk */
+  f_unlock(fd);
+
+  close(fd);
+
+  return 0;
+}
+
+====================================================================
+
+  ±µ¤U¨Ó±N©Ò¦³·s¼W¤å³¹ªº³¡¤À¡A±q rec_add §ï¬° rec_bot
+
+: bhttpd.c:add_post()
+: bmtad.c:visit_fresh()
+: bmtad.c:mta_memo()
+: bmtad.c:bbs_brd()
+: account.c:keeplog()
+: brdmail.c:mail2brd()
+
+- rec_add(folder, &hdr, sizeof(HDR));
++ rec_bot(folder, &hdr, sizeof(HDR));
+
+: enews.c:enews_cross()
+
+- rec_add(xfolder, &xpost, sizeof(HDR));
++ rec_bot(xfolder, &xpost, sizeof(HDR));
+
+: vote.c:keeplog()
+
+- rec_add(folder, &hdr, sizeof(HDR));
++ rec_bot(folder, &hdr, sizeof(HDR));
+
+: rec_article.c:bbspost_add()
+
+- rec_add(fpath, &hdr, sizeof(HDR));
++ rec_bot(fpath, &hdr, sizeof(HDR));
+
+: rec_article.c:move_post()
+
+- rec_add(folder, &post, sizeof(HDR));
++ rec_bot(folder, &post, sizeof(HDR));
+
+: song.c:song_order()
+
+- rec_add(fpath, &xpost, sizeof(HDR));
++ rec_bot(fpath, &xpost, sizeof(HDR));
+
+: post.c:move_post()
+
+- rec_add(fnew, &post, sizeof(HDR));
++ rec_bot(fnew, &post, sizeof(HDR));
+
+: post.c:do_unanonymous()
+
+- rec_add(folder, &post, sizeof(HDR));
++ rec_bot(folder, &post, sizeof(HDR));
+
+: post.c:do_post()
+
+- if (!rec_add(folder, &post, sizeof(HDR)))
++ if (!rec_bot(folder, &post, sizeof(HDR)))
+
+  ...
+
+-         if (!rec_add(folder, &post, sizeof(HDR)))
++         if (!rec_bot(folder, &post, sizeof(HDR)))
+
+: post.c:post_cross()
+
+-       rec_add(xfolder, &xpost, sizeof(HDR));
++       rec_bot(xfolder, &xpost, sizeof(HDR));
+
+  ...
+
+-     rec_add(xfolder, &xpost, sizeof(HDR));
++     rec_bot(xfolder, &xpost, sizeof(HDR));
+
+  ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ²Ä¤@¦¸¶iªO±N´å¼Ð©ñ¦b¥¼¸m©³ªº³Ì«á¤@½g
+
+: board.c:XoPost()
+
+    xo->key = XZ_POST;
+    xo->xyz = brd->title;
+
++   if (xo->pos == XO_TAIL)   /* ²Ä¤@¦¸¶iªO±N´å¼Ð©ñ¦b¥¼¸m©³ªº³Ì«á¤@½g */
++     xo->pos = last_nobottom(xo->dir);
+
+: board.c:last_nobottom() ·s¼W¦¹¨ç¦¡¦b XoPost() «e­±
+
+static int
+last_nobottom(folder)
+  char *folder;
+{
+  int fd, fsize;
+  struct stat st;
+  HDR hdr;
+
+  if ((fd = open(folder, O_RDONLY)) >= 0)
+  {
+    if (!fstat(fd, &st) && (fsize = st.st_size) >= sizeof(HDR))
+    {
+      while ((fsize -= sizeof(HDR)) >= 0)
+      {
+        lseek(fd, fsize, SEEK_SET);
+        read(fd, &hdr, sizeof(HDR));
+        if (!(hdr.xmode & POST_BOTTOM))
+          break;
+      }
+    }
+    close(fd);
+
+    return fsize / sizeof(HDR);
+  }
+
+  return XO_TALL;
+}
+
+====================================================================
+
+  ±µ¤U¨Ó·s¼W¤@­Ó help    ¢u¢w post_bottom  ¸m©³¤å³¹
+
+  ¢z¢w¢w¢w¢s¢w¢w¢w¢w¢w¢w¢s¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢{
+  ¢x«ö  Áä¢x ¨ç      ¦¡ ¢x  ±Ô                                        ­z  ¢x
+  ¢u¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t
+  ¢x_     ¢xpost_bottom ¢x¸m©³¤å³¹                                        ¢x
+  ¢|¢w¢w¢w¢r¢w¢w¢w¢w¢w¢w¢r¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}
+
+    ±N´å¼Ð²¾¨ì¬YÄæ¡A«ö _ ¥i¥H¸m©³¸Ó½g¤å³¹¡A³Q¸m©³ªº¤å³¹·|¥X²{¡u­«­n¡vªº²Å
+  ¸¹¡A³Q¸m©³ªº¤å³¹·|¤@ª½¥X²{¦b¬ÝªOªº©³³¡¡A¥u¦³ªO¥D¥i¥H¨Ï¥Î¦¹¥\¯à¡C
+
+    ­n¨ú®ø¸m©³¡Aª½±µ±N¸m©³ªº¨º½g¤å³¹¨ú®ø¼Ð°O¨Ã§R°£§Y¥i¡C
+
+ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,26 @@
+§@ªÌ: itoc (§@·~¦nÃø¼g) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ¯¸ªø¼s¼½§ï¥Î sysop ³o id
+®É¶¡: Wed Jan  1 13:14:19 2003                          Updated: 2003/08/17
+
+¡° ¤Þ­z¡mgaod (°ª¶¯¤¤¾Ç¸ê¬ã°ÆªÀ)¡n¤§»Ê¨¥¡G
+> ¯¸ªø¹ï¥þ¯¸¼s¼½¥Ø«e¬O¥Î¨äID¹ï¥þ¯¸¼s¼½
+> ¤£ª¾¹D¯à¤£¯àÅÜ¦¨¹³WindTop
+> ­n°µ¯¸°È¼s¼½®É¬O¥HSYSOP¹ï¥þ¯¸¼s¼½¡H¡H
+
+: ulist.c:ulist_broadcast()
+
+  if (bmw.caller)       /* bmw_edit() ¤¤¦^µª Yes ­n°e¥X¼s¼½ */
+  {
++   if (sysop)  /* ¯¸ªø¼s¼½ */
++   {
++     bmw.sender = 0;
++     sprintf(bmw.userid, "%s> ", str_sysop);
++   }
++   else        /* ¦n¤Í¼s¼½ */
++   {
+      /* itoc.000213: ¥[ "> " ¬°¤F»P¤@¯ë¤ô²y°Ï¤À */
+      sprintf(bmw.userid, "%s> ", cuser.userid);
++   }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

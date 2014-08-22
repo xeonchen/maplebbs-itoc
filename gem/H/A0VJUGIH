@@ -1,0 +1,76 @@
+§@ªÌ: itoc (:MM:) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]ªO¥D¦Û­qµo¤åºõ»â
+®É¶¡: Fri Apr 18 14:51:23 2003                          Updated: 2005/05/26
+
+¡° ¤Þ­z¡mDinsam.bbs@whshs.cs.nccu.edu.tw («e¥@.. o.O)¡n¤§»Ê¨¥¡G
+> §Ú°Ñ¦Ò¶iªOµe­± ¼g¤F¤@­ÓªO¥D¦Û­qµo¤åºõ»â
+
+: global.h
+
+#define FN_NOTE         "note"          /* ¶iªOµe­± */
++ #define FN_POSTLAW    "postlaw"       /* µo¤åºõ»â */
+
+: post.c:do_post()
+
++ brd_fpath(fpath, currboard, FN_POSTLAW);
++ if (more(fpath, (char *) -1) < 0)
+    film_out(FILM_POST, 0);
+
+  prints("µoªí¤å³¹©ó¡i %s ¡j¬ÝªO", currboard);
+
+: manage.c:post_postlaw_edit() ·s¼W©ó post_memo_edit() «á­±
+
+/* ----------------------------------------------------- */
+/* ªO¥D¥\¯à : ­×§ïµo¤åºõ»â                               */
+/* ----------------------------------------------------- */
+
+
+static int
+post_postlaw_edit(xo)       /* ªO¥D¦Û©w¤å³¹µoªíºõ»â */
+  XO *xo;
+{
+  int mode;
+  char fpath[64];
+
+  mode = vans("¤å³¹µoªíºõ»â (D)§R°£ (E)­×§ï (Q)¨ú®ø¡H[E] ");
+
+  if (mode != 'q')
+  {
+    brd_fpath(fpath, currboard, FN_POSTLAW);
+
+    if (mode == 'd')
+    {
+      unlink(fpath);
+      return XO_FOOT;
+    }
+
+    if (vedit(fpath, 0))      /* Thor.981020: ª`·N³Qtalkªº°ÝÃD */
+      vmsg(msg_cancel);
+    return XO_HEAD;
+  }
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+    "WMemo   ½s¿è¶iªOµe­±",
++   "PostLaw ½s¿èµo¤åºõ»â",
+
+  ...
+  ...
+
+- char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO"
++ char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (P)ºõ»â (M)°ÆªO"
+
+  ...
+  ...
+
+  case 'w':
+    return post_memo_edit(xo);
+
++ case 'p':
++   return post_postlaw_edit(xo);
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mitoc.Dorm-GD2.NCTU.edu.tw                [m

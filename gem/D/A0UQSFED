@@ -1,0 +1,86 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: Re: ½Ð°Ý¤@¤U  ¯¸ªøªº¥\¯à
+®É¶¡: Tue Jul 30 00:17:47 2002                          Updated: 2003/12/13
+
+¡° ¤Þ­z¡mtbp (tbp)¡n¤§»Ê¨¥¡G
+> ¦pªG§Ú·QÅý¯¸ªø¦b¬d¸ß¨Ï¥ÎªÌ®É
+> «öSpace´Nª½±µÅã¥Ü¥X©Ò¦³¨Ï¥ÎªÌ
+> ¤£¥Î¿é¤J­º¦r¥À
+> ½Ð°Ý³o¼Ë«ç»ò§ï©O
+
+: visio.c:vget_match()
+
+  else if (op & GET_USER)
+  {
+    struct dirent *de;
+    DIR *dirp;
+    int cc;
++   int cd;
+    char fpath[16];
+
+-   if (len == 0)
+-     return 0;
+
++   if (len)
++   {
+      cc = *prefix;
+      if (cc >= 'A' && cc <= 'Z') /* ´«¦¨¤p¼g */
+        cc |= 0x20;
+      if (cc < 'a' || cc > 'z')
+        return 0;
++     cd = cc;
++   }
++   else
++   {
++     if (!HAS_PERM(PERM_ALLACCT))  /* ¤@¯ë¨Ï¥ÎªÌ­n¿é¤J¤@¦r¤~¤ñ¹ï */
++       return 0;
++     cc = 'a';
++     cd = 'z';
++   }
+
++   for (; cc <= cd; cc++)
++   {
+      sprintf(fpath, "usr/%c", cc);
+      dirp = opendir(fpath);
+      while (de = readdir(dirp))
+      {
+        data = de->d_name;
++       if (*data <= ' ' || *data == '.')
++         continue;
+
+-       if (str_ncmp(prefix, data, len))
++       if (len && str_ncmp(prefix, data, len))
+          continue;
+
+        if (!match++)
+        {
+          match_title();
+          strcpy(hit = fpath, data);      /* ²Ä¤@µ§²Å¦Xªº¸ê®Æ */
+        }
+
+        move(row, col);
+        outs(data);
+        col += IDLEN + 1;
+
+        if (col >= SCR_WIDTH - IDLEN - 1)
+        {
+          col = 0;
+          if (++row >= b_lines)
+          {
+            if (match_getch())
++           {
++             cc = 'z';     /* Â÷¶} for °j°é */
+              break;
++           }
+            row = 3;
+          }
+        }
+      }
+
+      closedir(dirp);
+    }
++ }
+  else /* Thor.990203.µù¸Ñ: GET_LIST */
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

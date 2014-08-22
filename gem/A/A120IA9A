@@ -1,0 +1,23 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: itoc
+¼Ð  ÃD: Re: ½Ð°Ý·sµù¥Uªº±b¸¹?
+µo«H¯¸: µL¦W¤p¯¸ (2006/03/04 Sat 00:49:28)                Updated: 2006/03/04
+
+¡° ¤Þ­z¡mronaldun (Ronald)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý·sµù¥Uªº±b¸¹·|¦brecord©ÎlogªO¦³°O¿ý¶Ü?
+> ­Y¦³, ¨º½Ð°Ý¬O¨º¤äµ{¦¡²Î­pªº?
+
+: src/util/account.c
+
++   system("cat run/usies | grep APPLY > run/apply.log");
++   sprintf(title, "%s¨C¤éµù¥U¨Ï¥ÎªÌ°O¿ý", date);
++   keeplog("run/apply.log", BN_SECURITY, title, 2);
+
+    sprintf(title, "%s¤å³¹½g¼Æ²Î­p", date);
+    keeplog(FN_RUN_POST_LOG, BN_SECURITY, title, 2);
+
+--
+[1;30m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U[m
+[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H¤£¬pÄ´¹D¤§[37mbbs.ee.ndhu.edu.tw[30m®ü[m

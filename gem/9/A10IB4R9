@@ -1,0 +1,150 @@
+§@ªÌ: itoc (­ó­ó ¤£¸ò§Ú¥h¦Y¶º) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] struct.h acct.c talk.c ¤ß±¡
+®É¶¡: Wed Aug  7 12:02:37 2002                          Updated: 2004/07/14
+
+  §ï struct ACCT¡A­nÂà´« .ACCT
+  §ï struct UTMP¡A­n²M shm
+
+¡° ¤Þ­z¡mtandrian.bbs@ntcb.twbbs.org.tw (¤Û°ìÅ]«°«á¯ª)¡n¤§»Ê¨¥¡G
+>         ½Ð°Ý¦p¦ó¼W¥[  ¤ß±¡~~ ??   ^^
+> No.  P  ¥N¸¹         ¼ÊºÙ               ¬G¶m           °ÊºA  ¤ß±¡  µo§b
+
+: struct.h
+
+  #define UNLEN   23            /* Length of user name */
++ #define FLLEN   4             /* Length if feeling */
+
+: struct.h:strcut ACCT
+
+  char username[UNLEN + 1];     /* ¼ÊºÙ */
++ char feeling[FLLEN + 1];      /* ¤ß±¡ */
+
+: struct.h:struct UTMP
+
+  char username[UNLEN + 1];     /* user's nickname */
++ char feeling[FLLEN + 1];      /* user's feeling */
+
+: acct.c acct_show()
+
+  prints("  \033[32m§Úªº¼ÊºÙ¡G\033[37m%-35s\033[32m¾Ö¦³»È¹ô¡G\033[37m%d\n",
+    u->username, u->money);
+
++ prints("  \033[32m§Úªº¤ß±¡¡G\033[37m%-35s\n", u->feeling);
+
+  prints("  \033[32m¯u¹ê©m¦W¡G\033[37m%-35s\033[32m¾Ö¦³ª÷¹ô¡G\033[37m%d\n",
+    u->realname, u->gold);
+
+: acct.c acct_setup()
+
+  i++;
+  str = x.username;
+  while (1)
+  {
+    if (vget(i, 0, "¼Ê    ºÙ¡G", str, UNLEN + 1, GCARRY))
+      break;
+  };
+
++ i++;
++ str = x.feeling;
++ while (1)
++ {
++   if (vget(i, 0, "¤ß    ±¡¡G", str, FLLEN + 1, GCARRY))
++     break;
++ };
+
+: bbsd.c utmp_setup()
+
+  strcpy(utmp.userid, cuser.userid);
++ strcpy(utmp.feeling, cuser.feeling);
+
+: talk.c ulist_item() ª©­±¦Û©w
+
+- prints("%6d%c%c%s%-13s%-*.*s%s%-*.*s%-11.10s%s\n",
++ prints("%6d%c%c%s%-13s%-*.*s%s%-*.*s%-11.10s[1;33m%-5.4s[m%s\n",
+    num, ufo & UFO_CLOAK ? ')' : ' ', pager,
+    wcolor[fcolor], up->userid,
+-   (d_cols >> 1) + 21, (d_cols >> 1) + 20, up->username,
++   (d_cols >> 1) + [1;32m19[m, (d_cols >> 1) + [1;32m18[m, up->username,
+      fcolor > 0 ? "\033[m" : "",
+-   d_cols - (d_cols >> 1) + 19, d_cols - (d_cols >> 1) + 18,
++   d_cols - (d_cols >> 1) + [1;32m17[m, d_cols - (d_cols >> 1) + [1;32m16[m,
+      pickup_ship ? pal_ship(fcolor, up->userno) :
+    ...
+    ...
+-   bmode(up, 0), buf);
++   bmode(up, 0), up->feeling, buf);
+}
+
+: theme.h ª©­±¦Û©w
+
+  §ï NECKER_ULIST
+
+: config.h
+
+#define HAVE_CHANGE_NICK        /* ¨Ï¥ÎªÌ¦W³æ ^N ¥Ã¤[§ó§ï¼ÊºÙ */
+
++ #define HAVE_CHANGE_FEEL        /* ¨Ï¥ÎªÌ¦W³æ M ¥Ã¤[§ó§ï¤ß±¡ */
+
+#define HAVE_CHANGE_FROM        /* ¨Ï¥ÎªÌ¦W³æ ^F ¼È®É§ó§ï¬G¶m */
+
+#define HAVE_CHANGE_ID          /* ¨Ï¥ÎªÌ¦W³æ ^D ¼È®É§ó§ï ID */
+
+: talk.c ·s¼W ulist_feelchange() ©ó ulist_nickchange() ¤U­±
+
+#ifdef HAVE_CHANGE_FEEL
+static int
+ulist_feelchange(xo)
+  XO *xo;
+{
+  char *str, buf[FLLEN + 1];
+
+  if (!cuser.userlevel)
+    return XO_NONE;
+
+  strcpy(buf, str = cutmp->feeling);
+  if (vget(b_lines, 0, "½Ð¿é¤J·sªº¤ß±¡¡G", buf, FLLEN + 1, GCARRY))
+  {
+    if (strcmp(buf, str))
+    {
+      strcpy(str, buf);
+      strcpy(cuser.feeling, buf);       /* ¤ß±¡¤]¤@¨Ö§ó´« cuser. */
+      return ulist_body(xo);
+    }
+  }
+  return XO_FOOT;
+}
+#endif
+
+: talk.c talk_cb[]
+
+#ifdef HAVE_CHANGE_NICK
+  Ctrl('N'), ulist_nickchange,
+#endif
++#ifdef HAVE_CHANGE_FEEL
++ 'M', ulist_feelchange,
++#endif
+#ifdef HAVE_CHANGE_FROM
+  Ctrl('F'), ulist_fromchange,
+#endif
+
+: acct.c u_info()
+
+int
+u_info()
+{
+  char *str, username[UNLEN + 1];
++ char *ptr, feeling[FLLEN + 1];
+
+  move(MENU_XNOTE, 0);
+  strcpy(username, str = cuser.username);
++ strcpy(feeling, ptr = cuser.feeling);
+  acct_setup(&cuser, 0);
+  if (strcmp(username, str))
+    memcpy(cutmp->username, str, UNLEN + 1);
++ if (strcmp(feeling, ptr))
++   memcpy(cutmp->feeling, ptr, FLLEN + 1);
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32m140.113.128.62[37m µoªí[m

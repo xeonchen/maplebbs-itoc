@@ -1,0 +1,187 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] manage.c ªO¥D¦Û­q¬ÝªO¡Gµo¤åªùÂe­­¨î
+µo«H¯¸: °Ê¤O®Ö¤ß (2007/04/18 Wed 22:24:16)                Updated: 2007/04/19
+
+: struct.h ¥[¤J³o¬q©ó struct BRD ¤§«á
+> ¨ä¹êÀ³¸Ó§â­­¨î¼g¦b struct BRD ¸Ì­±
+> ¤£¹L¥Ñ©ó¤£·QÂà´« .BRD¡A©Ò¥H´N¥t¥~¦s¤@­ÓÀÉ®×
+
+typedef struct
+{
+  int age;
+  int numlogins;
+  int numposts;
+}    THRESHOLD;
+
+: global.h
+
+  #define FN_CZH             ".CZH"
++ #define FN_THRESHOLD       "threshold"    /* ¬ÝªOµo¤åªùÂe */
+
+: battr.h
+
+  #define BRD_ANONYMOUS      0x20    /* °Î¦W¬ÝªO */
++ #define BRD_THRESHOLD      0x40    /* µo¤åªùÂe­­¨î */
+
+  ...
+  ...
+
+- #define NUMBATTRS       6
++ #define NUMBATTRS       7
+
+- #define STR_BATTR       "zTcsvA"
++ #define STR_BATTR       "zTcsvAT"
+
+: battr.h:battr_tbl[]
+
+  "°Î¦W¬ÝªO",           /* BRD_ANONYMOUS */
++ "µo¤åªùÂe­­¨î",       /* BRD_THRESHOLD */
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+: post.c:do_post()
+
+  if (!(bbstate & STAT_POST))
+  {
+    ...
+    ...
+    return XO_FOOT;
+  }
++ else if (currbattr & BRD_THRESHOLD)
++ {
++   THRESHOLD th;
++   char msg[80];
++
++   brd_fpath(fpath, currboard, FN_THRESHOLD);
++   if (!rec_gec(fpath, &th, sizeof(THRESHOLD), 0))
++   {
++     if (cuser.lastlogin - cuser.firstlogin < th.age * 86400)
++     {
++       sprintf(msg, "µù¥U®É¶¡ %d ¤Ñ¥H¤W¡A¤è¥i¦b¦¹¬ÝªOµoªí¤å³¹", th.age);
++       vmsg(msg);
++       return XO_FOOT;
++     }
++     if (cuser.numlogins < th.numlogins)
++     {
++       sprintf(msg, "¤W¯¸¦¸¼Æ %d ¦¸¥H¤W¡A¤è¥i¦b¦¹¬ÝªOµoªí¤å³¹", th.numlogins)
+;
++       vmsg(msg);
++       return XO_FOOT;
++     }
++     if (cuser.numposts < th.numposts)
++     {
++       sprintf(msg, "µoªí¤å³¹ %d ½g¥H¤W¡A¤è¥i¦b¦¹¬ÝªOµoªí¤å³¹", th.numposts);
++       vmsg(msg);
++       return XO_FOOT;
++     }
++   }
++ }
+
+  film_out(FILM_POST, 0);
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+: manage.c §â¥H¤U³o¬q¥[¦b post_battr_noscore() «á­±
+
+static int
+post_battr_threshold(xo)
+  XO *xo;
+{
+  int ans, echo, num;
+  BRD *oldbrd, newbrd;
+  THRESHOLD th;
+  char fpath[64], buf[80];
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  brd_fpath(fpath, newbrd.brdname, FN_THRESHOLD);
+
+  switch (ans = vans("¡· µo¤åªùÂe­­¨î 1)¤£­­¨îªùÂe 2)­­¨îªùÂe [Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_THRESHOLD;
+    break;
+
+  case '2':
+    newbrd.battr |= BRD_THRESHOLD;
+
+    echo = rec_gec(fpath, &th, sizeof(THRESHOLD), 0) ? DOECHO : GCARRY;
+
+    if (echo & GCARRY)
+      sprintf(buf, "%d", th.age);
+    if (!vgets(b_lines, 0, "½Ð¿é¤Jµo¤åªùÂe¡Ðµù¥U´X¤Ñ¥H¤W¡H", buf, 4, echo))
+      return XO_FOOT;
+    if ((num = atoi(buf)) < 0)
+      return XO_FOOT;
+    th.age = num;
+
+    if (echo & GCARRY)
+      sprintf(buf, "%d", th.numlogins);
+    if (!vgets(b_lines, 0, "½Ð¿é¤Jµo¤åªùÂe¡Ðµn¤J´X¦¸¥H¤W", buf, 4, echo))
+      return XO_FOOT;
+    if ((num = atoi(buf)) < 0)
+      return XO_FOOT;
+    th.numlogins = num;
+
+    if (echo & GCARRY)
+      sprintf(buf, "%d", th.numposts);
+    if (!vgets(b_lines, 0, "½Ð¿é¤Jµo¤åªùÂe¡Ðµo¤å´X½g¥H¤W", buf, 4, echo))
+      return XO_FOOT;
+    if ((num = atoi(buf)) < 0)
+      return XO_FOOT;
+    th.numposts = num;
+
+    if (th.age <= 0 && th.numlogins <= 0 && th.numposts <= 0)
+      return XO_FOOT;
+
+    break;
+
+  default:
+    return XO_FOOT;
+  }
+
+  if ((memcmp(&newbrd, oldbrd, sizeof(BRD)) || (ans == '2')) &&
+    vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+
+    if (ans == '1')
+      unlink(fpath);
+    else /* if (ans == '2') */
+      rec_put(fpath, &th, sizeof(THRESHOLD), 0, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+#  ifdef HAVE_SCORE
+    "Score   ³]©w¥i§_µû¤À",
+#  endif
++   "ZLevel  µo¤åªùÂe­­¨î",
+
+  ...
+  ...
+
+#  ifdef HAVE_SCORE
+    " (S)µû¤À"
+#  endif
++   " (Z)­­¨î"
+
+  ...
+  ...
+
+#ifdef HAVE_SCORE
+  case 's':
+    return post_battr_noscore(xo);
+#endif
+
++ case 'z':
++   return post_battr_threshold(xo);
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m218-168-183-53.dynamic.hin[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

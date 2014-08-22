@@ -1,0 +1,21 @@
+§@ªÌ: itoc (AsPSQwel) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] talk.c ¥u¦³¯¸ªø¯àµµÁô
+®É¶¡: Wed Feb 12 23:57:44 2003                          Updated: 2003/02/12
+
+¡° ¤Þ­z¡mangel@usermail.twbbs.org (§c¡K)¡n¤§»Ê¨¥¡G
+> §Ú·Q½Ð°Ý¯à¤£¯à³]¦¨¥u¦³¯¸ªø¯àµµÁô§r?
+> ¨ä¥L¯¸°È¥u¦³¤@¯ëÁô¨­
+
+  §ï
+  acct.c:u_setup()
+  ulist.c:ulist_supercloak()
+  talk.c:t_cloak()
+
+  ¸Ì­±©Ò¦³ªº PERM_ALLADMIN ¬° PERM_SYSOP
+
+--
+  ³o¼Ë§ï (acct.c:u_setup) ¤]·|ÅÜ¦¨
+  ¥u¦³ PERM_SYSOP ¯à¥Î acl¡A¨ä¥L¯¸°È¤£¯à
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

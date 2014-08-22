@@ -1,0 +1,251 @@
+§@ªÌ: itoc (AsPSQwel) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] innbbsd FAQ
+®É¶¡: Fri Jan 24 12:17:15 2003
+
+                       [32m¡¹ Âà«H±`¨£°ÝÃD ¡¹[m
+
+  ¤@¡B°òÂ¦³]©w
+  ¤G¡B±`¨£°ÝÃD (FAQ)
+
+
+    ¥Ø«e MapleBBS ©Ò¨Ï¥Îªº innbbsd µ{¦¡¬O±q skhuang@csie.nctu.edu.tw ªº
+  innbbsd 0.50beta-4 ¥[¤W leeym@cae.ce.ntu.edu.tw ªº NoCeM 0.8¡A©Ò­×§ï¨Ó
+  ªº¡A¶È¾A¥Î©ó MapleBBS¡AµLªk¾A¥Î¨ä¥L BBS ¨t²Î¡C
+
+
+  [1;33m¤@¡B°òÂ¦³]©w[m
+
+  * ³]©w src/innbbsd/innbbsconf.h
+
+    #define _NoCeM_                     /* No See Them ¾×«H¾÷¨î */
+    ¦pªG¤£·Q¨Ï¥Î NoCeM ¾×«H¾÷¨î¡A½Ð #undef ³o¶µ¡C
+
+    #undef  _KEEP_CANCEL_               /* «O¯d cancel ªº¤å³¹©ó deleted ªO */
+    ¦pªG·Q§â cancel ªº¤å³¹³£°O¿ý¤U¨Ó¡A¨º»ò½Ð #define ³o¶µ¡C
+
+
+  * ³]©w¡uÂà¤å¯¸¥x¦Cªí¡v (innd/nodelist.bbs)
+
+    ¥u¦³¦b³o­ÓÀÉ®×¸Ì­±ªº¯¸¥x¡A¤~¤¹³\¸Ó¯¸¥x³s½u¦Ü¥»¯¸¡C
+
+
+  * ³]©w¡uÂà¤å¬ÝªO¦Cªí¡v (innd/newsfeeds.bbs)
+
+    ³o­ÓÀÉ®×¸Ì­±°O¸ü¤F©Ò¦³­n©M§O¥x¥æ´«¤å³¹ªº¬ÝªO¡A¨äÂà«Hªº¯¸¥x/¸s²Õ/¬ÝªO
+    ¹ï·Ó¦Cªí¡C
+
+
+  * ³]©w¡uNoCeM¾×¤å³W«h¡v (innd/ncmperm.bbs)
+
+    NoCeM ¾×«H¾÷¨îªº±±¨î¡A¥i¥H¿ï¾Ü¬O§_±µ¦¬ NoCeM notice ªº¬å¤å¡C
+
+
+  * ³]©w¡u¼s§i¤å¦W³æ¡v (innd/spamrule.bbs)
+
+    º¡¨¬³o­ÓÀÉ®×¸Ì­±©Ò¦C³W«hªº¤å³¹¡A±N³Q¥»¯¸©Ú¦¬¡C
+
+
+  [1;33m¤G¡B±`¨£°ÝÃD (FAQ)[m
+
+  (¥H¤U©Ò¦³ªº % ¶}ÀYªº«ü¥O¡A³£¬O¥H bbs ¨­¤À¦b /home/bbs °õ¦æ)
+
+
+  * §Ú­n«ç»ò³]©w nodelist.bbs¡H
+
+    1. nodelist.bbs ªº®æ¦¡¦p¤U¡G
+
+       WOLF            bbs.tnfsh.tn.edu.tw     IHAVE(7777)
+       ^^^^            ^^^^^^^^^^^^^^^^^^^     ^^^^^^^^^^^
+       node-name       host                    protocol(port)
+
+       ³oªí¥Ü¡G¥»¯¸±N»P Wolf ¯¸ (bbs.tnfsh.tn.edu.tw:7777) °µ IHAVE Âà«H¡C
+
+    2. node-name ¬O¸Ó¯¸ªºµu¦W¡AÀH«K±z©R¦W¡C
+    3. host ¬O¸Ó¯¸ªº hostname¡A¥i¥H¬O ip/fqdn¡A§Y¨Ï¤£¬O¥¿¸Ñ¡A¹³
+       xxx.twbbs.org ¤]¬O³Q±µ¨üªº¡C
+    4. ¥Ø«e¤ä´©ªº protocol ¦³ IHAVE POST ¤GºØ¡A¤@¯ë BBS ¨Ï¥Î IHAVE¡A
+       news-server ¨Ï¥Î POST¡C
+    5. port ¬°¹ï¤è¶}ªº³s±µ°ð¡A¤@¯ë BBS ¨Ï¥Î 7777¡Anews-server ¨Ï¥Î 119¡C
+    6. ¥u¦³§â¹ï¤è¯¸¥xªº¸ê°T¥[¤J nodelist.bbs ¥H«á¡A¹ï¤è¤~¥i¥H access §Ú­Ì¡C
+
+
+  * §Ú­n«ç»ò³]©w newsfeeds.bbs¡H
+
+    1. newsfeeds.bbs ªº®æ¦¡¦p¤U¡G
+
+       Maple        nthu.cs.bbs.plan        <-> plan   big5
+       ^^^^^        ^^^^^^^^^^^^^^^^        ^^^ ^^^^^  ^^^^
+       node-name    newsgroup               way board  charset
+
+       ³oªí¥Ü¡G¥»¯¸ªº plan ªO»P Maple ¯¸ªº nthu.cs.bbs.plan °µÂù¦VÂà«H¡A
+               ½s½X¬O big5¡C
+
+    2. node-name «ü©w­n©M nodelist.bbs ¤¤­þ­Ó¯¸¥xÂà«H¡C
+    3. ¦pªG¬O©M BBS Âà«Hªº¸Ü¡A¨º»ò newsgroup ¥i¥HÀH«K¨ú¦W¡A¥u­n¤G¯¸³£¨ú¬Û¦P
+       ´N¥i¥H¤F¡F¦pªG¬O©M news-server Âà«Hªº¸Ü¡A½Ð©M news-server ¨ú¦¨¬Û¦P¡C
+    4. way ¦V¥ª <- ªí¥ÜÂà¥X¡A¦V¥k -> ªí¥ÜÂà¶i¡AÂù¦V <-> ªí¥ÜÂà¥X¥BÂà¶i¡C
+    4. board «ü©w­n©M§Ú­Ì¯¸¤Wªº­þ­Ó¬ÝªOÂà«H¡C
+    5. charset ¥i«ü©w big5 ©Î¬O gb2312 ©Î¬O us-ascii µ¥¦U¦¡¦U¼Ëªº½s½X¡C
+
+
+  * §Ú­n«ç»ò³]©w ncmperm.bbs¡H
+
+    1. ncmperm.bbs ªº®æ¦¡¦p¤U¡G
+
+       news@news.math.nctu.edu.tw      power         ¡³
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^      ^^^^^         ^^
+       issuer                          type          perm
+
+       ³oªí¥Ü¡G¤¹³\ news@news.math.nctu.edu.tw ªº power ¬å«H¡C
+
+    2. issuer ¬Oµo NCM notice ªÌ¡C
+    3. ¦P¤@­Ó issuer ¥i¥Hµo¦n´X­Ó type ªº NCM notice¡C
+    4. perm ¦pªG¬O ¡³¡A¨º»ò´N¬O¤¹³\³o­Ó notice ¬å«H¡Fperm ¦pªG¬O ¢®¡A¨º»ò
+       ´N¤£¤¹³\³o­Ó notice ¬å«H¡C
+    5. ¦pªG¦³·s¼Wªº NoCeM issuer/type ªº¸Ü¡Aµ{¦¡·|¦Û°Ê§â ncmperm.bbs ¥[¤J
+       ncmperm.bbs¡A¹w³]¬O perm ¢®¡A¦pªG¯¸ªø­n¶}±Ò±µ¨ü³o­Ó notice¡A­n§â
+       perm §ï¦¨ ¡³¡C
+
+
+  * §Ú­n«ç»ò³]©w spamrule.bbs¡H
+
+    1. ncmperm.bbs ªº®æ¦¡¦p¤U¡G
+
+       Maple        House        [¨Ó·½] ¥]§t hinet.net
+       ^^^^^        ^^^^^         ^^^^       ^^^^^^^^^
+       path         board         type       detail
+
+       ³oªí¥Ü¡G¦b Maple ³o­Ó¯¸Âà¨Óªº¤å³¹¤¤¡A­Y¨Ó·½¥]§t hinet.net ±NµLªkÂà
+       «H¶i¤J House ªO¡C
+
+    2. path ¬O³o±ø³W«h¾A¥Î©ó­þ¨Ç¯¸Âà¨Óªº¤å³¹¡A¤]¥i¥H¿ï¾Ü©Ò¦³¯¸¥x¡C
+    3. board ¬O³o±ø³W«h¾A¥Î©ó­þ¨Ç¬ÝªO¡A¤]¥i¥H¿ï¾Ü©Ò¦³¬ÝªO¡C
+    4. type ¬O³o±ø³W«hÀË¬d­þ¤@Äæ¦ì¡C
+    5. detail ¬O³o±ø³W«hªº¤º®e¡C
+
+
+  * §Ú¥i¥H¸ò­þ¨Ç news-server Âà«H¡H
+
+    ¦b¦¹¦C¥X¤@¨Ç±`¨£ªº news-server¡G
+
+    1. ¥æ³q¤j¾Ç  netnews.nctu.edu.tw   POST(119)
+    2. ¥æ¤j¸ê¬ì  news.cis.nctu.edu.tw  POST(119)
+    3. ¥æ¤jÀ³¼Æ  news.math.nctu.edu.tw POST(119)
+    4. ¤¤¤s¤j¾Ç  news.nsysu.edu.tw     POST(119)
+    5. ¤¤¿³¤j¾Ç  news.nchu.edu.tw      POST(119)
+    6. Hinet     news.hinet.net        POST(119)
+
+    µM¦Ó³o¨Ç news-server ©¹©¹³£¦³¨ä¦s¨ú­­¨î¡A¨Ò¦p Hinet ªº¦øªA¾¹¶È­­ Hinet
+    ªº¥Î¤á¦s¨ú¡C
+
+    ­Y±z¤£ª¾¹D¶Q³æ¦ì±MÄÝªº news-server¡A½Ð«ê­pºâ¾÷¤¤¤ßµ¥¬ÛÃö³æ¦ì¡C
+
+
+  * §Ú­n«ç»ò±oª¾­þ­Ó newsgroup ¬O¹ïÀ³­þ­Ó°Q½×°Ï¡H
+
+    ¹ï©ó¤@¯ëªº¤j²³Âà«HªO¡A¦b³\¦h news-server ¤W³£¦³¨ä¹ïÀ³ªº¸s²Õ¡C¤@¨Ç±`¨£
+    ªº tw.bbs.* ¸s²Õ¹ï·Óªí½Ð°Ñ¦Ò³o­Óºô¯¸¡G
+    http://www.csie.nctu.edu.tw/~cdsheen/pnews/index.php
+
+
+  * §Ú­n«ç»ò±oª¾ news-server ¤W¦³¤°»ò newsgroup¡H
+
+    % telnet news.cs.nthu.edu.tw 119 > file
+    list
+    quit
+
+    ¨º»ò¦b file ³o­ÓÀÉ®×¸Ì­±´N°O¿ý¤F bbs.cs.nthu.edu.tw ³o­Ó news-server
+    ¤Wªº©Ò¦³ newsgroup ¤F¡C
+
+
+  * ¦p¦ó¤@¦¸§ì³\¦h½g¤å³¹¡H
+
+    bbslink ¹w³]¤@¦¸¥u§ì 100 «Ê«H¡A¦pªG­n§ì¶W¹L 100 «Êªº¸Ü¡A½Ð¨Ï¥Î -a
+    ³o­Ó°Ñ¼Æ¡C
+    % innd/bbslink -a 500 -s site
+    ¨ä¤¤ site ¬O°O¿ý¦b nodelist.bbs ¸Ìªº­^¤å¯¸¦W¡C
+
+
+  * ¦pªG§ì¹L¥hªº¤å³¹¡H
+
+    ¦pªG±z·Q¦¬¹L¥h¤w¸g§ì¹Lªº«H¡A¨º»ò½Ð­×§ï newsfeeds.bbs ¤¤ªº high-number
+    (±N³o¼Æ¦rÅÜ¤p¡A¦Ü©ó­n´î¤p¦h¤Ö¡A¨ú¨M©ó±z­n§ì´X«Ê¹L¥hªº«H)¡C
+
+    1. ­º¥ý°õ¦æ¥H¤U¡A´N·|§â³o­Ó¯¸ªº©Ò¦³¸s²Õ¤§ high-number §ó·s¡C
+       % innd/bbslink -c -s site
+
+    2. ¨ä¦¸§ï newsfeeds.bbs ¤¤¸Ó¸s²Õªº high-number¡C
+       ¦pªG·Q§ì¤@¤d«Ê«H¡A´N§â­ì¨Óªº¼Æ¦r´î¤@¤d¡C
+
+    3. µM«á°õ¦æ¥H¤U¡A´N·|¤@¦¸§ì 1000 «Ê¡C
+       % innd/bbslink -a 1000 -s site
+
+
+  * ¦pªG·Q¦¬¨ä¥L¯¸ªº³s½u¬å«Hªº¸Ü¡A«ç»ò°µ¡H
+
+    BBS ¯¸¹ïÂà¡A±N¦Û°Ê¦³³s½u¬å«Hªº¥\¯à¡A¤£»Ý­n¥t¥~³]©w¡C
+
+    ­Y·Q§ì news-server ªº³s½u¬å«Hªº¸Ü¡A¨º»ò½Ð¦b newsfeeds.bbs ¤¤¥[¤J
+
+    SiteA        control.cancel           -> junk   big5
+    SiteB        control.cancel           -> junk   big5
+
+    ¨C­Ó¨S¦³³QÁý«Hªº¯¸¥x³£­n¥[¤J¤@¦¸¡C
+
+
+  * ¦pªG·Q¦¬ NoCeM ªº¾×«H¾÷¨î¡A«ç»ò°µ¡H
+
+    ­º¥ý±z¥²¶·¥ý§ä¤@­Ó¦³ tw.bbs.admin ³o­Ó¸s²Õªº news-server¡A³q±`±z¦¬
+    tw.bbs.* ¸s²Õªº¨º¥x³£·|¦³³o­Ó¸s²Õ¡C
+
+    ¦pªG±z¤w¸g³Q³o¥x news-server Áý«H¡A¨º»ò±z¤°»ò³£¤£»Ý­n³]©w¡A¥u»Ý­n½Ð¸Ó
+    news-server ±N tw.bbs.admin ¥D°ÊÁýµ¹±z§Y¥i¡C
+
+    ¦pªG±z¨S¦³³Q³o¥x news-server Áý«H¡A¨º»ò±z­n¦b newsfeeds.bbs ¥[¤J
+
+    SiteA        tw.bbs.admin             -> junk   big5
+
+    ¨ä¤¤ SiteA ´N¬O¦³ tw.bbs.admin ³o­Ó¸s²Õªº news-server¡C
+
+
+  * µLªk BBS ¯¸¹ïÂà¡H
+
+    ¤j³¡¤À BBS ¹ïÂà¥¢±Ñªº­ì¦]¡A³£¬O¦]¬°¹ï¤è¨S¦³§â±z¥[¤J nodelist.bbs¡A
+    ½Ð¸ÕµÛ³s¹ï¤è BBS ¯¸ªº innbbsd port¡A¨Ò¦p¡G
+    % telnet bbs.tnfsh.tn.edu.tw 7777
+    ¦pªG¥X²{³o¼Ëªº°T®§¡G502 ±z¤£¦b¥»¯¸ªº nodelist.bbs ¦W³æ¤¤¡A
+    ¨º»ò½Ð¹ï¤èªº¯¸ªø§â±z¥[¤J nodelist.bbs¡C
+
+    ¥Ò¯¸©M¤A¯¸¤G­Ó BBS ¯¸¹ïÂà¡A¥Ò¯¸¤W¥i¥H¬Ý¨ì¤A¯¸ªº«H¡A¤A¯¸¤W¤£¯à¬Ý¨ì¥Ò¯¸ªº
+    «H¡A¨º»ò¥X°ÝÃDªº¬O¥Ò¯¸¡A¤£¬O¤A¯¸¡C
+
+    ±z¤]¥i¥H¦b bbslink ¥[°Ñ¼Æ -v¡A¨Ó¨q¥X¸Ô²Óªº°T®§¡A¬Ý¬O¥d¦b­þ¸Ì¡C
+    % innd/bbslink -v
+
+
+  * µLªk¸ò news-server §ì«H¡H
+
+    ¤j³¡¤À©M news-server Âà«H¥¢±Ñªº­ì¦]¡A³£¬O¦]¬°±z¦b¨º news-server ¨S¦³Åv
+    ­­¡A½Ð¸ÕµÛ³s¹ï¤è news-server ªº innd port¡A¨Ò¦p¡G
+    % telnet news.cs.nthu.edu.tw 119
+    ¦pªG¨S¦³¥X²{ (posting ok) ªº°T®§¡A¥Nªí±z¨S¦³¦b¨º¾÷¾¹ post ªºÅv­­¡C
+
+    ±z¤]¥i¥H¦b bbslink ¥[°Ñ¼Æ -v¡A¨Ó¨q¥X¸Ô²Óªº°T®§¡A¬Ý¬O¥d¦b­þ¸Ì¡C
+    % innd/bbslink -v
+
+
+  * ¦pªG·Q shutdown innbbsd ªº¸Ü¡A«ç»ò°µ¡H
+
+    % kill `tail -1 run/innbbsd-7777.pid | awk '{print $$1}'`
+
+
+  * ¦p¦ó§â¯¸¤WªºÂÂ«H¦A°e¥X¥h¤@¦¸¡H
+
+    % bin/outgo ¬ÝªO °_ÂI ²×ÂI
+    ¬ÝªO´N¬O­nÂà¥Xªº¬ÝªO­^¤å¦W¡C
+    °_ÂI¡B²×ÂI´N¬O«ü©w±q²Ä´X½g¤å³¹Âà¨ì²Ä´X½g¤å³¹¡C
+    ³o¼Ë´N·|§â¬ÝªOªº¤å³¹¦A¥[¨ì innd/out.bntp¡A¦p¦¹ bbslink ´N·|§â«H¦A°e¤@
+    ¹M¡C
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

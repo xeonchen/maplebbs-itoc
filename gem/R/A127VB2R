@@ -1,0 +1,141 @@
+µo«H¤H: kewang.bbs@bbs.niu.edu.tw (kewang) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¦Û­q¤å³¹½d¥»
+µo«H¯¸: Äõ«B±¡Ãh¸ê°T¯¸ (2006/06/01 Thu 20:19:17)          Updated: 2005/06/02
+
+¤@ª½¨S¬Ý¨ì¦³¤H¼g³o­Ó¥\¯à¥X¨Ó
+
+³Ìªñ¦³®É¶¡  §Ú´N¬ã¨s¤F¤@¤U
+
+==============================================================================
+
+¥ý°µ¤U­±³o­Ó¥\¯à  ­n¤£µM°µ¤F¦Û­q½d¥»¤]¨S¤°»ò·N¸q
+
+[1;33m[¥\¯à] manage.c ªO¥D¦Û­qµo¤åÃþ§O[m
+
+==============================================================================
+
+include/config.h
+
++ #ifdef POST_PREFIX              //¦Û­q¤å³¹Ãþ§O¼Æ¥Ø  by  kewang  2006.06.01
++ #define NUM_PREFIX      6
++ #define HAVE_TEMPLATE           //¦Û­q¤å³¹½d¥»  by  kewang  2006.06.01
++ #endif
+
+==============================================================================
+
+·s¼Wpost_template_edit()³o­Ó¨ç¦¡¦b so/manage.c:post_manage() «e­±
+
+#ifdef HAVE_TEMPLATE            //¦Û­q¤å³¹½d¥»  by  kewang 2006.06.01
+/* ----------------------------------------------------- */
+/* ªO¥D¥\¯à : ¦Û­q¤å³¹½d¥»                               */
+/* ----------------------------------------------------- */
+
+
+static int
+post_template_edit(xo)
+  XO *xo;
+{
+  int i;
+  int ans;
+  char buf[64], fpath[64];
+  char ftemplate[11];
+
+  if (!(bbstate & STAT_BOARD))
+    return XO_NONE;
+
+  for (i = 0; i < NUM_PREFIX; i++)
+  {
+    sprintf(buf, "½d¥»%d (D)§R°£ (E)­×§ï (Q)¨ú®ø¡H[E] ", i+1);
+    ans = vans(buf);
+
+    if (ans == 'q')
+      continue;
+
+    sprintf(ftemplate, "template_%d", i+1);
+
+    brd_fpath(fpath, currboard, ftemplate);
+
+    if (ans == 'd')
+    {
+      unlink(fpath);
+      continue;
+    }
+
+    if (vedit(fpath, 0))        /* Thor.981020: ª`·N³Qtalkªº°ÝÃD */
+      vmsg(msg_cancel);
+    return XO_HEAD;
+  }
+
+  return XO_FOOT;
+}
+#endif
+
+==============================================================================
+
+­×§ïso/manage.c:post_prefix_edit()
+
+: #define NUM_PREFIX 6
+- #define NUM_PREFIX 6
+
+==============================================================================
+
+­×§ïmaple/post.c:do_post()
+
+  utmp_mode(M_POST);
++#ifdef HAVE_TEMPLATE    //¦Û­q¤å³¹½d¥»  by  kewang 2006.06.01
++ if (mode >= 0 && mode < NUM_PREFIX)
++ {
++   char ftemplate[11];
++   sprintf(ftemplate, "template_%d", mode + 1);
++   brd_fpath(fpath, currboard, ftemplate);
++ }
++#else
+  fpath[0] = '\0';
++#endif
+
+==============================================================================
+
+­×§ïmaple/edit.c:vedit()
+
+     case Ctrl('X'):           /* Save and exit */
+
++ #ifdef HAVE_TEMPLATE            //¦Û­q¤å³¹½d¥»  by  kewang 2006.06.01
++        if (strstr(fpath, "template_") != NULL && ve_op == 1)
++          fpath[0] = '\0';
++ #endif
+
+==============================================================================
+
+­×§ïso/manage.c:post_manage()
+
+    "WMemo   ½s¿è¶iªOµe­±",
++#ifdef HAVE_TEMPLATE
++   "CusPost ¦Û­q¤å³¹½d¥»",
++#endif
+
+ ...
+ ...
+
+  case 'w':
+    return post_memo_edit(xo);
+
++#ifdef HAVE_TEMPLATE
++ case 'c':
++   return post_template_edit(xo);
++#endif
+
+==============================================================================
+
+¤j·§´N¬O³o¼Ë¤l~
+
+¤£¹L¦Û­qÃþ§O¨º­Ó³¡¤À¤j®a¦b°µªº®É­Ô¥i¯à·|²£¥Í¤@¨Ç°ÝÃD
+
+¤j®a¦Û¤v§ä§ä¦n¤F  ¦]¬°§Ú¤§«e§ïªº§Ñ¤F°µµù¸Ñ
+
+
+
+¦pªGÄ±±o­þÃä¥i¥H¦A§ï¶i  Åwªï«ü±Ð
+
+--
+ [1;42m Site [40;31m °ê¥ß©yÄõ¤j¾Ç£»Äõ«B±¡Ãh¸ê°T¯¸ [37m¡ibbs.niu.edu.tw¡j[m
+ [1;44m From [40;33m 220-132-68-25.HINET-IP.hinet.net[m

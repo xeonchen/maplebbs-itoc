@@ -1,0 +1,98 @@
+µo´H§H: guessi.bbs@cpu.tfcis.org (®S) ¨›™O: plan
+º–  √D: [≠◊ßÔ] ±¿§Â•º≈™(§Ë™k§G) ßÔ¨∞≥ﬂ¶n≥]©w
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2006/08/26 Sat 18:39:35)                Updated: 2007/04/26
+
+∏—®M§F!!  [1;30m(®S∞ struct)[m
+
+
+≥]©wßπ≤¶´·©“±oµ≤™G
+
+≠Y≥ﬂ¶n≥]©w¨∞[∂}±“] (¶π¨∞πw≥]≠»)
+
+±i∂K§Â≥π: ¨›™O¶C™Ì≈„•‹•º≈™( ßY´U∫Ÿ∫Ò¬I) ¶PÆ…§Â≥π¶C™Ì≈„•‹[+]
+µ˚≈≤§Â≥π: §Â≥π¶C™Ì≈„•‹•º≈™(´e§Ë[+]∞O∏π) [1;30m¨›™O¶C™Ì§£®¸ºv≈T[m
+≠◊ßÔ§Â≥π: §Â≥π¶C™Ì≈„•‹•º≈™(´e§Ë[+]∞O∏π) [1;30m¨›™O¶C™Ì§£®¸ºv≈T[m
+
+"∫Ò¬I•u¶≥¶b∑s§Â≥π•X≤{Æ…§~≈„•‹"
+
+≠Y≥ﬂ¶n≥]©w¨∞[√ˆ≥¨]
+
+"∫Ò¬I•u¶≥¶b∑s§Â≥π•X≤{Æ…§~≈„•‹"
+"§Â≥π´e≠±º–∞O[+] •u¶≥∑s§Â≥π§~≈„•‹"  ®‰æl§£®¸ºv≈T
+
+
+
+
+ß@™k: [1;37m•˝∞µ∫Îµÿ∞œ°y≥Qµ˚§¿πL™∫§Â≥π≈‹•º≈™ (§Ë™k§G)°z[m ¶A®Ã§U≠±≠◊ßÔ
+
+
+[32m:/src/include/ufo.h[m
+
+- #define UFO_NOUSE20     BFLAG(20)
++ #define UFO_READMD      BFLAG(20)   /* §Â≥π•º≈™ßP¬_ */
+
+- #define NUMUFOS_USER    20      /* §@ØÎ®œ•Œ™Ã •i•H•Œ´e 20 ≠” ufo */
++ #define NUMUFOS_USER    21      /* §@ØÎ®œ•Œ™Ã •i•H•Œ´e 21 ≠” ufo */
+
+- #define STR_UFO         "-mpsnemPBQFANbwtSHZJ----CHA"
++ #define STR_UFO         "-mpsnemPBQFANbwtSHZJr---CHA"
+
+
+- "´OØd",
++ "§Â≥π•º≈™ßP¬_    (√ˆ≥¨/∂}±“)",   /* UFO_READMD */
+
+
+[32m:/src/maple/post.c:post_attr()[m
+
++ if (cuser.ufo & UFO_READMD)  /* ≥ﬂ¶n≥]©w: ±¿§Â•º≈™ */
++   attr = fhdr->chrono;
++ else
++   attr = BMAX(fhdr->chrono, fhdr->stamp);
+#ifdef HAVE_REFUSEMARK
+- attr = ((mode & POST_BOTTOM) || !brh_unread(hdr->chrono) || 
+-   !chkrestrict(hdr)) ? 0x20 : 0;
++ attr = ((mode & POST_BOTTOM) || !brh_unread(attr) || 
++   !chkrestrict(hdr)) ? 0x20 : 0;
+#else
+- attr = ((mode & POST_BOTTOM) || !brh_unread(hdr->chrono)) ? 0x20 : 0;
++ attr = ((mode & POST_BOTTOM) || !brh_unread(attr) ? 0x20 : 0;
+#endif
+
+
+[32m:/src/maple/post.c:post_edit()[m
+[32m:/src/maple/post.c:post_score()[m
+
+- btime_update(chrrbno);  /* btime§£ßÛ∑s ®œ®‰§£≈„•‹∫Ò¬I */
+
+
+[32m:/src/maple/post.c:post_history()[m
+
+- chrono = BMAX(hdr->chrono, hdr->stamp);
+
++ check_stamp:                  /* ≥]©w¿À¨d¬I */
+
++ if (brh_unread(hdr->chrono))  /* •˝¿À¨dhdr->chrono ¨Oß_¶bbrh */
++   chrono = hdr->chrono;
++ else                          /* ≠Y§w∏g¶bbrh´h¿À¨dstamp      */
++   chrono = BMAX(hdr->chrono, hdr->stamp);
+
+  if (!brh_unread(chrono))      /* ¶p™G§w¶b brh §§°A¥NµLª›∞ ß@ */
+    return;
+
+..
+..
+
+    if (next < chrono)      /* ®S¶≥§W§@Ωg */
+      next = chrono;
+    brh_add(prev, chrono, next);
+  }
+
++ chrono = BMAX(hdr->chrono, hdr->stamp); /* ≠Y¶≥stamp      */
++ if (brh_unread(chrono)) /* ¿À¨dBMAX()¨Oß_¶bbrh ≠YµL´h™¶^ */
++   goto check_stamp;
+
+}
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m61-231-209-201.dynamic.hin[m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

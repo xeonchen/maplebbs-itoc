@@ -1,0 +1,81 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] Âo±¼ascii
+µo«H¯¸: °Ê¤O®Ö¤ß (Wed, 19 Nov 2003 09:36:42 +0800 (CST))  Updated: 2003/11/19
+
+¡° ¤Þ­z¡mcpd.bbs@pitch.twbbs.org (Seasons)¡n¤§»Ê¨¥¡G
+> ¹³kkcity¤@¼Ë¡AÂà±H®É¥i¥H¿ï¾Ü...
+> ¬O§_­n«O¯d ANSI ±m¦â±±¨î½X¡H(Yes/No) [;47m   [m
+> Ä±±o¦n¹³º¡¤£¿ùªº¡AÀ³¸Ó«ç»ò°µ¦n©O¡H
+
+: struct.h
+
+#define MQ_JUSTIFY      0x01    /* ¨­¤À»{ÃÒ«H¨ç */
+#define MQ_ATTACH       0x02    /* ¦³ attachment ªº«H¨ç */
++ #define MQ_NOANSI       0x04    /* strip ±¼ ANSI ªº«H¥ó */
+
+: xover.c:xo_forward()
+
+  static char rcpt[64];
+  char fpath[128], folder[80], *dir, *title, *userid;
+  HDR *hdr, xhdr;
+  int tag, locus, userno, cc, xmode;
+  int method;           /* Âà±H¨ì 0:¯¸¥~ >0:¦Û¤v <0:¨ä¥L¯¸¤º¨Ï¥ÎªÌ */
++ int mq;
+
+  ...
+  ...
+
+  else
+  {
+    if (not_addr(rcpt))
+      return XO_FOOT;
+
+    method = 0;
++   mq = (vans("¬O§_«O¯d ANSI ±m¦â±±¨î½X(Y/N)¡H[Y] ") == 'n') ? MQ_NOANSI : 0;
+  }
+
+  ...
+  ...
+
+      else                      /* Âà±H¯¸¥~ */
+      {
+-       if ((cc = bsmtp(fpath, title, rcpt, 0)) < 0)
++       if ((cc = bsmtp(fpath, title, rcpt, mq)) < 0)
+          break;
+      }
+
+: mail.c:bsmtp()
+
+    if (fp = fopen(fpath, "r"))
+    {
+      char *ptr;
++     char tmp[512];
+
+      str = buf;
+      *str++ = '.';
+-     while (fgets(str, sizeof(buf) - 3, fp))
++     while (fgets(tmp, sizeof(tmp), fp))
+      {
++       if (method & MQ_NOANSI)
++       {
++         str_ansi(str, tmp, sizeof(buf) - 3);
++         strcat(str, "\r\n");
++       }
++       else
++       {
++         str_ncpy(str, tmp, sizeof(buf) - 3);
+          if (ptr = strchr(str, '\n'))
+          {
+            *ptr++ = '\r';
+            *ptr++ = '\n';
+            *ptr = '\0';
+          }
++       }
+        fputs((*str == '.' ? buf : str), fw);
+      }
+      fclose(fp);
+    }
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

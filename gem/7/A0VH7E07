@@ -1,0 +1,29 @@
+§@ªÌ: itoc (©BÂP¬°¤°»ò³o»ò¦h¤H) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] ¼s¼½¥Î¨ä¥LÃC¦â
+®É¶¡: Fri Dec  6 02:24:18 2002                          Updated: 2002/12/06
+
+: bmw.c
+
+#define BMW_FORMAT  "\033[1;33;46m¡¹%s \033[37;45m %s \033[m" /* ¦¬¨ìªº¤ô²y */
+#define BMW_FORMAT2 "\033[1;33;41m¡¸%s \033[34;47m %s \033[m" /* °e¥Xªº¤ô²y */
++#define BMW_FORMAT3 "\033[1;33;45m¡¹%s \033[37;45m %s \033[m" /* ¦¬¨ìªº¼s¼½ */
+
+: bmw.c:bmw_rqst()
+
+      /* itoc.020126: ¥[¤J FN_AMW */
+-     fprintf(fp, BMW_FORMAT " %s\n",
+-       mptr->userid, mptr->msg, Btime(&(mptr->btime)));
++     fprintf(fp, mptr->userid[strlen(mptr->userid) - 2] != '>' ?
++       BMW_FORMAT " %s\n" : BMW_FORMAT3 " %s\n",
++       mptr->userid, mptr->msg, Btime(&(mptr->btime)));
+
+  ...
+  ...
+
+-   sprintf(buf, BMW_FORMAT, mptr->userid, mptr->msg);
++   sprintf(buf, mptr->userid[strlen(mptr->userid) - 2] != '>' ?
++     BMW_FORMAT : BMW_FORMAT3, mptr->userid, mptr->msg);
+    outz(buf);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,68 @@
+µo«H¤H: TKyo.bbs@cpu.tfcis.org (·t¶Â¶Q¤½¤l) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]Ãö©ó sudo ªº»Ý¨D
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/02/04 Fri 16:14:22)                Updated: 2005/02/04
+
+«e¨¥ :
+
+    ¤£ª¾¹D¦³¦h¤Ö¤H¸ò¤p§Ì¤@¼Ë·|¦³ sudo ªº»Ý¨D (§ó§ï route/¤â°ÊÂà«H/¨t²Î¹ï®É)
+    ©Ò¥H¯S§O´£¨Ñ, ¥i¥Hª½±µ³z¹L BBS ¤¶­±°õ¦æ sudo «ü¥Oªº¤p¨ç¦¡, ¦Ó¤£¥Îµn¤J¥D¾÷
+
+¯S§Oª`·N :
+
+    1.©³¤U¨â«h¨ç¦¡´£¨Ñµ¹ UNIX like OS ±M¥Î
+    2.¨Ï¥Î©³¤U¨â«h¨ç¦¡ªº°õ¦æÀÉ¥²¶·¬O¿W¥ß°õ¦æÀÉ (¦p¦P account ... etc)
+      ¤£µM, ±NµLªk°õ¦æ¥B°õ¦æ popen ³B¥²©w¥¢±Ñ (¸Ô±¡½Ð man popen)
+    3.¦Ó .so °ÊºA°õ¦æÀÉ³¡¤À, «h¬O©|¥¼´ú¸Õ¬O§_¥i¥H°õ¦æ
+    4.¥Ñ©ó sudo ¦³®É®Ä©Ê, ¥u­n²Ä¤@¦¸±K½X¥¿½T¼f®Ö³q¹L
+      ¤@¬q®É¶¡¤º, sudo ±N¤£·|¦AÅçÃÒ¨ä±K½X¬O§_¥¿½T, ©³¤U¨â«h¨ç¦¡¦P²z
+    5. ©Î¬O±N sudo ³]©w¦¨¤£¥Î¥´±K½X
+       ½s¿èvisudoªº³]©wÀÉ®×
+       bbs ALL=NOPASSWD:/sbin/reboot
+
+/*
+Return
+    1 : Failure
+    0 : Success
+*/
+
+static int
+sudo_check_passwd(passwd)
+  char *passwd;
+{
+  FILE *p;
+  int ch;
+
+  ch = 1;
+  if (p = popen("sudo -v -S", "w"))
+  {
+    fprintf(p, "%s\n", passwd);
+    ch = pclose(p);
+  }
+
+  return ch;
+}
+
+/*
+Return
+    0 : Failure
+    1 : Success
+*/
+
+static int
+sudo_run_command(passwd, command)
+  char *passwd;
+  char *command;
+{
+  if (sudo_check_passwd(passwd) == 0)
+  {
+    system(command);
+    return 1;
+  }
+
+  return 0;
+}
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mTKyo [30m±q [31mcszone.twbbs.org [30mµoªí[m

@@ -1,0 +1,32 @@
+µo«H¤H: waynesan.bbs@csc241.twbbs.org («z²Óªüªê) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] talk.c ¨Ï¥ÎªÌ¦Cªí¼Ð¥Ü¯¸ªø
+µo«H¯¸: °g¤Û°ê«× (2004/08/13 Fri 22:43:14)                Updated: 2004/10/07
+
+¥é³y"[1;31m¹Ø¬P[m"ªº§ïªk...
+
+¦b¶¢¸m¤@Äæµù©ú¬O§_¬°¯¸ªø......
+
+----------------------------------------------------------------------------
+
+: ulist.c:ulist_item()
+
++   if (up->userlevel & PERM_ALLADMIN)
++     strcpy(buf, "\033[1;31m¯¸ªø\033[m");
++   else
+#ifdef DETAIL_IDLETIME
+    if ((diff = now - up->idle_time) >= 60)     /* ¶W¹L 60 ¬í¤~ºâ¶¢¸m */
+      sprintf(buf, "%3d'%02d", diff / 60, diff % 60);
+#else
+    if (diff = up->idle_time)
+      sprintf(buf, "%2d", diff);
+#endif
+    else
+      buf[0] = '\0';
+
+--
+    [1;31m¡Z¡Z[m
+  [1;31m¡þ  [37m¡þ[34m¢v¢v¢@  [31m°g[34m¤Û[37m°ê«×[31m Charming [34mShadow [37mCountry[m
+[1;31m¢y  [37m¡þ[31m  [37m¡þ¢@  [34m¢j[33m¤J¹Ò¦ì§} csc241.twbbs.org[m
+[1;31m¢y  [37m¢@¡þ[31m  [37m¡þ  [34m¢j[32m¦ì§}¥N½X 203.71.212.241[m
+[1;31m  ¢@¡Z¡Z[37m¡þ[31m  [34m¡þ  [36m¨Ó·½¥À°ê 218-163-192-153.dynamic.hinet.net[m
+[1;31m  [4m¡þ¡@¡@[34m¢v¢v¢@[;1;31m  µoªí®É¶¡ 2004/08/13 Fri 22:30:33[m

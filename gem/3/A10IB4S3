@@ -1,0 +1,143 @@
+µo«H¤H: chrisliu.bbs@163.22.23.76 (¢Ñ¢ð¢ú¢ñ¢û¢Ú¢ñ¢ý*) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°ÝÂIºq¤À¯Å~
+µo«H¯¸: ÅÚ²ú¤p¯¸ (2004/05/24 Mon 04:05:07)                Updated: 2004/05/26
+
+¡° ¤Þ­z¡msmallcupid.bbs@bbs.ckit.edu.tw (¤­¤ë ·s®Èµ{)¡n¤§»Ê¨¥¡G
+> ´N¬O¦³ÃöÂIºq¤è­±ªº
+> ·Q­n¥\¯à´N¬O
+> ´¶³quser ÂIºq¤W­­ 3­º
+> ªO¥DÂIºq¤W­­ 6­º
+> ¨Ã¥B¥i¥H¥Îª÷¿ú¶R¤W­­..¤ñ¦p¤@­º¤W½u.´N¬Oªá100ª÷¹ô
+> ©M¥i¥H½Õ¾ãÀu¨}ªO¥D©ÎuserÂIºq¤W­­
+
+  §ï struct ACCT¡A­nÂà´« .ACCT
+
+: include/struch.h
+
+  ¦b struct ACCT ¦P¼Ë¦ì¸m¥[ numsong
+
+  int numlogins;        /* ¤W¯¸¦¸¼Æ */
+  int numposts;         /* µoªí¦¸¼Æ */
+  int numemails;        /* ±Hµo Inetrnet E-mail ¦¸¼Æ */
++ int numsong;          /* ÂIºqªº¤W­­ */
+
+: acct.c:acct_show()
+
+  usr_fpath(buf, uid, fn_dir);
+- prints("  \033[32m­Ó¤H«H¥ó¡G\033[37m%d «Ê\n", rec_num(buf, sizeof(HDR)));
++ prints("  \033[32m­Ó¤H«H¥ó¡G\033[37m%-35d\033[32mÂIºq³Ñ¾l¡G\033[37m%d\n",
++   rec_num(buf, sizeof(HDR)), u->numsong);
+
+: acct.c:acct_setup()
+
+    sprintf(buf, "%d", u->numemails);
+    vget(++i, 0, "µo«H¦¸¼Æ¡G", buf, 10, GCARRY);
+    if ((num = atoi(buf)) >= 0)
+      x.numemails = num;
+
++   sprintf(buf, "%d", u->numsong);
++   vget(++i, 0, "ÂIºq³Ñ¾l¡G", buf, 10, GCARRY);
++   if ((num = atoi(buf)) >= 0)
++     x.numsong = num;
+
+: so/bank.c
+
+¦b b_xempt() ¦¹¨ç¦¡¤§«á·s¼W¤U¦C¨ç¦¡
+
+int
+b_buysong()
+{
+  if ((HAS_PERM(PERM_BM) && (cuser.numsong > 5)) || (cuser.numsong > 2))
+  {
+    vmsg("±z¥Ø«e³Ñ¾lªºÂIºq¦¸¼Æ¤w¹F¤W­­¡AµLªk¦AÁÊ¶R");
+  }
+  else
+  {
+    if (cuser.gold < 100)
+    {
+      vmsg("­n 100 ª÷¹ô¤~¯àÁÊ¶RÂIºq¤W­­³á");
+    }
+    else if (vans("¬O§_ªá 100 ª÷¹ôÁÊ¶R¤@¦¸ÂIºq(Y/N)¡H[N] ") == 'y')
+    {
+      cuser.gold -= 100;
+      cuser.numsong++;
+    }
+  }
+}
+
+: so/song.c : song_order()
+
+  if (cuser.money < 100)
+  {
+    vmsg("­n 100 »È¹ô¤~¯àÂIºq¨ì¬ÝªO³á");
+    return XO_FOOT;
+  }
+
++ if (cuser.numsong <= 0)
++ {
++   vmsg("±zªºÂIºq¤W­­¤w¸g¬° 0¡AµLªkÂIºq");
++   return XO_FOOT;
++ }
+
+  if (!(hdr = song_get(xo, fpath)))
+    return XO_NONE;
+
+  if (!vget(b_lines, 0, "ÂIºqµ¹½Ö¡G", des, sizeof(des), DOECHO))
+    return XO_FOOT;
+  if (!vget(b_lines, 0, "·Q»¡ªº¸Ü¡G", say, sizeof(say), DOECHO))
+    strcpy(say, ".........");
+
+  annoy = vans("·Q­n°Î¦W¶Ü(Y/N)¡H[N] ") == 'y';
+
+  if (vans("½T©wÂIºq¶Ü(Y/N)¡H[Y] ") == 'n')
+    return XO_FOOT;
+
+  xo_fpath(fpath, xo->dir, hdr);
+  if (!(fpr = fopen(fpath, "r+")))
+    return XO_FOOT;
+
+- cuser.money -= 100;
++ cuser.numsong--;
+
+: maple/menu.c
+
+static MENU menu_buy[] =
+{
+  "bin/bank.so:x_bank", PERM_BASIC, - M_GAME,
+  "Bank       ¡ñ «H°U»È¦æ ¡ð",
+
+  ...
+
+  "bin/bank.so:b_xempt", PERM_BASIC, - M_GAME,
+  "Xempt      ¡ñ ¥Ã¤[«O¯d ¡ð",
+
++ "bin/bank.so:b_buysong", PERM_BASIC, - M_GAME,
++ "BuySong    ¡ñ ¶RÂIºq¼Æ ¡ð",
+
+  menu_tool, PERM_MENU + 'B', M_XMENU,
+  "ª÷¿Ä¥«³õ"
+};
+
+
+
+§Ú¤£ª¾¹D±z¬O¤£¬O³o­Ó·N«ä­C ;p
+
+¦]¬°ÂIºq­n¦©¤W­­ ¤S­n¦©ª÷¹ô... ¦nµh°Ú ">< ¿ú¤£¦nÁÈ©O ;ppp
+
+¨ºÂIºqªº100»È¹ô ¬O¤£¬O­n®ø±¼¤~¦n°Ú ^^?
+
+­n®ø±¼ªº¸Ü §â song_order ¨ç¦¡¸Ì­± ¸ò cuser.money ¦³Ãöªº§Ë±¼´N¦n
+
+--
+ [30;44m¢d¢e¢f¢g¢e¢g¢e¢d¢d¢e¢f¢g¢e¢d¢b¢b¢d¢e¢f¢e¢g¢d¢b¢b¢d¢g¢e¢f¢f¢g¢g¢g¢d¢d¢b¢b¢d¢b[1;30;40m r[m
+        [32m¥@¬É¤@ª½¦bÅ[1;32mÜ °ß¤@¤£ÅÜªº¥[;32mu¬O ²Ö   ¦a²yÂà¤[1;32mF¤@°é ®É¶¡ ¨«ª[;32mº¤£ª¾¤£Ä±[37m    [1;33m¡¹[30m a[m
+ [1;33m¡ã     [32m¨º­ÓÂ÷¶}ªº§A ¦[;32mü¥G ÁÙ¦í¦b§Ú¤ß¸[1;32mÌ­± ¥i¬O §Aªº¯º[;32mÁy «o¤w¸gÂÐ¤F¤@[1;32m¼h¦Ç[30m       i[m
+   [1;34m¡¸       [32m¹ï§[;32mA¦Ó¨¥ §Ú¬O§_¥u¬O¤[1;32m@¤ù¸¨¸­  [31m¡¸  [32m¦b§[;32mA²´©³ ¥Ã»·©¿²[1;32m¤[30m                n[m
+[1;30m            [32m¹ï§Ú¦Ó¨¥ §A©Î³\¤]¬O¤@¤ù¸¨¸­     [;32m ¦b§Ú­±«e ÀH­[1;32m·¦Ó­¸          [37m¡¹[30m    g[m
+[1;30m        [32m§[;32mÚ¤£Ãø¹L §ó¤£«[1;32má®¬   ¦]¬°§Úª¾¹D ¤@©[;32mw·|¦³¤@­Ó¤H¨[1;32mú¥N§A¦í¦b§Ú¤ß¸[;32mÌ­±[37m [1;30m      i[m
+[1;30m   [36m¡¹[32m¨º®[;32mÉ §Ú¥i¯à·|[1;32m§Ñ¤F§Aªº¦W¦r §Ñ¤F§[;32mAªºÁy  ¦ý §Ú·|¥Ã[1;32m»·°O±o ³o¤@¬q¯[;32mÂ¯uµL¬È[1;30m     r[m
+ [34m¢d¢e¢f¢g¢e¢g¢e¢d¢d¢e¢f¢g¢e¢d¢b¢b¢d¢e¢f¢e¢g¢d¢b¢b¢d¢g¢e¢f¢f¢g¢g¢g¢d¢d¢b¢b¢d¢b[1;30m l[m
+--
+ [36;1m ¢~¢w    ¢~¢w [37mº[«n°ê»Ú¤j¾Ç[31m [0;41m [1m¥»¤å§@ªÌ¡G[31;40m chrisliu ¡]¢Ñ¢ð¢ú¢ñ¢û¢Ú¢ñ¢ý*¡^[m
+ [32;1m [0;36m¢x      ¢u¢w   [37;1mN.C.N.U.   [42m ¤W¯¸¦aÂI¡G[32;40m ip196.puli34-10-10.ncnu.edu.tw
+ [34;1m ¢¢¢wivil¢¢¢wngineering    [44m [37m¤g¤ì¤ý´Â¤§[31m ÅÚ²ú¤p¯¸ [34m    [37mbbs.ce.ncnu.edu.tw [0m

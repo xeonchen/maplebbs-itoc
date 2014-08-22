@@ -1,0 +1,22 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: Ãö©óªO¥D
+µo«H¯¸: °Ê¤O®Ö¤ß (2003/12/16 Tue 10:59:36)                Updated: 2003/12/16
+
+¡° ¤Þ­z¡mjoue (¤p¤l)¡n¤§»Ê¨¥¡G
+> §Ú°O±o«e­±¦³½g¤£¯àª©¥D§ï¤¤¤å±Ô­z¥u¦³­Ó¤Hª©¥i¥Hªº¤å³¹
+
+: manage.c:post_brdtitle()
+
+  oldbrd = bshm->bcache + currbno;
++ if (strcmp(oldbrd->class, "­Ó¤H"))
++  return XO_NONE;
+
+: acct.c:brd_title()
+
+  bhdr = bshm->bcache + bno;
++ if (strcmp(bhdr->class, "­Ó¤H"))
++  return;
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

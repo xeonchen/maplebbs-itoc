@@ -1,0 +1,148 @@
+§@ªÌ: Thor (²H¥X) ¬ÝªO: plan
+¼ÐÃD: [M3] ¥Ø¿ý³Wµe
+®É¶¡: Fri Aug  7 01:30:55 1998
+
+«ØÄ³ brd/ ¥i»P gem/ ©ñ¦b¦P¤@Áû, usr/ ¥t¥~©ñ¤@Áû, ¥­¦æ®ÄªG¬Æ¨Î
+
+¦b³Wµe inode ®É, brd+gem ¨ºÁû¥i¥Î -i 2048
+usr ¨ºÁû±j¯P«ØÄ³ -i 1024
+
+--
+¡° Origin: ·¬¾ôÅæ¯¸<bbs.cs.nthu.edu.tw> ¡» From: d844301.HSIN-B.AB.nthu.edu.tw
+
+> ------------------------------------------------------------- <
+
+§@ªÌ: itoc (:MM:) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD] «H½c«H¥óªº«O¦s´Á­­..
+®É¶¡: Mon Apr  7 13:31:42 2003
+
+  1024 ¤À°t¤@­Ó inode ·|¦³¸û¦hªº inode ¥i¥H¥Î¡A¾A¦X¤pÀÉ®×«H¥ó¦hªº usr/
+  ¨S¯S§Oµù©ú¡A´N¬O inode ³]©w«ö¹w³]§Y¥i
+
+  Àu¥ý§â³t«×§Ö¡BÃ­©w«×°ªªºµwºÐ (¨Ò¦p SCSI µwºÐ)
+  ©ñ¦b¥]¬A /home/bbs/brd ©Î /home/bbs/usr ªº¨ºÁûµwºÐ
+
+  §Ú«ØÄ³ BBS À³¦Ü¤Ö¨Ï¥Î¤GÁûµwºÐ
+  ¤£©¯µwºÐ·´·l®É¡AÁÙ¦³³Æ¥÷¥i¥H¨ú¥X
+
+¡° ¦pªG¥u¦³¤@ÁûµwºÐ¡A«ØÄ³¤À³Î¦p¤U
+
+  * ²Ä¤@ÁûµwºÐ¡G(OS + BBS + ³Æ¥÷)
+    /
+    /usr
+    /var
+    /home
+    /home/bbs       ³o¤À³Î¬O -i 2048
+    /home/bbs/usr   ³o¤À³Î¬O -i 1024
+
+¡° ¦pªG¦³¤GÁûµwºÐ¡A«ØÄ³¤À³Î¦p¤U
+
+  * ²Ä¤@ÁûµwºÐ¡G(OS + BBS)
+    /
+    /usr
+    /var
+    /home
+    /home/bbs       ³o¤À³Î¬O -i 2048
+    /home/bbs/usr   ³o¤À³Î¬O -i 1024
+
+  * ²Ä¤GÁûµwºÐ¡G(³Æ¥÷)
+    /home/bbs/bak
+
+¡° ¦pªG¦³¤TÁûµwºÐ¡A«ØÄ³¤À³Î¦p¤U
+
+  * ²Ä¤@ÁûµwºÐ¡G(OS)
+    /
+    /usr
+    /var
+    /home
+
+  * ²Ä¤GÁûµwºÐ¡G(BBS)
+    /home/bbs       ³o¤À³Î¬O -i 2048
+    /home/bbs/usr   ³o¤À³Î¬O -i 1024
+
+  * ²Ä¤TÁûµwºÐ¡G(³Æ¥÷)
+    /home/bbs/bak
+
+¡° ¦pªG¦³¥|ÁûµwºÐ¡A«ØÄ³¤À³Î¦p¤U
+
+  * ²Ä¤@ÁûµwºÐ¡G(OS)
+    /
+    /usr
+    /var
+    /home
+
+  * ²Ä¤GÁûµwºÐ¡G(BBSother)
+    /home/bbs       ³o¤À³Î¬O -i 2048
+
+  * ²Ä¤TÁûµwºÐ¡G(BBSusr)
+    /home/bbs/usr   ³o¤À³Î¬O -i 1024
+
+  * ²Ä¥|ÁûµwºÐ¡G(³Æ¥÷)
+    /home/bbs/bak
+
+¡° ¦pªG¦³¤­ÁûµwºÐ¡A«ØÄ³¤À³Î¦p¤U
+
+  * ²Ä¤@ÁûµwºÐ¡G(OS)
+    /
+    /usr
+    /var
+    /home
+
+  * ²Ä¤GÁûµwºÐ¡G(BBSother)
+    /home/bbs       ³o¤À³Î¬O -i 2048
+
+  * ²Ä¤TÁûµwºÐ¡G(BBSusr)
+    /home/bbs/usr   ³o¤À³Î¬O -i 1024
+
+  * ²Ä¥|ÁûµwºÐ¡G(BBSbrd)
+    /home/bbs/brd   ³o¤À³Î¬O -i 2048
+
+  * ²Ä¤­ÁûµwºÐ¡G(³Æ¥÷)
+    /home/bbs/bak
+
+> ------------------------------------------------------------- <
+
+µo«H¤H: LinuxBoy.bbs@AT2.twbbs.org (-§Ú·R¥½±é¯«¸g-) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¦w¸Ëos¤ÁµwºÐªº®É­Ô¸Óª`·N¤°»ò
+µo«H¯¸: ¨È¥@¬É (Sat, 05 Apr 2003 02:04:25 +0800 (CST))
+
+  b ¥Nªí block size
+  f ¥Nªí fragment size
+  i ¥Nªí inode table ªº¤ñ¨Ò
+
+  block ¬O±q 4.3 BSD ¶}©l±Ä¥Î¤@ºØ¸Ñ¨M¹L¦h fragment ªº°ÝÃD¡A¹L¦hªº fragment ·|
+  ³y¦¨ I/O ®Ä²v§C¸¨¡Aµ¥¨ì²Ö¿n¤@©wªº fragment ´NÂà¦s¨ì block¡A­ì¥ý¥Î¨ìªº frag-
+  ment «h clean ±¼
+
+  fragment size ¬O FS ·í¤¤¯u¥¿ªº³Ì¤p³æ¦ì
+
+  inode °O¿ý¤@­ÓÀÉ®×ªºÄÝ©Ê¥H¤Î³o­ÓÀÉ®×¤À¥¬¦b­þ¨Ç datablock ¤W¡A¤@­Ó inode ªº
+  ¤j¤p¬° 128 byte¡A´«¥y¸Ü»¡¡A-i °Ñ¼Æªí¥Ü inode table ¸ò data area ¤§¶¡ªº¤ñ¨Ò
+  -i 1024 ªí¥Ü inode table/data area = 128/1024 = 1/8¡A³o­Ó 1024 ´N¬O§Ú­Ì¹w¦ô
+  ÀÉ®×ªº¥­§¡¤j¤p¬° 1024 byte
+
+  ¤@¯ë¨Ó»¡¡A°w¹ï BBS ÀÉ®×¤pªº¯S©Ê¡A§Ú­Ì·|¼W¥[ inode ªº¼Æ¶q¡A´î¤Ö fragment
+  size ªº¤j¤p¡A¦]¬°¤j³¡¤ÀÀÉ®×ªº¤j¤p³£¤p©ó 512 byte¡A©Ò¥H§Úªº«ØÄ³³]©w¦p¤U¡G
+
+  ®Ú¾Ú man newfs ªºµ²ªG¡A«ØÄ³ fragment size ¸ò block size ªº¤ñ¨Ò¬° 1:8
+
+  [1;37mnewfs -b 4096 -f 512 -i 1024[m
+
+  ¦n©_§Ú»¡­n¼W¥[ inode ªº¼Æ¶q¡A´î¤Ö fragment size ªº¤j¤p¡A¥i¬O§Ú¹w¦ô¥­§¡ÀÉ®×
+  ¤j¤p¬° 1024 byte¡H
+
+  ³o¬O´ú¸Õ¥X¨Óªº¡A³o¼Ë´N«Ü°÷¥Î¤F¡A¤£¥Î§â fragment size : inode  = 1:1¡A³o¼Ë
+  ·|®ö¶O¤£¤ÖªÅ¶¡¨Ó©ñ inode table :p
+
+--
+
+                                                   -- G.Chaucer --
+
+                                       And if that at myn owene lust I brenne,
+                                Fro whennes cometh my wailing and my pleynte¡H
+
+--
+
+[1;36mùÝùùùùùßùÝùçùùùßùÝùùùùùß[1;37m¨È¥@¬É¹q¤l§G§iÄæ¨t²Î[m [1;33m(AT2.twbbs.org)[m
+[1;46;37mùàùùùùùâ  ùø    ùÝùùùùùå[0;37m¨Ó¦Û NK219-91-46-115.adsl.pl.apol.com.tw [m
+[1;36mùã    ùå  ùãùù  ùãùùùùùå [m                                  Powered by [[1;37;44mAT[m]Clan[m

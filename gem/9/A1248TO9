@@ -1,0 +1,35 @@
+µo«H¤H: kevinblue.bbs@cpu.tfcis.org (³Í¤åÂÅ) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] bbs³s½u¤£¤Ï¬ddns
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/04/18 Tue 10:51:44)                Updated: 2007/01/14
+
+³o¼Ë³s½u´N¤£·|¤Ï¬d...
+login·|«D±`§Ö
+
+«Ü¤[¥H«e§ï¥X¨Óªº...
+¦ý¬O¤£ª¾¹D¹ï¤£¹ï ¨º®É­Ô¶Ã§ïªº Ê¨
+
+: bbsd.c:main()
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
++ uschar *addr;
+
+  ...
+  ...
+
+    /* ------------------------------------------------- */
+    /* ident remote host / user name via RFC931          */
+    /* ------------------------------------------------- */
+
+    tn_addr = sin.sin_addr.s_addr;
+-   dns_name((char *) &sin.sin_addr, fromhost);
+-   /* str_ncpy(fromhost, (char *)inet_ntoa(sin.sin_addr), sizeof(fromhost));*/
++   addr = (uschar *) &tn_addr;
++   sprintf(fromhost, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1mpc142.wireless2.scu.edu.tw[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

@@ -1,0 +1,57 @@
+§@ªÌ: itoc (¯¬©p¬P¬P§Ö¼Ö :)) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] ¤@¨Ç±`¥Î°Ñ¼Æªº¦WºÙ
+®É¶¡: Sun Sep  8 21:03:48 2002
+
+  ¤@¨Ç±`¥ÎªºÅÜ¼Æ¦WºÙ
+
+  FILE *fp;             // file pointer
+  int fd;               // file descriptor
+
+  int ch;               // vkey/vand char
+  int num;              // number
+  int pos;              // position
+  int max;              // maximum
+  usint ufo;            // user favor option
+
+  char buf[80];         // buffer
+  char msg[80];         // messsage
+  char tmp[80];         // temporary
+  char cmd[128];        // command
+  char ans[5];          // vmsg answer
+  char uid[IDLEN + 1];  // user id
+
+  char fpath[64];       // file path
+  char folder[64];      // folder path
+
+  char *str;            // string
+  char *ptr;            // pointer
+  char *dir;            // directory
+
+  screenline slp[2];    // screenline pointer
+  screenline slt[T_LINES]; // screenline total
+
+  HDR hdr;              // header (ÀÉÀY)
+  HDR mhdr, fhdr, ghdr; // mail/file/gem header
+
+  BRD brd;              // board header
+  MF mf;                // my favorite
+  NBRD nbrd;            // new board
+
+  ACCT acct;            // account
+  ACCT *u;              // user
+  ACCT cuser;           // current user
+  UTMP utmp, *up;       // user temporary
+  UTMP cutmp;           // current user temporary
+
+  PAL pal;              // pal
+  ALOHA aloha;          // aloha (==hello)
+
+  BMW bmw;              // bbs message write
+  BENZ benz;            // ¦³ bmw ·íµM¦³ benz :p (¨t²Î¨ó´M)
+
+  XO *xo;               // overall (xover) interactive routines
+  XO *xt;               // xover temporary
+  XZ xz;                // xover zone
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

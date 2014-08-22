@@ -1,0 +1,87 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¤å¥ó] ©w´ÁÀË¬d©Ò¦³Ãö©ó MapleBBS ªºªA°È
+µo«H¯¸: Àº¤Ñ±^ (Thu, 17 Jul 2003 01:26:56 +0800 (CST))
+
+±N³o­Ó¼g¦¨ sh ÀÉ®×...  µM«áµ¹ root ªº crontab ¥h¶]...
+ÀË¬d©Ò¦³ªA°È¬O§_¥¿±`°õ¦æ...  ¦pªG¨S¦³...
+¬å±¼·í±¼ªºµ{§Ç...  ¨Ã¥B­«·s±Ò°Ê¤§...
+
+RedHat 9.0 ¨Ï¥ÎªÌ......
+½Ð§â grep '*.25' Ãþ¦üªº¦r²´´«¦¨ grep '0.0.0.0:25' ³o¼Ëªº®æ¦¡
+
+¨ä¹ê¤p§Ì¹ï sh ªº¼gªk¤]¬O»{ÃÑ¤£¦h......
+·PÁÂ Frank ¤j¤jªº«üÂI...  ³o¼Ë²×©ó¹ï¤F...
+
+
+#!/bin/sh
+
+status=`netstat -na | grep '*.23' | awk '{print $6}'`
+if [ -z $status ] ; then
+    killall -9 bbsd
+    su bbs -c "/home/bbs/bin/camera"
+    su bbs -c "/home/bbs/bin/account"
+    /home/bbs/bin/bbsd
+    lpid=`tail -1 /home/bbs/run/bbs.pid | awk '{print $1}'`
+    echo bbsd restarted, new bbsd PID = $lpid
+fi
+
+status=`netstat -na | grep '*.25' | awk '{print $6}'`
+if [ -z $status ] ; then
+    killall -9 bmtad
+    /home/bbs/bin/bmtad
+    lpid=`cat /home/bbs/run/bmta.pid`
+    echo bmtad restarted, new bmtad PID = $lpid
+fi
+
+status=`netstat -na | grep '*.79' | awk '{print $6}'`
+if [ -z $status ] ; then
+    killall -9 bguard
+    /home/bbs/bin/bguard
+    lpid=`cat /home/bbs/run/bguard.pid`
+    echo bguard restarted, new bguard PID = $lpid
+fi
+
+status=`netstat -na | grep '*.3838' | awk '{print $6}'`
+if [ -z $status ] ; then
+    killall -9 xchatd
+    /home/bbs/bin/xchatd
+    lpid=`cat /home/bbs/run/chat.pid`
+    echo xchatd restarted, new xchatd PID = $lpid
+fi
+
+status=`netstat -na | grep '*.70' | awk '{print $6}'`
+if [ -z $status ] ; then
+    killall -9 gemd
+    /home/bbs/bin/gemd
+    lpid=`cat /home/bbs/run/gemd.pid`
+    echo gemd restarted, new gemd PID = $lpid
+fi
+
+status=`netstat -na | grep '*.110' | awk '{print $6}'`
+if [ -z $status ] ; then
+    killall -9 bpop3d
+    /home/bbs/bin/bpop3d
+    lpid=`cat /home/bbs/run/pop3.pid`
+    echo bpop3d restarted, new bpop3d PID = $lpid
+fi
+
+status=`netstat -na | grep '*.7777' | awk '{print $6}'`
+if [ -z $status ] ; then
+    killall -9 innbbsd
+    /home/bbs/innd/innbbsd
+    lpid=`cat /home/bbs/run/innbbsd-7777.pid`
+    echo innbbsd restarted, new innbbsd PID = $lpid
+fi
+
+
+--
+[0m[1mùÝùùùùùùùùùùùùùùùùùß[35m®É¶¡¤w°µ¤F¿ï¾Ü  ¤°»ò¤H¥s°µªB¤Í  °¸¦Ó¸IÀY  ¤ß±¡«o¯à¤@ÂI´N³q[0m
+[0m[1mùø[33;46m--[31m¡´[33m-¢w [37m¢c¢d[30m¢b  [37;40mùø[0;35m¦]¬°§Ú­Ì´¿¦³¹L  ²z·QÃþ¦üªº¥Í¬¡ ¤Ó¦h·P¨ü µ´«D¤T¨¥¨â»y¯à§Î®e[37m
+[0m[1mùø[33;46m¢¬¢x¢­      [37m¢c¢b[40mùø[0;34m¥i¯à¦³®É§Ú­ÌÅU¼{¤Ó¦h  ¤Ó¦h¨M©w»Ý­n§Ú­Ì¥h¿ï¾Ü[37m
+[m[1mùø[;34;46m¡t[1;32m¢¨¢© [;34;46m¡t[;32;46m¢¨¢©   [1;37;40mùø[m¾á¤ß·|¥Ç¿ù  Ãø§K·|¨ü®À  ©¯¦n¤@¸ô¤W¦³§A³­§Ú   [37m   ¡´   ¡´[0m
+[m[1mùø[32;46m¢¨¢i¢i¢©    ¢¨¢©[37;40mùø[m»P§A¤À¨Éªº§Ö¼Ö  ³Ó¹L¿W¦Û¾Ö¦³  ¦Ü¤µ§Ú¤´²`²`·P°Ê[37mùü[31m¡½[37mùý /[36m¡½[37mùû[0m
+[m[1mùø[;33;42m        ¢¨¢©    [1;37;40mùø[m¦n¤Í¦p¦P¤@®°µ¡  ¯àÅýµø³¥¤£¦P               [37;1m     //    \\[0m
+
+--
+[1;31m|[33m Origin [31m| [0;42m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m163.23.212.99[m

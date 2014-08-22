@@ -1,0 +1,93 @@
+ß@™Ã: itoc (Æ÷§ﬂ∞ §O) ¨›™O: itoc
+º–√D: Re: [∞›√D]menu∏¸§J™∫≈v≠≠
+Æ…∂°: 2004/05/18 Tue 02:11:40                           Updated: 2005/04/05
+
+°∞ §ﬁ≠z°mchwaian (µL®•)°n§ßª ®•°G
+> #ifdef HAVE_REGKEY_CHECK
+>   u_verify, PERM_BASIC, M_UFILES,
+>   "Verify     °m ∂Òª{√“ΩX °n",
+> #endif
+> π≥≥o§@∫ÿ™∫
+> ¶p™G≠nßÔ¶® !(PERM_POST) §~∑|•X≤{øÔ≥Ê
+> ≈˝ !(PERM_XXXX) •i•H work
+> menu()≠n´ÁªÚ≠◊•ø§Ò∏˚¶n?
+
+: menu.c
+
+#define PERM_MENU       PERM_PURGE
++ #define PERM_INVERSE    PERM_DENYLOGIN
+
+: menu.c:menu()
+
++       if (cc & PERM_INVERSE)
++       {
++         if (cc & level || !level)  /* ®S¶≥∏”≈v≠≠§~®q•X°Aguest §£®q•X */
++           continue;
++       }
++       else
++       {
+          if (cc && !(cc & level))   /* ¶≥∏”≈v≠≠§~®q•X */
+            continue;
++       }
+
+: menu.c:menu_user[]
+: §w¶≥ PERM_XXXX ≈v≠≠¥N§£∏¸§J™∫øÔ∂µ°A®‰≈v≠≠ßÔ¨∞ PERM_INVERSE | PERM_XXXX
+
+#ifdef HAVE_REGISTER_FORM
+- u_register, PERM_BASIC, M_UFILES,
++ u_register, PERM_INVERSE | PERM_VALID, M_UFILES,
+  "Register   °m ∂Òµ˘•U≥Ê °n",
+#endif
+
+#ifdef HAVE_REGKEY_CHECK
+- u_verify, PERM_BASIC, M_UFILES,
++ u_verify, PERM_INVERSE | PERM_VALID, M_UFILES,
+  "Verify     °m ∂Òª{√“ΩX °n",
+#endif
+
+- u_deny, PERM_BASIC, M_XMODE,
++ u_deny, PERM_BASIC | PERM_VALID, M_XMODE,
+  "Perm       °m ´Ï¥_≈v≠≠ °n",
+
+: user.c:u_register()  ≥o≠”®Á¶°¥N§£ª›≠n¿À¨d≈v≠≠
+
+-#ifdef JUSTIFY_PERIODICAL
+- if (HAS_PERM(PERM_VALID) &&
+-   cuser.tvalid + VALID_PERIOD - 10 * 86400 >= ap_start)
+-#else
+- if (HAS_PERM(PERM_VALID))
+-#endif
+- {
+-   zmsg("±z™∫®≠§¿ΩTª{§w∏gßπ¶®°A§£ª›∂Òºg•”Ω–™Ì");
+-   return XEASY;
+- }
+
+: user.c:u_verify()  ≥o≠”®Á¶°¥N§£ª›≠n¿À¨d≈v≠≠
+
+- if (HAS_PERM(PERM_VALID))
+- {
+-   zmsg("±z™∫®≠§¿ΩTª{§w∏gßπ¶®°A§£ª›∂Òºgª{√“ΩX");
+- }
+- else
+- {
+    ...
+- }
+
+  return XEASY;
+
+: user.c:u_deny()  ≥o≠”®Á¶°¥N§£ª›≠n¿À¨d≈v≠≠
+
+- if (!HAS_PERM(PERM_ALLDENY))
+- {
+-   zmsg("±z®S≥Q∞±≈v°A§£ª›¥_≈v");
+- }
+- else
+- {
+    ...
+- }
+
+  return XEASY;
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£ª∞ §OÆ÷§ﬂ [32;47m processor.tfcis.org [m
+ [1;45m¢¢[42m¢°[m [1mMo[30mdi[mfy: [1;36m2004/05/18 Tue 02:17:15[m

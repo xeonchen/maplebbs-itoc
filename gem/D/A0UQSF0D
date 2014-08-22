@@ -1,0 +1,143 @@
+§@ªÌ: itoc (¥æ¤j¹q¤l) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¤å³¹¤£¯àÂà±H
+®É¶¡: Sun Mar 10 15:11:11 2002                          Updated: 2004/09/07
+
+¡° ¤Þ­z¡melvis (elvis)¡n¤§»Ê¨¥¡G
+> >     §Ú¦b·Q¦pªG¨Ï¥ÎªÌ¥i¥H³]©w¦Û¤vªº¤å³¹¤£¥iÂà±H¨º¤]¤£¿ù
+
+: hdr.h
+
+#define POST_NOFORWARD      0x00004000      /* ¤£¯àÂà±Hªº */
+
+: modes.h
+
+#define EDIT_NOFORWARD  0x20    /* ¤£¯àÂà±H */
+
+> >     ¨Ï¥ÎªÌ¥i¥H¦b ctrl-x «á¤£«ö l ¤]¤£«ö s ¨Ó¦s
+> >     «ö¥t¤@­Ó¤£¥iÂà±Hªº¿ï¶µ
+
+: post.c do_post()
+
+  title = ve_title;
+  mode = (curredit & EDIT_OUTGO) ? POST_OUTGO : 0;
++ if (curredit & EDIT_NOFORWARD)
++   mode |= POST_NOFORWARD;
+
+  ...
+  ...
+
+  if (!rec_add(folder, &post, sizeof(HDR)))
+  {
+-   if (mode)
++   if (curredit & EDIT_OUTGO)
+      outgo_post(&post, currboard);
+
+: edit.c ve_filer()
+
+  [1;44m // menu1 menu2 menu3 menu4 ¤]¬O¤ñ·Ó­×§ï [m
+
+  if (ve_op < 0)        /* itoc.010301: ·s¼W ve_op = -1 ¤£¯àÀx¦s */
+-   msg = "[E]Ä~Äò (A)©ñ±ó ....";
++   msg = "[E]Ä~Äò (F)¤£±oÂà±H (A)©ñ±ó ....";
+  else if (bbsmode != M_POST)
+-   msg = "[S]¦sÀÉ (A)©ñ±ó ....";
++   msg = "[S]¦sÀÉ (F)¤£±oÂà±H (A)©ñ±ó ....";
+  else if (curredit & EDIT_OUTGO)
+-   msg = "[S]¦sÀÉ (L)¯¸¤º (A)©ñ±ó ...";
++   msg = "[S]¦sÀÉ (L)¯¸¤º (F)¤£±oÂà±H (A)©ñ±ó ...";
+  else
+-   msg = "[L]¯¸¤º (S)¦sÀÉ (A)©ñ±ó ...";
++   msg = "[L]¯¸¤º (S)¦sÀÉ (F)¤£±oÂà±H (A)©ñ±ó ...";
+
+  ...
+  ...
+
+  case 'l':
+    if (ve_op < 0)              /* itoc.010301: ¤£¯àÀx¦s */
+      return VE_FOOTER;
+    curredit &= ~EDIT_OUTGO;
+    break;
+
++ case 'f':
++   if (ve_op < 0)              /* itoc.010301: ¤£¯àÀx¦s */
++     return VE_FOOTER;
++   curredit |= EDIT_NOFORWARD;
++   curredit &= ~EDIT_OUTGO;    /* ¤£¯àÂà±H¥²¬O local save */
++   break;
+
+  case 'r':
+    tbf_read();
+    return VE_REDRAW;
+
+: post.c post_cross()
+
+#ifdef HAVE_REFUSEMARK
+      if (hdr->xmode & POST_RESTRICT)
+        continue;
+#endif
+
++     if (hdr->xmode & POST_NOFORWARD)
++       continue;
+
+      /* hdr_fpath(fpath, xo->dir, hdr); */
+      xo_fpath(fpath, dir, hdr);      /* lkchu.981201 */
+      brd_fpath(xfolder, xboard, fn_dir);
+
+: xover.c xo_forward()
+
+    /* itoc.000319: ­×¥¿­­¨î¯Å¤å³¹¤£±oÂà±H */
+    /* itoc.010602: GEM_RESTRICT ©M POST_RESTRICT ¤Ç°t¡A©Ò¥H¥[±K¤å³¹¤]¤£±oÂà±H */
+    if ((xmode & (GEM_RESTRICT | GEM_RESERVED)) && !HAS_PERM(PERM_ALLBOARD))
+      continue;
+
++   if (xmode & POST_NOFORWARD)
++      continue;
+
+    if (!(xmode & GEM_FOLDER))          /* ¬d hdr ¬O§_ plain text */
+
+
+> >     µM«á¦b¤å³¹¦Cªí¤]¥i¥H cancel ©Î¦A³]©w¤£¥iÂà±H
+> >     ·íµM­n¤£Âà«Hªº¸Ü¤@¶}©lªº¤£¥iÂà±H¤]·|¦s¦¨ localsave Åo
+
+: post.c:post_noforward() ·s¼W³o°¦¨ç¦¡¦b post_help() ¤§«e
+
+static int
+post_noforward(xo)
+  XO *xo;
+{
+  HDR *hdr;
+  int pos, cur;
+
+  if (!cuser.userlevel) /* itoc.020114: guest ¤£¯à¹ï¨ä¥L guest ªº¤å³¹¥[±K */
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
+  if (HAS_PERM(PERM_ALLBOARD) || !strcmp(hdr->owner, cuser.userid))
+  {
+    hdr->xmode ^= POST_NOFORWARD;
+
+    currchrono = hdr->chrono;
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono);
+  }
+
+  return XO_NONE;
+}
+
+: post.c:post_cb[]
+: post.c:xpost_cb[]
+
++ 'M', post_noforward,      [1;44m// «öÁä¦Û©w [m
+
+
+--
+  §Ú¨S¸Õ¹L³o¥\¯à¡A¤]¤£ª¾¹D¦³¨S¦³º|¬} :p
+
+  ¤£¹L¤£¯àÂà±Hªº¤å³¹¤£¬O«Ü©_©Ç¶Ü?
+  ¬JµM¯à³Q§O¤H¬Ý¨ì, ¥L´N¥i¥H¥ô·N copy ¤F°Ú
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

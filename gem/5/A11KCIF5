@@ -1,0 +1,14 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¨C¤Ñ±N¯¸ªø¦æ¬°°O¿ýÂà¦Ü log ªO
+®É¶¡: 2005/10/07 Fri 18:11:44                           Updated: 2005/10/07
+
+: account.c:main()
+
+    sprintf(title, "%s¤å³¹½g¼Æ²Î­p", date);
+    keeplog(FN_RUN_POST_LOG, BN_SECURITY, title, 2);
+
++   sprintf(title, "%s¯¸°È¦æ¬°°O¿ý", date);
++   keeplog(FN_RUN_ADMIN, BN_SECURITY, title, 2);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

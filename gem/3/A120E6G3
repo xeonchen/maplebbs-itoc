@@ -1,0 +1,121 @@
+µo«H¤H: gaod.bbs@cpu.tfcis.org (¹Ç¾¾¤j¤j......|||) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¨­¤ÀÃÒ»{ÃÒ¾÷¨î¼¶¼g (¥¼§¹¦¨)
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/03/02 Thu 23:09:43)                Updated: 2006/03/02
+
+¡° ¤Þ­z¡mguessi.bbs@bbs.wretch.cc (¨S)¡n¤§»Ê¨¥¡G
+> ¯¸¤W§Æ±æ¦³¨­¥÷ÃÒ»{ÃÒ §Y¨Ï¥ÎªÌ´£¨Ñ¨­¤ÀÃÒ¸ê®Æ
+> ¦A¥Ñ¯¸ªø°µ¨­¤ÀÃÒ¦r¸¹ªº½T»{ ­Y¥¿½T«hµ¹¤©Åv­­
+> ¥H¤U¬O§Ú¼gªº³¡¥÷.... ¶È§¹¦¨¨­¤ÀÃÒ½s½Xªº½T»{
+> §Æ±æ¯à¦b½T»{¨­¤ÀÃÒ½s½X¥¿½T«áµ¹©óPERM_VALIDÅv­­(°ò¥»Åv­­)
+> ¦ý¥Ñ©ó¹ï©óacctªº¾Þ§@¤£¼ôªR ³o³¡¥÷¤£ª¾¸Ó¦p¦ó¤U¤â ½Ð±Ð¦U¦ì
+> ¥H¤U¬°µ{¦¡½XÂ^¨ú³¡¥÷
+
+: src/menu.c:menu_admin[]  ©ñ¸m©óAdmin¿ï³æ ¶ÈSYSOP¥i¨Ï¥Î
+
+  "bin/admutil.so:a_check_idnum", PERM_SYSOP, - M_SYSTEM,
+  "CheckID     ¨­¤ÀÃÒ»{ÃÒ ",
+
+: src/so/admutil.c ·s¼W¨ç¦¡©ó a_register()¤§«e
+
+/*********************************/
+/* 060301.guessi ¨­¤ÀÃÒ»{ÃÒ¾÷¨î  */
+/*********************************/
+
+#if 0
+
+A=10 ¥x¥_¥« J=18 ·s¦Ë¿¤ S=26 °ª¶¯¿¤
+B=11 ¥x¤¤¥« K=19 ­]®ß¿¤ T=27 «ÌªF¿¤
+C=12 °ò¶©¥« L=20 ¥x¤¤¿¤ U=28 ªá½¬¿¤
+D=13 ¥x«n¥« M=21 «n§ë¿¤ V=29 ¥xªF¿¤
+E=14 °ª¶¯¥« N=22 ¹ü¤Æ¿¤ W=32 ª÷ªù¿¤
+F=15 ¥x¥_¿¤ O=35 ·s¦Ë¥« X=30 ¼ê´ò¿¤
+G=16 ©yÄõ¿¤ P=23 ¶³ªL¿¤ Y=31 ¶§©ú¤s
+H=17 ®ç¶é¿¤ Q=24 ¹Å¸q¿¤ Z=33 ³s¦¿¿¤
+I=34 ¹Å¸q¥« R=25 ¥x«n¿¤
+
+X123456789 ±N²Ä¤@­Ó­^¤å¦rÂà´«¦¨¬°¼Æ¦r
+abcdefghjklmnpqrstuvxywzio ¤À§O¹ïÀ³ 10 ~ 35
+±NÂà´««á¼Æ­È ¤Q¦ì¼Æ = X1 ­Ó¦ì¼Æ = X2
+¨ä¾l¥½¤E½X¤À§O¹ïÀ³ D1 ~ D9 ®M¤J¥H¤U¤½¦¡±oY
+
+Y = X1 + 9*X2
+  + 8*D1 + 7*D2 + 6*D3 + 5*D4
+  + 4*D5 + 3*D6 + 2*D7 + 1*D8 + D9
+
+­YY¥i³Q10¾ã°£ => ¥¿½T
+
+#endif
+
+static int
+CheckID(s)
+  char *s;
+{
+   char *p, *LEAD="ABCDEFGHJKLMNPQRSTUVXYWZIO";
+   int x, i;
+
+  if (strlen(s) != 10 || !(p = strchr(LEAD, toupper(*s))))
+    return 0;
+
+   x = p - LEAD;
+   x = x / 10 + x % 10 * 9;
+   p = s + 1;
+
+   if (*p != '1' && *p != '2')
+     return 0;
+
+   for (i = 1; i < 9; i++)
+   {
+     if (isdigit(*p))
+       x += (*p++ - '0') * (9 - i);
+     else
+       return 0;
+   }
+
+   x = 9 - x % 10;
+   return  (x == *p - '0');
+}
+
+
+int
+a_check_idnum()
+{
+  char idnum[11], buf[80];
+  ACCT acct;
+  HDR hdr;
+
+  if (acct_get(msg_uid, &acct) > 0 &&
+    vget(b_lines, 0, "½Ð¿é¤J¨­¤ÀÃÒ¦r¸¹¡G", idnum, 11, DOECHO) &&
+    CheckID(idnum))
+  {
+    time(&acct.tvalid);
+    /* itoc.041025: ³o­Ó acct_setperm() ¨Ã¨S¦³ºò¸ò¦b acct_get() «á­±¡A¤¤¶¡
+       ¹j¤F¤@­Ó vgets()¡A³o¥i¯à³y¦¨®³ÂÂ acct ¥hÂÐ»\·s .ACCT ªº°ÝÃD¡C¤£¹L¦]
+       ¬°¬O¯¸ªø¤~¦³ªºÅv­­¡A©Ò¥H´N¤£§ï¤F */
+    acct_setperm(&acct, PERM_VALID, 0);
+
+    /* ±H«Hµ¹¨Ï¥ÎªÌ */
+    usr_fpath(buf, acct.userid, fn_dir);
+    hdr_stamp(buf, HDR_LINK, &fhdr, FN_ETC_JUSTIFIED);
+    strcpy(hdr.title, msg_reg_valid);
+    strcpy(hdr.owner, str_sysop);
+    rec_add(buf, &hdr, sizeof(HDR));
+    m_biff(acct.userno);
+
+    sprintf(buf, "IDnum: %s by %s", idnum, cuser.userid);
+    justify_log(acct.userid, buf);
+  }
+
+  return 0;
+}
+
+--
+ ¦n·Q­n©M§A¤@°_¬Ý¤ë«G
+         ¾a¦b§AªÓ¤W  ±¡¸ÜºCºCÁ¿...
+
+                                 [1;37m ¢b¢c¢e¢f¢d¢c¢b[m   [5;36m ¡E[;1;33m ¡´[m
+                      ¡Ê   [1;32m ¡¶[5m¡E[;31m .[37m    [1;5;33m ¡E[m¡Ç[1;34m¡E[32m¡Ç[m    [1;32m¡Ç¡Ç[m
+                   ¡Ê ¡Ê  [32m ¢¨¢©[37m   [1;36m .[m       ¡´¡´£½     [m
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m      140.138.237.77      [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

@@ -1,0 +1,59 @@
+§@ªÌ: itoc (League) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¶}±Ò bbs ªº¤Ï¬d (dns_ident)
+®É¶¡: 2004/01/10 Sat 13:58:12                           Updated: 2007/01/14
+
+  ³o¨ä¹ê¬O­ì¥»¦³ªº¥\¯à¡A¥u¬O³Q§Ú®³±¼¤F
+  ¦pªG·Q¥[¦^¨Óªº¸Ü¡A´N³o¼Ë§ï
+  (µù: ¦pªG¨Ï¥ÎªÌ¶}±Ò¨¾¤õÀðªº¸Ü¡A¨º»ò¥L¦bµn¤J®É±N·|ÅÜ±o«ÜºC)
+
+: global.h
+
++ VAR char rusername[40];         /* real name */
+VAR char fromhost[48];          /* from FQDN */
+
+: bbsd.c:main()
+
+    tn_addr = sin.sin_addr.s_addr;
+-   dns_name((char *) &sin.sin_addr, fromhost);
+-   /* str_ncpy(fromhost, (char *)inet_ntoa(sin.sin_addr), sizeof(fromhost));*/
++   dns_ident(0, &sin, fromhost, rusername);
+
+    telnet_init();
+    term_init();
+    tn_main();
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ¦h¤F¤@­Ó¼s°ìÅÜ¼Æ rusername¡A¦b log ªº®É­Ô¥i¥H®³¥X¨Ó¥Î¡A¨Ò¦p¡G
+
+: bbsd.c:tn_login()
+
+- sprintf(buf, "%s ip:%08x (%d)", fromhost, tn_addr, currpid);
++ sprintf(buf, "%s@%s ip:%08x (%d)", rusername, fromhost, tn_addr, currpid);
+
+: post.c:log_anonymous()
+
+- sprintf(buf, "%s %-13s(%s)\n%-13s %s %s\n",
+-   Now(), cuser.userid, fromhost, currboard, fname, ve_title);
++ sprintf(buf, "%s %-13s(%s@%s)\n%-13s %s %s\n",
++   Now(), cuser.userid, rusername, fromhost, currboard, fname, ve_title);
+
+: bbsd.c:login_user()
+: §ï¦¨³o¼Ë¥H«á¡Aacl ªº®æ¦¡´N¦h¤F
+: rusername@fromhost
+
+        if (cuser.ufo & UFO_ACL)
+        {
+          usr_fpath(fpath, cuser.userid, FN_ACL);
++         str_lower(rusername, rusername);
+          str_lower(fromhost, fromhost);            /* lkchu.981201: ´«¤p¼g */
+-         if (!acl_has(fpath, "", fromhost))
++         if (!acl_has(fpath, rusername, fromhost))
+          {  /* Thor.980728: ª`·N aclÀÉ, ©M rusername, fromhost ­n¥þ³¡¤p¼g */
+            logattempt('-', content);
+            login_abort("\n±zªº¤W¯¸¦aÂI¤£¤Ó¹ï«l¡A½Ð®Ö¹ï [¤W¯¸¦aÂI³]©wÀÉ]");
+          }
+        }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

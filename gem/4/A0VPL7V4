@@ -1,0 +1,454 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¬Y¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¥þ¤å¸m´«
+µo«H¯¸: ¤ë¤U©]·Q (Sat, 25 Oct 2003 13:42:18 +0800 (CST))  Updated: 2007/04/26
+
+  vi¦³¡AM3·íµM¤]¥i¥H¦³¡AÁÙ¥i¥H¥[¤Wgrepªº§Þ³N¡AÅý¥þ¤å·j´MÅÜ¦¨¸m´«¬ÝªO¤U¯S©w¦r¦ê
+
+  ªº¥þ³¡¤å³¹©Çª«¯Åµ{¦¡:p
+
+  ¦ý¬O³o¥\¯àµ´¹ï­­¨î¥u¦³¯¸ªø¯à¥Î¡A¤U­±patch¤w¸g°µ¤F­­¨î¡C
+
+
+static int
+XoXpost2(xo, on, off, key, fchk_1, fchk_2)  /* Thor: eXtended post : call from post_cb */
+  XO *xo;
+  int on, off, key;
+  int (*fchk_1) (); /* ·j´Mªº¨ç¦¡ */
+  int (*fchk_2) ();
+{
+  int *xlist, fsize, max, locus, *ptr = NULL, shmid;
+  char *fimage;
+  HDR *head, *tail;
+  XO *xt;
+  pid_t pid = 0;
+#ifdef HAVE_XYNEWS
+  int returnPos;
+#endif
+
+  if ((max = xo->max) <= 0) /* Thor.980911: µù¸Ñ: ¥H¨¾¸U¤@ */
+    return XO_FOOT;
+
+  /* build index according to input condition */
+
+  fimage = f_map(xo->dir, &fsize);
+
+  if (fimage == (char *) -1)
+  {
+    vmsg("¥Ø«eµLªk¶}±Ò¯Á¤ÞÀÉ");
+    return XO_FOOT;
+  }
+
+  /* allocate index memory, remember free first */
+
+  /* Thor.990113: ©È°Ýtitle, authorªºÀþ¶¡¤S¦³¤Hpost */
+  max = fsize / sizeof(HDR);
+  xlist = xypostI = (int *) malloc(sizeof(int) * max);
+  shmid = (!key) ? shmget(XYSHMID, sizeof(int), 0) : -1;
+  if ((shmid < 0) && !key)
+  {
+    ptr = shm_new2(XYSHMID, sizeof(int) * max);
+    cutmp->status |= STATUS_SHM;
+  }
+
+  max = 0;
+  head = (HDR *) fimage;
+  tail = (HDR *) (fimage + fsize);
+
+  if ((shmid < 0) && !key)
+  {
+    if ((pid = fork()) > 0)
+    {
+      int middle = 0;
+
+      middle = (on + off) / 2;
+      if (middle == on)
+        middle = on + 1;
+      head += on;
+      locus = on - 1;
+      do
+      {
+        locus++;
+        if (locus > middle)
+          break;
+
+#ifdef HAVE_REFUSEMARK
+        if (!chkrestrict(head))
+          continue;
+#endif
+
+        if (!(search_all % 10000) && search_all > 0)
+        {
+          move(b_lines, 0);
+          prints("¤w¸g·j´M¤F %d ½g¤å³¹¡A­nÄ~Äò½Ð«ö¥ô·NÁä¡A­nµ²§ô½Ð«öEscÁä¡C"
+            , search_all);
+          if (igetch() == KEY_ESC)
+            break;
+        }
+
+      /* check condition */
+        if (!(* fchk_1) (head, 0))
+          continue;
+
+        xlist[max++] = locus;
+      } while (++head < tail);
+    }
+    else if (pid == 0)
+    {
+      int i = 0, middle = 0;
+
+      middle = (on + off) / 2;
+      if (middle == on)
+        exit(0);
+
+      head += middle + 1;
+      locus = middle;
+      do
+      {
+        locus++;
+        if (locus > off)
+          break;
+
+#ifdef HAVE_REFUSEMARK
+        if (!chkrestrict(head))
+          continue;
+#endif
+
+        /* check condition */
+        if (!(* fchk_2) (head))
+          continue;
+
+        *(ptr + i) = locus;
+        i++;
+      } while (++head < tail);
+      exit(0);
+    }
+  }
+  else
+  {
+    locus = -1;
+    do
+    {
+      locus++;
+      if (locus < on)
+        continue;
+      else if (locus > off)
+        break;
+
+#ifdef HAVE_REFUSEMARK
+      if (!chkrestrict(head))
+        continue;
+#endif
+
+      if (!(search_all % 10000) && search_all > 0)
+      {
+        move(b_lines, 0);
+        prints("¤w¸g·j´M¤F %d ½g¤å³¹¡A­nÄ~Äò½Ð«ö¥ô·NÁä¡A­nµ²§ô½Ð«öEscÁä¡C"
+          , search_all * 2);
+        if (igetch() == KEY_ESC)
+          break;
+      }
+
+      /* check condition */
+      if (!(* fchk_1) (head, key))
+        continue;
+
+      xlist[max++] = locus;
+    } while (++head < tail);
+  }
+  sleep(1); /* amaki.030912: ¤÷µ{§Ç¤pºÎ¤ù¨è¡A¤lµ{§Ç­Y¨S§ä§¹´Nºâ¤F */
+
+  munmap(fimage, fsize);
+
+  while (pid > 0)
+  {
+    if (*ptr > 0)
+    {
+      xlist[max++] = *ptr;
+      ptr++;
+    }
+    else
+      break;
+  }
+
+  if (max <= 0)
+  {
+    free(xlist);
+    xypostI = NULL;
+    vmsg(MSG_XY_NONE);
+    memset(out_hunt, 0, 32);
+    if (pid < 0)
+    {
+      shmdt(ptr);
+      system("ipcrm -M 2211");
+      cutmp->status ^= STATUS_SHM;
+    }
+    return XO_FOOT;
+  }
+
+  /* build XO for xpost_xo */
+
+  comebackPos = xo->pos;    /* Thor: record pos, future use */
+#ifdef HAVE_XYNEWS
+  returnPos = comebackPos;
+#endif
+
+  xz[XZ_XPOST - XO_ZONE].xo = xt = xo_new(xo->dir);
+  xz[XZ_XPOST - XO_ZONE].cb = (xo->dir[0] == 'b') ? xpost_cb : xmbox_cb;
+  xt->pos = 0;
+  xt->max = max;
+  xt->xyz = xo->xyz;
+  xt->key = XZ_XPOST;
+
+  xover(XZ_XPOST);
+
+  /* set xo->pos for new location */
+
+#ifdef HAVE_XYNEWS
+  if (xz[XZ_NEWS - XO_ZONE].xo)
+    xo->pos = returnPos;    /* ±q XZ_XPOST ¦^¨ì XZ_NEWS ´å¼Ð²¾¥h­ì¨Óªº¦a¤è */
+  else
+#endif
+    xo->pos = comebackPos;  /* ±q XZ_XPOST ¦^¨ì XZ_POST ´å¼Ð²¾¥h©Ò¿ï¨ú¤å³¹ªº¯u¥¿¦ì¸m */
+
+  /* free xpost_xo */
+
+  if (xt = xz[XZ_XPOST - XO_ZONE].xo)
+  {
+    free(xt);
+    xz[XZ_XPOST - XO_ZONE].xo = NULL;
+  }
+
+  /* free index memory, remember check free pointer */
+
+  if (xlist = xypostI)
+  {
+    free(xlist);
+    xypostI = NULL;
+  }
+
+  memset(out_hunt, 0, 32);
+  if (pid > 0)
+  {
+    shmdt(ptr);
+    system("ipcrm -M 2211");
+    cutmp->status ^= STATUS_SHM;
+  }
+  return XO_INIT;
+}
+
+
+/* ¤G¶i¦ì¤¸·j´Mªk */
+static int                      /* 0:¤£º¡¨¬±ø¥ó  !=0:º¡¨¬±ø¥ó */
+filter_full_2(head)
+  HDR *head;    /* «Ý´úª« */
+{
+  char *ptr, buf[32768];
+  struct timeval tv = {0, 0};
+  int rc, fd, fs;
+
+  hdr_fpath(buf, search_folder, head);
+
+  if ((fd = open(buf, O_RDONLY, 0600)) < 0)
+    return 0;
+
+  rc = 0;
+
+  memset(buf, 0, sizeof(buf));
+
+  while (read(fd, buf, sizeof(buf)))
+  {
+    if (ptr = str_str(buf, out_hunt))
+    {
+      rc = 1;
+      break;
+    }
+  }
+
+  close(fd);
+
+  fs = 1;
+  if (select(1, (fd_set *) &fs, NULL, NULL, &tv) > 0)
+    vkey();
+
+  return rc;
+}
+
+
+static int                      /* 0:¤£º¡¨¬±ø¥ó  !=0:º¡¨¬±ø¥ó */
+filter_full_1(head, key)
+  HDR *head;    /* «Ý´úª« */
+  int key;
+{
+  char *ptr, *offset, buf[32768], tmp[32768];
+  struct timeval tv = {0, 0};
+  int rc, fd, fs, article_len, hunt_len, replace_len;
+
+  if (search_fit < 0)
+    return 0;
+
+  hdr_fpath(buf, search_folder, head);
+
+  if ((fd = open(buf, (!key) ? O_RDONLY : O_RDWR, 0600)) < 0)
+    return 0;
+
+  if (search_all % 100 == 0)    /* ¨C 100 ½g¤~ refresh ¤@¦¸ */
+  {
+    move(b_lines, 0);
+    clrtoeol();
+    prints("¥Ø«e§ä¨ì \033[1;33m%d / %d\033[m ½g¡A¥þ¤å·j´M¤¤\033[5m...\033[m"
+      "«ö¥ô·NÁä¤¤Â_", search_fit, search_all * 2);
+    refresh();
+  }
+  search_all++;
+
+  rc = 0;
+
+  memset(buf, 0, sizeof(buf));
+
+  while (read(fd, buf, sizeof(buf)))
+  {
+    if (ptr = str_str(buf, out_hunt))
+    {
+      rc = 1;
+      search_fit++;
+      if (key) /* amaki.031024: §ó´«¦r¦ê */
+      {
+        article_len = strlen(buf);
+        hunt_len = strlen(out_hunt);
+        replace_len = strlen(Replace_string);
+        memset(tmp, 0, sizeof(tmp));
+        strcpy(tmp, buf);
+        offset = str_str(tmp, out_hunt);
+
+        do
+        {
+          strcpy(ptr, Replace_string);
+          ptr += replace_len;
+          offset += hunt_len;
+          if ((offset - tmp) >= article_len)
+            break;
+          strcpy(ptr, offset);
+        } while ((ptr = str_str(ptr, out_hunt)) && (offset = str_str(offset, out_hunt)));
+      }
+      break;
+    }
+  }
+
+  if (key)
+  {
+    lseek(fd, (off_t) 0, SEEK_SET);
+    write(fd, buf, strlen(buf));
+  }
+  close(fd);
+
+  fs = 1;
+  if (select(1, (fd_set *) &fs, NULL, NULL, &tv) > 0)
+  {
+    vkey();
+    search_fit = -1;
+  }
+
+  return rc;
+}
+
+
+int
+XoXfull(xo)
+  XO *xo;
+{
+  char ans[8], MSG[40];
+  int head, tail, key = 0;
+
+  if (!(bbstate & STAT_BOARD))
+  {
+    zmsg("©êºp¡I±z¤£¬OªO¥D¤£¯à¥Î³o¥\\¯à¡I");
+    return XO_FOOT;
+  }
+
+  if (xz[XZ_XPOST - XO_ZONE].xo)        /* itoc.020308: ¤£±o²Ö¿n¶i¤J¤G¦¸ */
+  {
+    vmsg(MSG_XYDENY);
+    return XO_FOOT;
+  }
+
+  /* input condition */
+
+  if (vans("±z­n¿ï¾Ü­þºØªA°È¡H 1)¥þ¤å·j´M 2)¥þ¤å´À´«¦r¦ê [1]") != '2')
+  {
+    if (!vget(b_lines, 0, "¥þ¤å·j´M¡G", out_hunt, sizeof(out_hunt), DOECHO))
+      return XO_FOOT;
+
+    sprintf(xypostHintword, "[¥þ¤å·j´M] %s", out_hunt);
+  }
+  else if (key = 1) /* amaki.031024: ¥þ¤å¸m´« */
+  {
+    if (!HAS_PERM(PERM_SYSOP))
+    {
+      zmsg("©êºp¡I±z¤£¬O¯¸ªø¡A¤£¯à¨Ï¥Î¸Ó¥\\¯à¡I");
+      return XO_FOOT;
+    }
+    if (!vget(b_lines, 0, "­n´À´«ªºÂÂ¦r¦ê¡G", out_hunt, sizeof(out_hunt), DOECHO))
+      return XO_FOOT;
+    if (!vget(b_lines, 0, "­n´À´«ªº·s¦r¦ê¡G", Replace_string, sizeof(Replace_string), DOECHO))
+    {
+      memset(out_hunt, 0, sizeof(out_hunt));
+      return XO_FOOT;
+    }
+
+    sprintf(xypostHintword, "[¥þ¤å¦r¦ê´À´«] %s ´À´« %s", out_hunt, Replace_string);
+  }
+  xypostHintauthor[0] = '\0';
+
+  str_lower(out_hunt, out_hunt);
+
+  search_folder = xo->dir;
+  search_fit = 0;
+  search_all = 0;
+
+  if (vget(b_lines, 0, (!key) ? "[³]©w·j´M½d³ò] °_ÂI¡G" : "[³]©w´À´«½d³ò] °_ÂI¡G", ans, 6, DOECHO))
+    head = atoi(ans);
+  else
+    return XO_FOOT;
+
+  if (head < 0)
+  {
+    zmsg("°_ÂI¦³»~");
+    return XO_FOOT;
+  }
+  else if (head > xo->max || head == 0)
+  {
+    head = 1;
+    tail = xo->max;
+    strcpy(MSG, (!key) ? "­n¶i¦æ¥þ°ì·j´M¡A½Ð±z½T©w(Y/N)¡H[N]" : "­n¶i¦æ¥þ°ì´À´«¡A½Ð±z½T©w(Y/N)¡H[N]");
+  }
+  else
+  {
+    vget(b_lines, 28, "²×ÂI¡G", ans, 6, DOECHO);
+    tail = atoi(ans);
+    if (tail < head)
+    {
+      zmsg("²×ÂI¦³»~");
+      return XO_FOOT;
+    }
+    if (tail > xo->max)
+      tail = xo->max;
+    strcpy(MSG, msg_sure_ny);
+  }
+
+  head--;
+  tail--;
+
+  if (vget(b_lines, 41, MSG, ans, 3, LCECHO) == 'y')
+  {
+    return XoXpost2(xo, head, tail, key, filter_full_1, filter_full_2);
+  }
+  else
+  {
+    memset(out_hunt, 0, sizeof(out_hunt));
+    memset(Replace_string, 0, sizeof(Replace_string));
+    return XO_FOOT;
+  }
+}
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

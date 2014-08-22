@@ -1,0 +1,28 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¤­¶ô¿úªº¤ß¨Æ...) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¬ÝªO¦Cªí Ctrl + P ¶}ÅP·sª©¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (2003/12/04 Thu 08:38:27)                Updated: 2003/12/04
+
+: src/maple/baord.c:class_newbrd()  ·s¼W¦¹¨ç¦¡¦b class_edit() ¤U­±¡C
+
+static int      /* qazq.031204: ¬ÝªO¦Cªí Ctrl + P ¶}ÅP·sª© */
+class_newbrd(xo)
+  XO *xo;
+{
+  if (!HAS_PERM(PERM_ALLBOARD))
+    return XO_NONE;
+
+  if (a_newbrd() >= 0)
+    return XO_INIT;
+  return XO_HEAD;
+}
+
+
+: baord.c:class_cb[]
+
+  'E', class_edit,
++  Ctrl('P'), class_newbrd,
+
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-137-41.HINET-IP.hinet.net [30mµoªí[m

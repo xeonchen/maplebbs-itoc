@@ -1,0 +1,188 @@
+§@ªÌ: itoc (¦Ñ¤Ò¤lªºÀY?!) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] BBS §ïÀY´«­±¤â¥U
+®É¶¡: Mon May 27 13:05:45 2002
+
+                       [32m¡¹ §ïÀY´«­±¤â¥U ¡¹[m
+
+  Tip01 ¦UÃþµe­±
+  Tip02 head ªºÃC¦â
+  Tip03 neck ªºÃC¦â
+  Tip04 feet ªºÃC¦â
+  Tip05 ´å¼Ð
+  Tip06 ¿ï³æªº¦r²´¤ÎÃC¦â
+  Tip07 ¤å³¹ªº banner
+  Tip08 ¨Ï¥ÎªÌ¦W³æªºÃC¦â
+  Tip09 ¬ÝªO¦Cªí¥¼Åªªº²Å¸¹
+  Tip10 ¯d¨¥ªO
+  Tip11 ¾\Åª¤å³¹ªº«e´X¦æ
+  Tip12 ½Ð«ö¥ô·NÁäÄ~Äò
+
+
+    ¥»¤å¥ó¬O¼gµ¹­n¦w¸Ë itoc ©ÒºûÅ@ªº bbs µ{¦¡ª©¥»©Ò¨Ï¥Îªº¡A¨Ã¤£¾A¥Î
+  ¨ä¥L bbs ª©¥»¡C
+
+    µ{¦¡¤¤ªº \033 (¤K¶i¦ì) ¬O«ü ASCII-27 ªº«öÁä¡A´N¬O KEY_ESC¡A´N¬O
+  «ö ^U ªº¨º­Ó±±¨î½X¡C
+
+    ·íµM¡A½s­×§¹µ{¦¡¥H«á¡A±z³£¥²¶·¦b ~bbs/src/ ¤U°õ¦æ
+  make clean freebsd install
+  (¦pªG±zªº§@·~¨t²Î¬O linux¡A´N°õ¦æ make clean linux install)
+
+  > ---------------------------------------------------------------- <
+
+
+  [1;4;33m¡¹ Tip01 ¦UÃþµe­±[m
+
+    ½Ð¶i ¥D¿ï³æ¡÷(A)nnounce ¸Ì­±ªº¦UÃþµe­±¤¤¡A«ö E ­×§ï¥H¤U¤å³¹¡G
+    (©Î±z¤]¥i¥H¶i¤u§@¯¸½s­×³o¨ÇÀÉ®×)
+
+     1  ¡º ¶}ÀYµe­±(¢¯)         ~bbs/gem/@/@opening.0
+     2  ¡º ¶}ÀYµe­±(¤@)         ~bbs/gem/@/@opening.1
+     3  ¡º ¶}ÀYµe­±(¤G)         ~bbs/gem/@/@opening.2
+     4  ¡º Åwªïµe­±             ~bbs/gem/@/@welcome
+     5  ¡º ¦A¨£µe­±             ~bbs/gem/@/@goodbye
+
+    §ï§¹µe­±¥H«á¡A½Ð°õ¦æ ¥D¿ï³æ¡÷(0)Admin¡÷(B)BSreset 1)°ÊºA¬ÝªO
+    (©Î±z¤]¥i¥H¶i¤u§@¯¸°õ¦æ ~bbs/bin/camera)
+
+
+  [1;4;33m¡¹ Tip02 head ªºÃC¦â[m
+
+[1;37;44m¡i¥D¥\¯àªí¡j                     [33m»P«n¦@»R[37m                     ¬ÝªO¡m©|¥¼¿ï©w¡n[0m
+
+    ¦pªG±z§Æ±æ header ªºÃC¦â¬O¥i¥H¶Ã¼Æ´«¨Ó´«¥h¡A½Ð
+  ­×§ï ~bbs/src/include/config.h
+
+#define COLOR_HEADER            /* lkchu.981201: ÅÜ´«±m¦â¼ÐÀY */
+
+    ¦pªG±z§Æ±æ header ªºÃC¦â¬O©T©w¦Ó¤£­n´«¨Ó´«¥h¡A½Ð #undef COLOR_HEADER
+  ¨Ã­×§ï ~bbs/src/maple/menu.c vs_head()
+
+  prints("\033[1;37;44m¡i%s¡j%s\033[33m%s\033[1;37;44m%s¬ÝªO¡m%s¡n\033[m\n",
+    title, buf, mid, buf + len, currboard);
+
+
+  [1;4;33m¡¹ Tip03 neck ªºÃC¦â[m
+
+[44m  ½s¸¹   ¬Ý  ªO       Ãþ§OÂà«H ¤¤   ¤å   ±Ô   ­z                 ªO    ¥D     [40m  [0m
+
+    ­×§ï ~bbs/src/include/theme.h
+
+#define COLOR3          "\033[44m"      /* neck ªºÃC¦â */
+
+
+  [1;4;33m¡¹ Tip04 feet ªºÃC¦â[m
+
+[1;33;44m ¬ÝªO¿ï¾Ü [0;30;47m (c)·s¤å³¹ (vV)¼Ð°O¤wÅª¥¼Åª (y)¥þ³¡¦C¥X (z)¿ï­q (A)¥þ°ì·j´M (S)±Æ§Ç [0m
+
+    ­×§ï ~bbs/src/include/theme.h
+
+#define COLOR1          "\033[1;33;44m" /* footer/feeter ªº«e¬qÃC¦â */
+#define COLOR2          "\033[0;30;47m" /* footer/feeter ªº«á¬qÃC¦â */
+
+
+  [1;4;33m¡¹ Tip05 ´å¼Ð[m
+
+    ¦pªG±z¤£³ßÅw > ³oºØ³æ½Õªº´å¼Ð¡A¦b¤§«e¦³¤@½g patch ¦³±Ð±z¦p¦ó§â
+  ´å¼Ð´«¦¨ ¡÷ ¤§Ãþªº¡C
+
+
+  [1;4;33m¡¹ Tip06 ¿ï³æªº¦r²´¤ÎÃC¦â[m
+
+                  > (A)nnounce  £i ºëµØ¤½§GÄæ £i
+
+    ¿ï³æ³o­Ó½Ð§ï ~bbs/src/maple/menu.c
+
+  Gem, 0, M_GEM,
+  "Announce  £i ºëµØ¤½§GÄæ £i",
+
+    ±z¥i¥H§ï¦¨¥ô¦ó±z³ßÅwªº¦r²´¡A­nª`·Nªº¬O¡A¬Y¨Ç¤¤¤å¦r¥i¯à­n¥[¤W \¡A
+  ¨Ò¦p ¡i¥\\½Ò®É¬q¡j¡C¨ä¥Lªº¿ï³æ¤]³£¥i¥H¦pªkªw»s¡C¤]¥i¥H¦b¸Ì­±¥[¤WÃC
+  ¦â±±¨î½X¡A¨Ò¦p¡G
+
+  Gem, 0, M_GEM,
+  "Announce  \033[1;36m£i\033[m ¥»¯¸¤½§GÄæ \033[1;36m£i\033[m",
+
+    ¦pªG±z³ßÅw¿ï³æ¥ú´Î¡A¨º»ò¡A½Ð­×§ï ~bbs/src/include/config.h
+
+#define CURSOR_BAR              /* itoc.010113: ¿ï³æ¥ú´Î */
+
+    ¦pªG±z #define ¤F CURSOR_BAR¡A¿ï³æ¸Ì´N¤£¯à¦³ÃC¦â±±¨î½X¡C
+
+
+  [1;4;33m¡¹ Tip07 ¤å³¹ªº banner[m
+
+    ­×§ï ~bbs/src/maple/edit.c ve_banner()
+    ³o¬O§ï post ¤å³¹³Ì«á¨º¦æ¨Ó·½¡C
+
+
+  [1;4;33m¡¹ Tip08 ¨Ï¥ÎªÌ¦W³æªºÃC¦â[m
+
+    ­×§ï ~bbs/src/include/global.h
+
+#define COLOR_NORMAL    "\033[m"        /* ¤@¯ë¨Ï¥ÎªÌ */
+#define COLOR_BADPAL    "\033[1;31m"    /* Ãa¤H */
+#define COLOR_MYPAL     "\033[1;32m"    /* §ÚªºªB¤Í */
+#define COLOR_OPAL      "\033[1;33m"    /* »P§Ú¬°¤Í */
+#define COLOR_SELF      "\033[1;36m"    /* ¦Û¤v */
+#define COLOR_BOTHPAL   "\033[1;37m"    /* ¤¬³]¦n¤Í */
+
+
+  [1;4;33m¡¹ Tip09 ¬ÝªO¦Cªí¥¼Åªªº²Å¸¹[m
+
+    ­×§ï ~bbs/src/include/theme.h
+
+#define ICON_UNREAD_BRD "\033[33m£¾"
+
+
+  [1;4;33m¡¹ Tip10 ¯d¨¥ªO[m
+
+    ­×§ï ~bbs/src/maple/menu.c pad_draw()
+
+  str = pad.msg;
+  sprintf(str, "¢~\033[30;47m¢¡ %s (%s)", cuser.userid, cuser.username);
+
+  for (cc = strlen(str); cc < 62; cc++)
+    str[cc] = ' ';
+
+  sprintf(str + cc,
+    "%s   \033[m\n"
+    "¢~\033[30;47m¢¡ \033[%dm%-70s   \033[m\n"
+    "¢~\033[30;47m¢¡ \033[%dm%-70s   \033[m\n"
+    "¢~\033[30;47m¢¡ \033[%dm%-70s   \033[m\n",
+    Etime(&(pad.tpad)),
+    pcolors[color], buf[0],
+    pcolors[color], buf[1],
+    pcolors[color], buf[2]);
+
+
+  [1;4;33m¡¹ Tip11 ¾\Åª¤å³¹ªº«e´X¦æ[m
+
+[34;47m §@ªÌ [37;44m itoc (°Õ°Õ°Õ°Õ)                                     [34;47m ¯¸¤º [37;44m SYSOP       [m
+[34;47m ¼ÐÃD [37;44m ´ú¸Õ´ú¸Õ                                                               [m
+[34;47m ®É¶¡ [37;44m Sat May 25 13:16:20 2002                                               [m
+
+    ­×§ï ~bbs/src/include/theme.h
+
+#define COLOR5          "\033[47;34m"   /* more ÀÉÀYªº¼ÐÃDÃC¦â */
+#define COLOR6          "\033[44;37m"   /* more ÀÉÀYªº¤º®eÃC¦â */
+
+
+  [1;4;33m¡¹ Tip12 ½Ð«ö¥ô·NÁäÄ~Äò[m
+
+    ­×§ï ~bbs/src/include/theme.h
+
+#define VMSG_NULL       "                                           " \
+                        \033[1;36m ¢j¢k¢l¢m¢n¢o¢p ½Ð«ö¥ô·NÁäÄ~Äò ¢p\033[m"
+
+
+  > ---------------------------------------------------------------- <
+
+    ³o¸Ì¼È®É¥ý´£¤Q¤G­Ó­×§ïªº¦a¤è´N¦n¤F¡A¨ä¹êÁÙ¦³«Ü¦h¥i¥H§ïªº¦a¤è¡A
+  ¥u­nµ½¥Î grep ´N¯à§ä¨ì«Ü¦hªF¦è¤F¡A¥ç§Y¦b ~bbs/src/ ¤U°õ¦æ
+  grep "keyword" */*.c
+
+    §Æ±æ¤j®aªº bbs ³£¯à¦³¦Û¤v¿W¯Sªº­·®æ¡C
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

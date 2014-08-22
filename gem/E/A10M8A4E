@@ -1,0 +1,45 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¦Ï¥¤¨ÑÀ³°Ó) ¬ÝªO: plan
+¼Ð  ÃD: ¾m³¾ª©ªº¨Ï¥ÎªÌ¦W³æ
+µo«H¯¸: ¤ë¤U©]·Q (Wed, 07 May 2003 00:47:03 +0800 (CST))  Updated: 2003/02/19
+
+  ¾m³¾ª©ªº¨Ï¥ÎªÌ¦W³æ
+
+  ÅýÃa¤H®ø¥¢¡A¾m³¾¥\¯à(¦]¬°¦³¤H¤ÏÀ³¤£·Q¬Ý¨ìXXX¥O¤H·P¨ì¹½´cªºID)
+
+: ufo.h  // ½Ð¨Ì¦Û¤vªº ufo.h ½Õ¾ã
+
+#define UFO_KIMONEWS    BFLAG(18)       /* itoc.020130: ¤W¯¸¬Ý Kimo News */
++ #define UFO_BADPAL    BFLAG(19)       /* Ãa¤H®ø¥¢ */
+
+  ...
+
+- #define NUMUFOS_USER    19      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 19 ­Ó ufo */
++ #define NUMUFOS_USER    20      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 20 ­Ó ufo */
+
+- #define STR_UFO         "-mpsnemPBQFANbwtSHK-----CHA"
++ #define STR_UFO         "-mpsnemPBQFANbwtSHKc----CHA"
+
+  ...
+
+  "¤W¯¸ÂsÄý©_¼¯·s»D(ÂsÄý/¤£Åª)",        /* UFO_KIMONEWS */
+
+- "«O¯d",
++ "Ãa¤H®ø¥¢        (®ø¥¢/¥X²{)",        /* UFO_BADPAL */
+
+: bmw.c:can_see()
+
+int                     /* 1:¥i¬Ý¨£ 0:¤£¥i¬Ý¨£ */
+can_see(my, up)
+  UTMP *my;
+  UTMP *up;
+{
+  usint mylevel, myufo, urufo;
+
++ if (my == cutmp && (my->ufo & UFO_BADPAL) && is_mybad(up->userno))
++   return 0;
+
+
+--
+  ¦³user¤ÏÀ³³o¼Ë·PÄ±¦n¹³§âxxx½ð¥X¯¸¥h......(·N¥~ªº¤ß²z¸ÉÀv®ÄªG)
+--
+  [1;33mOrigin: luna.twbbs.org[m

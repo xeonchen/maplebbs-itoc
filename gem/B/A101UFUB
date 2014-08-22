@@ -1,0 +1,45 @@
+µo«H¤H: fean.bbs@processor.tfcis.org (Hicom) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý¤@¤U "ªÑ¥«¤j¦ë"
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/02/03 Tue 00:58:20)                Updated: 2004/02/03
+
+: crontab -e ¥[¤J
+
+50 15 * * * bin/stock-open.pl > etc/game/stock_data
+
+: ~/bin/stock-open.pl ·s¼W¦¹ÀÉ®×¡A°O±o chmod 700
+
+#!/usr/bin/perl -w
+
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+$year -= 100;
+$mon++;
+
+if ($year < 10) {$year ="0".$year;}
+if ($mon < 10)  {$mon ="0".$mon;}
+if ($mday < 10) {$mday ="0".$mday;}
+
+`lynx -dump http://www.tse.com.tw/t11html/A11220$year$mon$mday.htm > tmp/stock_tmp`;  [1;36m(¥¼Â_¦æ±µ¤W¦æ)[m
+
+$c = 0;
+open(FP, "< tmp/stock_tmp");
+print "[$year/$mon/$mday]\n";
+while ($msg = <FP>)
+{
+  $msg=~ s/^\s+//;
+  $msg=~ s/\s+$//;
+  @a=split(/\s+/,$msg);
+
+  if (scalar(@a) > 7)
+  {
+    if ($c > 0 && length($a[0]."0") == 5)
+    {
+      printf('%-11s%4s%5s', $a[0].$a[1], ' ', $a[7] * 100);
+      print "\n";
+    }
+    $c++;
+  }
+}
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mfean [30m±q [35m210-58-29-238.cm.apol.com.tw [30mµoªí[m

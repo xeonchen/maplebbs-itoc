@@ -1,0 +1,44 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: °Ý¤@­Ó¥\¯à¡K¤£ª¾¹D¸Ó«ç»ò¼g¡K
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/03/18 Thu 10:56:34)                Updated: 2004/11/13
+
+¡° ¤Þ­z¡mEfen.bbs@bbs.med.ncku.edu.tw (^^)¡n¤§»Ê¨¥¡G
+> 140.116.250.3
+> ¸Ó¯¸¦b¥D¿ï³æ«öctrl+k
+> ¥i¥H¦Û¦æÆ[½à°ÊºA¬ÝªOªºµe­±¡A
+> ¥i¥H¤@±i¤@±iªº¬Ý
+
+: cache.c:film_out()
+
+  int fmax, len, *shot;
++ static int movienum = FILM_MOVIE;
+  char *film, buf[FILM_SIZ];
+
+  ...
+
+  if (tag >= FILM_MOVIE)        /* °ÊºA¬ÝªO */
+    tag += time(0) % (fmax - FILM_MOVIE);
++ else (tag < 0)
++ {
++   if (++movienum >= fmax)
++     movienum = FILM_MOVIE;
++   tag = movienum;
++ }
+
+: menu.c:menu()
+
+    case Ctrl('U'):
+      every_U(0);
+      goto every_key;
+#endif
+
++   case Ctrl('K'):
++     film_out(-1, MENU_XNOTE);
++     goto every_key;
+
+--
+  ¥h note ªOºëµØ°Ï¬Ý¤£´N¦n¤F
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

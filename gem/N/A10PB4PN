@@ -1,0 +1,20 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] °ÊºA¬ÝªO«e´X½g¥[­«¼·©ñ¾÷²v
+®É¶¡: 2004/11/13 Sat 12:52:50                           Updated: 2004/11/13
+
+  ¦b°ÊºA¬ÝªOªº«e´X½g¡A³Q¼·©ñªº¾÷²v¤ñ¸û°ª
+
+  ¦pªG§A¦³»Ý­n¯S§O¬°¤°»ò°µ¼s§iªº¸Ü¡A¥i¥H¨Ï¥Î
+
+: cache.c:film_out()
+
+  if (tag >= FILM_MOVIE)        /* °ÊºA¬ÝªO */
+-   tag += time(0) % (fmax - FILM_MOVIE);
++ {
++   len = time(0);
++   /* «e [1;44m3[m ½gªº¼·©ñ¾÷²v¦h 50%/[1;44m3[m */     [1;44m // 3 ³o­Ó¼Æ¦r¦Û©w [m
++   tag += len % ((len & 1) ? [1;44m3[m : fmax - FILM_MOVIE);
++ }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,90 @@
+§@ªÌ: itoc (³sÅQ¹Ú¸H) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ´`Àô·j´M¤U¤@­Ó¥¼Åª¬ÝªO
+®É¶¡: 2004/03/23 Tue 10:42:03                           Updated: 2004/03/23
+
+¡° ¤Þ­z¡mmusashi634.bbs@wretch.twbbs.org (¤»¤T¥|)¡n¤§»Ê¨¥¡G
+>   °²³]¯¸¤W¦³ 50 ­ÓªO
+>   ´å¼Ð²{¦b¦b½s¸¹ 46 ªº¬ÝªO«e­±¡A¦pªG±q½s¸¹ 46 ¦Ü 50 ³£¨S¦³·s¤å³¹
+>   ½s¸¹ 13 ªº¬ÝªO¦³·s¤å³¹¡A´å¼Ð¤£·|²¾°Ê¨ì ½s¸¹ 13 ªº¬ÝªO
+>   ±o¥ý§â´å¼Ð©¹¤W²¾°Ê¡AµM«á­«·s
+>   ¥i¥H½Ð±Ð¤@¤U¡A¦³¿ìªk§ï¦¨¥i¥H´`Àô·j´M¶Ü¡H
+
+: board.c:class_body()
+
+#ifdef AUTO_JUMPBRD
+  nextpos = 0;
+
+  /* itoc.010910: ·j´M¤U¤@­Ó¥¼Åª¬ÝªO */
+  if (class_jumpnext)
+  {
+    class_jumpnext = 0;
+    n = xo->pos;
+    chp = (short *) xo->xyz + n;
+
+    while (n < max)
+    {
+      chn = *chp++;
+      if (chn >= 0)
+      {
+        BRD *brd;
+
+        brd = bcache + chn;
+
+#ifdef ENHANCED_VISIT
+        /* itoc.010407: §ï¥Î³Ì«á¤@½g¤wÅª/¥¼Åª¨Ó§PÂ_ */
+        brh_get(brd->bstamp, chn);
+        if (brh_unread(brd->blast))
+#else
+        if (brd->blast > brd_visit[chn])
+#endif
+        {
+          nextpos = n;
+          break;
+        }
+      }
+      n++;
+    }
+
++   /* ¦pªG§ä¨ì³Ì«á¤@­ÓªO³£§ä¤£¨ì¥¼Åª¡A¨º»ò´`Àô¦A±qÀY§ä */
++   if (!nextpos)
++   {
++     n = 0;
++     chp = (short *) xo->xyz + n;
++   }
++
++   while (n < xo->pos)
++   {
++     chn = *chp++;
++     if (chn >= 0)
++     {
++       BRD *brd;
++
++       brd = bcache + chn;
++
++#ifdef ENHANCED_VISIT
++       /* itoc.010407: §ï¥Î³Ì«á¤@½g¤wÅª/¥¼Åª¨Ó§PÂ_ */
++       brh_get(brd->bstamp, chn);
++       if (brh_unread(brd->blast))
++#else
++       if (brd->blast > brd_visit[chn])
++#endif
++       {
++         nextpos = n;
++         break;
++       }
++     }
++     n++;
++   }
+
+    /* ¤U¤@­Ó¥¼ÅªªO¦b§O­¶¡A­nÂ½¹L¥h */
+-   if (nextpos >= cnt + XO_TALL)
++   if (nextpos < cnt || nextpos >= cnt + XO_TALL)
+      return nextpos + XO_MOVE;
+  }
+#endif
+
+--
+  ¼gÆZÅ¼ªº :p
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

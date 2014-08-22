@@ -1,0 +1,110 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]§ä¥XºëµØ°Ï®e¶q¹L¤jªº¬ÝªO
+®É¶¡: Wed Dec 10 19:15:36 2003                          Updated: 2003/12/11
+
+¡° ¤Þ­z¡mchwaian (µL¨¥)¡n¤§»Ê¨¥¡G
+> §Ú°Ñ¦Òbrdir¼g¤F¤@¤ä §äºëµØ°Ï®e¶q¶W¹L5000KB¤j¤pªº¬ÝªO
+
+: src/util/Makefile
+
+EXE =   .... gem-over
+
+: src/util/gem-over.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/gem-over.c      ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ²Î­pºëµØ°Ï¹L¤jªº¬ÝªO                         */
+/* create : 03/12/10                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+#include "bbs.h"
+
+static int total_n;         /* ½g¼Æ */
+static int total_k;         /* byte ¼Æ */
+
+static void
+gem_checksize(fpath)
+  char *fpath;
+{
+  int i;
+  char *ptr, *str;
+  struct stat st;
+  struct dirent *de;
+  DIR *dirp;
+
+  total_n = 0;
+  total_k = 0;
+
+  if (stat(fpath, &st))
+    return;
+
+  total_n = st.st_size;
+  ptr = (char *) strchr(fpath, '.');
+
+  for (i = 0; i < 32; i++)
+  {
+    *ptr = radix32[i];
+    *(ptr + 1) = '\0';
+    if (!(dirp = opendir(fpath)))
+      continue;
+
+    *(ptr + 1) = '/';
+    while (de = readdir(dirp))
+    {
+      str = de->d_name;
+
+      if (*str <= ' ' || *str == '.')
+        continue;
+
+      strcpy(ptr + 2, str);
+
+      if (!stat(fpath, &st))
+      {
+        if (*str == 'F')
+          total_n += st.st_size;
+        else if (*str == 'A')
+          total_k += st.st_size;
+      }
+    }
+    closedir(dirp);
+  }
+
+  total_n /= sizeof(HDR);
+  total_k /= 1024;
+}
+
+
+int
+main()
+{
+  FILE *fp;
+  BRD brd;
+  char fpath[64];
+
+  chdir(BBSHOME);
+
+  if (!(fp = fopen(FN_BRD, "r")))
+    return -1;
+
+  while (fread(&brd, sizeof(BRD), 1, fp) == 1)
+  {
+    if (!*brd.brdname)  /* ¦¹ªO¤w³Q§R°£ */
+      continue;
+
+    sprintf(fpath, "gem/brd/%s/%s", brd.brdname, FN_DIR);
+    gem_checksize(fpath);
+
+    if (total_n > 1000 || total_k > 5000)       /* 1000½g¡B5000KB */
+      printf("%s ªO %d ½g %d bytes\n", brd.brdname, total_n, total_k);
+  }
+  fclose(fp);
+
+  return 0;
+}
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

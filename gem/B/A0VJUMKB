@@ -1,0 +1,56 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¢ï¢ý¢í¢û¢ü¶Ã¼Æ¦W¤ùÀÉ¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Mon, 11 Aug 2003 22:53:04 +0800 (CST))  Updated: 2003/08/13
+
+    ³o­Ó¥\¯à¥i¥HÅý¯¸¥x¥Î¢ï¢ý¢í¢û¢üÀ°¦£¥´¼s§i...¨þ¨þ¡ã
+
+    ­n´X­Ó¦³´X­Ó....¤@¦¸¨Ó­Ó¢²¢¯­Ó¦W¤ùÀÉ¶]¶Ã¼Æ³£¥i....^^a
+
+
+    ¥[¤F¤U­±ªºµ{¦¡¤§«á¡A¥ÎÀH«K¤@­Ó¢ñ¢ìµn¤J¡]¥ý¥Î test ¥Nªí¡^
+
+    °µ¦n¤F¦W¤ùÀÉ¤§«á¡Aµn¤J¤u§@¯¸....
+
+
+    mv ~/usr/t/test/plans ~/usr/g/guest/plans0
+
+
+    ¤§«á­«ÂÐ¤W­±ªº°Ê§@....°µ¦n¦W¤ùÀÉ¤§«á....
+
+    mv ~/usr/t/test/plans ~/usr/g/guest/plans1  ¡]³o¸Ì§ï¦¨ plans1¡^
+
+    ¥H¦¹Ãþ±À....­n´X­Ó´N°µ´X­Ó....
+
+    ¦pªG¦³¢²¢¯­Ó¦W¤ùÀÉ´N·|¦³ plans0 ¡ã plans29 ­ÓÀÉ®×¡C
+
+
+    ¥[¤J¤U­±ªºµ{¦¡....
+
+
+==============================================================================
+
+: src/maple/talk.c:showplans()
+
+static void
+showplans(userid)
+  char *userid;
+{
+  int i;
+  FILE *fp;
+  char buf[256];
+
+  usr_fpath(buf, userid, fn_plans);
+
++ if (!strcmp(userid, STR_GUEST))
++ {
++   char tmp[3];
++   sprintf(tmp, "%d", time(0) % 3); /* ¦³´X­Ó¦W¤ùÀÉ ´N¥Î (time(0) % ¦h¤Ö) */
++   strcat(buf, tmp);
++ }
+
+  if (fp = fopen(buf, "r"))
+  {
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m bbs.cs.nchu.edu.tw [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-137-194.HINET-IP.hinet.net [30mµoªí[m

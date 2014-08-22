@@ -1,0 +1,717 @@
+µo«H¤H: verit.bbs@bbs.yzu.edu.tw (BBS ¯¸ªø¤j·|), ¬ÝªO: installbbs
+¼Ð  ÃD: [WindTop]¤ß²z´úÅçµ{¦¡
+µo«H¯¸: ¤¸´¼¤j¾Ç­·¤§¶ð (Tue Sep  9 20:00:52 2003)         Updated: 2003/09/10
+
+: menu.c ¾A·íªº¿ï³æ¥[¤J
+
+  "bin/mind.so:main_mind", 0, - M_XMODE,
+  "Mind       ¡ñ ¤ß²z´úÅç ¡ð",
+
+: run/mind
+
+  «Ø¥ß¦¹¥Ø¿ý
+
+: run/mind/help ·s¼W¦¹ÀÉ®×
+
+¤ß²z´úÅç§ë½Z®æ¦¡¦³¤TºØ :
+
+1. ¤@¯ëÃD¥Ø , ±µ¤U¤@ÃD
+
+    [Q]ÃD¥Ø
+    [A-1]»¡©ú1
+    [A-7]»¡©ú2
+
+    ¤W­±²Ä¤G¦æ¥Nªí , ²Ä¤@­Óµª®×±µ²Ä¤GÃD
+    ¤W­±²Ä¤T¦æ¥Nªí , ²Ä¤G­ÓÀÉ®×±µ²Ä¤KÃD
+
+2. ÃD¥Ø±µµ²ªG
+
+    [Q]ÃD¥Ø
+    [A-R-1]»¡©ú¤@
+    [A-0]»¡©ú¤G
+
+    ¤W­±²Ä¤G¦æ¥Nªí , ²Ä¤@­Óµª®×±µ²Ä¤@­Óµ²ªG
+    ¤W­±²Ä¤G¦æ¥Nªí , ²Ä¤G­Óµª®×±µ²Ä¤@ÃD
+
+    ps) ±µÃD¥Øªº¸Ü , ÃD¸¹°O±o´î¤@
+        ±µµ²ªGªº¸Ü , ½s¸¹¤£¥Î´î¤@
+
+3. µ²ªG
+
+    [R]µ²ªG¼ÐÃD
+    µ²ªG¤º®e
+
+    ps) µ²ªG¤º®e¥u¯à¤@¦æ :p
+
+
+¥i¥H°Ñ¦Ò¤U­±ªº½d¨Ò :)
+===
+[Q]ª½±µ¤F·íªº»¡,©p¬O?
+[A-1]·¥­«µø¥~ªí
+[A-2]¸û­«µø¤º¦b
+
+[Q]¹ï©ó³ßÅwªº¤HºA«×«Ü¿n·¥
+[A-3]YES
+[A-5]NO
+
+[Q]±`±`¹Ú¨£³ßÅwªº¤H
+[A-6]YES
+[A-4]NO
+
+[Q]¦bµó¤W¥©¹J¦Û¤v·tÅÊªº¤H,©p·|
+[A-5]ÁÜ½Ð¥L¤@¶ô¥h³Ü¯ù
+[A-14]¥u¥´©Û©I
+
+[Q]¤W½Ò(¤W¯Z)®É,±`¨nµÛ³ßÅwªº¤H¬Ý¡C
+[A-7]YES
+[A-1]NO
+
+[Q]¹ï©ó³ßÅwªº¤H:
+[A-8]¥ý±qªB¤Í°µ°_
+[A=16]²@¤£µS¦a¦V¥L§i¥Õ,¨M¤ß¤@©w­n©M¥L¦¨¬°ÅÊ¤H¡C
+
+[Q]ÅÊ¤H¤ñªB¤ÍÁÙ­«­n¡C
+[A-10]YES
+[A-4]NO
+
+[Q]¤£À´±o¾A®É¦aªí¥Õ,§Y¨Ï¬OµL²áªºª±¯º,¤]·|¨Ï©pÁy¬õ¡C
+[A-11]YES
+[A-5]NO
+
+[Q]´¿¸g¥h¹L³ßÅwªº¤H®a¸Ì¡C
+[A-12]YES
+[A-9]NO
+
+[Q]·tÅÊ¤§¤H´¿¥D°Ê»P§A»¡¸Ü¡C
+[A-18]YES
+[A-16]NO
+
+[Q]¦³«Ü¦h²§©ÊªB¤Í¡C
+[A-7]YES
+[A-11]NO
+
+[Q]·tÅÊªº¤H¦pªG·h¤F®a:
+[A-8]°¨¤W´M§ä§OªºÅÊ·R¹ï¶H
+[A-12]§Y¨Ï¤À¹j¨â¦aÁÙ¬O¤@¤ß¤@·N³ßÅw¥L
+
+[Q]°Q¹½¾ã¤Ñ¦b¤@°_ªºÅÊ·R,­«µø¾Ö¦³­Ó¤Hªº®É¶¡¤ÎªÅ¶¡¡C
+[A-20]YES
+[A-9]NO
+
+[Q]³ßÅw·ÓÅU¦Û¤v·tÅÊªº¤H¡C
+[A-R-3]YES
+[A-R-1]NO
+
+[Q]±¡¤H¸`®É¤£´±¿Ë¤â°eµ¹¥L¥©§J¤O¡C
+[A-13]YES
+[A-16]NO
+
+[Q]·í­±¦V¥L§i¥Õ,·|·P¨ì¤Q¤ÀÃø¬°±¡¡C
+[A-R-1]YES
+[A-R-2]NO
+
+[Q]¤£³ßÅwÁ¿ªø®É¶¡ªº¹q¸Ü¡C
+[A-13]YES
+[A-14]NO
+
+[Q]­Y¨ü¨ìÀ£¤O,«K·|¶É¥X¥þ¤O¤Ï§Ü¡C
+[A-R-4]YES
+[A-R-3]NO
+
+[Q]¦³¹L(·tÅÊ)¤Î³Q§i¥Õªº¸gÅç¡C
+[A-13]YES
+[A-20]NO
+
+[Q]§AÄ±±o¨º¤@ºØ¸û¦n:
+[A-R-2]³Q§i¥Õ
+[A-R-4]¦V¤H§i¥Õ
+
+[Q]´Nºâ¦³¤H¦V©p§i¥Õ,¦pªG¤£¬O¦Û¤v³ßÅwªºÃþ«¬,«K¤£·|»P¥L¥æ©¹¡C
+[A-17]YES
+[A-19]NO
+
+[R][³¢¹t]Ãþ«¬ªº¤H
+¹ï©ó³ßÅw·ÓÅU§O¤Hªº¦n¤j­ô§Î¶H,§âÂ÷®a¦Ó¦Û¤vÂô¦¿´òªº¶À»T·í°µ [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+(¥i«H¿àªº¤H)¨Ã©M¦o©¼¦¹¨Ì¿à¬Û¤¬·ÓÅU,¬O­Ó·Å©MÅé¶Kªº¹ï¶H¡C«Ü [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+®e©ö»P¤H±µªñ³oºØ¿Ë¤O¥¿¬O©p(§A)ªº¾y¤O©Ò¦b¡C
+
+[R][³¢ªÜ]Ãþ«¬ªº¤H
+¦b³ßÅwªº¤H­±«eÁ`¬OµLªkªí¹F¥X¦Û¤vªº¥»·N,¨Æ«á¤~¦Û§Ú©ê«è¤£¤w,[1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+¤£¹L«ÜÀ´±o¼»¼b¡B­A¿à¡B¤]«ÜÀ´±o¥D°Ê°Q¤H³ßÅw¡B»P¤H²á¤Ñ,¦]¦¹ [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+²§©ÊªB¤Í¤£¤Ö,¥u­n¯à±q¥¢±Ñ¤¤²Ö¿n¸gÅç,·¥¦³¥i¯à¦¨¬°¤j¨üÅwªïªº[1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+¤H¡C
+
+[R][¤pÀs¤k]Ãþ«¬ªº¤H
+¤º¼ö¥~§N,²M¯Âµ½¨}«¬ªº¤H:¨ä¹ê¬OÄÝ©ó¸û¦Û³¬¡B¤º¦Vªº©Ê®æ,¦ý¹ï [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+©ó¦Û¤v³ßÅwªº¨Æ¡Bª«·|¥þ¤ß¥hÃöª`,Áö¤£¥Î¨¥»yª½±µ»¡©ú,¦ý·|¥H  [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+¦æ°Ê¤£¸g·N¦a¬yÅS·R·N,¦b¤º¤ßªº¼ê´û¼ö±¡¤§¤¤ÁÙ¬O±aÂI¨IÃ­,©M  [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+³oÃþ«¬ªº¦b¤@°_À³¸Ó·|·P¨ì¦w¤ß¦Û¦b¡C
+
+[R][·¨¹L]Ãþ«¬ªº¤H
+¦]¬°­Ó©Ê°õµÛ,¹ï¦Û¤v¤ß»öªº¤H·|§V¤Oªº¦u­Ô¦b¦o(¥L)¨­®Ç,¦³®É  [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+¥i¯à·|¤£´±©ú©ú¥Õ¥Õ§@¥X·Rªº§i¥Õ,¦ý±M±¡ªº¦o(¥L),­Y¹J¨ìÅÊ¤H  [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+ªº­I«q,¥L¥²·|¨ÏºÉ¥þ¤O¥h®¾¦^,¬O¨üÀ£¤O·U¤j¤Ï¼u·U¤j,¥Ã»·¤£ªA [1;36m(µLÂ_¦æ«ö¤U¦æ)[m
+¿éªº¤H¡C
+
+: src/so/Makeifle
+
+SO =    .... [1;33mmind.so[m
+
+: src/so/mind.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* mind.c        ( YZU_CSE WindTop BBS )                 */
+/*-------------------------------------------------------*/
+/* author : verit.bbs@bbs.yzu.edu.tw                     */
+/* target : ¤ß²z´úÅç                                     */
+/* create : 03/08/05                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define MAX_DESC_LENGTH      256        /* ±Ô­zªºªø«× */
+#define MAX_TEXT_LENGTH      512        /* ¤º¤åªºªø«× */
+
+#define MAX_MIND_QUESTION    50         /* ³Ì¦hÃD¥Ø­Ó¼Æ */
+#define MAX_MIND_ANSWER      5          /* ¨CÃD³Ì¦hµª®×¼Æ */
+#define MAX_MIND_RESULT      10         /* ³Ì¦hµ²ªG¼Æ */
+
+#define LEN                  50         /* ¤@¦æ³Ì¦hÅã¥Ü´X­Ó¦r */
+#define MIND_XPOS            5          /* ¹w³]¿é¥X x ®y¼Ð */
+#define MIND_YPOS            10         /* ¹w³]¿é¥X y ®y¼Ð */
+
+#define DEF_PATH        "run/mind/"
+
+static int x, y;
+
+typedef struct
+{
+  char question[MAX_DESC_LENGTH];
+  char ans_desc[MAX_MIND_ANSWER][MAX_DESC_LENGTH];
+  int ans_next[MAX_MIND_ANSWER];
+  int ans;
+}      QUESTION;
+
+typedef struct
+{
+  char title[MAX_DESC_LENGTH];
+  char desc[MAX_TEXT_LENGTH];
+}      RESULT;
+
+typedef struct
+{
+  QUESTION question[MAX_MIND_QUESTION];
+  RESULT result[MAX_MIND_RESULT];
+  int qcount;
+  int rcount;
+}      MIND;
+
+
+static int
+read_file(fpath, m)
+  char *fpath;
+  MIND *m;
+{
+  FILE *fp;
+  int num;
+  int ans;
+  int result;
+  char buf[MAX_TEXT_LENGTH];
+  char *tmp, *tmp2;
+  if (!(fp = fopen(fpath, "r")))
+    return -1;
+
+  num = -1;
+  result = 0;
+  while (fgets(buf, sizeof(buf), fp))
+  {
+    if (buf[1] == 'Q')
+    {
+      if (num >= 0)
+        m->question[num].ans = ans;
+      if (++num >= MAX_MIND_QUESTION)
+      {
+        fclose(fp);
+        return -2;
+      }
+      strcpy(m->question[num].question, buf + 3);
+      if (tmp2 = strchr(m->question[num].question, '\n'))
+        *tmp2 = 0;
+      ans = 0;
+    }
+    else if (buf[1] == 'A')
+    {
+      tmp = strchr(buf, ']');
+      *tmp = 0;
+
+      if (buf[3] == 'R')
+        m->question[num].ans_next[ans] = atoi(buf + 4);
+      else
+        m->question[num].ans_next[ans] = atoi(buf + 3);
+
+      strcpy(m->question[num].ans_desc[ans], tmp + 1);
+      if (tmp2 = strchr(m->question[num].ans_desc[ans], '\n'))
+        *tmp2 = 0;
+      ++ans;
+    }
+    else if (buf[1] == 'R')
+    {
+      m->question[num].ans = ans;
+
+      strcpy(m->result[result].title, buf + 3);
+      if (tmp2 = strchr(m->result[result].title, '\n'))
+        *tmp2 = 0;
+
+      if (fgets(buf, sizeof(buf), fp))
+        strcpy(m->result[result].desc, buf);
+      else
+        memset(m->result[result].desc, 0, MAX_TEXT_LENGTH);
+
+      if (tmp2 = strchr(m->result[result].desc, '\n'))
+        *tmp2 = 0;
+      if (++result >= MAX_MIND_RESULT)
+        break;
+    }
+  }
+
+  m->qcount = num + 1;
+  m->rcount = result;
+
+  fclose(fp);
+
+  return 1;
+}
+
+
+static int
+print_quiz(src)
+  char *src;
+{
+  int wstate = 0;
+  int word = 0;
+  char *str = src;
+  char buf[128], *tmp;
+  char form[128];
+  int pos = LEN + 1;
+  int height = 0;
+
+  sprintf(form, "%%-%ds", pos + 1);
+
+  while (*str)
+  {
+    height++;
+    tmp = str;
+    move(x++, y);
+    outs(" \033[0;37m¢j\033[1;37m");
+
+    wstate = 0;
+    word = 0;
+    for (; word < pos && *str; str++)
+    {
+      wstate = (*str < 0) ? ((wstate == 1) ? 0 : 1) : 0;
+      word++;
+    }
+
+    if (!(*str < 0 && wstate == 0))
+      str++;
+
+    memset(buf, 0, sizeof(buf));
+    strncpy(buf, tmp, str - tmp);
+    prints(form, buf);
+    if (strlen(buf) == pos)
+      outs("\033[0;47;30m¢p\033[40;30;1m¢p\033[m ");
+    else
+      outs("\033[0;47;30m¢p\033[40;30;1m¢p\033[m ");
+  }
+
+  return height;
+}
+
+
+static int
+draw_item(src, pos, mode)
+  char *src;
+  int pos;
+  int mode;
+{
+  char buf[128];
+
+  sprintf(buf, "%%d;37m %s %%-%ds", (mode) ? "¡»" : "  ", LEN - 2);
+  move(MIND_XPOS + pos + 2, MIND_YPOS);
+
+  outs(" \033[0;37m¢j\033[1;");
+  prints(buf, (mode) ? 41 : 40, src);
+  outs("\033[0;47;30m¢p\033[40;30;1m¢p\033[m ");
+}
+
+
+static int
+draw_menu(question, no)
+  QUESTION *question;
+  int no;
+{
+  int i, cur;
+  int c;
+  int h;
+
+  x = MIND_XPOS;
+  y = MIND_YPOS;
+
+  move(x++, y);
+  outs(" \033[0;40;37m¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å\033[m");
+  move(x++, y);
+  prints(" \033[0;37;44m¢j\033[1m²Ä %02d ÃD%-43s \033[0;47;34m¢p\033[m", no + 1, " ");
+  move(x++, y);
+  prints(" \033[0;37m¢j\033[1m%-51s \033[0;47;30m¢p\033[40;30;1m¢p\033[m", " ");
+  cur = 0;
+  h = print_quiz(question[no].question) + 2;
+
+  move(x++, y);
+  prints(" \033[0;37m¢j\033[1m%-51s \033[0;47;30m¢p\033[40;30;1m¢p\033[m", " ");
+
+  for (i = 0; i < question[no].ans; ++i, ++x)
+    draw_item(question[no].ans_desc[i], i + h, (i == cur) ? 1 : 0);
+
+  move(x++, y);
+  prints(" \033[0;37m¢j\033[1m%-51s \033[0;47;30m¢p\033[40;30;1m¢p\033[m", " ");
+  move(x++, y);
+  outs(" \033[0;47;30m¢h\033[30;1m¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h\033[40;30;1m¢p\033[m");
+
+  outz("\033[1;37;42m ¡i¾Þ§@»¡©ú¡jq)Â÷¶} Enter)§@µª                                                \033[m");
+
+  while (c = vkey())
+  {
+    draw_item(question[no].ans_desc[cur], cur + h, 0);
+    switch (c)
+    {
+    case KEY_UP:
+      cur = (cur == 0) ? question[no].ans - 1 : cur - 1;
+      break;
+    case KEY_DOWN:
+      cur = (cur + 1) % question[no].ans;
+      break;
+    case '\n':
+    case ' ':
+      return cur;
+    case 'q':
+      vmsg(NULL);
+      return -892226;
+    }
+    draw_item(question[no].ans_desc[cur], cur + h, 1);
+  }
+
+  return 0;
+}
+
+
+static void
+do_test(fpath, title)
+  char *fpath;
+  char *title;
+{
+  int no, ans;
+  MIND m;
+
+  if (read_file(fpath, &m) <= 0)
+    return;
+
+  no = 0;
+  while (1)
+  {
+    vs_bar("¤ß²z´úÅç");
+    move(3, MIND_YPOS);
+    prints("¥Ø«e´úÅçªºÃD¥Ø¬O : %s", title);
+    ans = draw_menu(m.question, no);
+    if (ans == -892226)
+      return;
+    no = m.question[no].ans_next[ans];
+    if (no < 0)
+    {
+      x = MIND_XPOS;
+      y = MIND_YPOS;
+      no = -no;
+      --no;
+
+      vs_bar("¤ß²z´úÅç");
+      move(x++, y);
+      prints(" \033[0;40;37m¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å¡Å\033[m   ");
+      move(x++, y);
+      prints(" \033[0;37;42m¢j\033[1mµ²ªG¡G%-45s \033[0;47;32m¢p\033[m   ", m.result[no].title);
+      move(x++, y);
+      prints(" \033[0;37m¢j\033[1m%-51s \033[0;47;30m¢p\033[40;30;1m¢p\033[m ", " ");
+
+      print_quiz(m.result[no].desc);
+
+      move(x++, y);
+      prints(" \033[0;37m¢j\033[1m%-51s \033[0;47;30m¢p\033[40;30;1m¢p\033[m ", " ");
+      move(x++, y);
+      prints(" \033[0;47;30m¢h\033[30;1m¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h¢h\033[40;30;1m¢p\033[m ");
+      vmsg(NULL);
+      break;
+    }
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* xover ¿ï³æ                                            */
+/*-------------------------------------------------------*/
+
+extern XZ xz[];
+extern char xo_pool[];
+
+static int mind_add();
+
+typedef struct
+{
+  char title[56];
+  char fpath[8];
+}      XMIND;
+
+
+static void
+mind_item(num, mind)
+  int num;
+  XMIND *mind;
+{
+  prints("%6d     %-64s\n", num, mind->title);
+}
+
+
+static int
+mind_body(xo)
+  XO *xo;
+{
+  XMIND *mind;
+  int num, max, tail;
+
+  move(3, 0);
+  clrtobot();
+  max = xo->max;
+  if (max <= 0)
+  {
+    if (vans("­n·s¼W¸ê®Æ¶Ü(Y/N)¡H[N] ") == 'y')
+      return mind_add(xo);
+    return XO_QUIT;
+  }
+
+  mind = (XMIND *) xo_pool;
+  num = xo->top;
+  tail = num + XO_TALL;
+  if (max > tail)
+    max = tail;
+
+  do
+  {
+    mind_item(++num, mind++);
+  } while (num < max);
+
+  return XO_FOOT;
+}
+
+
+static int
+mind_head(xo)
+  XO *xo;
+{
+  vs_head("¤ß²z´úÅç", str_site);
+  outs("[¡ö]Â÷¶} [Enter]´úÅç [q]ÂsÄý [^P]·s¼W [c]­×§ï [d]§R°£ [h]§ë½Z®æ¦¡\n"
+    "\033[30;47m  ½s¸¹     ´ú  Åç  ¦W  ºÙ                                                     \033[m");
+  return mind_body(xo);
+}
+
+
+static int
+mind_load(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(XMIND));
+  return mind_body(xo);
+}
+
+
+static int
+mind_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(XMIND));
+  return mind_head(xo);
+}
+
+
+static int      /* 1:·s¼W/­×§ï  0:¨ú®ø */
+mind_edit(mind, echo)
+  XMIND *mind;
+  int echo;
+{
+  char fpath[64];
+
+  if (echo == DOECHO)
+  {
+    time_t t = time(0);
+    memset(mind, 0, sizeof(XMIND));
+    archiv32(t, mind->fpath);
+  }
+
+  if (vget(b_lines, 0, "¦WºÙ¡G", mind->title, sizeof(mind->title), echo))
+  {
+    sprintf(fpath, "%s%s", DEF_PATH, mind->fpath);
+    if (!vedit(fpath, 0))
+      return 1;
+    vmsg(echo == DOECHO ? "¨ú®ø·s¼W" : "¨ú®ø­×§ï");
+  }
+
+  return 0;
+}
+
+
+static int
+mind_add(xo)
+  XO *xo;
+{
+  XMIND mind;
+
+  if (!HAS_PERM(PERM_SYSOP))
+    return XO_NONE;
+
+  if (mind_edit(&mind, DOECHO))
+  {
+    rec_add(xo->dir, &mind, sizeof(XMIND));
+    xo->pos = XO_TAIL;
+    xo_load(xo, sizeof(XMIND));
+  }
+  return mind_head(xo);
+}
+
+
+static int
+mind_delete(xo)
+  XO *xo;
+{
+  if (!HAS_PERM(PERM_SYSOP))
+    return XO_NONE;
+
+  if (vans(msg_del_ny) == 'y')
+  {
+    if (!rec_del(xo->dir, sizeof(XMIND), xo->pos, NULL))
+      return mind_load(xo);
+  }
+  return XO_FOOT;
+}
+
+
+static int
+mind_change(xo)
+  XO *xo;
+{
+  XMIND *mind, mate;
+  int pos, cur;
+
+  if (!HAS_PERM(PERM_SYSOP))
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  mind = (XMIND *) xo_pool + cur;
+
+  mate = *mind;
+  mind_edit(mind, GCARRY);
+  if (memcmp(mind, &mate, sizeof(XMIND)))
+  {
+    rec_put(xo->dir, mind, sizeof(XMIND), pos, NULL);
+    move(3 + cur, 0);
+    mind_item(++pos, mind);
+  }
+
+  return mind_init(xo);
+}
+
+
+static int
+mind_browser(xo)
+  XO *xo;
+{
+  XMIND *mind;
+  int pos, cur;
+  char fpath[64];
+
+  if (!HAS_PERM(PERM_SYSOP))
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  mind = (XMIND *) xo_pool + cur;
+  sprintf(fpath, "%s%s", DEF_PATH, mind->fpath);
+  more(fpath, NULL);
+  return mind_init(xo);
+}
+
+
+static int
+mind_do(xo)
+  XO *xo;
+{
+  XMIND *mind;
+  int pos, cur;
+  char fpath[64];
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  mind = (XMIND *) xo_pool + cur;
+  sprintf(fpath, "%s%s", DEF_PATH, mind->fpath);
+  do_test(fpath, mind->title);
+
+  return mind_init(xo);
+}
+
+
+static int
+mind_help(xo)
+  XO *xo;
+{
+  char fpath[64];
+
+  sprintf(fpath, "%shelp", DEF_PATH);
+  more(fpath, NULL);
+  return mind_head(xo);
+}
+
+
+static KeyFunc mind_cb[] =
+{
+  XO_INIT, mind_init,
+  XO_LOAD, mind_load,
+  XO_HEAD, mind_head,
+  XO_BODY, mind_body,
+
+  Ctrl('P'), mind_add,
+  'r', mind_do,
+  'q', mind_browser,
+  'c', mind_change,
+  'd', mind_delete,
+  'h', mind_help
+};
+
+
+int
+main_mind()
+{
+  XO *xo;
+  char fpath[64];
+
+  /* ­É¥Î XZ_PAL¡A©Ò¥H feeter ·|¤£¹ï¡A¨S®t :p */
+  sprintf(fpath, "%sindex", DEF_PATH);
+  xz[XZ_PAL - XO_ZONE].xo = xo = xo_new(fpath);
+  xz[XZ_PAL - XO_ZONE].cb = mind_cb;
+  xover(XZ_PAL);
+  free(xo);
+
+  return 0;
+}
+
+--
+[1;32m¡° Origin: [33m¤¸´¼¤j¾Ç ­·¤§¶ð [37m<bbs.yzu.edu.tw> [m
+[1;32m¡° From  : [36mbbs.yzu.edu.tw[m

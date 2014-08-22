@@ -1,0 +1,38 @@
+µo«H¤H: itoc.bbs@kulu.twbbs.org (¦Ñ¤Ò¤lªºÀY?!), ¬ÝªO: itoc
+¼Ð  ÃD: [­×¥¿] visio.c vget() ¿é¤J±±¨î½X­×¥¿
+µo«H¯¸: ©BÂP©BÂP¤õÁç¯¸ (Sun Jun  2 01:54:31 2002)         Updated: 2002/10/17
+
+  vget ¥i¥H¿é¤J±±¨î½X¡A·|³y¦¨µe­±¿ù¶Ã
+  ¤èªk¬O§Q¥Î emailpost ¥ýµ¹¤@½g¦³±±¨î½Xªº«H¥ó
+  ¦A©ó«H¥ó¦^ÂÐ¸Ó«H¡A«K¥i§â±±¨î½X¦s¤J vget ªº lastcmd
+  post ®É¥Î¤W¤UÁä²¾¨ì­è¤~¨º­Ó lastcmd §Y¥i
+
+  ¬°¤F¸Ñ¨M³o­Ó°ÝÃD¡Abmtad/innbbsd ¦b¦¬«H/¤å³¹®É¤w¸g strip ±¼¤F±±¨î½X
+  ©Ò¥H¯¸¤W²z½×¤W´N¤£·|¦³±±¨î½Xªº«H¥ó/¤å³¹
+  µM¦Ó¦pªG±zªº¯¸¬OÂà´«¹L¨Óªº
+  ·|¦³¤@¨Ç¥H«e¯d¤Uªº¦³±±¨î½X¼ÐÃDªº«H¥ó/¤å³¹
+
+  ¨º»ò´N³o¼Ë§ï
+
+: visio.c vget()
+
+      do
+      {
+        if (!(ch = *prompt++))
+        {
+          /* clrtoeol */
+
+          for (ch = col; ch < len; ch++)
+            outc(' ');
+          break;
+        }
+
++       if (ch == KEY_ESC)      /* itoc.020601: ¤£±o¨Ï¥Î±±¨î½X */
++         ch = '*';
+
+        outc(ch);
+        data[col] = ch;
+      } while (++col < max);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

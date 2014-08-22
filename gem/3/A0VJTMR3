@@ -1,0 +1,32 @@
+§@ªÌ: itoc (¯uªº«Ü¥i·R°Ú :D) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ¯¸ªø¥i¥HÅª¥[±K¤å³¹
+®É¶¡: Fri Aug 16 10:34:37 2002                          Updated: 2003/05/15
+
+  ¬ÝªOÁ`ºÞ¥i¥HÅª¥[±K¤å³¹¤ÎÁôÂÃºëµØ°Ï
+
+: board.c Ben_Perm()
+
+  /* itoc.030515: ¬ÝªOÁ`ºÞ­«·s§PÂ_ */
+  else if (ulevel & PERM_ALLBOARD)
+-   bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT;
++   bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT | BRD_M_BIT;
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ­Y¥u·QÅý¬ÝªOÁ`ºÞ¥i¥H¬ÝÁôÂÃºëµØ°Ï¡A¦Ó¤£¯à¬Ý¬ÝªO¥[±K¤å³¹
+  ¨º»ò¤£­n§ï¤W­±ªº¡A¦Ó¬O³o¼Ë§ï
+
+: gem.c:gem_link()
+
+- if (bno & BRD_M_BIT)
++ if ((bno & BRD_M_BIT) || HAS_PERM(PERM_ALLBOARD))
+    level ^= GEM_M_BIT;
+
+: post.c:post_gem()
+
+- if (bbstate & STAT_BM)
++ if ((bbstate & STAT_BM) || HAS_PERM(PERM_ALLBOARD))
+    level ^= GEM_M_BIT;
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

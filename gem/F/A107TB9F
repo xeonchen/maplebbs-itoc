@@ -1,0 +1,33 @@
+§@ªÌ: itoc (¯}¸Ñ¶´Åé¤~¬O¤ý¹D¡I) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] Admin ¿ï³æ¼W¥[ NewBoard ¿ï¶µ
+®É¶¡: 2004/04/15 Thu 17:18:02                           Updated: 2004/04/14
+
+  ¶}·sªOªº¥\¯à¤w¸g§ï¦¨¦b ¬ÝªO¦Cªí/¤ÀÃþ¸s²Õ ¤¤«ö ^P ¤F
+  ¦ý¬O¦pªGÁÙ¬O§Æ±æ¦³­ì¥»¨º¼Ë³]­pªº¸Ü...
+
+: menu.c:menu_admin[]
+
++ "bin/admutil.so:a_newbrd", PERM_ALLBOARD, - M_SYSTEM,
++ "NewBoard   ¢« ¶}ÅP·sªO ¢¨",
+
+: admutil.c:a_newbrd() ·s¼W¦b a_editbrd() ¤U­±
+
+int
+a_newbrd()
+{
+  BRD newboard;
+
+  memset(&newboard, 0, sizeof(BRD));
+
+  /* itoc.010211: ·s¬ÝªO¹w³] postlevel = PERM_POST; battr = ¤£Âà«H */
+  newboard.postlevel = PERM_POST;
+  newboard.battr = BRD_NOTRAN;
+
+  if (brd_new(&newboard) >= 0)
+    vmsg("·sªO¦¨¥ß¡A°OµÛ¥[¤J¤ÀÃþ¸s²Õ");
+
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

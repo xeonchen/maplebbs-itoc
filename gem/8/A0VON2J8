@@ -1,0 +1,137 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¤Ö°µ¡B¤Ö·Q¡B¦h©ñ¶}) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¨Ï¥ÎªÌ¦Û©w²ßºD¡Ð¤W¯¸¦Û°ÊÁÊ¶RÁô¨­Åv¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Tue, 14 Oct 2003 00:21:14 +0800 (CST))  Updated: 2005/11/23
+
+    ¥Ø«eªºµ{¦¡¼gªk¡A¤Z¬OÁÊ¶R¼È®ÉÁô¨­Åvªº¤H¡A¤U¯¸¦A¤W¯¸Áô¨­ÅvÁÙ¦b¡C
+
+    °£«D¨Ï¥ÎªÌ¿ï¾Ü¤F²{¨­¡A¤£µM´X¥Gµ¥©ó¾Ö¦³¥Ã¤[Áô¨­¡C
+
+    ³o¼Ë¨C¦¸¤W¯¸¦Û°ÊÁÊ¶RÁô¨­Åv´N¨S¦³·N¸q¤F¡C
+
+    ©Ò¥H¥ý¹ïµ{¦¡­×§ï¤@¤U¡AÅý¨S¦³¥Ã¤[Áô¨­Åv¡]PERM_CLOAK¡^ªº¤H...
+
+    ¤W¯¸«á®³±¼¼È®ÉÁô¨­Åv¡]UFO_CLOAK¡^¡C
+
+    µM«á§PÂ_¬O§_¦³¤W¯¸¦Û°ÊÁÊ¶RÁô¨­Åvªº³ß¦n³]©w¡C
+
+    ¦pªG¦³¦A§â¼È®ÉÁô¨­Åv¥[¦^¥h¡A[1;35;4m¨Ã¥B¦©°£ÁÊ¶R¼È®ÉÁô¨­Åvªº¿ú¡I[m
+
+==============================================================================
+
+: src/include/ufo.h
+
+[1;33m+ #define UFO_LOGINCLOAK  BFLAG(19)   /* ¤W¯¸ª½±µÁô¨­ */[m
+
+
+[1;32m![m #define NUMUFOS_USER    [1;32m20[m  /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e [1;32m20[m ­Ó ufo */
+
+[1;32m![m #define STR_UFO     "-mpsnemPBQFANbwtSHK[1;32mc[m----CHA"
+
+
+#ifdef HAVE_NETTOOL
+  "¤W¯¸ÂsÄý·s»D    (ÂsÄý/¤£­n)",    /* UFO_KIMONEWS */
+#else
+  "«O¯d",
+#endif
+
+[1;33m+ "Áô¨­¤W¯¸        (Áô¨­/²{¨­)",    /* UFO_LOGINCLOAK */
+[1;31m- "«O¯d",[m
+
+
+
+
+        [2003/09/28] bbsd.c §ï¼g tn_login()¡C
+
+: src/maple/bbsd.c:tn_login()   030928 ¤§«eªº¡A­n§ï tn_login()
+
+: src/maple/bbsd.c:login_user() 030928 ¤§«áªº¡A­n§ï login_user()
+
+
+#endif  /* SYSOP_SU */
+      {
+        /* SYSOP gets all permission bits */
+        /* itoc.010902: DENY perm ±Æ¥~ */
+        cuser.userlevel = ~0 ^ (PERM_DENYMAIL | PERM_DENYTALK | PERM_DENYCHAT |
+PERM_DENYPOST);
+      }
+    }
+
++   if (!(HAS_PERM(PERM_ALLADMIN)) && !(HAS_PERM(PERM_CLOAK)))
++     cuser.ufo &= ~UFO_CLOAK;   //®³±¼¨S¦³¥Ã¤[Áô¨­Åvªº¼È®ÉÁô¨­
+
++   if (!HAS_PERM(PERM_CLOAK) && cuser.ufo & UFO_LOGINCLOAK)
++   {                                           /* qazq.031010: Áô¨­¤W¯¸ */
++     if (cuser.gold >= 10)
++     {
++       cuser.gold -= 10;      //³o¸Ì¦©ªº¿ú­n©M bank.c:b_invis() ¦©ªº¤@¼Ë¡C
++       cuser.ufo |= UFO_CLOAK;
++     }
++     else
++     {
++       vmsg("±zªº¿ú¤£°÷ÁÊ¶R¼È®ÉÁô¨­¡A¨t²Î¦Û°Ê¨ú®ø¤W¯¸Áô¨­ªº²ßºD");
++       cuser.ufo &= ~UFO_LOGINCLOAK;
++     }
++   }       // µù¸Ñ¦n¹³¦³»¡¦b¬Y­Ó®É¬q¤§«e¤£¯à¦³ vmsg() ©M more()
+            // ¤£¹L¤£ª¾¹D·|µo¥Í¤°»ò¨Æ±¡¡C
+
+    if (cuser.ufo & UFO_ACL)
+    {
+      usr_fpath(fpath, cuser.userid, FN_ACL);
+
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-136-36.HINET-IP.hinet.net [30mµoªí[m
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¦Û©wufo - ¤W¯¸¸ß°Ý¬O§_ÁÊ¶R¼È®ÉÁô¨­Åv
+µo«H¯¸: µL¦W¤p¯¸ (2005/11/21 Mon 20:11:58)
+
+ ¡º [¥\¯à] bbsd.c ¨Ï¥ÎªÌ¦Û©w²ßºD¡Ð¤W¯¸¦Û°ÊÁÊ¶RÁô¨­Åv
+
+    ¡ô­×§ï¦¹½g¤º®e §ï¬°Y/N½T»{
+
+: src/include/ufo.h
+
++ #define UFO_LOGINCLOAK  BFLAG(19)   /* ¤W¯¸ª½±µÁô¨­ */
+
+! #define STR_UFO     "-mpsnemPBQFANbwtSHKc----CHA"
+
++ "Áô¨­¤W¯¸        (Áô¨­/²{¨­)",    /* UFO_LOGINCLOAK */
+- "«O¯d",
+
+: bbsd.c:login_user()
+
++ if (!(HAS_PERM(PERM_ALLADMIN)) && !(HAS_PERM(PERM_CLOAK)))
++      cuser.ufo &= ~UFO_CLOAK;             //®³±¼¨S¦³¥Ã¤[Áô¨­Åvªº¼È®ÉÁô¨­
++
++ if (!(HAS_PERM(PERM_CLOAK)) && cuser.ufo & UFO_LOGINCLOAK)
++ {                                         // qazq.031010: Áô¨­¤W¯¸
++    if (vans("¬O§_ªá 1ª÷Áô¨­¤W¯¸ Y/N[N] ") == 'y')
++    {
++      if (cuser.gold >= 1)  //¦©ªº¿ú­n©M bank.c:b_invis() ¤@¼Ë
++      {
++      cuser.gold -= 1;
++      cuser.ufo ^= UFO_CLOAK;
++      }
++      else
++      {
++      vmsg("§Aªº¿úÁÙ¤£°÷ÁÊ¶RÁô¨­­ò¡I");
++      cuser.ufo &= ~UFO_LOGINCLOAK;
++      }
++    }
++ }
+
+        if (cuser.ufo & UFO_ACL)
+        {
+          usr_fpath(fpath, cuser.userid, FN_ACL);
+
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î [37m61-231-197-55.dynamic.hinet.net[30m®ü[m

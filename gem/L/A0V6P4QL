@@ -1,0 +1,68 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (:MM:), ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¨q¥X¨Ï¥ÎªÌµù¥U³æ©Ò¶ñ¤§¹q¸Ü/¦í§}
+µo«H¯¸: XEON (Mon, 10 Mar 2003 00:36:22 +0800 (CST))      Updated: 2003/09/26
+
+¡° ¤Þ­z¡mLucifer (¥u¦nºÛ¨ì³o¸Ì¼g¤é°O)¡n¤§»Ê¨¥¡G
+>             ¯¸ªø¯¸°È¦b¬d¸ß¨Ï¥ÎªÌ®É
+>             ¦A¦hÅã¥Ü 1,¹q¸Ü 2,¦í§} ³o¨â¶µ
+>             ³o¨â¶µ¬O¦b¶ñ¼gµù¥U³æ®É¼gªº(¦pªG¦³¶ñ)
+
+: acct.c:acct_show()
+
+  if (adm)
+  {
++   char address[60], phone[20];
+
+    prints("  \033[32m¤W¯¸¦aÂI¡G\033[37m%-35s\033[32mµo«H¦¸¼Æ¡G\033[37m%d\n",
+      u->lasthost, u->numemails);
+    bitmsg("  \033[32mÅv­­µ¥¯Å¡G\033[37m", STR_PERM, ulevel);
+    bitmsg("  \033[32m²ßºDºX¼Ð¡G\033[37m", STR_UFO, u->ufo);
+
++   if (find_rform(u->userno, u->userid, address, phone))
++   {
++     prints("  \033[32mµù¥U¦í§}¡G\033[37m%-35s\033[32mµù¥U¹q¸Ü¡G\033[37m%s\n",
++       address, phone);
++   }
+  }
+
+: acct.c:find_rform() ¥[¤J acct_show() ¤§«e
+
+static int          /* 1:§ä¨ì  0:¨S§ä¨ì */
+find_rform(userno, userid, address, phone)
+  int userno;               /* ¶Ç¤J userno/userid */
+  char *userid;
+  char *address, *phone;    /* ¦^¶Ç address/phone */
+{
+  RFORM *rform;
+  int fd, rc;
+
+  rc = 0;
+  if ((fd = open(FN_RUN_RFORM_LOG, O_RDONLY)) >= 0)
+  {
+    mgets(-1);
+
+    while (rform = mread(fd, sizeof(RFORM)))
+    {
+      if (userno == rform->userno && !strcmp(userid, rform->userid))
+      {
+        strcpy(address, rform->address);
+        strcpy(phone, rform->phone);
+        rc = 1;
+        break;          /* ­Y§â³o¦æ break ®³±¼¡A¨º»ò´N¬O§ä³Ì«á¤@µ§µù¥U³æ */
+      }                 /* ­Y§â³o¦æ break ¯dµÛ¡A¨º»ò´N¬O§ä²Ä¤@µ§µù¥U³æ */
+    }
+
+    close(fd);
+  }
+
+  return rc;
+}
+
+--
+  ¤£ª¾¹D¦b¤°»ò®É­Ô¶}©l
+  §Ú´N§â address µ¥Äæ¦ì±q ACCT ¤¤®³±¼¤F
+  ©Ò¥H sizeof(ACCT) ±q¥H«eªº 512 ­°¦¨²{¦bªº 220
+
+--
+    [1;32m¢~¢w¢w Origin ¢¡ [33;45m °Ê¤O®Ö¤ß [37m processor.tfcis.org [32;40m ¡ã £_£`£a ¢w¢w¢q[m
+    [1;32m¢x     Modify ¢£ [31m03/03/10  0:36:22 [m

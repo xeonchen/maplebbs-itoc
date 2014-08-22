@@ -1,0 +1,139 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶(Skyl ¬ÝªO: plan
+¼Ð  ÃD: [¤å¥ó] ¸gÀÙ·§ªp economy.c
+µo«H¯¸: Àº¤Ñ±^ (2004/01/23 Fri 10:43:40)                  Updated: 2004/01/23
+
+¥u·Qª¾¹D²{¦bª÷»È¹ô¤@¨Ç¸ê°T......
+
+: src/util/Makefile
+
+EXE =   .... [1;33meconomy[m
+
+: util/economy.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/economy         ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ¸gÀÙ·§ªp                                     */
+/* create : 04/01/23                                     */
+/* update :   /  /                                       */
+/* author : BioStar.bbs@micro.bio.ncue.edu.tw            */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define OUTFILE_ECONOMY "gem/@/@-economy"
+#define FN_ECONOMY      "run/economy"
+
+
+typedef struct
+{
+  long long int totalgold;
+  long long int totalmoney;
+  time_t last_time;
+} ECONOMY;
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+int
+main()
+{
+  char c;
+  int usernum = 0, avgmoney = 0, avggold = 0;
+  long long int totalmoney = 0, totalgold = 0;
+  FILE *fp;
+  ECONOMY economy;
+  long long int golddiff = 0, moneydiff = 0;
+  double avggolddiff, avgmoneydiff, days;
+  time_t now_time, interval;
+
+  chdir(BBSHOME);
+
+  /* ²Ä¤@¦¸²Î­p */
+  if (rec_get(FN_ECONOMY, &economy, sizeof(ECONOMY), 0))
+    memset(&economy, 0, sizeof(ECONOMY));
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    char buf[64];
+    struct dirent *de;
+    DIR *dirp;
+
+    sprintf(buf, BBSHOME "/usr/%c", c);
+    chdir(buf);
+
+    if (!(dirp = opendir(".")))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      ACCT acct;
+      int fd;
+      char *fname;
+
+      fname = de->d_name;
+      if (*fname <= ' ' || *fname == '.')
+        continue;
+
+      sprintf(buf, "%s/.ACCT", fname);
+      if ((fd = open(buf, O_RDONLY)) < 0)
+        continue;
+
+      read(fd, &acct, sizeof(ACCT));
+      close(fd);
+
+      totalmoney += acct.money;
+      totalgold += acct.gold;
+      usernum++;
+    }
+
+    closedir(dirp);
+  }
+
+  chdir(BBSHOME);
+
+  avgmoney = totalmoney / usernum;
+  avggold = totalgold / usernum;
+
+  now_time = time(0);
+  interval = now_time - economy.last_time;
+  days = (double) interval / (double) 86400;
+
+  golddiff = totalgold - economy.totalgold;
+  moneydiff = totalmoney - economy.totalmoney;
+  avggolddiff = ((double) golddiff / (double) usernum) / days;
+  avgmoneydiff = ((double) moneydiff / (double) usernum) / days;
+
+  if (fp = fopen(OUTFILE_ECONOMY, "w"))
+  {
+    fprintf(fp, "\n\n\t\t\t\t\t¥»¯¸¸gÀÙ·§ªp\n");
+    fprintf(fp, "\n\t\t¢~¢w¢t\033[1;32;41m %s  \033[m¢u¢w¢¡\n", Now());
+    fprintf(fp, "\t\t¢x¥»¯¸¥Ø«eÁ`¤H¤f¡G%14d ¤H ¢x\n", usernum);
+    fprintf(fp, "\t\t¢x\033[1;33m¥»¯¸¤H¥ÁÁ`ª÷¹ô¡G%14lld ¤¸\033[m ¢x\n", totalgold);
+    fprintf(fp, "\t\t¢x\033[1;33m¥­§¡¨C¤H¦³ª÷¹ô¡G%14d ¤¸\033[m ¢x\n", avggold);
+    fprintf(fp, "\t\t¢x\033[1;33mª÷¹ô¤é¥Í²£¤òÃB¡G%14lld ¤¸\033[m ¢x\n", golddiff);
+    fprintf(fp, "\t\t¢x\033[1;33m¥­§¡ª÷¹ô¤é²£ÃB¡G%14.3f ¤¸\033[m ¢x\n", avggolddiff);
+    fprintf(fp, "\t\t¢x\033[1m¥»¯¸¤H¥ÁÁ`»È¹ô¡G%14lld ¤¸\033[m ¢x\n", totalmoney);
+    fprintf(fp, "\t\t¢x\033[1m¥­§¡¨C¤H¦³»È¹ô¡G%14d ¤¸\033[m ¢x\n", avgmoney);
+    fprintf(fp, "\t\t¢x\033[1m»È¹ô¤é¥Í²£¤òÃB¡G%14lld ¤¸\033[m ¢x\n", moneydiff);
+    fprintf(fp, "\t\t¢x\033[1m¥­§¡»È¹ô¤é²£ÃB¡G%14.3f ¤¸\033[m ¢x\n", avgmoneydiff);
+    fprintf(fp, "\t\t¢¢¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢£\n");
+
+    fclose(fp);
+  }
+
+  economy.totalgold = totalgold;
+  economy.totalmoney = totalmoney;
+  economy.last_time = now_time;
+  rec_put(FN_ECONOMY, &economy, sizeof(ECONOMY), 0, NULL);
+}
+
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mBioStar [30m±q [35m61-219-111-196.HINET-IP.hinet.net [30mµoªí[m

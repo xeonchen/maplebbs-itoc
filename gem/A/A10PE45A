@@ -1,0 +1,58 @@
+µo´H§H: itoc.bbs@xeon.tfcis.org (∑¶≠∑ºs≥ı..¡Ÿ¥πµÿ´∞´®) ¨›™O: plan
+º–  √D: [•\Ø‡] ≠Y newboard ¶≥∑s§Â≥π°AØ∏™¯™∫µe≠±∑|¥£•‹
+µo´HØ∏: ∞ §OÆ÷§ﬂ (Sun, 31 Aug 2003 00:14:20 +0800 (CST))  Updated: 2007/02/10
+
+°∞ §ﬁ≠z°mCrBoy (>>¬_Ωu≠∑ºÈ•|≥Bø≥∞_<<)°n§ßª ®•°G
+> (∞wπÔ¨›™O¡`∫ﬁ)¶bnewboard™©¶≥∑s§Â≥πÆ…
+> •L™∫µe≠±∑|¶≥π≥∑s∂l•Û§ß√˛™∫¥£•‹...
+
+: menu.c:vs_head()
+
+  else
+  {
+    if ((spc = strlen(mid)) > len)
+    {
+      spc = len;
+      memcpy(ttl, mid, spc);
+      mid = ttl;
+      mid[spc] = '\0';
+    }
+  }
+
++ if (HAS_PERM(PERM_ALLBOARD))
++ {
++   int bno;
++   BRD *brd;
++   extern BCACHE *bshm;
++
++   bno = brd_bno("newboard");      [1;44m// ®Ã¶UØ∏•”Ω–¨›™O™∫¶a§Ë¶”©w [m
++   if (currbno != bno)     /* ≠Y§w∏g¶b [newboard] ¥NµLª›¶A brh_get() */
++   {
++     brd = bshm->bcache + bno;
++
++#ifdef ENHANCED_VISIT
++     brh_get(brd->bstamp, bno);
++     if (brh_unread(brd->blast))
++#else
++     if (brd->blast > brd_visit[bno])
++#endif
++     {
++       mid = "\033[5;42m ¶≥§H•”Ω–¨›™O \033[m";
++       spc = 14;
++     }
++#ifdef ENHANCED_VISIT
++     brd = bshm->bcache + currbno;
++     brh_get(brd->bstamp, currbno);
++#end
++   }
++ }
+
+  spc = 2 + len - spc;
+  len = 1 - spc & 1;
+  memset(buf, ' ', spc >>= 1);
+  buf[spc] = '\0';
+
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m     [31m∞[1m §[0;31mOÆ[1m÷§[0;31mﬂ [1mprocessor.tfcis.org    [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[ [1m    itoc.dorm11.nctu.edu.tw         [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

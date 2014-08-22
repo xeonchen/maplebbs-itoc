@@ -1,0 +1,203 @@
+µo«H₪H: Dinsam.bbs@ccudream.twbbs.org («e¥@.. o.O) ¬Ý×O: plan
+¼׀  ֳD: [¥\¯א]₪p«¬°Ê÷A¬Ý×O2(§ן¨ֿ¥־camera)
+µo«H¯¸: ₪₪¥¿¿v¹Ú¶י (Tue, 02 Sep 2003 15:20:50 +0800)      Updated: 2005/05/17
+
+¦b¥\¯א¦C×ם¥kֳה×÷×ֵ¥ױ ¥i¥H¦³₪p°Ê÷A¬Ý×O
+
+¥״«e₪w×¾°ÝֳD¡G
+
+   1.¥²¶·¶}±ׂ¶i₪J₪l¿ן³ז­«¼· movie ₪~¯א¸ׁ¨M´Ý¼v°ÝֳD
+     (₪£×¾¹D¦³¨S¦³₪H¥i¥H§ן¦¨©M­ל¥»×÷movie¦P¨B¡A³o¼ֻ´N§ף¦nֵo)
+   2.¥i¨ֿ¥־ASCII©־±m¦ג¡A¦‎¨ֿ¥־®ֹ½׀×`·N×ר«׳(¯S§O¬O¨ֿ¥־ֲש¦ג¦r)₪£¯א¶W¹L80
+   3.¦p×G©w¦ז¼ֶ¬°₪C¦ז¡A´N¥‏³¡³£­n¥־₪C¦ז¡A₪£¯א¦h₪]₪£¯א₪ײ¡A₪£µM·|¦³©ַµe­±
+
+
+: global.h
+
+#define FN_ETC_FEAST    "etc/feast"     /* ¸`₪י */
++ #define FN_GEM_ADVER  "gem/@/@-ad"    /*₪p°Ê÷A¬Ý×O */
+
+: BBS ¯¸₪÷ (A)nnounce ÷כµ״₪½§Gִז
+
+  Ctrl+P => (D)¸ך®ֶ ¥[₪J @-ad ³oְֹ®׳³sµ²
+  ³o¼ֻ¥H«ב­n­׳§ן₪ס¸û®e©צ
+
+: @-ad½d¨ְֹׂ (¥H₪C¦ז¬°½d¨ׂ)
+
+# ₪«¸¹¶}ְY×÷×÷¬Oµש¸ׁ
+שÝשששששששששששששששששששששששששß
+שר     ₪p¼s§i¬Ý×O         שר
+שר                        שר
+שר                        שר
+שר                        שר
+שר                        שר
+שדשששששששששששששששששששששששששו
+שÝשששששששששששששששששששששששששß
+שר     ₪p¼s§i¬Ý×O         שר
+שר                        שר
+שר                        שר
+שר                        שר
+שר                        שר
+שדשששששששששששששששששששששששששו
+שÝשששששששששששששששששששששששששß
+שר     ₪p¼s§i¬Ý×O         שר
+שר                        שר
+שר                        שר
+שר                        שר
+שר                        שר
+שדשששששששששששששששששששששששששו
+
+: config.h
+
+#undef  CURSOR_BAR
+
+  CURSOR_BAR ±o undef ₪~₪£·|¥X¿ש
+
+: config.h
+
+/* camera.c °Ê÷A¬Ý×O */
+
+#define MOVIE_MAX       180             /* °Êµe±i¼ֶ */
+#define MOVIE_SIZE      (108 * 1024)    /* °Êµe cache size */
++ #define AD_LINE       7               /* ₪p«¬°Ê÷A¬Ý×O¦³₪C¦ז */
+
+: struct.h
+
+typedef struct
+{
+  int shot[MOVIE_MAX];  /* Thor.980805: ¦X²z½d³ע¬° 0..MOVIE_MAX - 1 */
+  char film[MOVIE_SIZE];
+  char today[16];
++ int adnum;                    /* ¦³´X½g§¹¾ד¼s§i */
++ char ad[AD_LINE * 20][128];   /* ³ּ¦h 20 ½g§¹¾ד¼s§i  */
+} FCACHE;
+
+
+: camera.c:main()
+
++ do_ad(fshm);
+
+  exit(0);
+}
+
+
+: camera.c:do_ad() ¥[₪J main() «e­±
+
+
+/* ----------------------------------------------------- */
+/* ¸ü₪J₪p«¬°Ê÷A¬Ý×O                                      */
+/* ----------------------------------------------------- */
+
+
+static void
+do_ad(fshm)
+  FCACHE *fshm;
+{
+  int num;
+  char msg[STRLEN], *str;
+  FILE *fp;
+
+  if (fp = fopen(FN_GEM_ADVER, "r"))
+  {
+    for (num = 0; num < AD_LINE * 20;)  /* ³ּ¦h 20 ½g§¹¾ד¼s§i */
+    {
+      if (!fgets(msg, STRLEN, fp))
+        break;
+      if (*msg == '#' || *msg == '\n')
+        continue;
+      if (str = strchr(msg, '\n'))
+        *str = '\0';
+      strcpy(fshm->ad[num], msg);
+      num++;
+    }
+
+    fclose(fp);
+
+    num /= AD_LINE;
+    if (num > 0)
+    {
+      fshm->adnum = num;
+      return;
+    }
+  }
+
+  fshm->adnum = 1;
+  strcpy(fshm->ad[0], "¿ש»~¡I₪p«¬°Ê÷A¬Ý×O¦³°ÝֳD");
+}
+
+
+: menu.c movie()
+
+  if ((bbsmode <= M_XMENU) && (cuser.ufo & UFO_MOVIE))
++ {
++   int i, x;
++
++   i = (time(0) % fshm->adnum) * AD_LINE - 1;         /* ¶ֳ¼ֶ¿ן₪@­׃¼s§i */
++   for (x = MENU_XPOS; x <= MENU_XPOS + AD_LINE; x++)
++   {
++     move(x, 42);              /* ©ס¦b¿ן³ז×÷¥kֳה */
++     outs(fshm->ad[i++]);
++   }
+    film_out(FILM_MOVIE, MENU_XNOTE);
++ }
+
+: menu.c menu()
+
+      mode = 0;
+      do
+      {
+        move(MENU_XPOS + mode, MENU_YPOS + 2);
+        if (mode <= max)
+        {
+          mptr = table[mode];
+          str = mptr->desc;
+          prints("(\033[1;36m%c\033[m)", *str++);
+          outs(str);
+        }
+-       clrtoeol();
++       refresh();
+      } while (++mode <= mmx);
+
+...............
+...............
+
+      if (cmd <= M_XMENU)       /* ₪l¥״¿‎×÷ mode ­n <= M_XMENU */
+      {
+        menu->level = PERM_MENU + mptr->desc[0];
+        menu = (MENU *) mptr->func;
+
+-       mode = MENU_LOAD | MENU_DRAW;
++       mode = MENU_LOAD | MENU_DRAW | MENU_FILM;
+
+...............
+
+............
+
+    case 'e':
+      if (depth > 0)
+      {
+        menu->level = PERM_MENU + table[cc]->desc[0];
+        menu = (MENU *) menu->func;
+
+-       mode = MENU_LOAD | MENU_DRAW;
++       mode = MENU_LOAD | MENU_DRAW | MENU_FILM;
+
+: visio.c igetch()
+
+-         if (bbsmode < M_XMENU)        /* ¦b menu ¸ּ­±­n´« movie */
+-         {
+-           movie();
+-           refresh();
+-         }
+
+--
+
+§ן§¹½sִ¶§¹₪§«ב°O±oreboot
+
+
+--
+[m[1;33m¡´[36m     [37m£»[36m    [37m£»[36m ¢¨¢h¢© ¢¨¢h¢© ¢h  ¢h ¢i¢h¢© ¢i¢h¢© ¢i¢h¢© ¢¨¢h¢© ¢i¢h¢p   [33m¡‏[m
+  [1m£»[m [1;33m¢­[37m         ¢i     ¢i     ¢i  ¢i ¢i  ¢p ¢i  ¢p ¢i¢g   ¢i¢g¢p ¢p¢p¢p [33m¡¹[m
+[32m¢¨[37;42m     [1;33m¡¹[37m£»     [33m¢×¢i¢« ¢×¢i¢« ¢×¢i¢« ¢i¢i¢« ¢i¢×¢g ¢i¢g¢« ¢i  ¢p ¢p¢p¢p[37m£»[;37;42m  [32;40m¢©[m
+[32;42m  [1;37m¢ׁ¢ׂ¢׀¢׀¢ב  [32m₪₪¥¿[35m¿v¹Ú¶י[36mBBS¯¸ [31mֵw×ן»Yֱ{°ֶׁ[[32m cd.twbbs.org  (140.123.20.230)[36m [;37;42m   [m
+[1;32m http://cd.twbbs.org[;32;40m¢×[30;42m [1;33m [37m¡¯[32m [37mAuthor:[;30;42m Dinsam      [1;37m¡¹ From:[;30;42m 218.171.110.242 [1;32m  [33m [;32;40m¢«[m

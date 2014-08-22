@@ -1,0 +1,56 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ±q¬ÝªO±N¤å³¹¦¬¶iºëµØ°Ï®É¦Û°Ê¼Ð°O¢ï
+®É¶¡: 2006/07/07 Fri 13:40:46                           Updated: 2006/07/07
+
+  1. ·í [A] ªOªO¥D±N [A] ªO¤å³¹¡u½Æ»s¶K¤W¡v©Î¡u¤À§O«ØÀÉ¦¬¿ý¡v
+     ¶i [A] ªOºëµØ°Ï®É¡A¸Ó¤å³¹·|¼Ð°O¢ï
+
+  2. ·í [A] ªOªO¥D±N [A] ªO¤å³¹¡u¶È½Æ»s¤£¶K¤W¡v¡A¸Ó¤å³¹¤£·|¼Ð°O¢ï
+
+  3. [B] ªOªO¥D¦¬¶i [B] ªOºëµØ°Ï¤£·|¼Ð°O¢ï
+
+  4. [A] ªO¤pªO¥D¦¬¶i [A] ªOºëµØ°Ï¤£·|¼Ð°O¢ï
+
+  5. [B] ªO¤pªO¥D¦¬¶i [B] ªOºëµØ°Ï¤£·|¼Ð°O¢ï
+
+  6. ¤@¯ë¨Ï¥ÎªÌ¦¬¶i¦Û¤v«H½cºëµØ°Ï¤£·|¼Ð°O¢ï
+
+  ­n°µºëµØ°Ï³o½g [¥\¯à] post.c ºëµØ°Ï¦¬ÂÃ¼Ð°O¢ï
+
+: gem.c:gem_do_paste()
+
+  int xmode, fsize;
+  char folder[64], fpath[64];
+  HDR fhdr, *data, *head, *tail;
+
++ if (*srcDir == 'b' && *dstDir == 'g' && !(hdr->xmode & POST_GEM))
++ {
++   char *ptr;
++   extern BCACHE *bshm;
++
++   strcpy(fpath, srcDir + 4);
++   if (ptr = strchr(fpath, '/'))
++   {
++     *ptr = '\0';
++
++     /* ±q¦P¤@¬ÝªO copy ¨ìºëµØ°Ï paste */
++     if (!strncmp(fpath, dstDir + 8, strlen(fpath)))
++     {
++       if ((xmode = brd_bno(fpath)) >= 0)
++       {
++         if (is_bm((bshm->bcache + xmode)->BM, cuser.userid))
++         {
++           hdr->xmode ^= POST_GEM;
++           currchrono = hdr->chrono;
++           rec_put(srcDir, hdr, sizeof(HDR), 0, cmpchrono);
++         }
++       }
++     }
++   }
++ }
+
+  xmode = hdr->xmode;
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-1.EE.NCTU.edu.tw[37m µoªí[m

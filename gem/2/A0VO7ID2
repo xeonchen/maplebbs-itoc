@@ -1,0 +1,439 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: [¤å¥ó] ¤p§Ì¾ã²z¹Lªº¡u¥þ¤å·j¯Á¡v
+µo«H¯¸: Àº¤Ñ±^ (Wed, 08 Oct 2003 13:46:57 +0800 (CST))    Updated: 2007/04/26
+
+±N¦U¦ì¤j¤jªº¤å³¹¾ã²z¤@¤U......
+µM«á¥Î userno + 10000 §@¬° SHMKEY ......
+filter_full_1 ©M filter_full_2 ¦X¨Ö...  ¥Î°Ñ¼Æ¨Ó§@¬°¤÷¤lµ{§Ç°Ï§O...
+¥Î malloc °t¸m°O¾ÐÅé¨Ó©ñ¸m¥þ½g¤å³¹...  ¦Ó«D©T©w¤j¤pªº°}¦C...
+¥i¥H¸`¬Ù°O¾ÐÅé¨Ã¥BÁ×§K¤å³¹¤Ó¤j¶W¹L°}¦C¤j¤p¡I
+
+: config.h
+
+#define STATUS_MGEMOVER BFLAG(7)        /* ­Ó¤HºëµØ°Ï¹L¦h */
++ #define STATUS_SHM    BFLAG(8)        /* ¨Ï¥Î shm */
+
+: maple/xpost.c
+
+static int
+XoXpost2(xo, hdr, on, off, fchk_1, fchk_2)
+  XO *xo;
+  HDR *hdr;     /* ·j´Mªº±ø¥ó */
+  int on, off;
+  int (*fchk_1) (); /* ·j´Mªº¨ç¦¡ */
+  int (*fchk_2) ();
+{
+  int *xlist, fsize, max, locus, *ptr, xyshmid;
+  char *fimage, buf[32];
+  HDR *head, *tail;
+  XO *xt;
+  pid_t pid;
+#ifdef HAVE_XYNEWS
+  int returnPos;
+#endif
+
+  if ((max = xo->max) <= 0) /* Thor.980911: µù¸Ñ: ¥H¨¾¸U¤@ */
+    return XO_FOOT;
+
+  /* build index according to input condition */
+
+  fimage = f_map(xo->dir, &fsize);
+
+  if (fimage == (char *) -1)
+  {
+    vmsg("¥Ø«eµLªk¶}±Ò¯Á¤ÞÀÉ");
+    return XO_FOOT;
+  }
+
+  /* allocate index memory, remember free first */
+
+  /* Thor.990113: ©È°Ýtitle, authorªºÀþ¶¡¤S¦³¤Hpost */
+  max = fsize / sizeof(HDR);
+  xlist = xypostI = (int *) malloc(sizeof(int) * max);
+  xyshmid = 10000 + cuser.userno;
+  ptr = shm_new(xyshmid, sizeof(int) * max);
+  cutmp->status |= STATUS_SHM;
+
+  max = 0;
+  head = (HDR *) fimage;
+  tail = (HDR *) (fimage + fsize);
+
+  if ((pid = fork()) > 0)
+  {
+    int middle = 0;
+
+    middle = (on + off) / 2;
+    if (middle == on)
+      middle = on + 1;
+    head += on;
+    locus = on - 1;
+    do
+    {
+      locus++;
+      if (locus > middle)
+        break;
+
+#ifdef HAVE_REFUSEMARK
+      if (!chkrestrict(head))
+        continue;
+#endif
+
+      if (!(search_all % 10000) && search_all > 0)
+      {
+        move(b_lines, 0);
+        prints("¤w¸g·j´M¤F %d ½g¤å³¹¡A­nÄ~Äò½Ð«ö¥ô·NÁä¡A­nµ²§ô½Ð«öEscÁä¡C"
+          , search_all);
+        if (igetch() == KEY_ESC)
+          break;
+      }
+
+      /* check condition */
+      if (!(* fchk_1) (head, hdr, 1))
+        continue;
+
+      xlist[max++] = locus;
+    } while (++head < tail);
+  }
+  else if (pid == 0)
+  {
+    int i = 0, middle = 0;
+
+    middle = (on + off) / 2;
+    if (middle == on)
+      exit(0);
+
+    head += middle + 1;
+    locus = middle;
+    do
+    {
+      locus++;
+      if (locus > off)
+        break;
+
+#ifdef HAVE_REFUSEMARK
+      if (!chkrestrict(head))
+        continue;
+#endif
+
+      /* check condition */
+      if (!(* fchk_2) (head, hdr, 2))
+        continue;
+
+      *(ptr + i) = locus;
+      i++;
+    } while (++head < tail);
+    exit(0);
+  }
+  else
+  {
+    do
+    {
+      locus++;
+      if (locus < on)
+        continue;
+      else if (locus > off)
+        break;
+
+#ifdef HAVE_REFUSEMARK
+      if (!chkrestrict(head))
+        continue;
+#endif
+
+      if (!(search_all % 10000) && search_all > 0)
+      {
+        move(b_lines, 0);
+        prints("¤w¸g·j´M¤F %d ½g¤å³¹¡A­nÄ~Äò½Ð«ö¥ô·NÁä¡A­nµ²§ô½Ð«öEscÁä¡C"
+          , search_all);
+        if (igetch() == KEY_ESC)
+          break;
+      }
+
+      /* check condition */
+      if (!(* fchk_1) (head, hdr, 1))
+        continue;
+
+      xlist[max++] = locus;
+    } while (++head < tail);
+  }
+  sleep(1); /* amaki.030912: ¤÷µ{§Ç¤pºÎ¤ù¨è¡A¤lµ{§Ç­Y¨S§ä§¹´Nºâ¤F */
+
+  munmap(fimage, fsize);
+
+  while (*ptr != 0 && pid > 0 && max > 0)
+  {
+    xlist[max++] = *ptr;
+    ptr++;
+  }
+
+  sprintf(buf, "ipcrm -M %d", xyshmid);
+
+  if (max <= 0)
+  {
+    free(xlist);
+    xypostI = NULL;
+    vmsg(MSG_XY_NONE);
+    memset(out_hunt, 0, 32);
+    memset(out_lunt, 0, 32);
+    system(buf);
+    cutmp->status ^= STATUS_SHM;
+    return XO_FOOT;
+  }
+
+  /* build XO for xpost_xo */
+
+  comebackPos = xo->pos;    /* Thor: record pos, future use */
+#ifdef HAVE_XYNEWS
+  returnPos = comebackPos;
+#endif
+
+  xz[XZ_XPOST - XO_ZONE].xo = xt = xo_new(xo->dir);
+  xz[XZ_XPOST - XO_ZONE].cb = (xo->dir[0] == 'b') ? xpost_cb : xmbox_cb;
+  xt->pos = 0;
+  xt->max = max;
+  xt->xyz = xo->xyz;
+  xt->key = XZ_XPOST;
+
+  xover(XZ_XPOST);
+
+  /* set xo->pos for new location */
+
+#ifdef HAVE_XYNEWS
+  if (xz[XZ_NEWS - XO_ZONE].xo)
+    xo->pos = returnPos;
+    /* ±q XZ_XPOST ¦^¨ì XZ_NEWS ´å¼Ð²¾¥h­ì¨Óªº¦a¤è */
+  else
+#endif
+    xo->pos = comebackPos;
+    /* ±q XZ_XPOST ¦^¨ì XZ_POST ´å¼Ð²¾¥h©Ò¿ï¨ú¤å³¹ªº¯u¥¿¦ì¸m */
+
+  /* free xpost_xo */
+
+  if (xt = xz[XZ_XPOST - XO_ZONE].xo)
+  {
+    free(xt);
+    xz[XZ_XPOST - XO_ZONE].xo = NULL;
+  }
+
+  /* free index memory, remember check free pointer */
+
+  if (xlist = xypostI)
+  {
+    free(xlist);
+    xypostI = NULL;
+  }
+
+  memset(out_hunt, 0, 32);
+  memset(out_lunt, 0, 32);
+  system(buf);
+  cutmp->status ^= STATUS_SHM;
+  return XO_INIT;
+}
+
+
+static int                      /* 0:¤£º¡¨¬±ø¥ó  !=0:º¡¨¬±ø¥ó */
+filter_full(head, hdr, fchk_num)
+  HDR *head;    /* «Ý´úª« */
+  HDR *hdr;     /* ±ø¥ó */
+  int fchk_num; /* µ{§Ç½s¸¹ */
+{
+  char fpath[64], *key, *buf;
+  int rc, fd, len;
+  struct timeval tv = {0, 10};
+  struct stat st;
+
+  if (fchk_num == 1 && search_fit < 0)
+    return 0;
+
+  hdr_fpath(fpath, search_folder, head);
+
+  if ((fd = open(fpath, O_RDONLY, 0600)) < 0)
+    return 0;
+
+  stat(fpath, &st);
+  buf = (char *) malloc(st.st_size + 1);
+
+  if (fchk_num == 1)
+  {
+    if (search_all % 100 == 0)  /* ¨C 100 ½g¤~ refresh ¤@¦¸ */
+    {
+      move(b_lines, 0);
+      clrtoeol();
+      prints("¥Ø«e§ä¨ì \033[1;33m%d / %d\033[m ½g¡A¥þ¤å·j´M¤¤\033[5m...\033[m"
+        "«ö¥ô·NÁä¤¤Â_", search_fit, search_all);
+      refresh();
+    }
+    search_all++;
+  }
+
+  rc = 0;
+  key = hdr->title;
+
+  while (len = read(fd, buf, st.st_size))
+  {
+    buf[len] = '\0';
+    if (strstr(buf, key))
+    {
+      rc = 1;
+      if (fchk_num == 1)
+        search_fit++;
+      break;
+    }
+    if (len < st.st_size)       /* ¤w¸gÅª§¹¾ã­ÓÀÉ */
+      break;
+  }
+
+  free(buf);
+
+  close(fd);
+
+  if (fchk_num == 1)
+  {
+    /* ¨Ï¥ÎªÌ¥i¥H¤¤Â_·j´M */
+    fd = 1;
+    if (select(1, (fd_set *) &fd, NULL, NULL, &tv) > 0)
+    {
+      vkey();
+      search_fit = -1;
+    }
+  }
+
+  return rc;
+}
+
+
+int
+XoXfull(xo)
+  XO *xo;
+{
+  HDR hdr;
+  char *key, ans[8], MSG[40];
+  int i = 0, head, tail;
+
+  if (HAS_STATUS(STATUS_COINLOCK))
+  {
+    vmsg(msg_coinlock);
+    return XEASY;
+  }
+
+  if (xz[XZ_XPOST - XO_ZONE].xo)        /* itoc.020308: ¤£±o²Ö¿n¶i¤J¤G¦¸ */
+  {
+    vmsg(MSG_XYDENY);
+    return XO_FOOT;
+  }
+
+  /* input condition */
+
+  key = hdr.title;
+  if (!vget(b_lines, i, "¥þ¤å·j´M¡G", key, 30, DOECHO))
+    return XO_FOOT;
+
+  sprintf(xypostHintword, "[¥þ¤å·j´M] %s", key);
+  xypostHintauthor[0] = '\0';
+
+  search_folder = xo->dir;
+  search_fit = 0;
+  search_all = 0;
+
+  if (vget(b_lines, i, "[³]©w·j´M½d³ò] °_ÂI(0=¥þ³¡·j¯Á)¡G", ans, 6, DOECHO))
+  {
+    head = atoi(ans);
+    i += 40;
+  }
+  else
+    return XO_FOOT;
+
+  if (head < 0)
+  {
+    zmsg("°_ÂI¦³»~");
+    return XO_FOOT;
+  }
+  else if (head > xo->max || head == 0)
+  {
+    head = 1;
+    tail = xo->max;
+    strcpy(MSG, "­n¶i¦æ¥þ³¡·j´M¡A½Ð±z½T©w(Y/N)¡H[N]");
+  }
+  else
+  {
+    vget(b_lines, i, "²×ÂI¡G", ans, 6, DOECHO);
+    tail = atoi(ans);
+    if (tail < head)
+    {
+      zmsg("²×ÂI¦³»~");
+      return XO_FOOT;
+    }
+    if (tail > xo->max)
+      tail = xo->max;
+    strcpy(MSG, msg_sure_ny);
+    i += 13;
+  }
+
+  head--;
+  tail--;
+
+  if (vget(b_lines, i, MSG, ans, 3, LCECHO) == 'y')
+  {
+    strcpy(out_hunt, key);
+    str_lower(out_lunt, out_hunt);
+    return XoXpost2(xo, &hdr, head, tail, filter_full, filter_full);
+  }
+  else
+  {
+    memset(out_lunt, 0, 32);
+    memset(out_hunt, 0, 32);
+    return XO_FOOT;
+  }
+}
+
+
+: maple/bbsd.c:u_exit()
+
+  int fd, diff;
+  char fpath[80], buf[32];
+  ACCT tuser;
+
+[1;32;40m+ if (cutmp->status & STATUS_SHM)[m
+[1;32;40m+ {[m
+[1;32;40m+   sprintf(buf, "ipcrm -M %d", (cutmp->userno + 10000));[m
+[1;32;40m+   system(buf);[m
+[1;32;40m+ }[m
+
+
+: maple/bguard.c:ushm_guard()
+
+      if (flop & 15)
+      {
+#ifdef TIME_KICKER
+    if (idle >= IDLE_TIMEOUT)
+    {
+      errno = 0;
+
+[1;32;40m+     if (uentp->status & STATUS_SHM)[m
+[1;32;40m+     {[m
+[1;32;40m+       sprintf(buf, "ipcrm -M %d", (uentp->userno + 10000));[m
+[1;32;40m+        system(buf);[m
+[1;32;40m+     }[m
+
+      if ((kill(pid, SIGTERM) < 0) && (errno == ESRCH))
+
+
+: maple/bguard.c:ushm_guard()
+
+#ifdef TIME_KICKER
+    if (idle >= IDLE_TIMEOUT)
+      sig = SIGTERM;
+#endif
+
+    if ((kill(pid, sig) < 0) && (errno == ESRCH))
+    {
+[1;32;40m+     if (uentp->status & STATUS_SHM)[m
+[1;32;40m+     {[m
+[1;32;40m+       /* FreeBSD ¤~¥Î ipcrm -M¡ALinux ¤£¤@¼Ë */[m
+[1;32;40m+       sprintf(buf, "ipcrm -M %d", (uentp->userno + 10000));[m
+[1;32;40m+       system(buf);[m
+[1;32;40m+     }[m
+      uentp->pid = uentp->userno = 0;
+
+--
+ [1;41m¢z[42m¢q[m Or[1mig[30min[m: [41m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+ [1;43m¢q[44m¢}[m A[1mut[30mho[mr: [1;33mBioStar [30m±q [35m163.23.212.18 [30mµoªí[m

@@ -1,0 +1,38 @@
+µo«H¤H: chonsi.bbs@WithHeart.twbbs.org (¦B¶ô¤¤ªº¯P¤õ - ¦BµK), ¬ÝªO: plan
+¼Ð  ÃD: [¤À¨É]Â²¤ÆÂ÷¯¸¤ô²y³B²zµ{§Ç
+µo«H¯¸: ÀH¤ß§{ (Thu Dec 26 18:43:57 2002)                 Updated: 2003/08/17
+
+¦]¬°Ãh©À¥H«eÂ÷¯¸®É³B²z¤ô²yªºÂ²¼ä...
+§Æ±æ¤£­nª½±µ¦C¥X¤ô²y¬ö¿ý... (­n¦h«ö´X­ÓÁä¤~¯àÂ÷¶})
+§ïÅý¨Ï¥ÎªÌ¦Û¤v¿ï¾Ü­n¤£­n¦C¥X¨Ó...
+
+: bmw.c:bmw_log()
+
+    if ((cuser.ufo & UFO_NWLOG) || !st.st_size)
+    {
+      op = 'c';
+    }
+    else
+    {
+[1;31m- [m    more(buf, (char *) -1);
+#ifdef RETAIN_BMW
+[1;32m![m     op = vans("... (R)«O¯d [1;33m(L)¦C¥X [m(C)²M°£ (S)¦sÃÒ¡H[R] ");
+#else
+[1;32m![m     op = vans("... (R)«O¯d [1;33m(L)¦C¥X [m(C)²M°£¡H[R] ");
+#endif
+    }
+
+  ...
+  ...
+
+[1;33m+[m    case 'l':
+[1;33m+[m      more(buf, (char *) -1);
+[1;33m+[m      bmw_log();
+[1;33m+[m      break;
+
+    default:
+      break;
+
+--
+    [1;36m¢~¢w¢w Origin ¢¡ [37mÀH¤ß§{ [33;45m chonsi.dorm8.nctu.edu.tw [36;40m ¡ã £\£]£^ ¢w¢w¢q[m
+    [1;36m¢q     Author ¢£ [32mntserv.csie.nctu.edu.tw[m

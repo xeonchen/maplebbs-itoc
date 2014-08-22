@@ -1,0 +1,55 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý­×§ï¤å³¹/«H¥óÀÉÀY
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/02/26 Thu 23:38:50)                Updated: 2006/02/23
+
+¡° ¤Þ­z¡mAwing (¤s©Y¦Ï)¡n¤§»Ê¨¥¡G
+> ¬°¤F¾AÀ³ÂÂ¯¸¨Ï¥ÎªÌ²ßºD,
+> §Ú§âÀÉÀY¦h¥[¤W¤F¤@ºb,
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+: more.c:more()
+
+int
+more(fpath, footer)
+  char *fpath;
+  char *footer;
+{
++ #define MSG_SEPERATE    "\033[36m"MSG_SEPERATOR"\033[m\n"
++ uschar *fnew;
+
+  ...
+  ...
+
+    if (!*buf)  /* ²Ä¤@¦¸ "\n\n" ¬OÀÉÀYªºµ²§À */
+      break;
+  }
+  headend = foff;
+
++ if (header_len && footer)     /* ¤@¯ë¤å³¹¡A¦bÀÉÀY»P¥»¤å¤§¶¡¥[¤J¤À¹j½u */
++ {
++   lino = strlen(MSG_SEPERATE);
++
++   if (!(fnew = malloc(fsize + lino)))
++   {
++     free(fimage);
++     return -1;
++   }
++
++   shift = foff - fimage;
++   memcpy(fnew, fimage, shift);
++   memcpy(fnew + shift, MSG_SEPERATE, lino);
++   memcpy(fnew + shift + lino, foff, fsize - shift);
++
++   free(fimage);
++   fsize += lino;
++   fimage = fnew;
++   fend = fimage + fsize;
++   headend = fimage + shift;
++ }
+
+  /* Âk¹s */
+  foff = fimage;
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

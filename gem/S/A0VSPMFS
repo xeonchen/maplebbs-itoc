@@ -1,0 +1,186 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: Ãö©óM3 for win
+®É¶¡: Wed Dec  3 02:25:27 2003                          Updated: 2005/04/05
+
+¡° ¤Þ­z¡mGainer.bbs@venus.nhit.edu.tw (GAI)¡n¤§»Ê¨¥¡G
+> §Ú¤w¸g¬[³]Maple¤£¹L¦b¨t²ÎºûÅ@°Ï¸Ì­±¤Ö¤F¤@¦V'³]©wÅv­­'
+> ­n¦p¦ó·s¼W©O??
+
+: menu.c:menu_admin[]
+
+  "bin/admutil.so:a_user", PERM_ALLACCT, - M_SYSTEM,
+  "User       ¢« ÅU«È¸ê®Æ ¢¨",
+
++ "bin/admutil.so:a_setperm", PERM_ALLBOARD, - M_SYSTEM,
++ "Perm       ¢« ³]©wÅv­­ ¢¨",
+
+: admutil.c:a_setperm() ¥[¦b a_user() «á­±
+
+int
+a_setperm()
+{
+  ACCT acct;
+  int adm;
+  usint levelup, leveldown;
+  char ans[8];
+
+  move(1, 0);
+  clrtobot();
+
+  while (acct_get(msg_uid, &acct) > 0)
+  {
+    if (acct.userlevel & PERM_ALLADMIN)        /* ¤£¯à§ï¯¸°ÈªºÅv­­ */
+      return 0;
+
+    [1;44m// ¦pªG¤j¯¸ªø¤£·QÅý¤p¯¸ªø¥Î  ¢« ³]©wÅv­­ ¢¨ ³o¿ï¶µ¬Ý¨Ï¥ÎªÌ¸ê®Æ [m
+    [1;44m// ¨º»ò¥i¥H§â¤U­±³o¦æ®³±¼                                      [m
+    acct_show(&acct, 1);        /* Åã¥Ü¨Ï¥ÎªÌ¸ê®Æ */
+
+    if (HAS_PERM(PERM_ALLACCT))
+    {
+      adm = vans("³]©w 1)ªO¥D¤W¥ô 2)ªO¥D¨ø¥ô 3)°±Åv 4)´_Åv 5)¬å±b¸¹¡H[Q] ");
+      if (adm < '1' || adm > '5')
+        return 0;
+    }
+    else /* if (HAS_PERM(PERM_ALLBOARD)) */
+    {
+      adm = vans("³]©w 1)ªO¥D¤W¥ô 2)ªO¥D¨ø¥ô Q)¨ú®ø [Q] ");
+      if (adm < '1' || adm > '2')
+        return 0;
+    }
+
+    if (vans(msg_sure_ny) != 'y')
+      return 0;
+
+    switch (adm)
+    {
+    case '1':
+      levelup = PERM_BM;
+      leveldown = 0;
+      break;
+
+    case '2':
+      levelup = 0;
+      leveldown = PERM_BM;
+      break;
+
+    case '3':
+      levelup = 0;
+      if (vans("½Ð°Ý­n°±¤î³o¦ì¨Ï¥ÎªÌªºµo¤åÅv¶Ü(Y/N)¡H[Y] ") != 'n')
+        levelup |= PERM_DENYPOST;
+      if (vans("½Ð°Ý­n°±¤î³o¦ì¨Ï¥ÎªÌªº½Í¸ÜÅv¶Ü(Y/N)¡H[Y] ") != 'n')
+        levelup |= PERM_DENYTALK;
+      if (vans("½Ð°Ý­n°±¤î³o¦ì¨Ï¥ÎªÌªº²á¤ÑÅv¶Ü(Y/N)¡H[Y] ") != 'n')
+        levelup |= PERM_DENYCHAT;
+      if (vans("½Ð°Ý­n°±¤î³o¦ì¨Ï¥ÎªÌªº±H«HÅv¶Ü(Y/N)¡H[Y] ") != 'n')
+        levelup |= PERM_DENYMAIL;
+      leveldown = 0;
+
+      /* °±Åv­n«ü©w´Á­­ */
+      adm = -1;
+      if (vget(b_lines, 0, "°±Åv´X¤Ñ¡G", ans, 4, DOECHO))
+        adm = atoi(ans);
+      if (adm <= 0)
+        adm = 30;         /* ¹w³] 30 ¤Ñ */
+      acct.tvalid = time(0) + adm * 86400;
+      break;
+
+    case '4':
+      levelup = 0;
+      leveldown = PERM_ALLDENY;
+      time(&(acct.tvalid));
+      break;
+
+    case '5':
+      levelup = PERM_PURGE;
+      leveldown = 0;
+      break;
+    }
+
+    acct_setperm(&acct, levelup, leveldown);
+  }
+
+  return 0;
+}
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ¯¸°È°±Åv»Ý­n¿é¤J²z¥Ñ¡A¨Ã¥B§â²z¥Ñ°O¦b log ªO
+
+: admutil.c ·s¼W¥H¤U¨ç¦¡¦b a_setperm() «e­±
+
+static void
+add_post(brdname, fpath, title)           /* µo¤å¨ì¬ÝªO */
+  char *brdname;        /* ±ý post ªº¬ÝªO */
+  char *fpath;          /* ÀÉ®×¸ô®| */
+  char *title;          /* ¤å³¹¼ÐÃD */
+{
+  HDR hdr;
+  char folder[64];
+
+  brd_fpath(folder, brdname, fn_dir);
+  hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
+  strcpy(hdr.owner, cuser.userid);
+  strcpy(hdr.nick, cuser.username);
+  strcpy(hdr.title, title);
+  rec_add(folder, &hdr, sizeof(HDR));
+}
+
+
+static void
+log_setperm(userid, day, reason)
+  char *userid;
+  int day;
+  char *reason;
+{
+  char fpath[64], title[TTLEN + 1];
+  FILE *fp;
+
+  sprintf(fpath, "tmp/log_setperm.%s", cuser.userid);   /* ¼È¦sÀÉ */
+  if (fp = fopen(fpath, "w"))
+  {
+    sprintf(title, "¯¸ªø %s °± %s Åv %d ¤Ñ",
+      cuser.userid, userid, day);
+
+    /* ¤å³¹ÀÉÀY */
+    fprintf(fp, "%s %s (%s) %s %s\n",
+      str_author1, cuser.userid, cuser.username,
+      str_post2, BN_SECURITY);
+    fprintf(fp, "¼ÐÃD: %s\n®É¶¡: %s\n\n", title, Now());
+
+    /* ¤å³¹¤º®e */
+    fprintf(fp, "%s\n\n", title);
+    fprintf(fp, "²z¥Ñ¡G%s\n\n", reason);
+    fclose(fp);
+
+    add_post(BN_SECURITY, fpath, title);
+    unlink(fpath);
+  }
+}
+
+: admutil.c:a_setperm()
+
+  ACCT acct;
+  int adm;
+  usint levelup, leveldown;
+  char ans[8];
++ char reason[80];
+
+  ...
+  ...
+
+      /* °±Åv­n«ü©w´Á­­ */
+      adm = -1;
+      if (vget(b_lines, 0, "°±Åv´X¤Ñ¡G", ans, 4, DOECHO))
+        adm = atoi(ans);
+      if (adm <= 0)
+        adm = 30;         /* ¹w³] 30 ¤Ñ */
+      acct.tvalid = time(0) + adm * 86400;
++     if (!vget(b_lines, 0, "°±Åv²z¥Ñ¡G", reason, 50, DOECHO))
++       strcpy(reason, "²ö¶·¦³");
++     log_setperm(acct.userid, adm, reason);
+      break;
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

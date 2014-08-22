@@ -1,0 +1,48 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: Re: [°ÝÃD] ¥i¥H°µ¨ì anonymous »P unanonymous ªº±À¤å³s°Ê¶Ü¡H
+®É¶¡: 2005/01/12 Wed 09:55:47                           Updated: 2005/01/12
+
+¡° ¤Þ­z¡mBioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶)¡n¤§»Ê¨¥¡G
+> ·Q»¡ anonymous »P unanonymous ¬O§_¤]¥i¥H±À¤å³s°Ê......
+> ¦]¬° anonymous »P unanonymous ªº chrono ¬Û¦P......
+
+  ¦pªG§A¥u¦³¤@­Ó°Î¦W¬ÝªO¡A¦ý anonymous »P unanonymous ªº chrono
+  ¦³«Ü¤j¥i¯à¬O¬Û¦Pªº (ÁÙ¬O¦³¥i¯à®t 1 ¬í)
+
+  ¨º¥i¥H³o¼Ë§ï
+
+: post.c:do_unanonymous()
+
+- hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
++ hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
+
+: post.c:post_score()
+
+  if (fp = fopen(fpath, "a"))
+  {
+    time_t now;
+    struct tm *ptime;
++   char folder[64], buf[80];
+
+    time(&now);
+    ptime = localtime(&now);
+
+-   fprintf(fp, "¡÷ \033[36m%s %s\033[m¡G%-*s%02d/%02d/%02d\n",
++   sprintf(buf, "¡÷ \033[36m%s %s\033[m¡G%-*s%02d/%02d/%02d\n",
+      userid, verb, 62 - strlen(userid), reason,
+      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
++   fputs(buf, fp);
+    fclose(fp);
+
++#ifdef HAVE_ANONYMOUS
++   if ((currbattr & BRD_ANONYMOUS) && strcmp(userid, cuser.userid))
++   {
++     brd_fpath(folder, BN_UNANONYMOUS, fn_dir);
++     hdr_fpath(fpath, folder, hdr);
++     f_cat(fpath, buf);
++   }
++#endif
+  }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,42 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: itoc
+¼Ð  ÃD: [¤å¥ó] ºëµØ°Ïªº½g¼Æ¤W­­©M®e¶q¤W­­
+µo«H¯¸: Àº¤Ñ±^ (Sun, 06 Jul 2003 15:21:41 +0800 (CST))    Updated: 2003/07/09
+
+  (1) Âà´« .ACCT
+
+  ­º¥ýÃö¯¸
+
+: src/util/tran/transacct.c:NEW
+
+struct NEW                      /* ­n©M·sª©µ{¦¡ struct ¤@¼Ë */
+{
+  ...
+  ...
+  char lasthost[30];            /* ¤W¦¸µn¤J¨Ó·½ */
+  char email[60];               /* ¥Ø«eµn°Oªº¹q¤l«H½c */
+
++ int gemsize_n;                /* ­Ó¤HºëµØ°Ï½g¼Æ¤W­­ */
++ int gemsize_k;                /* ­Ó¤HºëµØ°Ï®e¶q¤W­­ */
+};
+
+: src/util/tran/transacct.c:main()
+
+      strcpy(new.lasthost, old.lasthost);
+      strcpy(new.email, old.email);
++     new.gemsize_n = 1000;        /* ¹w³]¤W­­ 1000 ½g */
++     new.semsize_k = 100000;      /* ¹w³]¤W­­ 100000 bytes */
+
+
+  µM«á compile transacct.c ¨Ã°õ¦æ transacct
+
+: include/struct.h:ACCTªºµ²ºc
+
+  char lasthost[30];            /* ¤W¦¸µn¤J¨Ó·½ */
+  char email[60];               /* ¥Ø«eµn°Oªº¹q¤l«H½c */
++ int gemsize_n;                /* ­Ó¤HºëµØ°Ï½g¼Æ¤W­­ */
++ int gemsize_k;                /* ­Ó¤HºëµØ°Ï®e¶q¤W­­ */
+}
+
+--
+[1;31m|[33m Origin [31m| [;37;45m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [35;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m218-163-206-115.HINET-IP.hinet.net[m

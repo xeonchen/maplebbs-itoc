@@ -1,0 +1,48 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] Â²Åé¤ä´© (1)
+®É¶¡: 2004/12/17 Fri 18:05:29                           Updated: 2004/12/17
+
+¡° ¤Þ­z¡mintelp.bbs@wretch.csie.nctu.edu.tw (....)¡n¤§»Ê¨¥¡G
+> ´N¬O¦VµL¦W¯¸¤@¼Ë...
+> ¿é¤J±b¸¹«á­±¦A¦h¥[¤@­Ó ÂI
+> ´N¥i¥HÂà¦¨ Â²Åéµe­±...
+
+  ¶i¯¸¿é¤J ID «á­±¥[­Ó . ªí¥Ü ¥ÎÂ²Åé
+
+: global.h
+
++ VAR int trans2gb;             /* Âà¦¨Â²Åé¤¤¤å */
+VAR int bbsmode;                /* bbs operating mode, see modes.h */
+VAR usint bbstate;              /* bbs operatine state */
+
+: bbsd.c:login_user()
+
+  int attempts;         /* ¹Á¸Õ´X¦¸¿ù»~ */
+  int multi;
++ int len;
+- char fpath[64], uid[IDLEN + 1];
++ char fpath[64], uid[IDLEN + 2];
+#ifndef CHAT_SECURE
+  char passbuf[PSWDLEN + 1];
+#endif
+
+  move(b_lines, 0);
+  outs("   ¡° °ÑÆ[±b¸¹¡G\033[1;32m" STR_GUEST "\033[m  ¥Ó½Ð·s±b¸¹¡G...");
++ move(b_lines - 3, 0);
++ outs("Add '.' after your ID for simplified Chinese GB support");
+
+  ...
+  ...
+
+-   vget(b_lines - 2, 0, "   [±zªº±b¸¹] ", uid, IDLEN + 1, DOECHO);
++   vget(b_lines - 2, 0, "   [±zªº±b¸¹] ", uid, IDLEN + 2, DOECHO);
+
++   len = strlen(uid) - 1;
++   if (uid[len] == '.')
++   {
++     uid[len] = '\0';
++     trans2gb = 1;
++   }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

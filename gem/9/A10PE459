@@ -1,0 +1,30 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] menu.c ­Y¦³µù¥U³æ¡A¯¸ªøªº vs_head ·|°{°Ê´£¥Ü
+®É¶¡: Sat Jul 13 12:46:40 2002                          Updated: 2004/03/05
+
+¡° ¤Þ­z¡mdream.bbs@sea.twbbs.org (£i ¬î®ü´Å £i)¡n¤§»Ê¨¥¡G
+> ¦³·s¨Ï¥ÎªÌ¶ñµù¥U³æ®É¡A¯¸ªø¨Ã¤£·|¦¬¨ì³qª¾¡C
+> ¯à­×§ï¦¨¡@
+> [1;36;44mºëµØ¤å³¹  [37;46m           [5;33;45m  ¦³·sªº¨Ï¥ÎªÌµù¥UÅo!  [;1;37;46m                ¬ÝªO [33;44m  [36mSYSOP  [m
+
+: menu.c:vs_head()
+
+  if (HAS_STATUS(STATUS_BIFF))
+  {
+    mid = "\033[5;41m ¶l®t¨Ó«ö¹a¤F \033[m";
+    spc = 14;
+  }
++ else if (HAS_PERM(PERM_ALLREG) &&
++   rec_num(FN_RUN_RFORM, sizeof(RFORM)))
++ {
++   mid = "\033[5;45m ¦³¤H¶ñµù¥U³æ \033[m";
++   spc = 20;
++ }
+  else
+  {
+
+--
+  ³o·|¦Y I/O
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32ma128124.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

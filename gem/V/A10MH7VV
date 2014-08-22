@@ -1,0 +1,43 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý ¶i¯¸µe­±Åã¥Ü¨t²Î¤w¶}¾÷®É¶¡
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/10 Sun 09:34:58)                Updated: 2004/10/10
+
+¡° ¤Þ­z¡mchue.bbs@wretch.twbbs.org (¹]µ§)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý ¶i¯¸µe­±Åã¥Ü¨t²Î¤w¶}¾÷®É¶¡¦p¦ó¼g...ºëµØ°Ï§ä¤£¨ì
+
+  ¶}ÀYµe­±¨q¥X²Ä¤@¦ì¨Ï¥ÎªÌ¤W¯¸¦Ü¤µªº®É¶¡
+
+  §ï struct UCACHE ­n­«¶} bbs
+
+: struct.h:UCACHE
+
+  double sysload[3];
+  int avgload;
++ time_t bbs_start;     /* ²Ä¤@­Ó¨Ï¥ÎªÌ¤W¯¸®É¶¡ */
+
+: cache.c:ushm_init()
+
+  ushm = shm_new(UTMPSHM_KEY, sizeof(UCACHE));
++ if (!(ushm->bbs_start))
++   time(&(ushm->bbs_start));
+
+: bbsd.c:tn_main()
+
+static inline void
+tn_main()
+{
++ time_t diff;
+  clear();
+
+- prints(MYHOSTNAME " ¡ó " SCHOOLNAME " ¡ó " MYIPADDR "\n"
+-   "Åwªï¥úÁ{¡i\033[1;33;46m %s \033[m¡j¥Ø«e½u¤W¤H¼Æ [%d] ¤H",
+-   str_site, ushm->count);
++ diff = (time(0) - ushm->bbs_start) / 3600;
++ prints(MYHOSTNAME " ¡ó " SCHOOLNAME " ¡ó " MYIPADDR "\n"
++   "Åwªï¥úÁ{¡i\033[1;33;46m %s \033[m¡j¥Ø«e½u¤W¤H¼Æ [%d] ¤H¡A"
++   "¤w¶}¾÷ %d ¤Ñ %d ®É",
++   str_site, ushm->count, diff / 24, diff % 24);
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

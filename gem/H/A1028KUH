@@ -1,0 +1,21 @@
+µo«H¤H: waynesan.bbs@csc241.twbbs.org (ªüªê), ¬ÝªO: plan
+¼Ð  ÃD: Re: [¶¢²á] ¤p¤ë¾ä
+µo«H¯¸: °g¤Û°ê«× (Sat, 22 Feb 2003 18:10:33 +0800 (CST))  Updated: 2003/03/26
+
+¥ý¨ìnoteª©ªº °ÊºA¬ÝªO ºëµØ°Ï¤¤ÀH«KPO¤@½g¤å
+¦n¤F¦sÀÉ«á¦b¦Cªí¤¤
+¦b­è­è¨º½g¤å³¹«e«ö(S)
+¬d¬ÝFile¬O­þ¸Ì
+¨Ò¦p File: gem/brd/note/1/A0V5EIP1
+µM«á¦A±N¤U¦æ¥[¤Jcrontab
+
+# ¨C¤ë¤@¸¹§â¤p¤ë¾ä©ñ¨ì°ÊºA¬ÝªO
+3 2 1 * * src/sh/calendar.sh > gem/brd/note/1/A0V5EIP1
+
+--
+    [1;31m¡Z¡Z[34m¡Z¡Z[m
+  [1;31m¡þ  [37m¡þ[31m    [34m¢@  [31m°g[34m¤Û[37m°ê«×[31m Charming [34mShadow [37mCountry[m
+[1;31m¢y  [37m¡þ[31m  [37m¡þ¢@[34m¢y  [33m¤J¹Ò¦ì§} csc241.twbbs.org[m
+[31;1m¢y  [37m¢@¡þ[31m  [37m¡þ[34m¢y  [32m¦ì§}¥N½X 203.71.212.241[m
+[31;1m  ¢@    [37m¡þ[31m  [34m¡þ  [36m¨Ó·½¥À°ê 61-225-89-60.HINET-IP.hinet.net[m
+[31;1m    ¢v¢v[34m¢v¢v    [35mµoªí®É¶¡ 03/02/22 18:10:33 [m

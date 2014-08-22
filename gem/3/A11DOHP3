@@ -1,0 +1,36 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] bbsd.c ¥Ó½Ð new id ¥H«á´N°¨¤Wµù¥U
+®É¶¡: Sat Jul 20 01:27:39 2002                          Updated: 2005/10/31
+
+¡° ¤Þ­z¡mmac.bbs@kulu.twbbs.org (­·¤§§¯ºë)¡n¤§»Ê¨¥¡G
+>     §Ú·QÅý¨Ï¥ÎªÌ  ¦bnew±b¸¹®É
+>     ¶ñ§¹°ò¥»¸ê®Æ«á  ´N°¨¤W¨Ï¥Îe-mailµù¥U
+
+: bbsd.c:tn_reg() ·s¼W³o¨ç¦¡©ó tn_motd() «e­±
+
+static void
+tn_reg()
+{
+  if (vans("¬O§_°¨¤W E-mail »{ÃÒ(Y/N)¡H[Y] ") != 'n')
+    u_addr();
+  else if (vans("¬O§_°¨¤W¶ñ¼gµù¥U³æ(Y/N)¡H[Y] ") != 'n')
+    u_register();
+  else
+    vmsg("­nµù¥U¤~·|¦³§¹¾ãÅv­­³á");
+}
+
+: bbsd.c:tn_motd()
+
+#ifdef HAVE_FORCE_BOARD
+  brd_force();  /* itoc.000319: ±j¨î¾\Åª¤½§iªO */
+#endif
+
++ if (cuser.numlogins == 1)     /* itoc.020719: ·sµù¥Uªº¨Ï¥ÎªÌ°¨¤Wµù¥U */
++ {
++   tn_reg();
++   cuser.numlogins++;      /* itoc.030217: ¥H§K¤W¯¸¥¼¹F¤@¤ÀÄÁ¡A¤£­p¦¸¼Æ */
++ }
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

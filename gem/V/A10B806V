@@ -1,0 +1,61 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¦p¦ó·s¼W¤½§i«¬¬ÝªO..
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/05/26 Wed 09:24:54)                Updated: 2004/05/26
+
+¡° ¤Þ­z¡mUizmp (¶Â³Tªk®v)¡n¤§»Ê¨¥¡G
+> Ãþ¦ü0Announceª©ªº¥\¯à
+> ³Ì¦n¥i¥H³]©wµ¹¦³ or ¨S¦³¤@ºØÅv­­ªº¤H¤@©w­n¬Ýªº..
+> ex. ÅýÅýª©¥D±j­¢¥h¬Ýbmª©ªº·s¤å³¹¤§Ãþªº
+
+: bbsd.c:tn_motd()
+
+#ifdef HAVE_FORCE_BOARD
+  brd_force();
++ brd_force2();
+#endif
+
+: maple.p
+
+void brd_force(void);
++ void brd_force2(void);
+
+: board.c:brd_force2() ·s¼W¦b brd_force() ¤U­±
+
+#ifdef HAVE_FORCE_BOARD
+void
+brd_force2()
+{
+  if (HAS_PERM(PERM_BM))        [1;44m// ­­¨î±ø¥ó¦Û©w [m
+  {
+    int bno;
+    BRD *brd;
+
+    bno = brd_bno("bm");        [1;44m// ¬ÝªO¦Û©w [m
+    brd = bshm->bcache + bno;
+    if (brd->btime <= 0)        /* ©|¥¼§ó·s brd->blast ´N¤£±j¨î¾\Åª¤½§iªO */
+      return;
+
+    brh_get(brd->bstamp, bno);
+
+#ifdef ENHANCED_VISIT
+    while (brh_unread(brd->blast))
+#else
+    if (brd->blast > brd_visit[bno])
+#endif
+    {
+      vmsg("¦³·s¤½§i¡I½Ð¥ý¾\\Åª§¹·s¤½§i«á¦AÂ÷¶}");
+      XoPost(bno);
+      xover(XZ_POST);
+
+#ifndef ENHANCED_VISIT
+      time(&brd_visit[bno]);
+#endif
+    }
+  }
+}
+#endif  /* HAVE_FORCE_BOARD */
+
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;45m¢¢[42m¢¡[m [1mMo[30mdi[mfy: [1;36m2004/05/26 Wed 09:24:54[m

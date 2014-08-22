@@ -1,0 +1,156 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¼öªù¬ÝªO±Æ¦æº](2)¡Ðtopbrd.c
+µo«H¯¸: ¤¤¿³¸ê¬ì (Mon, 14 Jul 2003 17:08:54 +0800 (CST))  Updated: 2007/05/13
+
+: util/Makefile
+
+EXE = .......
+[1;32m![m     ............. topusr [1;32mtopbrd[m usies-sort
+
+
+: util/topbrd.c
+
+    ·s¼W¾ã¤äµ{¦¡¡A°Ñ¦Ò topgem.c §ïªº¡C
+
+/*-------------------------------------------------------*/
+/* topbrd.c ( NTHU CS MapleBBS Ver 3.10 )                */
+/*-------------------------------------------------------*/
+/* target : ¼öªù¬ÝªO±Æ¦æº]                               */
+/* create : 03/07/03                                     */
+/* update : 03/07/03                                     */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/* modify : qazq.bbs@bbs.cs.nchu.edu.tw                  */
+/*-------------------------------------------------------*/
+
+
+
+#include "bbs.h"
+
+
+#define BRD_TIMES   "run/brd_times.log"
+#define TOPBRD      "gem/@/@-topbrd"
+
+/*-------------------------------------------------------*/
+/* BRD shm ³¡¤À¶·»P cache.c ¬Û®e                         */
+/*-------------------------------------------------------*/
+
+
+static BCACHE *bshm;
+
+
+static void
+init_bshm()
+{
+  /* itoc.030727: ¦b¶}±Ò bbsd ¤§«e¡AÀ³¸Ó´N­n°õ¦æ¹L account¡A
+     ©Ò¥H bshm À³¸Ó¤w³]©w¦n */
+
+  bshm = shm_new(BRDSHM_KEY, sizeof(BCACHE));
+
+  if (bshm->uptime <= 0)        /* bshm ¥¼³]©w§¹¦¨ */
+    exit(0);
+}
+
+
+static BRD *
+brd_get(brdname)
+  char *brdname;
+{
+  BRD *bhdr, *tail;
+
+  bhdr = bshm->bcache;
+  tail = bhdr + bshm->number;
+  do
+  {
+    if (!strcmp(brdname, bhdr->brdname))
+      return bhdr;
+  } while (++bhdr < tail);
+  return NULL;
+}
+
+
+typedef struct
+{
+  int times;            /* ¶i¤J¬ÝªO¾\Åª¦¸¼Æ */
+  char brdname[BNLEN + 1];  /* ªO¦W */
+}   BRDDATA;
+
+
+static int
+int_cmp(a, b)
+  BRDDATA *a, *b;
+{
+  return (b->times - a->times); /* ¥Ñ¤j±Æ¨ì¤p */
+}
+
+
+int
+main()
+{
+  time_t now;
+  struct tm *ptime;
+  BRDDATA board[MAXBOARD];
+  FILE *fp;
+  int locus, i, m;
+  BRD *bhdr;
+
+  chdir(BBSHOME);
+
+  if (!(fp = fopen(BRD_TIMES, "r")))
+    return;
+
+  locus = 0;
+  while (!feof(fp))
+  {
+    fscanf(fp, "%s%d", board[locus].brdname, &(board[locus].times));
+    locus++;
+  }
+  fclose(fp);
+
+  qsort(board, locus, sizeof(BRDDATA), int_cmp);
+
+  init_bshm();
+
+  fp = fopen(TOPBRD, "w");
+
+  [1;44m// ¤U­±¬OÅã¥Üµe­±¡A¥i¥H¦Û¤vµe....¬Ý°_¨Ó©MµL¦W¤p¯¸ªº¦³ÂI¹³...(°k...:P)[m
+
+  time(&now);
+  ptime = localtime(&now);
+  fprintf(fp, "        ¢t\033[1;41m        ¼öªù¬ÝªO±Æ¦æº]        \033[m¢u"
+    "        \033[33m²Î­p¤é´Á: \033[36m%d ¤ë %d ¤é\033[m\n\n",
+    ptime->tm_mon + 1, ptime->tm_mday);
+
+  m = 1;
+  for (i = 0; i < locus; i++)
+  {
+    if (board[i].times == 0)
+      break;
+
+    if (!(bhdr = brd_get(board[i].brdname)))   /* ¦¹ªO¤w§ï¦W©Î³Q¬å */
+      continue;
+
+    /* ¸õ¹L¤£¦C¤J±Æ¦æº]ªº¬ÝªO */
+    /* (BASIC + ... + VALID) < (VALID << 1) */
+    if ((bhdr->readlevel | bhdr->postlevel) >= (PERM_VALID << 1))
+      continue;
+
+    fprintf(fp, "\033[1;31m%4d. \033[33m¬ÝªO: \033[32m%-13s  "
+      "\033[1;3%dm%5.5s\033[m %-34.33s  \033[1;35m¤H¦¸ \033[36m%-3d\033[m\n",
+      m, board[i].brdname, bhdr->class[3] & 7, bhdr->class,
+      bhdr->title, board[i].times);
+
+    m++;
+  }
+
+  fclose(fp);
+}
+
+: crontab -e ·s¼W
+
+36 3 * * * bin/topbrd > /dev/null 2>&1
+
+    //¤@©w­n¥ý¹L¤È©]12ÂI¤~¯à¶]­ò¡I¦]¬°­nÅý account ¶]¥X usies-sort
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-136-210.HINET-IP.hinet.net[m

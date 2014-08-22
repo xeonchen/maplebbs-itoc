@@ -1,0 +1,179 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: Re: [∞›√D] §j∂q´ÿ±b∏π™∫µ{¶°
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2005/08/12 Fri 09:15:45)                Updated: 2005/08/12
+
+°∞ §ﬁ≠z°mshadowofsoul (Shadow Of Soul)°n§ßª ®•°G
+> ¶≥§H¶≥ºgπL§j∂q´ÿ±b∏π™∫function∂‹°H
+> √˛¶¸§@¶∏´ÿ•ﬂ§@≠”list™∫±b∏π§Œ±KΩX≥oºÀ™∫function..
+> ≠n•Œ©Û∑s•Õ™∫±b∏π..
+
+: src/util/Makefile
+
+EXE =   ... [1;33maddacct[m
+
+: src/util/addacct.c ∑sºW¶πµ{¶°
+
+/*-------------------------------------------------------*/
+/* util/addacct.c       ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : §j∂q´ÿ±b∏π                                   */
+/* create : 05/08/12                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#if 0  /* ®œ•Œ§Ë¶° */
+
+  ´ÿ§@≠” ~bbs/list ™∫§Â¶r¿…°AÆÊ¶°¨∞°u±b∏π+™≈•’+±KΩX°v°A±KΩX§£•i•H¶≥™≈•’°A®“¶p
+
+z000001  passwd1
+z000002  passwd2
+zabc     passwd3
+
+#endif
+
+
+#include "bbs.h"
+
+
+static int
+uniq_userno(fd)
+  int fd;
+{
+  char buf[4096];
+  int userno, size;
+  SCHEMA *sp;                   /* record length 16 •iæ„∞£ 4096 */
+
+  userno = 1;
+
+  while ((size = read(fd, buf, sizeof(buf))) > 0)
+  {
+    sp = (SCHEMA *) buf;
+    do
+    {
+      if (sp->userid[0] == '\0')
+      {
+        lseek(fd, -size, SEEK_CUR);
+        return userno;
+      }
+      userno++;
+      size -= sizeof(SCHEMA);
+      sp++;
+    } while (size);
+  }
+
+  return userno;
+}
+
+
+static void
+acct_add(userid, passwd)
+  char *userid, *passwd;
+{
+  int fd;
+  SCHEMA slot;
+  char fpath[64];
+  ACCT acct;
+
+  if (!*userid || !*passwd)
+    return;
+
+  if (strlen(userid) > IDLEN || strlen(passwd) > PSWDLEN)
+  {
+    printf("ID:%s Pass:%s ±b∏π©Œ±KΩXπL™¯\n", userid, passwd);
+    return;
+  }
+
+  memset(&acct, 0, sizeof(ACCT));
+
+  str_ncpy(acct.userid, userid, sizeof(acct.userid));
+  str_ncpy(acct.passwd, genpasswd(passwd), sizeof(acct.passwd));
+  str_ncpy(acct.username, userid, sizeof(acct.username));/* userid ∑Ìº ∫Ÿ */
+  str_ncpy(acct.realname, userid, sizeof(acct.realname));/* userid ∑Ì©m¶W */
+  acct.userlevel = PERM_DEFAULT;
+  acct.ufo = UFO_DEFAULT_NEW;
+  acct.numlogins = 1;
+  sprintf(acct.email, "%s.bbs@%s", acct.userid, MYHOSTNAME);
+
+  usr_fpath(fpath, userid, NULL);
+  if (dashd(fpath))
+  {
+    printf("§w¶≥¶πID: %s\n", userid);
+    return;
+  }
+
+  /* dispatch unique userno */
+
+  acct.tvalid = acct.firstlogin = acct.lastlogin =
+    acct.tcheck = slot.uptime = time(NULL);
+  memcpy(slot.userid, userid, IDLEN);
+
+  fd = open(FN_SCHEMA, O_RDWR | O_CREAT, 0600);
+  {
+    f_exlock(fd);
+
+    acct.userno = uniq_userno(fd);
+    write(fd, &slot, sizeof(slot));
+    f_unlock(fd);
+  }
+  close(fd);
+
+  /* create directory */
+
+  /* usr_fpath(fpath, userid, NULL); */
+  mkdir(fpath, 0700);
+  strcat(fpath, "/@");
+  mkdir(fpath, 0700);
+  usr_fpath(fpath, userid, "gem");
+  mak_links(fpath);
+#ifdef MY_FAVORITE
+  usr_fpath(fpath, userid, "MF");
+  mkdir(fpath, 0700);
+#endif
+
+  usr_fpath(fpath, userid, FN_ACCT);
+  fd = open(fpath, O_WRONLY | O_CREAT, 0600);
+  write(fd, &acct, sizeof(ACCT));
+  close(fd);
+
+  printf("ID:%s Pass:%s §w´ÿ∏mßπ¶®\n", userid, passwd);
+}
+
+
+int
+main()
+{
+  char *userid, *passwd, buf[256];
+  FILE *fp;
+
+  chdir(BBSHOME);
+
+  if (fp = fopen("list", "r"))
+  {
+    while (fgets(buf, sizeof(buf), fp))
+    {
+      if (userid = strchr(buf, '\n'))
+        *userid = '\0';
+      if (userid = strchr(buf, ' '))
+      {
+        *userid = '\0';
+
+        passwd = userid + 1;
+        if (userid = strrchr(passwd, ' '))
+          passwd = userid + 1;
+
+        userid = buf;
+
+        acct_add(userid, passwd);
+      }
+    }
+  }
+
+  return 0;
+}
+
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m itoc.Dorm11.NCTU.edu.tw  [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

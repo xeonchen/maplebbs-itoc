@@ -1,0 +1,81 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¦¿¤ô¨ÌÂÂ¬ÂÄn¡Aª_¦åªy) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¯¸¤è³B²z¼Ð°O¢á¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Tue, 02 Sep 2003 13:02:41 +0800 (CST))  Updated: 2004/03/11
+
+    ¯¸¤è³B²z§¹¼Ð°O¢á
+
+    ¥H«e´N¼g¦n¤F.... :p
+
+    §Ñ°O¢ø¢÷¤F....^^|||
+
+==============================================================================
+
+
+: src/include/hdr.h
+
+#define POST_RESERVED   0x00001000  /* ­­¨î¯Å¤å³¹¡A¶· sysop ¤~¯à§ó§ï */
+
++#define POST_DONE       0x00002000  /* qazq.030815: ¯¸¤è³B²z§¹¼Ð°O¢û */
+
+#define POST_SCORE      0x00004000  /* ¼Ð°Oµû¤À¹Lªº */
+
+
+
+: src/maple/post.c:post_attr()
+
+#ifdef HAVE_REFUSEMARK
+  if (mode & POST_RESTRICT)
+    attr |= 'X';
+  else
+#endif
+
++ if (mode & POST_DONE)
++   attr |= 'S';        /* qazq.030815: ¯¸¤è³B²z§¹¼Ð°O¢û */
++ else
+
+: post.c:post_done_mark()   ·s¼W¾ã­Ó¨ç¦¡¦b post_mark() ¤U­±
+
+static int          /* qazq.030815: ¯¸¤è³B²z§¹¦¨¼Ð°O¢á*/
+post_done_mark(xo)
+  XO *xo;
+{
+  if (HAS_PERM(PERM_SYSOP)) /* qazq.030815: ¥u¦³¯¸ªø¥i¥H¼Ð°O */
+  {
+    HDR *hdr;
+    int pos, cur, xmode;
+
+    pos = xo->pos;
+    cur = pos - xo->top;
+    hdr = (HDR *) xo_pool + cur;
+    xmode = hdr->xmode;
+
+#ifdef HAVE_LABELMARK
+    if (xmode & POST_DELETE)    /* «Ý¬åªº¤å³¹¤£¯à mark */
+      return XO_NONE;
+#endif
+
+    hdr->xmode = xmode ^ POST_DONE;
+    currchrono = hdr->chrono;
+
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono);
+    move(3 + cur, 7);
+    outc(post_attr(hdr));
+  }
+  return XO_NONE;
+}
+
+
+
+
+: post.c:post_cb[]
+
++ Ctrl('S'), post_done_mark,    /* qazq.030815: ¯¸¤è³B²z§¹¦¨¼Ð°O¢á*/
+
+: post.c:xpost_cb[]
+
++ Ctrl('S'), post_done_mark,    /* qazq.030815: ¯¸¤è³B²z§¹¦¨¼Ð°O¢á*/
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m bbs.cs.nchu.edu.tw [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-136-200.HINET-IP.hinet.net [30mµoªí[m

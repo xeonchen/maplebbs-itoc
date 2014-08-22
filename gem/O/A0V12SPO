@@ -1,0 +1,37 @@
+§@ªÌ: itoc (§@·~¦nÃø¼g) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] song.c ÂIºq¨ì¬ÝªO¶¶«KÂIºq¥h«H½c
+®É¶¡: Tue Dec 31 18:34:42 2002                          Updated: 2005/06/25
+
+¡° ¤Þ­z¡mRoger («K·í«L)¡n¤§»Ê¨¥¡G
+> ¦]¬°¦³¨Ç¨Ï¥ÎªÌ¤ÏÀ³¥L­ÌÂIªººq¤£¤@©w·|³Q¨Ï¥ÎªÌ¬Ý¨ì
+> ¯à¤£¯àÅý¨Ï¥ÎªÌÂIºqµ¹A®É
+> ÂIªººq°£¤F°e¨ìktvª©¥~
+> ÁÙ¯à§âºq¥»±H¨ìAªº«H½c©O?
+
+: song.c:song_order()
+
+  btime_update(brd_bno(BN_KTV));
+
++ if (!annoy &&         /* ¨S°Î¦W¤~¥i¶¶«K±H«H½c */
++   vans("­n¶¶«K±H¨ì¥Lªº«H½c¶Ü(Y/N)¡H[N] ") == 'y')
++ {
++   if (acct_userno(des) > 0)   /* ­n¦³³o id ¤~¦æ */
++   {
++     usr_fpath(fpath, des, fn_dir);
++     hdr_stamp(fpath, HDR_COPY, &xpost, buf);
+
++     strcpy(xpost.owner, cuser.userid);
++     strcpy(xpost.nick, cuser.username);
++     sprintf(xpost.title, "%s ÂIµ¹±z", cuser.userid);
+
++     rec_add(fpath, &xpost, sizeof(HDR));
++   }
++   else
++     vmsg(err_uid);
++ }
+
+  return XO_FOOT;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

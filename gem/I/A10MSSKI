@@ -1,0 +1,57 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¦b BBS ¯¸¤W­×§ï©Ò¦³ÀÉ®×
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/14 Thu 19:41:31)                Updated: 2004/10/14
+
+¡° ¤Þ­z¡mrainphiz (¡@)¡n¤§»Ê¨¥¡G
+>     ´N¬O¦bºëµØ°Ï¤º¶}¤@­ÓÁôÂÃ¥Ø¿ý¡A
+>     ¾Ö¦³¯¸ªøÅv­­ªº¥i¥HÆ[¬Ý»P­×§ï¡A¤£¥Î¦A¤W¤u§@¯¸¥h
+>     ¦³ÂIÃþ¦üWD¥[link¨ì bbs ¥Ø¿ý¤U¥ô¤@ÀÉ®×ªº¤è¦¡~
+
+  ºëµØ°Ï ^P ·s¼W (D)¸ê®Æ
+
+  ¼ÐÃD¡Gsrc/maple/bbsd.c
+  ÀÉ¦W¡Gnotepad
+
+  ¦b¸Ó¸ê®Æ¤W«ö K §Y¥i½s¿è ~/src/maple/bbsd.c
+
+: gem.c:gem_cb[]
+
++ 'K', gem_notepad,
+  'h', gem_help
+
+: gem.c:gem_notepad() ¥[¦b gem_help() «e­±
+
+static int
+gem_notepad(xo)
+  XO *xo;
+{
+  HDR *hdr;
+  char *fname;
+
+  if (HAS_PERM(PERM_SYSOP))
+  {
+    hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+    if (!strcmp(hdr->xname, "@notepad"))
+    {
+      fname = hdr->title;
+      if (dashf(fname))
+        vedit(fname, 0);
+      return gem_head(xo);
+    }
+  }
+  return XO_NONE;
+}
+
+: gem.c:gem_browse()
+
+    /* browse article */
++   if (!strcmp(hdr->xname, "@notepad"))
++       strcpy(fpath, hdr->title);
+
+    /* Thor.990204: ¬°¦Ò¼{more ¶Ç¦^­È */
+    if ((xmode = more(fpath, FOOTER_GEM)) < 0)
+      break;
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

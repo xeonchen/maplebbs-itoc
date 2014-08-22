@@ -1,0 +1,25 @@
+§@ªÌ: itoc (¤Ó¶§ªá¨à~) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ¨Ï¥ÎªÌ¦W³æ¤Á´«¦©¾÷
+®É¶¡: Sun Dec 15 16:53:35 2002                          Updated: 2002/12/31
+
+¡° ¤Þ­z¡myiyihi.bbs@bbs.kmvs.km.edu.tw (<ÀR>----((())))¡n¤§»Ê¨¥¡G
+> ­n¦p¦ó¦b¨Ï¥ÎªÌ¦W³æ¼W¥[¤@­Ó (p)«ü¥O¡B¥i¦b¨Ï¥ÎªÌ¦W³æ
+> ¤Á´«¦©¾÷¬° 1)§¹¥þ¶}©ñ 2)¦n¤Í±M½u 3)»·Â÷¹ÐÄÛ
+
+: ulist.c:ulist_pager() ¥[¤J·s¨ç¦¡©ó ulist_ship() ¤U­±
+
+static int
+ulist_pager(xo)
+  XO *xo;
+{
+  t_pager();
+  return ulist_body(xo);   /* ¦P¨B§ó·s¦Û¤vªº©I¥s¾¹ª¬ºA */
+}
+
+: ulist.c:ulist_cb[]
+
+  'S', ulist_ship,
++ 'p', ulist_pager,
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,32 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ^w ¬d¦r¨å
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/08/23 Mon 18:53:52)                Updated: 2004/09/07
+
+¡° ¤Þ­z¡mcentric (centric)¡n¤§»Ê¨¥¡G
+>         ¦pªG·Q­n¹³µL¦W¤@¼Ë ¥ô·N¦a¤è«ö ctrl+w ´N¥i¥H¨Ï¥Î
+
+: menu.c:menu()  ¿ï³æ«ö ^W ¬d¦r¨å
+
+    case Ctrl('U'):
+      every_U(0);
+      goto every_key;
+
++   case Ctrl('W'):
++     DL_func("bin/dreye.so:main_dreye");
++     goto every_key;
+
+: xover.c:xover()  ¤¶­±«ö ^W ¬d¦r¨å
+
+    else if (cmd == Ctrl('U'))
+    {
+      cmd = every_U(zone);
+    }
++   else if (cmd == Ctrl('W'))
++   {
++     DL_func("bin/dreye.so:main_dreye");
++     cmd = XO_INIT;
++   }
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;43m¢¢[46mùñ[m [1mMo[30mdi[mfy: [1;35m2004/08/23 Mon 18:53:52[m

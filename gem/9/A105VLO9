@@ -1,0 +1,974 @@
+µo«H¤H: hightman@feeling-NOsmthSPAM-org (xtt), ¬ÝªO: plan
+¼Ð  ÃD: [M3] «XÃ¹´µ¤è¶ô(Âù¤Hª©) tetris2.c
+µo«H¯¸: ·ÅÄÉ¤p«Î (Thu Jan  2 12:30:36 2003)               Updated: 2005/03/20
+
+: talk.c:talk_speak()
+
+#ifdef HAVE_GAME
+    else if (ch == Ctrl('O'))
+    { /* Thor.990219: ©I¥s¥~±¾´Ñ½L */
+      data[0] = ch;
+      if (send(fd, data, 1, 0) != 1)
+        break;
+      if (DL_func("bin/bwboard.so:vaBWboard", fd, 0) == -2)
+        break;
+    }
+
++   else if (ch == Ctrl('L'))      /* Hightman.021229: «XÃ¹´µ¤è¶ô¹ï¾Ô */
++   {
++     data[0] = ch;
++     if (send(fd, data, 1, 0) != 1)
++       break;
++     if (DL_func("bin/tetris2.so:vaTetris", fd, 0) == -2)
++       break;
++   }
+#endif
+
+: src/game/Makefile
+
+SO =    .... [1;33mtetris2.so[m
+
+: src/game/tetris2.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* tetris2.c    ( NTHU CS MapleBBS Ver 3.10 )            */
+/*-------------------------------------------------------*/
+/* target : Âù¤H«XÃ¹´µ¤è¶ô                               */
+/* create : 02/12/29                                     */
+/* update :   /  /                                       */
+/* author : hightman.bbs@bbs.hightman.net                */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#ifdef HAVE_GAME
+
+#define BLOCK_CHAR      "¡½"
+
+static int cfd;         /* socket number */
+
+typedef struct
+{
+  int ypos;
+  int xpos;
+  int style;
+  int direction;
+  int last_y;
+  int last_x;
+  int last_d;
+  int newstyle;
+  int level;
+  int score;
+  int lines;
+  int lines2;           /* °e¥X¦æ¼Æ */
+  int map[21][12];
+}      TetrisScreen;
+
+static TetrisScreen ts[2];
+
+/* ¨CºØ¤è¶ô³£¬O 4*4 ªº¡AµM«á¥i¥HÂà 4 ­Ó¤è¦V */
+
+static int style_x[7][4][4] =
+{
+  0, 1, 0, 1,    0, 1, 0, 1,   0, 1, 0, 1,   0, 1, 0, 1,
+  0, 1, 2, 3,    1, 1, 1, 1,   0, 1, 2, 3,   1, 1, 1, 1,
+  0, 1, 1, 2,    1, 0, 1, 0,   0, 1, 1, 2,   1, 0, 1, 0,
+  1, 2, 0, 1,    0, 0, 1, 1,   1, 2, 0, 1,   0, 0, 1, 1,
+  0, 1, 2, 0,    0, 1, 1, 1,   2, 0, 1, 2,   0, 0, 0, 1,
+  0, 1, 2, 2,    1, 1, 0, 1,   0, 0, 1, 2,   0, 1, 0, 0,
+  0, 1, 2, 1,    1, 0, 1, 1,   1, 0, 1, 2,   0, 0, 1, 0
+};
+
+static int style_y[7][4][4] =
+{
+  0, 0, 1, 1,    0, 0, 1, 1,   0, 0, 1, 1,   0, 0, 1, 1,
+  1, 1, 1, 1,    0, 1, 2, 3,   1, 1, 1, 1,   0, 1, 2, 3,
+  0, 0, 1, 1,    0, 1, 1, 2,   0, 0, 1, 1,   0, 1, 1, 2,
+  0, 0, 1, 1,    0, 1, 1, 2,   0, 0, 1, 1,   0, 1, 1, 2,
+  0, 0, 0, 1,    0, 0, 1, 2,   0, 1, 1, 1,   0, 1, 2, 2,
+  0, 0, 0, 1,    0, 1, 2, 2,   0, 1, 1, 1,   0, 0, 1, 2,
+  0, 0, 0, 1,    0, 1, 1, 2,   0, 1, 1, 1,   0, 1, 1, 2
+};
+
+
+static int GameOver;        /* 1:I-win  2:I-fail  3:He-quit 4:I-quit 5:unknow-reson 0:not-over */
+static int GameTimes;       /* ²Ä´X§½¤F¡H */
+static int clocker, delay, gmode;
+
+
+#define GAME_OVER       -5
+#define GAME_WAIT       -4
+#define GAME_START      -3
+#define GAME_PREP       -2
+#define GAME_REFRESH    -1
+#define GAME_ON         0
+#define GAME_WIN        1
+#define GAME_FAIL       2
+#define GAME_IQUIT      3
+#define GAME_HQUIT      4
+#define GAME_DISCONN    5
+
+
+static void
+map_move(x, y)      /* ¦b¹CÀ¸µe­±¤Wªº¬Û¹ï²¾°Ê */
+  int x, y;
+{
+  move(x + 2, 2 * y);
+}
+
+
+static void
+map_show(m)     /* ®Ú¾Ú (m: 0-§Ú¤è  1-¹ï¤è) ¨q¥Xµe­± */
+  int m;
+{
+  int x, y;
+
+  for (x = 0; x < 21; x++)
+  {
+    map_move(x, m * 28);
+    for (y = 0; y < 12; y++)
+    {
+      if (ts[m].map[x][y] == 8)
+        outs("ùþ");
+      else if (ts[m].map[x][y])
+        outs(BLOCK_CHAR);
+      else
+        outs("  ");
+    }
+  }
+}
+
+
+static void
+show_block(f, m)    /* ¨q¥X©Î²M°£¤@­Ó¤è¶ô²Õ */
+  int f, m;     /* f=1:¨q¥X f=0:²M°£ */
+{
+  int i, b, x, y, d, s;
+
+  b = m * 28;
+  d = ts[m].last_d;
+  y = ts[m].last_y;
+  x = ts[m].last_x;
+  s = ts[m].style;
+
+  if (d == -1)
+    return;
+  for (i = 0; i < 4; i++)
+  {
+    map_move(x + style_x[s][d][i], y + b + style_y[s][d][i]);
+    if (f)
+      outs(BLOCK_CHAR);
+    else
+      outs("  ");
+  }
+  move(1, 0);
+}
+
+
+static void
+map_raise(n, m)     /* ¹ï¤è­¢¨Ï§Ú¤è¦a¹Ï¤W¤É */
+  int n, m;
+{
+  int x, y, k;
+
+  if (n < 1)
+    return;
+
+  k = (m + 1) % 2;
+
+  for (x = 0; x < 20; x++)
+  {
+    for (y = 1; y < 11; y++)
+    {
+      ts[k].map[x][y] = ts[k].map[x + n][y];
+    }
+  }
+
+  ts[k].ypos -= n;
+
+  if (ts[k].ypos < 0)
+    ts[k].ypos = 0;
+
+  do
+  {
+    for (y = 1; y < 11; y++)
+    {
+      x = 20 - n;
+      ts[k].map[x][y] = ((x * ts[m].score) >> (int)(y / n)) % 3;
+    }
+  }
+  while (--n > 0);
+
+  map_show(k);
+  show_block(1, k);
+}
+
+
+static void
+new_block(m)        /* Åã¥Ü¤@­Ó·s¤è¶ô²Õ */
+  int m;
+{
+  int i, b, s;
+
+  b = m * 12;
+  s = ts[m].newstyle;
+
+  map_move(0, b + 12);
+  outs("        ");
+  map_move(1, b + 12);
+  outs("        ");
+
+  for (i = 0; i < 4; i++)
+  {
+    map_move(style_x[s][0][i], 12 + b + style_y[s][0][i]);
+    outs(BLOCK_CHAR);
+  }
+  move(1, 0);
+}
+
+
+static void
+move_block(m)       /* ¤è¶ô²Õªº²¾°Ê */
+  int m;
+{
+  show_block(0, m);
+  ts[m].last_x = ts[m].xpos;
+  ts[m].last_y = ts[m].ypos;
+  ts[m].last_d = ts[m].direction;
+  show_block(1, m);
+}
+
+
+static int
+crash(x, y, s, d, m)    /* §PÂ_¬O§_¼²¨ì¤F */
+  int x, y, s, d, m;
+{
+  int i;
+
+  for (i = 0; i < 4; i++)
+  {
+    if (ts[m].map[x + style_x[s][d][i]][y + style_y[s][d][i]])
+      return 1;
+  }
+  return 0;
+}
+
+/* ÀË¬d¬O§_¦³»Ý­n®ø¥hªº */
+static void
+check_lines(m)
+  int m;
+{
+  int y, x, s = 0;
+
+  for (y = 0; y < 20; y++)
+  {
+    for (x = 1; x < 11; x++)
+    {
+      if (ts[m].map[y][x] == 0)
+        break;
+    }
+
+    if (x == 11)
+    {
+      int y2;
+
+      /* ®ø¥h¦æ¤W³¡¥þ³¡¤U²¾ */
+      for (y2 = y; y2 > 0; y2--)
+      {
+        for (x = 1; x < 11; x++)
+          ts[m].map[y2][x] = ts[m].map[y2 - 1][x];
+      }
+
+      for (x = 1; x < 11; x++)
+        ts[m].map[0][x] = 0;
+
+      ts[m].lines++;
+      s++;
+
+      if (ts[m].lines % 30 == 0)
+      {
+        if (m == 0)
+        {
+          delay *= 0.9;
+          bell();
+        }
+        ts[m].level++;
+      }
+    }
+  }
+
+  y = s;
+  s = (1 << y) - 1;
+
+  if (s > 0)
+  {
+    s = s * (10 + ts[m].level) / 10;
+    ts[m].score += s;
+    map_show(m);
+
+    /* ¤W¤É§a */
+    if (y > 1)
+      map_raise(y - 1, m);
+
+    /* update lines, score, lines2 */
+    ts[m].lines2 += (y - 1);
+
+    move(9, 27 + m * 24);
+    prints("%d", ts[m].lines);
+    move(11, 27 + m * 24);
+    prints("%d", ts[m].lines2);
+    move(13, 27 + m * 24);
+    prints("%d", ts[m].score);
+    move(15, 27 + m * 24);
+    prints("%d", ts[m].level);
+    move(1, 0);
+  }
+}
+
+/* ¼²¨ì«áªº³B²z */
+static void
+arrived(m)
+  int m;
+{
+  int y, x, i, s, d;
+
+  s = ts[m].style;
+  d = ts[m].direction;
+
+  for (i = 0; i < 4; i++)
+  {
+    y = ts[m].ypos + style_y[s][d][i];
+    x = ts[m].xpos + style_x[s][d][i];
+    ts[m].map[y][x] = s + 1;
+  }
+
+  check_lines(m);
+  if (m == 0)
+    GameOver = GAME_REFRESH;
+}
+
+
+static void
+play_count(userid, total, win)  /* ¦^¶Ç userid ªºÁ`³õ¼Æ¡B³Ó³õ¼Æ */
+  char *userid;
+  int *total, *win;
+{
+  char fpath[64];
+  int fd;
+  int grade[32];        /* «O¯d 32 ­Ó int */
+
+  *total = 0;
+  *win = 0;
+
+  usr_fpath(fpath, userid, "bwboard");
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    read(fd, grade, sizeof(grade));
+    close(fd);
+
+    *total = grade[10];
+    *win = grade[11];
+  }
+}
+
+
+static void
+play_add(win)                   /* §ÚªºÁ`/³Ó³õ¼Æ +1 */
+  int win;
+{
+  char fpath[64];
+  int fd;
+  int grade[32];        /* «O¯d 32 ­Ó int */
+
+  usr_fpath(fpath, cuser.userid, "bwboard");
+  if ((fd = open(fpath, O_RDWR | O_CREAT, 0600)) >= 0)
+  {
+    if (read(fd, grade, sizeof(grade)) != sizeof(grade))
+      memset(grade, 0, sizeof(grade));
+
+    grade[10]++;
+    if (win)
+      grade[11]++;
+
+    lseek(fd, (off_t) 0, SEEK_SET);
+    write(fd, grade, sizeof(grade));
+    close(fd);
+  }
+}
+
+
+static void
+show_record()
+{
+  int myTotal, yourTotal, myWin, yourWin;
+
+  /* ¨ú±o¾ÔÁZ */
+  play_count(cuser.userid, &myTotal, &myWin);
+  play_count(cutmp->mateid, &yourTotal, &yourWin);
+
+  move(1, 0);
+  clrtoeol();
+  prints("¡¹%s [%d¾Ô%d³Ó]", cuser.userid, myTotal, myWin);
+
+  move(1, 38);
+  outs("V.S.");
+
+  move(1, 44);
+  prints("¡¸%s [%d¾Ô%d³Ó]", cutmp->mateid, yourTotal, yourWin);
+}
+
+
+/* ¹CÀ¸µ²§ô­ì¦] */
+static char *
+over_reason(over)
+  int over;
+{
+  if (over == GAME_WIN)
+    return "¡» §Ú¤èÀò³Ó¡I";
+  else if (over == GAME_FAIL)
+    return "¡» §Ú¤è¥¢±Ñ¡I";
+  else if (over == GAME_HQUIT)
+    return "¡» ¹ï¤è¤¤Â_¡I";
+  else if (over == GAME_IQUIT)
+    return "¡» §Ú¤è¤¤Â_¡I";
+  else
+    return "¡» ¤£©ú­ì¦]¡I(ºô¸ô°ÝÃD¡H)";
+}
+
+/* ¹CÀ¸µ²ªG */
+static void
+show_result()
+{
+  /* °O¿ý¾Ô¿n¡A¤À¼Æ¦hªÌ¬°³ÓªÌ */
+  play_add(ts[0].score > ts[1].score);
+
+  move(2, 0);
+  clrtobot();
+  refresh();
+
+  prints(" ¢z¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢{\n");
+  prints(" ¢x         «XÃ¹´µ¤è¶ô¹ï¾Ôµ²ªG ²Ä%3d§½               ¢x\n", GameTimes);
+  prints(" ¢x         ==========================               ¢x\n");
+  prints(" ¢u¢w¢w¢w¢w¢w¢s¢w¢w¢w¢w¢w¢w¢w¢w¢w¢s¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t\n");
+  prints(" ¢x ¥Î¤á¦WºÙ ¢x [%-13s]  ¢x (%-13s)  ¢x\n", cuser.userid, cutmp->mateid);
+  prints(" ¢u¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t\n");
+  prints(" ¢x Á`®ø¦æ¼Æ ¢x  %-13d   ¢x  %-13d   ¢x\n", ts[0].lines, ts[1].lines);
+  prints(" ¢u¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t\n");
+  prints(" ¢x »º°e¦æ¼Æ ¢x  %-13d   ¢x  %-13d   ¢x\n", ts[0].lines2, ts[1].lines2);
+  prints(" ¢u¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t\n");
+  prints(" ¢x ¥»§½±o¤À ¢x  %-13d   ¢x  %-13d   ¢x\n", ts[0].score, ts[1].score);
+  prints(" ¢u¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢r¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t\n");
+  prints(" ¢x µ²§ô­ì¦] ¢x %-37s¢x\n", over_reason(GameOver));
+  prints(" ¢|¢w¢w¢w¢w¢w¢r¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}\n");
+  prints(" «ö <\033[1;32mEnter\033[m> Ä~Äò¹CÀ¸, <\033[1;32m^C ^D\033[m> °h¥X¹CÀ¸. ");
+
+  delay = GameOver;  /* ­É¥Î delay «O¦s¯u¥¿ over ­ì¦]¡A¥H§KÂ_½u¤F¤´µM­n­«¶} */
+  GameOver = GAME_WAIT;
+
+  add_io(cfd, 60);
+}
+
+
+/* À°§Uµe­± */
+static void
+show_help()
+{
+  move(4, 33);
+  prints("  ²Ä %4d §½  ", ++GameTimes);
+  move(5, 33);
+  outs("ùú¢w¢w¢w¢w¢wùû");
+  move(6, 33);
+  outs("¢x ­p ¤À µP ¢x");
+  move(7, 33);
+  outs("ùü¢w¢w¢w¢w¢wùý");
+  move(8, 26);
+  outs("---------== ¦æ¼Æ ==---------");
+  move(9, 26);
+  outs(" 0                       0");
+  move(10, 26);
+  outs("---------== °e¥X ==---------");
+  move(11, 26);
+  outs(" 0                       0");
+  move(12, 26);
+  outs("---------== ±o¤À ==---------");
+  move(13, 26);
+  outs(" 0                       0");
+  move(14, 26);
+  outs("---------== ¯Å§O ==---------");
+  move(15, 26);
+  outs(" 0                       0");
+  move(16, 26);
+  outs("---------== À°§U ==---------");
+  move(17, 26);         /* 12+16 = 28 */
+  outs("¥ª²¾ a, ¡ö | ¥k²¾ d, ¡÷");
+  move(18, 26);
+  outs("±ÛÂà h, ¡ô | ¤U­° s, ¡õ");
+  move(19, 26);
+  outs("§Ö­° x,' ' | »{¿é ^F");
+  move(20, 26);
+  outs("¤¤Â_ ^C ^D ·|¦©¤Àªº ..");
+  move(21, 26);
+  outs("¤Á´«¹ï¤è«Ì¹õ§Y®É¼Ò¦¡ ^G");
+}
+
+
+/* ¥i¶Ç°eµ¹¹ï¤èªº«ü¥O */
+static int
+send_cmd(cmd)
+  int cmd;
+{
+  int i;
+  char valid[23] =
+  {
+    'a', 'A', 'd', 'D', 'h', 'H', 'k', 'K', ' ', 'n', 'N', 'y', 'Y',
+    'j', 'J', 's', 'S', 'z', 'Z', 'x', 'X', KEY_ENTER, Ctrl('F')
+  };
+
+  if (cmd == KEY_UP)
+    cmd = 'h';
+  else if (cmd == KEY_DOWN)
+    cmd = 's';
+  else if (cmd == KEY_LEFT)
+    cmd = 'a';
+  else if (cmd == KEY_RIGHT)
+    cmd = 'd';
+
+  for (i = 0; i < 23; i++)
+  {
+    if (valid[i] == cmd)
+    {
+      char c;
+
+      c = cmd;
+      if (send(cfd, &c, 1, 0) != 1)
+      {
+        GameOver = GAME_DISCONN;
+        return 0;
+      }
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int tetris_start();
+
+/* ¾Þ§@«ü¥O¶° m¬°0®É­Yªð¦^0¤~°e¥X«ü¥Oµ¹¹ï¤è */
+static int
+tetris_cmd(cmd, m)
+  int cmd, m;
+{
+  int x, y, s, d;
+
+  if (cmd >= '0' && cmd < '7')
+  {
+    if (!m)
+      return -1;
+    if (GameOver == GAME_START)
+    {
+      ts[1].newstyle = cmd - '0';
+      GameOver = GAME_REFRESH;
+      return -1;
+    }
+    else
+    {
+      ts[1].style = ts[1].newstyle;
+      ts[1].xpos = 3;
+      ts[1].ypos = 0;
+      ts[1].direction = 0;
+      ts[1].newstyle = cmd - '0';
+      ts[1].last_d = -1;
+
+      new_block(1);
+      move_block(1);
+      return 0;
+    }
+  }
+
+  /* game wait to over */
+  if (GameOver == GAME_WAIT)
+  {
+    if (delay >= 0)
+    {
+      if (cmd == KEY_ENTER)
+      {
+        move(b_lines - 1, 0);
+        if (m)
+          outs("¹ï¤è­n¨D¦A¨Ó¤@½L¡A±zÛÂ·N¶Ü¡H[Y/n]");
+        else
+          outs("µ¥«Ý¹ï¤èÀ³µª¤¤¡A½Ðµy­Ô ... ^c ^d °h¥X");
+        delay = -1 - m;     /* µ¥ªº: -1   ¦^µªªº: -2 */
+      }
+      return 0;
+    }
+
+    if ((delay - m) != -2)
+      return 0;         /* ³o®É key ´N¤£ºâ */
+
+    if (cmd == 'n' || cmd == 'N')
+      delay = 1;
+    else
+      delay = 0;
+
+    /* disconn ªº¤£·|°õ¦æ¨ì³o¨B */
+    GameOver = GAME_OVER;
+    return -1;
+  }
+
+  if (GameOver != GAME_ON)
+    return -1;
+
+  x = ts[m].xpos;
+  y = ts[m].ypos;
+  s = ts[m].style;
+  d = ts[m].direction;
+
+  switch (cmd)
+  {
+  case Ctrl('F'):
+    GameOver = GAME_FAIL - m;
+    return -1;
+  case Ctrl('G'):
+    gmode ^= 1;         /* §Y®É¼Ò¦¡¤Á´« */
+    break;
+  case 'A':
+  case 'a':
+  case KEY_LEFT:
+    if (!crash(x - 1, y, s, d, m))
+    {
+      ts[m].xpos--;
+      if (!gmode || !m)
+        move_block(m);
+    }
+    break;
+  case 'D':
+  case 'd':
+  case KEY_RIGHT:
+    if (!crash(x + 1, y, s, d, m))
+    {
+      ts[m].xpos++;
+      if (!gmode || !m)
+        move_block(m);
+    }
+    break;
+  case 'H':
+  case 'h':
+  case KEY_UP:
+    if (!crash(x, y, s, (d + 3) % 4, m))
+    {
+      ts[m].direction = (d + 3) % 4;
+      if (!gmode || !m)
+        move_block(m);
+    }
+    break;
+  case 'K':
+  case 'k':
+    if (!crash(x, y, s, (d + 1) % 4, m))
+    {
+      ts[m].direction = (d + 1) % 4;
+      if (!gmode || !m)
+        move_block(m);
+    }
+    break;
+  case 'J':
+  case 'j':
+    if (!crash(x, y, s, (d + 2) % 4, m))
+    {
+      ts[m].direction = (d + 2) % 4;
+      if (!gmode || !m)
+        move_block(m);
+    }
+    break;
+  case 'S':
+  case 's':
+  case 'Z':
+  case 'z':
+  case KEY_DOWN:
+    if (m == 0)
+      clocker = times(0);
+    if (crash(x, y + 1, s, d, m))
+    {
+      if (gmode && m)
+        move_block(m);
+      arrived(m);
+      break;
+    }
+    else
+    {
+      ts[m].ypos++;
+      if (!gmode || !m)
+        move_block(m);
+    }
+    break;
+  case 'x':
+  case 'X':
+  case ' ':
+    while (!crash(x, ts[m].ypos + 1, s, d, m))
+      ts[m].ypos++;
+    move_block(m);
+    arrived(m);
+    break;
+  default:
+    break;
+  }
+  return 0;
+}
+
+/* ¨C³õ¤ñÁÉªºªì©l¤Æ */
+static int
+tetris_init()
+{
+  int i;
+
+  /* Tetris Screen initilize ... */
+  memset(ts, 0, sizeof(ts));
+  for (i = 0; i < 20; i++)
+  {
+    ts[0].map[i][0] = 8;
+    ts[1].map[i][0] = 8;
+    ts[0].map[i][11] = 8;
+    ts[1].map[i][11] = 8;
+  }
+
+  for (i = 0; i < 12; i++)
+  {
+    ts[0].map[20][i] = 8;
+    ts[1].map[20][i] = 8;
+  }
+
+  GameOver = GAME_PREP;
+  delay = 40;
+
+  clear();
+  vs_bar("«XÃ¹´µ¤è¶ô - Âù¤Hª©");
+  map_show(0);
+  map_show(1);
+  show_record();
+  show_help();
+
+  return 0;
+}
+
+/* ¤@­Ó¦r²Å¤@­Ó¦r²Åªº°e¹L¥h */
+static int
+tetris_start()
+{
+  uschar data[80];
+  int i, ch;
+
+  tetris_init();
+
+  clocker = times(0);
+
+  srand(time(0));
+  add_io(cfd, 0);
+
+  for (;;)
+  {
+    if (GameOver == GAME_PREP)
+    {
+      ts[0].newstyle = rand() % 7;
+
+      data[0] = ts[0].newstyle + '0';
+
+      if (send(cfd, data, 1, 0) != 1)
+      {
+        GameOver = GAME_DISCONN;
+        continue;
+      }
+
+      GameOver = GAME_START;
+
+      outz("¹ï¤èÁÙ¦b·Ç³Æ¤¤ ... ½Ðµy«á \033[5m ... \033[m");
+      refresh();
+
+      continue;
+    }
+
+    if (GameOver == GAME_REFRESH)   /* need new block */
+    {
+      ts[0].style = ts[0].newstyle;
+      ts[0].xpos = 3;
+      ts[0].ypos = 0;
+      ts[0].direction = 0;
+      ts[0].newstyle = rand() % 7;
+      ts[0].last_d = -1;
+
+      data[0] = ts[0].newstyle + '0';
+      if (send(cfd, data, 1, 0) != 1)
+      {
+        GameOver = GAME_DISCONN;
+        continue;
+      }
+
+      move_block(0);
+      new_block(0);
+
+      if (crash(ts[0].xpos, ts[0].ypos, ts[0].style, ts[0].direction, 0))   /* game over */
+      {
+        data[0] = Ctrl('F');    /* ¬Û·í©ó»{¿é */
+        if (send(cfd, data, 1, 0) != 1)
+          GameOver = GAME_DISCONN;  /* ºôµ¸Â_½u? */
+        else
+          GameOver = GAME_FAIL; /* §Ú¤è¥ý±Ñ! */
+        continue;
+      }
+      GameOver = GAME_ON;   /* ¹CÀ¸Ä~Äò. */
+    }
+
+    if (GameOver == GAME_OVER)
+      break;            /* ¹CÀ¸µ²§ô2 */
+
+    if (GameOver > 0)       /* ¹CÀ¸µ²§ô1 */
+      show_result();        /* ¦¹¨B±N GameOver ³]¬° GAME_WAIT */
+
+    ch = vkey();
+
+    /* Â_½u¤FÁÙ°µ¨ä¥¦°®¹À */
+    if (GameOver == GAME_WAIT && delay == GAME_DISCONN)
+      break;
+
+    if (ch == I_OTHERDATA)  /* ¦³¼Æ¾Ú¶i¨Ó */
+    {
+      ch = recv(cfd, data, 1, 0);
+      if (ch <= 0)
+      {
+        GameOver = GAME_DISCONN;
+        continue;
+      }
+
+      for (i = 0; i < ch; i++)
+      {
+        if (data[i] == Ctrl('C') || data[i] == Ctrl('D'))
+        {
+          if (GameOver == GAME_WAIT)
+            GameOver = GAME_OVER;
+          else
+            GameOver = GAME_HQUIT;
+          break;
+        }
+        else if (tetris_cmd(data[i], 1) != 0)
+          break;
+      }
+
+    }
+
+    if (ch == Ctrl('C') || ch == Ctrl('D'))
+    {
+      /* ^c ^d ¬OªÖ©w­n¶Ç¥X¥hªº */
+      data[0] = ch;
+      if (send(cfd, data, 1, 0) != 1)
+      {
+        GameOver = GAME_DISCONN;/* ºôµ¸Â_½u? */
+        continue;
+      }
+
+      if (GameOver == GAME_WAIT)
+        GameOver = GAME_OVER;
+      else
+        GameOver = GAME_IQUIT;
+      continue;
+    }
+
+    if (GameOver == GAME_START)
+      continue;
+
+    /* °e¥X©Ò¦³¯à°e¥XªºÁä */
+    /* °e¥X¥¢±Ñ¥»¦a¤]µL»Ý°õ¦æ¤F */
+    if (send_cmd(ch))
+      tetris_cmd(ch, 0);
+
+    if (GameOver != GAME_ON)
+      continue;
+
+    /* Delay timeout  auto down */
+    if ((times(0) - clocker) > delay)
+    {
+      /* ³qª¾¹ï¤è, ¬Û·í©ó 's' */
+      data[0] = 's';
+      if (send(cfd, data, 1, 0) != 1)
+      {
+        GameOver = GAME_DISCONN;
+        continue;
+      }
+
+      clocker = times(0);
+      if (crash(ts[0].xpos, ts[0].ypos + 1, ts[0].style, ts[0].direction, 0))
+        arrived(0);
+      else
+      {
+        ts[0].ypos++;
+        move_block(0);
+      }
+    }
+  }
+  return GAME_OVER;
+}
+
+
+/* Tetris2 Main */
+static int
+Tetris2(sock, later)
+  int sock;
+  int later;
+{
+  screenline sl[T_LINES];
+  char c;
+
+  cfd = sock;
+  vs_save(sl);
+
+  if (!later)
+  {
+    c = vans("±z½T©w­n©M¹ï¤è³æ¬D«XÃ¹´µ¤è¶ô¶Ü(Y/N)¡H[Y] ");
+    if (send(cfd, &c, 1, 0) != 1)
+      return -2;
+
+    vs_restore(sl);
+  }
+  else
+  {
+    outz("¹ï¤è­n¨D¶i¤J«XÃ¹´µ¤è¶ô¹ï¾Ô¼Ò¦¡, ¿ï¾Ü¤¤½Ðµy­Ô.....");
+    refresh();
+    if (recv(cfd, &c, 1, 0) != 1)
+      return -2;
+
+    vs_restore(sl);
+  }
+
+  if (c == 'n')
+    return -1;
+
+  GameTimes = 0;
+  delay = 0;            /* ­É¥Î delay ¨M©wµ{§Ç¬O§_²×¤î */
+  gmode = 0;            /* §Y®É¶Ç¿é */
+
+  do
+  {
+    tetris_start();
+  }
+  while (!delay);
+
+  add_io(cfd, 60);
+
+  vs_restore(sl);
+  return 0;
+}
+
+
+#include <stdarg.h>
+
+int
+vaTetris(va_list pvar)
+{
+  int sock, later;
+
+  sock = va_arg(pvar, int);
+  later = va_arg(pvar, int);
+  return Tetris2(sock, later);
+}
+#endif  /* HAVE_GAME */
+
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

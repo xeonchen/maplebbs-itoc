@@ -1,0 +1,52 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¼öªù¬ÝªO±Æ¦æº](1)¡Ðusies-sort.c
+µo«H¯¸: ¤¤¿³¸ê¬ì (Mon, 14 Jul 2003 16:56:46 +0800 (CST))  Updated: 2004/01/14
+
+    §Q¥Î­ì¥»´N¦³ªºµ{¦¡¨Ó¶]....ÀÝ¥Î¨t²Î¸ê·½ :p
+
+: util/usies-sort.c
+
+- #include <stdio.h>
++ #include "bbs.h"
+
+[1;32m![m #define NUM_BADBOARD    [1;32m2000[m    /* §C©ó [1;32m2000[m ¤H¦¸ªºªO¦C¤J§C¨Ï¥Î²v */
+
+            //¦h¤Ö¦Û¤v³]§a....2000À³¸Ó«Ü°÷¤F....^_^
+
+[1;33m+ #define BRD_TIMES (BBSHOME "/run/brd_times.log")[m/*qazq:¥[¤J¬ÝªO¾\Åª¦¸¼Æ¬ö¿ý*/
+
+
+static void
+usies_sort(fpath)
+  char *fpath;
+{
+  int num;
+  char brdname[60], buf[60];
+  char *str;
+[1;32m![m FILE *fp[1;32m, *ftimes[m;
+
+  if (!(fp = fopen(fpath, "r")))
+    return;
+
+[1;33m+ ftimes = fopen(BRD_TIMES, "w");[m
+
+  ......
+  ......
+
+    else            /* ·s¥X²{ªºªO */
+    {
+      if (num < NUM_BADBOARD)       /* ²Î­p«e¤@­ÓªO¨Ï¥Î´X¦¸ */
+      {
+        printf("%-15s%d\n", brdname, num);
+[1;33m+       fprintf(ftimes, "%-15s%d\n", brdname, num);[m
+      }
+      strcpy(brdname, buf);
+
+      ......
+      ......
+
+}
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-136-210.HINET-IP.hinet.net[m

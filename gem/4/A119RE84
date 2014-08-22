@@ -1,0 +1,69 @@
+µo«H¤H: DarkKiller.bbs@Deer.twbbs.org (±ª°Ê) ¬ÝªO: plan
+¼Ð  ÃD: maple3-itoc subversion ªA°È
+µo«H¯¸: ¤p³À³À BBS (2004/12/31 Fri 17:40:52)
+
+https://gslin.org/svn/maple3-itoc/
+
+³o¬O§Ú¦Û¤v§Ëªº¡A¤£¬O itoc ¦b maintain ªº¡C³o¬O¨Ï¥Î itoc ¨C¹j¤@¬q®É¶¡
+·|¦b http://processor.tfcis.org/~itoc/ ©ñªºª©¥» commit ¶i¥hªº¡C
+
+https ªº³¡¤À¬O USERTRUST sign ªº certificate¡C
+
+°£¤F¥i¥Hª½±µ¦b½u¤W¬Ý¥Ø«eªº source code¡A±z¥i¥H¨Ï¥Î¤U¦C«ü¥O¨ú±o³Ì²{¦b
+ªº source code¡G
+
+svn checkout https://gslin.org/svn/maple3-itoc/
+
+--
+                                                Resistance is futile.
+                                         <gslin@ccreader.nctu.edu.tw>
+--
+¡° Origin: ¨¸´c¤p³À³À <Deer.twbbs.org> ¡» From: deer.math.nctu.edu.tw
+
+> -------------------------------------------------------------------------- <
+
+µo«H¤H: chwaian.bbs@cpu.tfcis.org (µL¨¥) ¬ÝªO: plan
+¼Ð  ÃD: Re: maple3-itoc subversion ªA°È
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/01/13 Thu 15:38:58)
+
+¡° ¤Þ­z¡mDarkKiller.bbs@Deer.twbbs.org (±ª°Ê)¡n¤§»Ê¨¥¡G
+> ¡° ¤Þ­z¡mFish.bbs@fishocean.twbbs.org (³½²Â³½Äø§b§b³½)¡n¤§»Ê¨¥¡G
+> >     §Ú¦³ÂIÂIºÃ°Ý­C....
+> >     ¨º³o¼Ë¬O¤£¬O¯¸¥x¤£¯à°µ¥ô¦óªº patch ?
+> §A¥i¥H¦Û¤v¬[¤@­Ó resposity¡AµM«á¥Î svn merge (À³¸Ó¬O§a) °µ¡A¹J¨ì
+> conflict ªº¦a¤è¦A¤â°Ê§ï´N¥i¥H¤F...
+
+¨ä¹ê¤U¸ü¤U¨Óªºcode ¤]¤£¤@©w­nª½±µ¥Î¦b¯¸¤W
+
+¥Îsvn¨ÓÀËµø µ{¦¡½Xªº­×§ï¬O«D±`¤è«Kªº
+
+¹³§Ú³£¬O¦bbbs¥Ø¿ý¤U
+
+svn checkout https://gslin.org/svn/maple3-itoc/src trunk
+
+³o·|¤U¸ü·sªºµ{¦¡½X¨ì trunk ªº¥Ø¿ý
+
+¥H«á¦pªG¦³·sµ{¦¡½X§ó·s
+
+¨ì trunk ªº¥Ø¿ý¤U °õ¦æ svn update
+
+µM«á °²³]¤§«e§A¤U¸üªºª©¥»¬O r8 ²{¦b r9
+
+°õ¦æ svn diff -r 8:9
+
+´N¥i¥H¬Ý¨ì©³°µ¤F­þ¨Ç­×§ï µM«á¦A¥Î¨ì§A¯¸¤Wªºsrc¥h
+
+³o¤ñ¥H«e­n¬ÝÀÉ®×­×§ï¤é´Á µM«á¦Û¤v¤@­Ó­Ódiff­n¤è«K³\¦h¤F @_@
+
+¥t¥~ svn log -v ¤]¥i¥H¬Ý¨ì©³­×§ï¤F­þ¨ÇÀÉ®× ¤]ÆZ±`¥Îªº
+
+§ó¸Ô²Óªº Subversion ¨Ï¥Î¤èªk
+
+¥i¥H¨ì©³¤Uºô§}¬Ý
+
+http://freebsd.sinica.edu.tw/%7Eplasma/svnbook/book.html
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mchwaian [30m±q [31m218-165-120-243.dynamic.hinet.net [30mµoªí[m

@@ -1,0 +1,126 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¡¯§Ú­n°µªº§ó¦n¡¯) ¬ÝªO: itoc
+¼Ð  ÃD: Re: ¤pd¬å¤å
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/10/23 Sat 22:30:09)                Updated: 2004/10/24
+
+¡° ¤Þ­z¡mcsd.bbs@bbs.wretch.cc (¦ÌÂÎ)¡n¤§»Ê¨¥¡G
+> ·Q°Ý¤@¤U»¡
+> ¥Ø«eªO¥D(¯¸ªø)¨Ï¥Î¤p d¬å¨Ï¥ÎªÌ¤å³¹
+> ¬O¤£¬O¤£·|´î¨Ï¥ÎªÌ¤å³¹¼Æ©O
+> ¦]¬°³Ìªñ´ú¸Õ¤F¤@¤U
+> ¦n¹³¥Î¤p d¬å
+> ¨Ï¥ÎªÌ¤å³¹¼ÆÁÙ¬O¤£·|´î¤Ö
+> ¥t¥~¦pªG­n§ï
+> À³¸Ó­n«ç»ò­×§ï©O
+
+  ¥u­­ªO¥D¤p d ¬å¤å¡A¤~·|¦©¨Ï¥ÎªÌ¤å³¹¼Æ
+
+: src/include/struct.h UTMP
+
+struct UTMP
+{
+  ...
++ int numposts;     /* µo¤å¦¸¼Æ */
+}
+
+: bbsd.c:utmp_setup()
+
+  strcpy(utmp.userid, cuser.userid);
++ utmp.numposts = cuser.numposts;
+
+: post.c:post_delete()
+
+  int pos, cur, by_BM;
++ int userno;
+  HDR *hdr;
+  char buf[80];
+
+  ...
+  ...
+
+      if (!by_BM && !(currbattr & BRD_NOCOUNT))
+      {
+        ...
+        sprintf(buf, "%s¡A±zªº¤å³¹´î¬° %d ½g", MSG_DEL_OK, cuser.numposts);
+        vmsg(buf);
+      }
++     else if (by_BM && !(currbattr & BRD_NOCOUNT) &&
++       (userno = acct_userno(hdr->owner)) > 0)
++     {
++       extern UCACHE *ushm;
++       int online = 0;
++       UTMP *uentp, *uceil;
++
++       uentp = ushm->uslot;
++       uceil = (void *) uentp + ushm->offset;
++       do
++       {
++         if (uentp->userno == userno)
++         {
++           /* ¦b½u¤W¡A¼g¤J utmp-> */
++           uentp->numposts--;
++           online = 1;
++           sprintf(buf, "§R°£§¹²¦¡I%s ¤å³¹½g¼Æ´î¬° %d ½g¡C",
++             uentp->userid, uentp->numposts);
++         }
++       } while (++uentp <= uceil);
++
++       if (online)
++       {
++         vmsg(buf);
++       }
++       else        /* ¤£¦b½u¤W¡A¼g¤J .ACCT */
++       {
++         ACCT acct;
++
++         if (acct_load(&acct, hdr->owner) >= 0)
++         {
++           acct.numposts--;
++           acct_save(&acct);
++           sprintf(buf, "§R°£§¹²¦¡I%s ¤å³¹½g¼Æ´î¬° %d ½g¡C",
++             acct.userid, acct.numposts);
++           vmsg(buf);
++         }
++       }
++     }
+
+==============================================================================
+
+  ±µ¤U¨Ó§â cuser.numposts ©M cutmp->numposts ³s°Ê
+
+: bbsd.c:u_exit()
+
++   cuser.numposts = cutmp->numposts;
+    cuser.userlevel = tuser.userlevel;
+    cuser.tvalid = tuser.tvalid;
+
+: post.c:do_post()
+
+      prints("³o¬O±zªº²Ä %d ½g¤å³¹¡A±o %d »È¡C", ++cuser.numposts, mode);
++     cutmp->numposts++;
+
+: post.c:post_cross()
+
+      cuser.numposts += (tag == 0) ? 1 : tag;
++     cutmp->numposts += (tag == 0) ? 1 : tag;
+
+: post.c:post_delete()
+
+        if (cuser.numposts > 0)
++       {
+          cuser.numposts--;
++         cutmp->numposts--;
++       }
+
+==============================================================================
+
+    §ï¤F UTMP ­nÃö¯¸¡B²M shm¡B¶}¯¸¡C
+
+    ©Î¬Oª½±µ­«·s¶}¾÷ :p
+
+    ¦P¼Ëªº¤]¥i¥H§R¤å³¹ªº®É­Ô¦©¥Lªº¿ú¡I
+
+    ¤]¬O§â money ©ñ¨ì UTMP ¸Ì­±¡C
+
+--
+ [1;42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1;44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m218-163-144-217.dynamic.hinet.net [30mµoªí[m

@@ -1,0 +1,41 @@
+µo«H¤H: LHD.bbs@YoMin.twbbs.org (§Ú¬Oµ{³]¼o§÷) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] °Î¦WªOªº¤å³¹µû¤À
+µo«H¯¸: ¹C¥Á¤§®a (Wed, 04 Jun 2003 15:13:32 +0800 (CST))  Updated: 2004/09/07
+
+  ­Y°Î¦W±À¤å¡A¨º»ò°O¿ý±À¤åªº¤º®e
+
+: post.c:post_score()
+
++#ifdef HAVE_ANONYMOUS
++ if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
++   log_anonyscore(hdr->xname, reason);
++#endif
+
+  if (curraddscore)
+  {
+    currchrono = hdr->chrono;
+    rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono, addscore);
+    return XO_LOAD;
+  }
+
+: post.c:log_anonyscore() ·s¼W³o¨ç¦¡©ó post_score() ¤§«e
+
+#ifdef HAVE_ANONYMOUS
+static void
+log_anonyscore(fname, say)
+  char *fname, *say;
+{
+  char buf[512];
+
+  /* Thor.990113: ¥[¤W fromhost ¤ñ¸û¸ÔºÉ */
+  sprintf(buf, "%s %-13s(%s)\n%-13s %s ²z¥Ñ:%s\n",
+    Now(), cuser.userid, fromhost, currboard, fname, say);
+  f_cat(FN_RUN_ANONYMOUS, buf);
+}
+#endif
+
+--
+[m¢d¢e¢f¢g¢h¢f¢e¢d¢c¢b                [33m¢©  ¢¨      ¢i¢©¢¨¢i ¡´  [1;30mYoMin.twbbs.org[m
+[30;47m¢h¢f¢e¢c¢b¡Å¢d¢f¢g[0;35m   ©~µL©w©Òªº¶³   [33m¢ª¢i¢« ¢«¢ª ¢i¢ª¢«¢i ¡¶ ¢i¢h¢© [m¥æ¤j¸ê¬ì
+[1;34mÄÆ¦Û [31mlocalhost                        [0;33m¢i   ¢©¢¨ ¢i    ¢i ¢i ¢i  ¢i  [0;1m¹C¥Á¤§®a[m

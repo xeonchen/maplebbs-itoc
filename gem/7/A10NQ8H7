@@ -1,0 +1,633 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] RPG ¬[ºc
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/08/23 Mon 23:15:43)                Updated: 2004/10/09
+
+  ·s¼W¦¹¥\¯à¥H«á
+  ÂÂ¨Ï¥ÎªÌ­n¥ý (A)pply ¢à¢Þ¢Õ¥Ó½Ð¡A¤~·|¦³ RPG ±b¸¹
+  ·s¨Ï¥ÎªÌ«h¬O¦bµù¥U®É´N·|¶¶«K¶ñ RPG ±b¸¹
+
+: maple.p
+
++ /* rpg.c */
++ int rpg_load(RPG *rpg, char *userid);
++ void rpg_save(RPG *rpg, char *userid);
++ void rpg_apply(RPG *u, char *userid);
++ int r_info(void);
++ int r_query(void);
++ int r_apply(void);
+
+: bbsd.c:u_exit()
+
+  /* ¼g¦^ .ACCT */
+
+  if (!HAS_STATUS(STATUS_DATALOCK))
+  {
+    ...
+    ...
+      close(fd);
+    }
++   rpg_save(&crpg, cuser.userid);
+  }
+}
+
+: bbsd.c:acct_apply()
+
++ rpg_apply(&crpg, userid);
+
++ usr_fpath(buf, userid, FN_RPG);
++ fd = open(buf, O_WRONLY | O_CREAT, 0600);
++ write(fd, &crpg, sizeof(crpg));
++ close(fd);
+
+  sprintf(buf, "%d", try);
+  blog("APPLY", buf);
+
+: bbsd.c:login_user()
+
++ rpg_load(&crpg, uid);
+
+  return multi;
+}
+
+: menu.c:menu_rpg[] ·s¼W¦b menu_tool[] ¤W­±
+
+  /* --------------------------------------------------- */
+  /* rpg menu                                            */
+  /* --------------------------------------------------- */
+
+static MENU menu_rpg[] =
+{
+  r_query, 0, M_QUERY,
+  "Query    ¢à¢Þ¢Õ¬d¸ß",
+
+  r_info, PERM_BASIC, M_XMODE,
+  "Info     ¢à¢Þ¢Õ¸ê°T",
+
+  r_apply, PERM_BASIC, M_XMODE,
+  "Apply    ¢à¢Þ¢Õ¥Ó½Ð",
+
+  menu_tool, PERM_MENU + 'Q', M_XMENU,
+  "«_ÀI¶i¨ú"
+};
+
+: menu.c:menu_tool[]
+
++ menu_rpg, 0, M_XMENU,
++ "RPG        ¡i ¹CÀ¸¤H¶¡ ¡j",
+
+  menu_tool, PERM_MENU + Ctrl('A'), M_XMENU,
+  "¨ä¥L¥\\¯à"
+
+: bbs.h
+
+#include "struct.h"             /* data structure */
++ #include "rpg.h"              /* rule play game */
+#include "global.h"             /* global variable & definition */
+
+: global.h
+
+/* ----------------------------------------------------- */
+/* ­Ó¤H¥Ø¿ýÀÉ¦W³]©w                                      */
+/* ----------------------------------------------------- */
+
++ #define FN_RPG          ".RPG"          /* User rpg account */
+#define FN_ACCT         ".ACCT"         /* User account */
+
+  ...
+  ...
+
+/* ----------------------------------------------------- */
+/* GLOBAL VARIABLE                                       */
+/* ----------------------------------------------------- */
+
++ VAR RPG crpg;                       /* current user structure */
+VAR int bbsmode;                /* bbs operating mode, see modes.h */
+
+: src/maple/Makefile
+
+SRC =   acct.c bbsd.c bmw.c board.c cache.c edit.c favor.c \
+        gem.c mail.c menu.c more.c pal.c post.c talk.c visio.c \
+-       window.c xover.c xpost.c
++       window.c xover.c xpost.c rpg.c
+
+OBJ =   acct.o bbsd.o bmw.o board.o cache.o edit.o favor.o \
+        gem.o mail.o menu.o more.o pal.o post.o talk.o visio.o \
+-       window.o xover.o xpost.o
++       window.o xover.o xpost.o rpg.o
+
+
+: ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+: src/include/rpg.h ·s¼W¦¹µ{¦¡
+: ¨ä¤¤ struct RPG ¥u¬O­Ó½d¨Ò¡A¥i¥HÀH¦Û¤vªº¹CÀ¸³]©w­×§ï
+
+/*-------------------------------------------------------*/
+/* rpg.h     ( NTHU CS MapleBBS Ver 3.10 )               */
+/*-------------------------------------------------------*/
+/* target : rpg games                                    */
+/* create : 00/03/16                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#ifndef _RPG_H_
+#define _RPG_H_
+
+
+/*-------------------------------------------------------*/
+/* °Ñ¦Ò struct.h                                         */
+/* ----------------------------------------------------- */
+/* ¨Ï¥ÎªÌ¹CÀ¸°O¿ý .RPG struct : 512 bytes                */
+/* ----------------------------------------------------- */
+
+
+typedef struct
+{
+  char usertitle[12];       /* ÀY»Î */
+  char username[24];        /* ¼ÊºÙ */
+
+  int level;                /* µ¥¯Å(µ´¹ï­È) (+)ÂàÂ¾«áªºµ¥¯Å (-)ÂàÂ¾«eªºµ¥¯Å */
+  int alliance;             /* °}Àç(µ´¹ï­È) (+)µ½¨} (-)¨¸´c */
+  int exp;                  /* ¸gÅç­È */
+
+                            /* ¯à¶q(¥Î2charÁY¼g) */
+  int hp;                   /* Åé¤O health point */
+  int mp;                   /* ÆF¤O mana point   */
+  int mv;                   /* °Ê¤O moving point */
+  int po;                   /* ¤º¤O power point  */
+
+                            /* ¯à¶q¤W­­ */
+  int maxhp;                /*  ¦å  */
+  int maxmp;                /* ÆF¤O */
+  int maxmv;                /* °Ê¤O */
+  int maxpo;                /* ¤º¤O */
+
+                            /* ÄÝ©Ê(¥Î3charÁY¼g) */
+  int str;                  /* ¤O¶q strength */
+  int inl;                  /* ´¼¤O intelligence */
+  int wis;                  /* ´¼¼z wisdom */
+  int dex;                  /* ±Ó±¶ dexterity */
+  int con;                  /* Åé®æ constitution */
+  int luc;                  /* ¹B®ð luck */
+  int cha;                  /* ¾y¤O charisma */
+
+                            /* ÁôÂÃ¯S½è(¥Î4charÁY¼g) */
+  int calm;                 /* §NÀR calm */
+  int cour;                 /* «i®ð courage */
+  int heal;                 /* °·±d health */
+  int lern;                 /* ¾Ç²ß learn */
+  int mood;                 /* ¤ß±¡ mood */
+
+                            /* ¤­¤j¸ê·½(¥Î³æ¼Æ) */
+  int money;                /* »È¹ô */
+  int gold;                 /* ¶Àª÷ */
+  int gem;                  /* Ä_¥Û */
+  int wood;                 /* ¤ì§÷ */
+  int iron;                 /* Äq¥Û */
+
+                            /* ¤Q¤j¸Ë³Æ(¥Î³æ¼Æ) */
+  int weapon;               /* ªZ¾¹ */
+  int helm;                 /* ÀY²¯¡B´U¡B«a */
+  int amulet;               /* Å@¨­²Å¡B¶µÁå */
+  int armor;                /* ²¯¥Ò */
+  int glove;                /* ¤â®M */
+  int ring;                 /* §Ù«ü */
+  int bracer;               /* Áu³¹ */
+  int belt;                 /* ¥Ö±a */
+  int pant;                 /* ¿Ç¤l */
+  int shoe;                 /* ¾c¤l */
+
+}      RPG;
+#endif          /* _RPG_H_ */
+
+
+: ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+: src/maple/rpg.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* rpg.c        ( NTHU CS MapleBBS Ver 3.00 )            */
+/*-------------------------------------------------------*/
+/* target : rpg routines                                 */
+/* create : 01/03/16                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+/* ----------------------------------------------------- */
+/* (.RPG) «_ÀIªÌ±b¸¹ (account) I/O                       */
+/* ----------------------------------------------------- */
+
+
+int
+rpg_load(rpg, userid)
+  RPG *rpg;
+  char *userid;
+{
+  int fd;
+
+  usr_fpath((char *) rpg, userid, FN_RPG);
+  fd = open((char *) rpg, O_RDONLY);
+  if (fd >= 0)
+  {
+    /* Thor.990416: ¯S§Oª`·N, ¦³®É .RPGªºªø«×·|¬O0 */
+    read(fd, rpg, sizeof(RPG));
+    close(fd);
+  }
+  return fd;
+}
+
+
+void
+rpg_save(rpg, userid)
+  RPG *rpg;
+  char *userid;
+{
+  int fd;
+  char fpath[64];
+
+  usr_fpath(fpath, userid, FN_RPG);
+  fd = open(fpath, O_WRONLY | O_CREAT, 0600);
+  if (fd >= 0)
+  {
+    write(fd, rpg, sizeof(RPG));
+    close(fd);
+  }
+}
+
+
+/* ----------------------------------------------------- */
+/* (.RPG) «_ÀIªÌ±b¸¹ (account) subroutine                */
+/* ----------------------------------------------------- */
+
+
+void
+rpg_apply(u, userid)
+  RPG *u;
+  char *userid;
+{
+  strcpy(u->usertitle, "·s«_ÀIªÌ");
+  strcpy(u->username, userid);
+
+  u->level = -1;
+  u->alliance = u->exp = 0;
+  u->hp = u->mp = u->mv = u->po =
+    u->maxhp = u->maxmp = u->maxmv = u->maxpo = 100;
+  u->str = u->inl = u->wis = u->dex = u->con = u->luc = u->cha = 10;
+  u->calm = u->cour = u->heal = u->lern = u->mood = 0;
+  u->money = u->gold = u->gem = u->wood = u->iron = 0;
+  u->weapon = u->helm = u->amulet = u->armor = u->glove = 0;
+  u->ring = u->bracer = u->belt = u->pant = u->shoe = 0;
+}
+
+
+static int
+rpg_get(msg, rpg, userid)
+  char *msg;
+  RPG *rpg;
+  char *userid;
+{
+  outz("¡¹ ¿é¤J­º¦r¥À«á¡A ¥i¥H«öªÅ¥ÕÁä¦Û°Ê·j´M");
+
+  /* --------------------------------------------------- */
+  /* name complete for user ID                           */
+  /* --------------------------------------------------- */
+  /* return value :                                      */
+  /*  0: ¨Ï¥Îª½±µ«ö enter ==> cancel                     */
+  /* -1: bad user id                                     */
+  /*  1: current user id                                 */
+  /* --------------------------------------------------- */
+
+  if (!vget(1, 0, msg, userid, IDLEN + 1, GET_USER))
+    return 0;
+
+  if (rpg_load(rpg, userid) >= 0)
+    return 1;
+
+  vmsg(err_uid);
+  return -1;
+}
+
+
+static void
+rpg_show(u, adm)
+  RPG *u;
+  int adm;                      /* 0: user info/query  1: admin */
+{
+  int alli;
+  char *camp;
+
+  clrtobot();
+
+  outs("\n        \033[30;41m¢s¢r¢s¢r¢s¢r\033[m  \033[45mùüùÞùÞùûùúùÞùùùû"
+    "ùÝùÞùùùûùúùÞùùùû\033[m  \033[30;41m¢s¢r¢s¢r¢s¢r\033[m\n"
+    "        \033[30;41m¢r¢s¢r¢s¢r¢s\033[m  \033[1;37;45m  ùàùâ  ùàùâ"
+    "  ùøùàùáùâ  ùàùâ  ùø\033[m  \033[30;41m¢r¢s¢r¢s¢r¢s\033[m\n"
+    "        \033[30;41m¢s¢r¢s¢r¢s¢r\033[m  \033[45m  ùàùâ  ùàùâ  ùø"
+    "ùàùâùý  ùàùâ  ùø\033[m  \033[30;41m¢s¢r¢s¢r¢s¢r\033[m\n"
+    "        \033[30;41m¢r¢s¢r¢s¢r¢s\033[m  \033[1;30;45mùüùäùäùûùãùå"
+    "  ùüùãùå    ùüùäùùùý\033[m  \033[30;41m¢r¢s¢r¢s¢r¢s\033[m\n");
+
+
+  alli = u->alliance;
+  if (alli > 100)
+  {
+    if (alli > 700)
+      camp = "\033[41m¤j¦n¤H\033[m";
+    else if (alli > 400)
+      camp = "\033[1;31m¦n¤H\033[m";
+    else
+      camp = "\033[31m¦³¤@ÂIÂIµ½¨}\033[m";
+  }
+  else if (alli < -100)
+  {
+    if (alli < -700)
+      camp = "\033[45m§A¹ê¦b¤ÓÃa¤F\033[m";
+    else if (alli < -400)
+      camp = "\033[1;35mÆZ½âªº\033[m";
+    else
+      camp = "\033[35m¦³¤@ÂIÂI¨¸´c\033[m";
+  }
+  else
+    camp = "¤¤¥ßµL¤ñ";
+
+  prints("\n¯à¶q¡GÅé¤O %5d/%5d  ÆF¤O %5d/%5d  °Ê¤O %5d/%5d  ¤º¤O %5d/%5d\n",
+    u->hp, u->maxhp, u->mp, u->maxmp, u->mv, u->maxmv, u->po, u->maxpo);
+
+  prints("\n\033[1;33m[%s] \033[36m%s\033[m",
+    u->usertitle, u->username);
+
+  prints("\n¦Ò®Ö¡Gµ¥¯Å %5d  ¸gÅç %5d  °}Àç %s  %sÂàÂ¾",
+    abs(u->level), u->exp, camp, u->level > 0 ? "¤w" : "¥¼");
+
+  prints("\nÄÝ©Ê¡G¤O¶q [%3d]  ´¼¤O [%3d]  ´¼¼z [%3d]  ±Ó±¶ [%3d]",
+    u->str, u->inl, u->wis, u->dex);
+
+  prints("\nÄÝ©Ê¡GÅé®æ [%3d]  ¹B®ð [%3d]  ¾y¤O [%3d]",
+    u->con, u->luc, u->cha);
+
+  prints("\n¸ê·½¡G»È¹ô %5d  ¶Àª÷ %5d", u->money, u->gold);
+
+  prints("\n¸ê·½¡GÄ_¥Û %5d  ¤ì§÷ %5d  Äq¥Û %5d", u->gem, u->wood, u->iron);
+
+  if (adm)
+  {
+    prints("\n¯S½è¡G§NÀR %5d  «i®ð %5d  °·±d %5d  ¾Ç²ß %5d  ¤ß±¡ %5d",
+      u->calm, u->cour, u->heal, u->lern, u->mood);
+
+    prints("\n¸Ë³Æ¡GªZ¾¹ %5d  ÀY²¯ %5d  ¶µÁå %5d  ²¯¥Ò %5d  ¤â®M %5d",
+      u->weapon, u->helm, u->amulet, u->armor, u->glove);
+
+    prints("\n¸Ë³Æ¡G§Ù«ü %5d  Áu³¹ %5d  ¥Ö±a %5d  ¿Ç¤l %5d  ¾c¤l %5d",
+      u->ring, u->bracer, u->belt, u->pant, u->shoe);
+  }
+
+  outs("\n\n        \033[30;41m¢r¢s¢r¢s¢r¢s¢r¢s¢r¢s¢r¢s¢r¢s¢r¢s¢r¢s"
+    "¢r¢s¢r¢s¢r¢s¢r¢s¢r¢s¢r¢s\033[m");
+}
+
+
+static void
+rpg_setup(u, userid, adm)
+  RPG *u;
+  char *userid;
+  int adm;
+{
+  RPG x;
+  int i, num;
+  char *str, buf[80];
+
+  rpg_show(u, adm);
+  memcpy(&x, u, sizeof(RPG));
+
+  if (vans("³]©w 1)¸ê®Æ Q)¨ú®ø [Q] ") != '1')
+    return;
+
+  move(i = 3, 0);
+  clrtobot();
+
+  str = x.usertitle;
+  while (1)
+  {
+    if (vget(i, 0, "ÀY    »Î¡G", str, sizeof(x.usertitle), GCARRY))
+      break;
+  }
+
+  i++;
+  str = x.username;
+  while (1)
+  {
+    if (vget(i, 0, "¼Ê    ºÙ¡G", str, sizeof(x.username), GCARRY))
+      break;
+  }
+
+  if (adm)
+  {
+    for (;;)
+    {
+      /* ÁÙ¦³§ï§OªºÄæ¦ìªº¸Ü¡A¦Û¤v§ï¼gµ{¦¡ */
+      adm = vans("1)µ¥¯Å 2)°}Àç 3)¤W­­ [Q] ");
+
+      if (adm == '1')
+      {
+        sprintf(buf, "%d", u->level);
+        vget(i, 0, "µ¥¯Å¡G", buf, 6, GCARRY);
+        x.level = atoi(buf);
+      }
+      else if (adm == '2')
+      {
+        sprintf(buf, "%d", u->alliance);
+        vget(i, 0, "°}Àç¡G", buf, 6, GCARRY);
+        x.alliance = atoi(buf);
+      }
+      else if (adm == '3')
+      {
+        for (;;)
+        {
+          num = vans("[¤W­­] s)¤O¶q i)´¼¤O w)´¼¼z d)±Ó±¶ "
+            "c)Åé®æ l)¹B®ð a)¾y¤O [Q] ");
+
+          if (num == 's')
+          {
+            sprintf(buf, "%d", u->str);
+            vget(i, 0, "¤O¶q¡G", buf, 6, GCARRY);
+            if (num = atoi(buf) > 0)
+              x.str = num;
+          }
+          else if (num == 'i')
+          {
+            sprintf(buf, "%d", u->inl);
+            vget(i, 0, "´¼¤O¡G", buf, 6, GCARRY);
+            if (num = atoi(buf) > 0)
+              x.inl = num;
+          }
+          else if (num == 'w')
+          {
+            sprintf(buf, "%d", u->wis);
+            vget(i, 0, "´¼¼z¡G", buf, 6, GCARRY);
+            if (num = atoi(buf) > 0)
+              x.wis = num;
+          }
+          else if (num == 'd')
+          {
+            sprintf(buf, "%d", u->dex);
+            vget(i, 0, "±Ó±¶¡G", buf, 6, GCARRY);
+            if (num = atoi(buf) > 0)
+              x.dex = num;
+          }
+          else if (num == 'c')
+          {
+            sprintf(buf, "%d", u->con);
+            vget(i, 0, "Åé®æ¡G", buf, 6, GCARRY);
+            if (num = atoi(buf) > 0)
+              x.con = num;
+          }
+          else if (num == 'l')
+          {
+            sprintf(buf, "%d", u->luc);
+            vget(i, 0, "¹B®ð¡G", buf, 6, GCARRY);
+            if (num = atoi(buf) > 0)
+              x.luc = num;
+          }
+          else if (num == 'a')
+          {
+            sprintf(buf, "%d", u->cha);
+            vget(i, 0, "¾y¤O¡G", buf, 6, GCARRY);
+            if (num = atoi(buf) > 0)
+              x.cha = num;
+          }
+          else
+          {
+            break;
+          }
+        }
+      }
+      else
+      {
+        break;
+      }
+    }
+  }
+
+  if (vans(msg_sure_ny) != 'y')
+    return;
+
+  memcpy(u, &x, sizeof(x));
+  rpg_save(u, userid);
+  utmp_admset(acct_userno(userid), STATUS_DATALOCK);
+}
+
+
+/* ----------------------------------------------------- */
+/* ¿ï³æ«ü¥O                                              */
+/* ----------------------------------------------------- */
+
+
+int
+r_info()
+{
+  move(1, 0);
+  rpg_setup(&crpg, cuser.userid, 0);
+  return 0;
+}
+
+
+int
+r_query()
+{
+  int ans;
+  char userid[IDLEN + 1];
+  RPG rpg;
+
+  move(1, 0);
+  clrtobot();
+
+  if (HAS_PERM(PERM_ALLACCT))
+  {
+    while (ans = rpg_get(msg_uid, &rpg, userid))
+    {
+      if (ans > 0)
+        rpg_setup(&rpg, userid, 1);
+    }
+  }
+  else
+  {
+    while (ans = rpg_get(msg_uid, &rpg, userid))
+    {
+      if (ans > 0)
+        rpg_show(&rpg, 0);
+    }
+  }
+
+  return 0;
+}
+
+
+int
+r_apply()               /* ¦Û±þ­«¨Ó */
+{
+  if (vans("±z±N­«·s¶}©l¤@¬q·sªº®È³~(Y/N)¡H[N] ") != 'y')
+    return XEASY;
+
+  rpg_apply(&crpg, cuser.userid);
+  rpg_save(&crpg, cuser.userid);
+  return 0;
+}
+
+: ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ³o¥u¬O RPG ªº¬[ºc¡A²Ó¸`¨Ã¨S¦³¼g
+  ¹CÀ¸ªº²Ó³¡ª±ªk«h¬O­nÅý¯¸ªø¦Û¦æ³W¹º¡A¨Ò¦p¡G
+
+  ¤@¡Bµoªí¤å³¹¡A¨Ì¦r¼Æ¥[¤ì§÷¡B¨Ì®É¶¡¥[Äq¥Û
+    : post.c:do_post()
+      mode = BMIN(wordsnum, spendtime) / 10;    /* ¨C¤Q¦r/¬í ¤@¤¸ */
+      prints("³o¬O±zªº²Ä %d ½g¤å³¹¡A±o %d »È¡C", ++cuser.numposts, mode);
+      addmoney(mode);
+    + crpg.wood += wordsnum;
+    + crpg.iron += spendtime;
+
+  ¤G¡Bµoªí¤å³¹¡A­Y¦r¼Æ¶W¹L®É¶¡¡A°}ÀçÅÜµ½¨}¡F¤Ï¤§ÅÜ¨¸´c
+    : post.c:do_post()
+      mode = BMIN(wordsnum, spendtime) / 10;    /* ¨C¤Q¦r/¬í ¤@¤¸ */
+      prints("³o¬O±zªº²Ä %d ½g¤å³¹¡A±o %d »È¡C", ++cuser.numposts, mode);
+      addmoney(mode);
+    + crpg.alliance += wordsnum - spendtime;
+
+  ¤T¡B¦b¤ô²y¦Cªí¥á¤ô²y¡A¥[¤O¶q
+    : bmw.c:bmw_write()
+      if (up = utmp_find(userno))
+    + {
+        do_write(up);
+    +   crpg.str++;
+    + }
+
+  ¥|¡B¦b¨Ï¥ÎªÌ¦Cªí¥á¤ô²y¡A¥[´¼¤O
+    : ulist.c:ulist_write()
+      if (up = ulist_pool[xo->pos])
+    + {
+        do_write(up);
+    +   crpg.inl++;
+    + }
+
+  ¤­¡BÂ÷¯¸®É¡A¨C¤@¤ÀÄÁ¥[¸gÅç­È 1 ÂI¡A¶°º¡ 10000 ¤ÀÄÁ¤É¤@¯Å
+    : bbsd.c:u_exit()
+      diff = (time(&cuser.lastlogin) - ap_start) / 60;
+    + crpg.exp += diff;
+    + if (crpg.exp >= 10000)
+    + {
+    +   crpg.exp -= 10000;
+    +   crpg.level++;
+    + }
+
+  ¤Ï¥¿³£¬O crpg.xxx «ç¼Ë«ç¼Ë
+  ¦Ü©ó xxx ¬O¤°»ò¡A§A¥u­n¬Ý rpg.h ´N¥i¥Hª¾¹D¤F
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.dorm11.nctu.edu.tw [30mµoªí[m

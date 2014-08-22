@@ -1,0 +1,97 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý«Ý¬å¤å³¹¥\¯à
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/06/28 Mon 00:32:54)                Updated: 2005/03/15
+
+¡° ¤Þ­z¡msbs (SBS)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¦³¿ìªk¥[¤J¹³¤£¨}¤û¤jD¥\¯à¶Ü?
+> ¥ý¼Ð°O¡AµM«á©T©w¤Ñ¼Æ«á¨t²Î·|¦Û°Ê§R°£
+
+: hdr.h:struct HDR
+
+typedef struct
+{
+  time_t chrono;                /* timestamp */
+  int xmode;
+
+  int xid;                      /* reserved */
+
+- char xname[32];               /* ÀÉ®×¦WºÙ */
++ char xname[28];               /* ÀÉ®×¦WºÙ */
++ time_t delday;                /* ´X¤Ñ«á§R°£ */
+  char owner[80];               /* §@ªÌ (E-mail address) */
+  char nick[49];                /* ¼ÊºÙ */
+  char score;                   /* ¤å³¹µû¤ñ¤À¼Æ */
+
+  char date[9];                 /* 96/12/31 */
+  /* Thor.990329:¯S§Oª`·N, date¥u¨ÑÅã¥Ü¥Î, ¤£§@¤ñ¸û, ¥HÁ×§K y2k °ÝÃD,
+                 ©w¸q 2000¬° 00, 2001¬°01 */
+
+  char title[73];               /* ¥DÃD TTLEN + 1 */
+}          HDR;
+
+: post.c:post_attr()
+
+static int
+post_attr(hdr)
+  HDR *hdr;
+{
+  int mode, attr;
+
++ if (hdr->delday > 0)
++   return 'D';
+
+  mode = hdr->xmode;
+
+: post.c:post_delday() ·s¼W¦¹¨ç¦¡¦b post_mark() «á­±
+
+static int
+post_delday(xo)
+  XO *xo;
+{
+  if (bbstate & STAT_BOARD)
+  {
+    HDR *hdr;
+    int pos, cur, day;
+    char ans[4];
+
+    pos = xo->pos;
+    cur = pos - xo->top;
+    hdr = (HDR *) xo_pool + cur;
+
+    if (hdr->xmode & POST_MARKED)
+      return XO_NONE;
+
+    if (vget(b_lines, 0, "´X¤Ñ«á§R°£¡G", ans, 3, DOECHO))
+    {
+      if ((day = atoi(ans)) > 0)
+      {
+        hdr->delday = time(NULL) + day * 86400;
+        currchrono = hdr->chrono;
+        rec_put(xo->dir, hdr, sizeof(HDR), pos, cmpchrono);
+        move(3 + cur, 7);
+        outc(post_attr(hdr));
+      }
+    }
+  }
+  return XO_NONE;
+}
+
+: post.c:post_cb[]
+
+  'm', post_mark,
++ 'p', post_delday,             [1;44m // «öÁä¦Û©w [m
+
+: expire.c:expire()
+
+    if (hdr.xmode & (POST_MARKED | POST_BOTTOM) || total <= minp)
+      keep = 1;
+    else if (hdr.chrono < duetime || total > maxp)
+      keep = 0;
++   else if (hdr.delday && hdr.delday < synctime)
++     keep = 0;
+    else
+      keep = 1;
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.dorm11.nctu.edu.tw [30mµoªí[m

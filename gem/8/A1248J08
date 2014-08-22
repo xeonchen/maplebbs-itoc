@@ -1,0 +1,75 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: expire ¤p¥\¯à½Ð±Ð
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/03/28 Tue 23:15:37)                Updated: 2006/04/18
+
+¡° ¤Þ­z¡mcchhsu (AG)¡n¤§»Ê¨¥¡G
+> ¦b¬Y­Ó¯¸¬Ý¨ì ¦b¤å³¹«e ¦h­Ó­^¤å¼Ð°O"A" ...
+> ¤@¬q®É¶¡«á ¨º­Ó¤å³¹ ´N·|¦Û°Ê³Qexpire ¬å±¼¤F
+> ½Ð°Ý ³o¬O«ç»ò°µ¨ìªº ..
+
+  ³Q¼Ð¥Ü POST_REMOVE ªº¤å³¹¦b¤T¤Ñ«á·|¦Û°Ê³Q§R°£
+
+: hdr.h
+
+- #define POST_16         0x00008000
++ #define POST_REMOVE     0x00008000
+
+: post.c:post_attr()
+
+  if (mode & POST_MARKED)
+    attr |= 'M';
++ else if (mode & POST_REMOVE)
++   attr |= 'A';
+
+: post.c:post_remove() ·s¼W¦¹¨ç¦¡¦b post_mark() «á­±
+
+static int
+post_remove(xo)
+  XO *xo;
+{
+  if (bbstate & STAT_BOARD)
+  {
+    HDR *hdr;
+    int pos, cur;
+
+    pos = xo->pos;
+    cur = pos - xo->top;
+    hdr = (HDR *) xo_pool + cur;
+
+    hdr->xmode ^= POST_REMOVE;
+    currchrono = hdr->chrono;
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono);
+
+    move(3 + cur, 7);
+    outc(post_attr(hdr));
+  }
+  return XO_NONE;
+}
+
+: post.c:post_cb[]
+: post.c:xpost_cb[]
+
+  'm', post_mark,
++ 'i', post_remove,
+
+: expire.c
+
+#define EXPIRE_LOG      "run/expire.log"
++ static time_t ystday;
+
+: expire.c:main()
+
+  init_bshm();
++ ystday = time(NULL) - 86400 * 3;   /* ¥u«O¯d¤T¤Ñ */
+
+: expire.c:expire()
+
+    if (hdr.xmode & (POST_MARKED | POST_BOTTOM) || total <= minp)
+      keep = 1;
++   else if ((hdr.xmode & POST_REMOVE) && (hdr.chrono < ystday))
++     keep = 0;
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m itoc.dorm11.nctu.edu.tw  [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

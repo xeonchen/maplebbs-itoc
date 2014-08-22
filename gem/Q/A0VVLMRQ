@@ -1,0 +1,80 @@
+µo«H¤H: truck66.bbs@bbs2.ba.ccu.edu.tw (¦Ò¸Õ¡H¨S¦b©Èªºªü) ¬ÝªO: plan
+¼Ð  ÃD: ·Q¼W¥[ª÷»ÈÂà¶×ªº±H«H³qª¾
+µo«H¯¸: »Å¤Ú·s¯¸ (2004/01/06 Tue 22:28:11)                Updated: 2004/10/28
+
+    ®¦¡A§Ú¥H¶×´Úµ{¦¡½X·í§@ÂÅ¥»¡A§ï¤F«H¥ó¤ºªº°T®§
+
+: so/bank.c:x_exchange()
+
+  char buf[60], ans[10];
++ int orimoney, origold;
+
+...
+...
+
+
+  if (vget(20, 0, buf, ans, 3, LCECHO) == 'y')
+  {
++   orimoney = cuser.money;
++   origold = cuser.gold;
+
+    if (i)
+    {
+...
+...
+
+    sprintf(buf, "§A¨­¤W¦³ª÷¹ô %d ¤¸,»È¹ô %d ¤¸", cuser.gold, cuser.money);
+    vmsg(buf);
+
++   if (vans("±z¬O§_­n¯d¤U¶×§I°O¿ý(Y/N)¡H[Y] ") != 'n')
++   {
++     char folder[64], fpath[64];
++     HDR hdr;
++     FILE *fp;
+
++     usr_fpath(folder, cuser.userid, fn_dir);
++     if (fp = fdopen(hdr_stamp(folder, 0, &hdr, fpath), "w"))
++     {
++       fprintf(fp, "%s %s (%s)\n¼ÐÃD: ª÷»È¶×§I³qª¾\n®É¶¡: %s\n\n",
++         str_author1, cuser.userid, cuser.username, Now());
+
++       fprintf(fp, "\n±z­ì¥»¨­¤W¦³ª÷¹ô %12d ¤¸¡A»È¹ô %12d ¤¸",
++         origold, orimoney);
+
++       if (i)
++         fprintf(fp, "\n\n±z®³¤F %d ª÷´« %d »È", dollar, dollar * GOLD2MONEY);
++       else
++         fprintf(fp, "\n\n±z®³¤F %d »È´« %d ª÷", dollar, dollar / MONEY2GOLD);
+
++       fprintf(fp, "\n\n±z²{¦b¨­¤W¦³ª÷¹ô %12d ¤¸¡A»È¹ô %12d ¤¸",
++         cuser.gold, cuser.money);
++       fclose(fp);
+
++       strcpy(hdr.title, "ª÷»È¶×§I³qª¾");
++       strcpy(hdr.owner, cuser.userid);
++       rec_add(folder, &hdr, sizeof(HDR));
++     }
++   }
+  }
+  else
+  {
+    vmsg("¨ú®ø¥æ©ö");
+
+  }
+  else
+  {
+    vmsg("¨ú®ø¥æ©ö");
+
+--
+
+   ½Äªü¡ã¡ã[1;30m¥d¨®[37m¯S§ð¶¤[m¡ã¡ã      [1;33m¡³     [30m¢d¢e¢f¢g¢g¢h¢h¢i¢«[m      ¹Í[1;30m¹Í[m¡ã
+                             [1;33m¡Ã[34m¢i[33m>  [30m¢¨¢i¢i¢i¢i¢i¢i¢i¢«[m        §A¶W[1;30m³t[m¤F¡ã
+     ¨S¦b[1;30m©È[mªº°Õ¡ã¡ã            [1;33m/| [30m¢¨¢i¢i¢i¢i¢i¢i¢i¢«[m          [1;30m§Ö[m°±¨®¡ã¡ã
+                      [30m   [m  ¢¨¢i¢i[47m [1;30m¢[40mi¢i¢i¢i¢i¢i¢i¢«[m   =====
+       ½Ä[1;30m½Ä[m½Ä¡ã¡ã   [30m   [m ¢¨¢i¢i¢i[1;30;47m¢¨[40m¢i¢i¢i¢i¢i¢i¢«[m   =====
+                     ¢¨¢[43mi¢« ¢[mi[1;30;47m¢¨[40m¢i¢i¢[43mi¢«  ¢i[40m¢«[m   =====
+                         [30;43m¢©¢¨[40m¢e¢e¢e¢e¢[43m© ¢¨[40m¢«[m
+--
+[1;35m¢¨[45m [40m¢©¢¨[45m [40m¢©¢© ¢¨ ¢¨[45m [40m¢© ¢¨[45m [40m¢© [37mOrigin: ¤¤¥¿¤j¾Ç £» ¥øºÞ»Å¤Ú¯¸ bbs2.ba.ccu.edu.tw[0m
+[1;35m¢iùâ ¢iùâ ¢i ¢i ¢i [45mù[40mâ ¢i ¢i [30mAuthor: truck66      ±q       140.123.224.94 µoªí
+[1;37;45m¢ª ¢«¢ª ¢«¢ª ¢« ¢ª ¢« ¢« ¢ª[34m   . [37mo     ¡C  [0;37;45m.¡O    . O   [1;35m  .  ¡E     [37m ¡O¡C[1;37mo  [0;34;45m [1;36m [m

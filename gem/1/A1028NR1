@@ -1,0 +1,23 @@
+µo«H¤H: omni.bbs@bbs.nhctc.edu.tw (·R´r), «H°Ï: Chinfost
+¼Ð  ÃD: Re: ½Ð°Ý¦p¦ó¹q¸£¤À¿ë¤¤­^¤å¦r
+µo«H¯¸: ·s¦Ë®v°|­·¤§§{ (Sat Mar  4 11:15:11 2000)
+
+¡° ¤Þ­z¡myusue.bbs@cis.nctu.edu.tw (¬Oªº  §A¯uªº¬O...)¡n¤§»Ê¨¥¡G
+>   ½Ð°Ý¦b¤@¬q¤¤­^¥æÂøªº¦r¦ê¤¤ ¹q¸£¦p¦ó¥h¤À¿ë¦óºØ¬°¤¤¤å¦óºØ¬°­^¤å
+>   ¬O§Q¥ÎASCII½X¶Ü??¨ºBoundªº¼Æ¦r¬O¦h¤Ö©O??
+
+§AÀ³¸Óª¾¹D... ASCII ¬O Single Byte  Big5 ¬O Double Byte
+¦Ó Big5 ½X²Ä¤@ Byte ¤@©w¬O >= 0x80 ¦Ó ASCII ¬O < 0x80
+§A¥i¥H¥Î³o¨â­Ó¯S©Ê¨Ó¤À¿ì
+
+
+[34;47m §@ªÌ [37;44m Wei-Chang Shann (³æºû¹ü)                                               [m
+[34;47m ¼ÐÃD [37;44m Big-5 ½s½X¨t²Î                                                         [m
+[34;47m ®É¶¡ [37;44m http://www.math.ncu.edu.tw/~shann/Chinese/big5.html  (Oct 24, 1995)    [m
+
+Big-5 ­º½X¦b 161 (\241, 0xA1) ¨ì 254 (\376, 0xFE) ¤§¶¡.
+Big-5 ¦¸½X¦b  64 (\100, 0x40) ¨ì 126 (\176, 0x7E) ¤§¶¡
+        ©Î¬O 161 (\241, 0xA1) ¨ì 254 (\376, 0xFE) ¤§¶¡.
+
+--
+.

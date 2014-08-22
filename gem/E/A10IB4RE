@@ -1,0 +1,64 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¦¬/µo¤ô²y¦¸¼Æ
+®É¶¡: Sun Aug 17 16:08:35 2003                          Updated: 2003/08/17
+
+  §ï struct ACCT¡A­nÂà´« .ACCT
+
+: struct.h:struct ACCT
+
+  int numlogins;                /* ¤W¯¸¦¸¼Æ */
+  int numposts;                 /* µoªí¦¸¼Æ */
+  int numemails;                /* ±Hµo Inetrnet E-mail ¦¸¼Æ */
++ int numbmwtx;                 /* µo¤ô²y¦¸¼Æ */
++ int numbmwrx;                 /* ¦¬¤ô²y¦¸¼Æ */
+
+: bmw.c:bmw_edit()
+
++   cuser.numbmwtx++;
+
+    /* itoc.020126: ¥[¤J FN_AMW */
+    usr_fpath(fpath, userid, fn_amw);
+
+: bmw.c:bmw_rqst
+
++   cuser.numbmwrx++;
+
+    /* itoc.020126: ¥[¤J FN_AMW */
+    usr_fpath(buf, cuser.userid, fn_amw);
+
+: acct.c:acct_show()
+
+- prints("  \033[32mµù¥U¤é´Á¡G\033[37m%s\n", Btime(&u->firstlogin));
+
+- prints("  \033[32m¥úÁ{¤é´Á¡G\033[37m%s\n", Btime(&u->lastlogin));
+
++ prints("  \033[32mµù¥U¤é´Á¡G\033[37m%-35s\033[32mµo°e¤ô²y¡G\033[37m%d\n",
++   Btime(&u->firstlogin), u->numbmwtx);
+
++ prints("  \033[32m¥úÁ{¤é´Á¡G\033[37m%-35s\033[32m±µ¦¬¤ô²y¡G\033[37m%d\n",
++   Btime(&u->lastlogin), u->numbmwrx);
+
+: acct.c acct_setup()
+
+    sprintf(buf, "%d", u->gold);
+    vget(++i, 0, "ª÷    ¹ô¡G", buf, 10, GCARRY);
+    if ((num = atoi(buf)) >= 0)
+      x.gold = num;
+
++   sprintf(buf, "%d", u->numbmwtx);
++   vget(++i, 0, "¶Ç¤ô²y¼Æ¡G", buf, 10, GCARRY);
++   if ((num = atoi(buf)) >= 0)
++     x.numbmwtx = num;
+
++   sprintf(buf, "%d", u->numbmwrx);
++   vget(++i, 0, "¦¬¤ô²y¼Æ¡G", buf, 10, GCARRY);
++   if ((num = atoi(buf)) >= 0)
++     x.numbmwrx = num;
+
+    sprintf(buf, "%d", u->numemails);
+    vget(++i, 0, "µo«H¦¸¼Æ¡G", buf, 10, GCARRY);
+    if ((num = atoi(buf)) >= 0)
+      x.numemails = num;
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

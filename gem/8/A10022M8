@@ -1,0 +1,68 @@
+µo«H¤H: Efen.bbs@backwind.g1.dorm.ncku.edu.tw (,,,,,,) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¶i¯¸°Êµe
+µo«H¯¸: °j­·¨¦ (2003/12/26 Fri 17:53:12)                  Updated: 2004/01/12
+
+°ò¥»¤W´N¬O¶i¯¸®É¡A³s¼·´X±i¹Ï¨Ó°µ¬°°Êµe¡A
+­º¥ý¥ý¦b¦UÃþµe­±¤U·s¼W¤T­Ó¸ê®Æ
+enter-0  enter-1  enter-2
+¡]­n³s¼·´X±i´N·s¼W´X­Ó¡^
+
+: maple/bbsd.c:tn_main()¡A¦³¶W¹L¤T±iªº¸Ü¡A´N¦Û¦æ·ÓµÛ¥[¤J
+
+static inline void
+tn_main()
+{
++ int i;
+
+  clear();
+
+#ifdef HAVE_LOGIN_DENIED
+  if (acl_has(BBS_ACLFILE, "", fromhost))
+    login_abort("\n¶Q¾÷¾¹©ó¤£³Q±Í¯¸±µ¨ü");
+#endif
+
++ for (i = 0; i < 3; i++)      /* ¦³¤T±i¶i¯¸°Êµe */
++ {
++   film_out(FILM_ENTER0 + i,  0);
++   refresh();
++   usleep(300000);            /* ¨C±i°±¯d0.3¬í */
++   clear();
++ }
+
+  prints(MYHOSTNAME " ¡ó " SCHOOLNAME " ¡ó " MYIPADDR "\n"
+    "Åwªï¥úÁ{¡i\033[1;33;46m %s \033[m¡j¥Ø«e½u¤W¤H¼Æ [%d/300] ¤H",
+    str_site, ushm->count);
+
+
+: util/camera.c
+
+static char *list[] =           /* src/include/struct.h */
+{
+  ...
+  ...
+
++ "enter-0",                    /* FILM_ENTER0   */
++ "enter-1",                    /* FILM_ENTER1   */
++ "enter-2",                    /* FILM_ENTER2   */
+  NULL                          /* FILM_MOVIE    */
+};
+
+
+: include/struct.h   ½s¸¹­n«ö¶¶§Ç
+
+- #define FILM_MOVIE      17      /* °ÊºA¬ÝªO FILM_MOVIE ­n©ñ¦b³Ì«á­± */
++ #define FILM_ENTER0     17      /* ¶i¯¸°Êµe(¢¯) */
++ #define FILM_ENTER1     18      /* ¶i¯¸°Êµe(¢°) */
++ #define FILM_ENTER2     19      /* ¶i¯¸°Êµe(¢±) */
++ #define FILM_MOVIE      20      /* °ÊºA¬ÝªO FILM_MOVIE ­n©ñ¦b³Ì«á­± */
+
+
+make§¹­«¶}¾÷´N¦æ¤F¡K
+¼·©ñ¬O¦³¶¶§Çªº¡A±qenter-0 ¦Aenter-1 ³Ì«áenter-2
+°Êµe½s¿è´N·Ó¦¹½s´N¥i¥H¡C
+
+­n¬Ý½d¨Òªº½Ð³s¦Ü¥»¯¸¡G
+backwind.twbbs.org
+--
+[0m[1;31;44m ¡y¢~¢£[33m¦¨¤jÂå¾Ç[31m¢~¢£ [32m¢ª[35m¢¨      [37m¡Ë  ¡¸ [35m¢[32mi[33m¢[36mi [32mbbs.med.ncku.edu.tw [36m¢[33mi[32m¢[35mi [37m¡¸  ¡Ê     [0m
+[0m[1;31;42m ¢~¢£[33m°j ­· ¨¦[31m¢~¢£¡z [31m¢«[34m¢© [37m¡÷From¡G[36m140.116.131.76                             [37m¡ö[0m

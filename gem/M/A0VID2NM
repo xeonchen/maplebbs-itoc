@@ -1,0 +1,60 @@
+§@ªÌ: itoc (SS ­n§¹³J¤F) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ³s¸p§¹¶}ªO¦Û°Ê¥[¤J Class
+®É¶¡: Tue Jan 14 14:22:09 2003                          Updated: 2005/05/19
+
+: newbrd.c ¦b nbrd_newbrd() «e­±¥[¤J³o¤G­Ó¨ç¦¡
+
+static int
+hdr_cmp(a, b)
+  HDR *a;
+  HDR *b;
+{
+  /* ¥ý¤ñ¹ï¤ÀÃþ¡A¦A¤ñ¹ïªO¦W */
+  int k = strncmp(a->title + BNLEN + 1, b->title + BNLEN + 1, BCLEN);
+  return k ? k : str_cmp(a->xname, b->xname);
+}
+
+
+static void
+add_class(brd)
+  BRD *brd;
+{
+  HDR hdr;
+  char *fpath;
+
+  [1;44m// ¥H¤U³o¤@¬q­n¥Ñ¦U¯¸¦Û©w [m
+  if (!strcmp(brd->class, "­Ó¤H"))
+    fpath = "gem/@/@11_Personal";
+  else if (!strcmp(brd->class, "¹ìªO"))
+    fpath = "gem/@/@10_Room";
+  else if (!strcmp(brd->class, "Àç¶¤"))
+    fpath = "gem/@/@09_Camp";
+  [1;44m// ¥H¤W³o¤@¬q­n¥Ñ¦U¯¸¦Û©w [m
+
+  else
+  {
+    vmsg("µ{¦¡µLªk§PÂ_¦¹¬ÝªO¤§¤ÀÃþ¡A½Ð¦Û¦æ¥[¤J¤ÀÃþ");
+    return;
+  }
+
+  /* ¥[¤J¾A·íªº¤ÀÃþ */
+
+  brd2gem(brd, &hdr);
+  rec_add(fpath, &hdr, sizeof(HDR));
+  rec_sync(fpath, sizeof(HDR), hdr_cmp, NULL);
+
+  vmsg("·sªO¦¨¥ß¡Aµ{¦¡¦Û°Ê¥[¤J Class ¸s²Õ¦¨¥\\");
+}
+
+: newbrd.c:nbrd_newbrd()
+
+  if (brd_new(&newboard) < 0)
+    return 0;
+
++ add_class(&newboard);
+
+- vmsg("·sªO¦¨¥ß¡A°OµÛ¥[¤J¤ÀÃþ¸s²Õ");
+  return 1;
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

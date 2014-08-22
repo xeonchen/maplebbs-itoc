@@ -1,0 +1,116 @@
+§@ªÌ: itoc (¼g¤£§¹¤F ^^) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ½s¿è¤å³¹®É·j´M¦r¦ê
+®É¶¡: Sat Aug 23 20:59:41 2003                          Updated: 2003/08/23
+
+¡° ¤Þ­z¡mcpd.bbs@pitch.twbbs.org (Seasons)¡n¤§»Ê¨¥¡G
+> ´N¬O¦b½s¿è¤å³¹ªº®É­Ô...¤£ª¾¹Dmaple¦³¨S¦³´M§ä¦r¦êªº¥\¯à©O¡H
+> ¹³joe¤@¼Ë¡A«ö ^kf ©Î Esc + s ´N¯à´M§ä¦r¦ê...
+> ¹³¤@½g¤å³¹«Üªøªº®É­Ô¡A´N¥i¥H«öE¨Ó½s¿è·j´M­n§äªº¦r¦ê...
+
+  ¥Ñ©ó edit ®Éªº«öÁä Ctrl+? ³£¦³¥\¯à¦û¥h¤F
+  ©Ò¥H­n¥ý§ì¥X¤@­Ó«öÁä¡A¦b¦¹¥H Ctrl('B') °µ¨Ò¤l
+  §A¤]¥i¥H¦Û¤v¿ï§OªºÁä
+
+: edit.c:vedit() ¥Ñ©ó Ctrl('B') ¥i¥H¥Î KEY_PGUP ¨ú¥N
+:                ©Ò¥H§â Ctrl('B') ÄÀ©ñ¥X¨Óµ¹§Oªº¥\¯à¥Î
+
+int             /* -1:¨ú®ø½s¿è 0:§¹¦¨½s¿è */
+vedit(fpath, ve_op)
+  char *fpath;
+  int ve_op; /* 0:¯Âºé½s¿èÀÉ®×  -1:½s¿è¦ý¤£¯àÀx¦s  1:quote/header  2:quote */
+{
+  textline *vln, *tmp;
+  int cc, col, mode, margin, pos;
++ char hunt[32];
+
+  /* --------------------------------------------------- */
+  /* ªì©l³]©w¡G¸ü¤JÀÉ®×¡B¤Þ¥Î¤å³¹¡B³]©w½s¿è¼Ò¦¡          */
+  /* --------------------------------------------------- */
+
++ hunt[0] = '\0';
+  tmp = vln = ve_alloc();
+
+  ...
+  ...
+
+      case KEY_PGUP:
+-     case Ctrl('B'):
+
+        ve_pageup();
+        continue;
+
+   ...
+   ...
+
++     case Ctrl('B'):
++
++       if (vget(b_lines, 0, "·j´M¡G", hunt, sizeof(hunt), GCARRY))
++       {
++         if (!ve_search(hunt))
++         {
++           vmsg("§ä¤£¨ì±z·Q·j´Mªº¦r¦ê");
++           ve_mode = mode | VE_FOOTER;
++         }
++       }
++       continue;
+
+      default:
+
+        goto ve_key;
+      }
+
+: edit.c:ve_search() ·s¼W¦¹¨ç¦¡©ó ve_goto() «á­±
+
+static inline int
+ve_search(hunt)
+  char *hunt;
+{
+  textline *cur, *top, *tmp;
+  uschar *str, *pend;
+  int len, find;
+
+  len = strlen(hunt);
+  find = 0;
+
+  for (cur = vx_cur; cur; cur = cur->next)   /* ©¹¤U·j´M */
+  {
+    str = cur->data + (cur == vx_cur ? ve_col + 1: 0);
+    pend = str + cur->len - len + 1;
+
+    while (str < pend)
+    {
+      if (!str_ncmp(str, hunt, len))
+      {
+        ve_col = str - cur->data;
+        find = 1;
+        goto find_hunt;
+      }
+      str++;
+    }
+  }
+
+find_hunt:
+
+  if (find)
+  {
+    top = cur;
+
+    for (len = 0; len < 10; len++)
+    {
+      if (!(tmp = top->prev))
+        break;
+      top = tmp;
+    }
+
+    vx_cur = cur;
+    vx_top = top;
+    ve_lno = len;
+
+    ve_position(cur, top);
+  }
+
+  return find;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

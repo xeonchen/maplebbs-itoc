@@ -1,0 +1,100 @@
+µo«H¤H: cne.bbs@processor.tfcis.org (§b§bªº) ¬ÝªO: plan
+¼Ð  ÃD: ¤@­Ó·s¥\¯à
+µo«H¯¸: XEON (Wed, 02 Apr 2003 16:28:29 +0800 (CST))      Updated: 2003/04/08
+
+  ¤ô²yÀËÁ|ªO¡A¨Ï¥ÎªÌ¦b¤ô²y°O¿ý¤¤«ö x
+  ¥i¥H°Î¦W§â¤ô²yÂà¥h Evidence ªO
+  (¥Î bmw ³oÀÉ®×¨Ó°µªº¡A©Ò¥H¨Ï¥ÎªÌ¨ä¹ê¥i¥H­×§ï)
+
+: bmw.c: bmw_cb[] =
+
++ 'x', bmw_post,
+
+: etc/help/bmw/bmw.hlp
+
+  (x)          ÀËÁ|
+
+: global.h
+
+#define BN_EVIDENCE   "Evidence"      /* ¤ô²yÀËÁ|ªO */
+
+: bmw.c:bmw_post() ·s¼W³o¨ç¦¡©ó bmw_help() ¤§«e
+
+static int
+bmw_post(xo)
+  XO *xo;
+{
+  int fd;
+  BMW *bmw;
+  char userid[IDLEN + 1], fpath[80];
+
+  usr_fpath(fpath, cuser.userid, FN_BMW);
+  if ((fd = open(fpath, O_RDONLY)) < 0)
+    return XO_NONE;
+
+  ll_new();
+  mgets(-1);
+  while(bmw = mread(fd, sizeof(BMW)))
+  {
+    if (!ll_has(bmw->userid))
+      ll_add(bmw->userid);
+  }
+
+  if (!vget(1, 0, "½Ð¿é¤J¥N¸¹(«öªÅ¥ÕÁä¦C¥X¨Ï¥ÎªÌ)¡G", userid,
+    IDLEN + 1, GET_LIST))
+  {
+    vmsg("¸Ó¨Ï¥ÎªÌ¨S¦³¥á¤ô²yµ¹±z­ò¡I");
+    close(fd);
+    return XO_HEAD;
+  }
+
+  sprintf(fpath, "[ÀËÁ|ÄÌÂZ] ¬O§_Âà¿ý¦Ü %s ªO(Y/N)¡H[N] ", BN_EVIDENCE);
+  if (vans(fpath) == 'y')
+  {
+    FILE *fp;
+    char fname[40];
+    HDR hdr;
+    int ans;
+
+    ans = vans("±z·Q­n¼Ê¦W¶Ü(Y/N)¡H[N] ");
+
+    sprintf(fname, "tmp/%s.bmw", cuser.userid);
+    fp = fopen(fname, "w");
+    fprintf(fp, "´£¥XÀËÁ|ªÌ: %s (%s)\n\n",
+      ans == 'y' ? "²q²q§Ú¬O½Ö" : cuser.userid,
+      ans == 'y' ? "^o^" : cuser.username);
+    fprintf(fp, "%s\n", msg_seperator);
+
+    lseek(fd, 0, SEEK_SET);
+    mgets(-1);
+    while(bmw = mread(fd, sizeof(BMW)))
+    {
+      if (!str_cmp(bmw->userid, userid))
+      {
+        fprintf(fp, bmw->sender == cuser.userno ?
+          BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",
+          bmw->userid, bmw->msg, Btime(&bmw->btime));
+      }
+    }
+    fclose(fp);
+
+    brd_fpath(fpath, BN_EVIDENCE, fn_dir);
+    hdr_stamp(fpath, HDR_LINK | 'A', &hdr, fname);
+    strcpy(hdr.owner, "[¨t²ÎÀËÁ|]");
+    strcpy(hdr.nick, cuser.userid);    /* °Î¦W¥i¦b hdr.nick ¤¤¬d¨ì id */
+    sprintf(hdr.title, "[ÀËÁ|] ¤ô²yÄÌÂZ (%s)", userid);
+    rec_add(fpath, &hdr, sizeof(HDR));
+
+    unlink(fname);
+  }
+
+  close(fd);
+  return XO_HEAD;
+}
+
+--
+  Author: weichung.bbs@bbs.ntit.edu.tw
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44m61-217-97-3.HINET-IP.hinet.net           [m

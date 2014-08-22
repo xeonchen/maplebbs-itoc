@@ -1,0 +1,676 @@
+µo«H¤H: kevinblue.bbs@nightless.twbbs.org (³Í¤åÂÅ) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¤¤¤åª©BBC·s»D
+µo«H¯¸: «°°Ï©]¥¼¯v (2006/08/28 Mon 21:57:03)              Updated: 2006/08/28
+
+¤µ¤Ñµy·Lªá¤FÂI®É¶¡¹Á¸Õparse¬Ý¬Ý¨ä¥L¦³´£¨Ñ·s»D¯¸¥xªººô¯¸
+
+¿ïBBC¦³´X­Ó­ì¦]
+1. ¤£¹³yahoo¦³cookieÁÙ¦³¤@°ï©_©_©Ç©Çªº³W«h
+2. ¦³´£¨Ñ¯Â¤å¦rª©·s»D(¤è«Kparse)
+
+¥H¤U¬O§Ú§ïªºcode(±q©_¼¯·s»D­×§ï¡Aparse RSS§ì·s»D)
+http://opensvn.csie.org/nightlessbbs/freebsd/trunk/src/util/bbc-enews-open.c
+¬°¤F°t¦XBBC·s»D§Ú­×§ï¤FENEWSªºstruct
+
+typedef struct
+{
+  time_t chrono;                /* ½s¸¹ */
+  char kind;                    /* ºØÃþ */
+  char xname[50];               /* ÀÉ®×¦WºÙ */
+
+  char link[128];               /* ³sµ²¸ô®| */
+[1;33m+ char description[512];        /* ·s»D¤j­n */[m
+  char title[TTLEN + 1];        /* ¤å³¹¼ÐÃD */
+} ENEWS;
+
+·s»D¤j­n¥i¥H©ñ¦bcna¤W
+
+¥t¥~¥Ñ©óBBCªº·s»D³sµ²³£«Üªø¡A©Ò¥H§Ú¥ÎlibcurlªºAPI¼g¤Fbbs¦Û°ÊÁYºô§}ªºfunction
+½Ð°t¦Xshorten_url.c¬Ý
+http://opensvn.csie.org/nightlessbbs/freebsd/trunk/src/lib/mk0rz.c
+
+ÁÙ¦³¨Ñ¥~³¡©I¥sªº°õ¦æÀÉ
+http://opensvn.csie.org/nightlessbbs/freebsd/trunk/src/util/shorten_url.c
+
+·s»Dparseªº³¡¥÷¤£´±»¡³£¨S¦³°ÝÃD¡A¦]¬°BBCªººô­¶¤º®eÁÙÆZ¦h®æ¦¡ªº
+§Ú¥u¬O§Æ±æºÉ¶q¥i¥H§â·s»D§ì¶i¨Ó¡A¤£¨¬ªº³¡¥÷§Æ±æ¦³¤H¥i¥H¤@°_¸É¨¬ :)
+
+libcurl³¡¥÷½Ð°Ñ¦Ò http://curl.haxx.se/libcurl/c/allfuncs.html
+
+ps.¦³¨S¦³¤H·Q¹Á¸Õ¬Ý¬ÝÄ«ªG¤é³ø¡H
+   ¦pªG§A­n¥Î§Úªºmk0rz½Ð¦w¸Ëcurl
+   Ãö©ó¦p¦ó©Mlibcurl linking½Ð°õ¦æcurl-config
+   ©ÎªÌ¦bMakefile¤W¥[¤W -lcurl ¸Õ¸Õ(§Ú³o¼Ë¬O¥i¦æªº)
+
+: src/util/bbc-enews-open.c ·s¼W¦¹µ{¦¡¡AMakefile ­n¦P¨B§ï
+
+/*-------------------------------------------------------*/
+/* util/enews-open.c    ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : BBC·s»D§ó·s                                 */
+/* create : 02/01/29                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#if 0
+
+¥»BBC·s»D§ó·sµ{¦¡»Ý­n°t¦X contab ¥h§ì¸ê®Æ¡Acrontab ¦p¤U¡G
+
+# ¨C¤Ñ 10:30AM 4:30PM §ì©_¼¯·s»D
+   30 10,16 * * * bin/enews-open
+      ­n¨Ï¥Î enews-open.c ¥²¶·¸Ë¦³ lynx¡Aª`·N lynx ªº¸ô®|­n©Mµ{¦¡§k¦X¡C
+         ¦pªG¥D¾÷»Ý³z¹L proxy ¤~¯à³s¥~ªº¸Ü¡A¨º»ò­n­×§ï lynx.cfg ªº http_proxy
+³]©w­È¡C
+            ¤å³¹ÀÉ®×©ñ¦b run/kimo/
+
+            bbc rss
+            http://news.bbc.co.uk/chinese/trad/hi/institutional/rss/default.st
+m#userss?
+            XML RSS feed¤¤¤åºô¥D­¶
+            http://newsrss.bbc.co.uk/rss/chinese/trad/news/rss.xml
+
+            XML RSS feed°ê»Ú·s»D
+            http://newsrss.bbc.co.uk/rss/chinese/trad/world/rss.xml
+
+            XML RSS feed¤¤°ê³ø¾É
+            http://newsrss.bbc.co.uk/rss/chinese/trad/china_news/rss.xml
+
+            XML RSS feed´ä¥x®ø®§
+            http://newsrss.bbc.co.uk/rss/chinese/trad/taiwan_hk/rss.xml
+
+            XML RSS feed­^°ê°ÊºA
+            http://newsrss.bbc.co.uk/rss/chinese/trad/uk/rss.xml
+
+            XML RSS feed­^»y±Ð¾Ç
+            http://newsrss.bbc.co.uk/rss/chinese/trad/learn_english/rss.xml
+
+            XML RSS feedª÷¿Ä°]¸g
+            http://newsrss.bbc.co.uk/rss/chinese/trad/business/rss.xml
+
+            XML RSS feed¬ì§Þ°·±d
+            http://newsrss.bbc.co.uk/rss/chinese/trad/sci/tech/rss.xml
+
+            XML RSS feed­^°ê³øºK
+            http://newsrss.bbc.co.uk/rss/chinese/trad/press/rss.xml
+
+            note. rss¸Ì­±ªºlink³£¬O¥H¹Ï¤åª©¬°¥D¡A¤£¹Lparse¤ñ¸û®e©öªº¬O¯Â¤å¦rª©
+            linkªº®t§O¥u¦blow¸òhi
+            ex.
+            ¹Ï¤åª©
+            http://news8.thdo.bbc.co.uk/chinese/trad/hi/newsid_5290000/newsid_
+5290200/5290212.stm
+            ¯Â¤å¦rª©
+            http://news8.thdo.bbc.co.uk/chinese/trad/low/newsid_5290000/newsid
+_5290200/5290212.stm
+
+#endif
+
+#include "bbs.h"
+
+#define LYNX_PATH   "/usr/local/bin/lynx --source"  /* lynx ªºµ´¹ï¸ô®| */
+#define POSTBOARD   "bbc_news"      //±ýpost·s»Dªºª©¦W
+#define INDEX_FILE  "tmp/bbc_index"
+#define NEWS_FILE   "tmp/bbc_news"
+#define RSS         "http://newsrss.bbc.co.uk/rss/chinese/trad/"
+#define BBC_NEWS    "http://news8.thdo.bbc.co.uk/chinese/trad/low/"
+#define BBC_NEWS_HI "http://news8.thdo.bbc.co.uk/chinese/trad/hi/"
+
+            /*-------------------------------------------------------*/
+            /* ¤å³¹Âà¨ì¬ÝªO                                          */
+            /*-------------------------------------------------------*/
+
+            static BCACHE *bshm;
+         static void
+            init_bshm()
+            {
+               /* itoc.030727: ¦b¶}±Ò bbsd ¤§«e¡AÀ³¸Ó´N­n°õ¦æ¹L account¡A©Ò¥H
+bshm À³¸Ó¤w³]©w¦n */
+         bshm = shm_new(BRDSHM_KEY, sizeof(BCACHE));
+
+         if (bshm->uptime <= 0)        /* bshm ¥¼³]©w§¹¦¨ */
+            exit(0);
+      }
+
+   static void
+      update_btime(brdname)
+      char *brdname;
+   {
+      BRD *bhdr, *tail;
+
+      bhdr = bshm->bcache;
+      tail = bhdr + bshm->number;
+      do
+      {
+         if (!str_cmp(brdname, bhdr->brdname))
+         {
+            bhdr->btime = -1;
+            break;
+         }
+      } while (++bhdr < tail);
+   }
+
+   static bool                      /* return true: ¥H«e´N§ì¹Lªº³sµ² */
+      old_link(fold, link)
+      char *fold;
+   char *link;
+   {
+      bool rc = false;
+      ENEWS enews;
+      FILE *fp;
+
+      if (fp = fopen(fold, "r"))
+      {
+         while (fread(&enews, sizeof(ENEWS), 1, fp) == 1)
+         {
+            if (!strcmp(enews.link, link))
+            {
+               rc = true;
+               break;
+            }
+         }
+
+         fclose(fp);
+      }
+
+      /*if(rc)
+         printf("link­«½Æ\n");
+      else
+         printf("·slink\n");*/
+
+      return rc;
+   }
+
+   static char* Userid = "·s»D³ø°¨¥J";
+   static char* Usernick="CTRL+O¥i¥H§¹¾ã¾\\Åª!";
+
+   static void
+      post_board(fpath, title, kind)
+      char *fpath;
+   char *title;
+   int kind;
+   {
+      char folder[64];
+      HDR hdr;
+      char *class[] =
+      {
+         "°ê»Ú·s»D", "¤¤°ê³ø¾É", "´ä¥x®ø®§", "­^°ê°ÊºA",
+         "ª÷¿Ä°]¸g", "¬ì§Þ°·±d"
+      };
+
+      char *board = POSTBOARD;    // Âà¥h KimoNews ªO¡A¦Û©w
+
+      brd_fpath(folder, board, FN_DIR);
+      hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
+      strcpy(hdr.nick, Usernick);
+      strcpy(hdr.owner, Userid);
+      sprintf(hdr.title, "[%s] %.64s", class[kind], title);
+      rec_add(folder, &hdr, sizeof(HDR));
+
+      update_btime(board);
+   }
+
+
+   /*-------------------------------------------------------*/
+   /* ¤ÀªR html                                             */
+   /*-------------------------------------------------------*/
+
+
+   static int wlen;    /* ¥»¦æ¦³¦h¤Ö¦r */
+   static int slen;    /* ¥»¦æ¦³¦h¤Ö¥b§Î¦r */
+
+   static void
+      foutc(ch, fp)
+      int ch;
+   FILE *fp;
+   {
+      static int in_tag = 0;    /* 1: ¦b <tag> ¤¤ */
+      static int in_chi = 0;    /* 1: «e¤@½X¬O¤¤¤å¦r */
+
+      if (ch == '<')
+      {
+         in_tag = 1;
+         return;
+      }
+
+      if (!in_tag)
+      {
+         if (in_chi || ch & 0x80)    /* «e¤@­Óchar©Î³ochar¬O¤¤¤å¦rªº²Ä¤@½X */
+            in_chi ^= 1;
+         else                        /* ¦pªG³£¤£¬O¡Aªí¥Ü³ochar¬O¥b§Î¦r */
+            slen++;
+
+         if (wlen >= 60 - slen % 2)  /* ¤@¦æ³Ì¦h 60 ¦r¡A­Y¦³©_¼Æ­Ó¥b§Î¦r¡A
+                                        ¸Ó¦æ¥u¦L 59 ¦r */
+         {
+            fputs("\n  ", fp);      /* ¨C¦æ«e­±³£ªÅ¥|®æ */
+            wlen = 0;
+            /* slen = 0; */
+            slen = !in_chi;           /* ­Y·sªº³o¦æ²Ä¤@­Óchar¬O¥b§Î¦r¡Aslen=1
+*/
+         }
+
+         fputc(ch, fp);
+         wlen++;
+      }
+      else
+      {
+         if (ch == '>')
+            in_tag = 0;
+      }
+   }
+
+
+   static void
+      fouts(str, fp)
+      uschar *str;
+   FILE *fp;
+   {
+      int ch;
+
+      wlen = 0;
+      slen = 0;
+      fputs("\n  ", fp);      /* ¨C¦æ«e­±³£ªÅ¥|®æ */
+
+      while (ch = *str)
+      {
+         foutc(ch, fp);
+         str++;
+      }
+   }
+
+
+   static void
+      html_download(enews, kind)        /* ¤U¸ü¤å³¹¨ÃÂà´«¬°¤å¦rÀÉ */
+      ENEWS *enews;
+   int kind;
+   {
+      char *strS, *strE;
+      char buf[2048];   /* °²³]¤å³¹¨C¬q¤£·|¶W¹L 2048 ¦r */
+      char fpath[64];
+      FILE *fpr, *fpw;
+      bool skip = false;
+
+      /* ¤U¸ü¤å³¹ */
+      if(enews->link)
+         sprintf(buf, LYNX_PATH " " BBC_NEWS "%s  > " NEWS_FILE, enews->link);
+
+      system(buf);
+
+      /* Âà´«¬°¤å¦rÀÉ */
+      if (fpr = fopen(NEWS_FILE, "r"))
+      {
+         sprintf(fpath, "run/bbc/%d/%s", kind, enews->xname);
+         //printf("¼g¤J¡G %s\n", fpath);
+
+         if (fpw = fopen(fpath, "w"))
+         {
+            /* ¶}ÀY¥[¤W¼ÐÃD */
+         fprintf(fpw, "%s %s (%s) %s %s\n",STR_AUTHOR1, Userid, Usernick, STR_
+POST2, "BBCNews");
+         fprintf(fpw, "¼ÐÃD: %s\n®É¶¡: %s\n", enews->title, Now());
+
+         /* html -> text */
+         fgets(buf, sizeof(buf), fpr);
+
+         while(!strstr(buf, "<!-- E IIMA -->"))
+            fgets(buf, sizeof(buf), fpr);
+
+         fgets(buf, sizeof(buf), fpr);
+
+         while(!strstr(buf, "<!-- E BO --><!-- E BO -->") &&
+               !strstr(buf, "<!-- E BO --><br>")&&
+               !strstr(buf, "ºô¤Í·N¨£¿ïµn¡G"))
+         {
+            if(strstr(buf, "<p>") || strstr(buf, "<P>") || strstr(buf, "<!-- S
+ SF -->") ||
+                  strstr(buf, "<!-- E SF -->") ||
+                  strstr(buf, "<ul class") || strstr(buf, "</ul>"))
+               skip=true;
+            else if((strS = strstr(buf, "<li>")))
+            {
+               strE = strstr(buf, "</li>");
+
+               if(strE)
+                  *(strE) = '\0';
+
+               str_ncpy(buf, buf+4, sizeof(buf)); //§â<li>¥h±¼;
+            }
+            else if((strS = strstr(buf, "<b>")))
+            {
+               strE = strstr(buf, "</b>");
+
+               if(strE)
+                  *(strE)= '\0';
+
+               str_ncpy(buf, buf+3, sizeof(buf));//§â<b>¥h±¼
+
+               //printf("%s\n", buf);
+            }
+            else if((strS = strstr(buf, "</B>")))
+            {
+               strE = strstr(buf, "</B>");
+
+               if(strE)//¦³</B>
+                  *(strE)= '\0';
+
+               str_ncpy(buf, buf+3, sizeof(buf));//§â<b>¥h±¼
+
+               //printf("%s\n", buf);
+            }
+            else if((strS = strstr(buf, "<br />")))
+            {
+               //*(strS) = "\n"; //§â<br />´«¦¨\n
+            }
+            else if(strstr(buf, "<!-- S IIMA -->"))
+            {
+               while(!strstr(buf, "<!-- E IIMA -->"))
+                  fgets(buf, sizeof(buf), fpr);
+            }
+
+            if(!skip && buf[0] !='\n')
+            {
+               //printf("%s", buf);
+               fouts(&buf[0], fpw);
+            }
+
+            skip=false;
+            fgets(buf, sizeof(buf), fpr);
+         }
+
+         /* µ²§À¥[¤W³sµ² */
+         sprintf(buf, BBC_NEWS_HI"%s", enews->link);
+         fprintf(fpw, "\n--\n­^°êBBC·s»D %s\n\n", mk0rz(buf));
+         fclose(fpw);
+
+         post_board(fpath, enews->title, kind);
+      }
+      fclose(fpr);
+      unlink(NEWS_FILE);  /* ²M°£¼È¦sÀÉ */
+   }
+}//end
+
+void
+xml_fetch(fpath, kind)  /* ±N³oÀÉ®×¤¤¦³®Äªº³sµ²§ä¥X¨Ó */
+char *fpath;
+int kind;        /* ºØÃþ */
+{
+   static int chrono = 0;
+   FILE *fp;
+   char folder[64], fold[64], buf[1024];
+   char *strA, *strB;
+   ENEWS enews;
+   int space=0;
+   bool skip = false;
+
+   if (!(fp = fopen(fpath, "r")))
+      return;
+
+   sprintf(folder, "run/bbc/%d/.ENEWS", kind);
+   sprintf(fold, "%s.o", folder);
+   f_mv(folder, fold);
+
+#if 0
+   ³B²z XML ®æ¦¡¦p¤U¡G
+      <item>
+      <title>¬ü°ê­¸¾÷¥¢¨Æ¡§¶]¹D¨Æ¬G¤Þ°_¡¨</title>
+      <description>¬ü°êComairªí¥Ü¡A¯Z¾÷5191¸¹¦]¡§¶]¹D¨Æ¬G¡¨¥¢¨Æ¡A50¦W­¼«È©M¾÷
+²Õ¤H­û¤¤¤@¤H¥ÍÁÙ¡C</description>
+      <link>http://news.bbc.co.uk/go/rss/-/chinese/trad/hi/newsid_5290000/news
+id_5290800/5290846.stm</link>
+      <guid isPermaLink="false">http://news.bbc.co.uk/chinese/simp/hi/newsid_5
+290000/newsid_5290800/5290846.stm</guid>
+      <pubDate>Sun, 27 Aug 2006 14:43:31 GMT</pubDate>
+      <category>¤¤¤åºô¥D­¶</category>
+      </item>
+
+#endif
+
+      //while (fgets(buf, sizeof(buf), fp) && article_num <= 30)//¨C¦¸§ì30«h·s
+»D
+      while (fgets(buf, sizeof(buf), fp))
+      {
+         if (strstr(buf, "<item>"))
+         {
+            /* ¥[¤J record */
+            memset(&enews, 0, sizeof(ENEWS));
+            enews.chrono = ++chrono;      /* ¨C½g¤å³¹¤@­Ó½s¸¹ */
+            enews.kind = kind;
+            sprintf(enews.xname, "A%06d%d", chrono, kind); //ÀÉ¦W
+            //printf("filename: %s\n", enews.xname); //ÀÉ¦W
+
+            fgets(buf, sizeof(buf), fp); /* ¦pªG§ä¨ìitem«h¤U¤@­Ó¥²¬O<title> */
+            strA = strstr(buf, "</title>");//§ì¨ì</title>¬°¤î
+
+            if(!strA)//¦pªG<title>¸ò</title>¤£¦A¦P¤@¦æ
+               skip = true; //´£¿ô­n¦hskip±¼¤£¬O¦P¤@¦æªº</title>
+            else
+               *strA = '\0';
+
+            strB = &buf[0];
+            while(*strB == ' ')
+            {
+               space++;
+               strB++;
+            }
+            str_ncpy(enews.title, buf + space + 7, sizeof(enews.title));//buf+
+7: <title>¤£­n
+            //printf("title: %s\n", enews.title);
+            space=0;
+            if(skip)
+               fgets(buf, sizeof(buf), fp); /* skip </title> */
+            skip = false;
+
+
+            fgets(buf, sizeof(buf), fp);/* §ädescription*/
+            strA = strstr(buf, "</description>");//§ì¨ì</description>¬°¤î
+
+            if(!strA)
+               skip = true;
+            else
+               *strA = '\0';
+
+            strB = &buf[0];
+            while(*strB == ' ')
+            {
+               space++;
+               strB++;
+            }
+            str_ncpy(enews.description, buf + space + 13, sizeof(enews.title))
+;//buf+13: <description>¤£­n
+            //printf("description: %s\n", enews.description);
+            space=0;
+            if(skip)
+               fgets(buf, sizeof(buf), fp); /* skip </description> */
+            skip = false;
+
+
+            fgets(buf, sizeof(buf), fp); /* ¤U¤@­Ó¥²¬O<link> */
+            strA = strstr(buf, "newsid");//hi¤£­n(¤è«Kparse)
+
+            if(strA)//¦³newsid linkªº¤~parse url
+            {
+               strB = strstr(strA, "</link>");
+
+               if(!strB)
+                  fgets(buf, sizeof(buf), fp); /* ¤U¤@­Ó¥²¬O<link> */
+               else
+                  *strB = '\0';
+
+               sprintf(enews.link, strA);//¥u§ìºô§}¦³newidªº
+               //printf("link: %s\n", enews.link);
+         }
+
+         if (!rec_add(folder, &enews, sizeof(ENEWS)) && !old_link(fold, enews.
+link))
+            html_download(&enews, kind, fold);
+
+         //article_num++;
+      }
+}
+
+fclose(fp);
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+int main(void)
+{
+   int kind;
+   char cmd[256];
+   char *class[] =
+   {
+      "world", "china_news", "taiwan_hk", "uk", "business", "sci/tech"
+   };
+
+   chdir(BBSHOME);
+
+   init_bshm();
+
+   /* §ì¸ê®Æ¨Ã¤ÀªR¤§ */
+   for (kind = 0 ; kind <= 5 ; kind++)
+   {
+      sprintf(cmd, LYNX_PATH " " RSS "%s/rss.xml > " INDEX_FILE, class[kind]);
+      //printf("%s\n",cmd);
+      system(cmd);
+      xml_fetch(INDEX_FILE, kind);
+   }
+
+   unlink(INDEX_FILE);     /* ²M°£¼È¦sÀÉ */
+   return 0;
+}
+
+: src/lib/mk0rz.c ·s¼W¦¹µ{¦¡¡AMakefile ­n¦P¨B§ï
+
+#include "bbs.h"
+
+#define tmp_url "tmp/tmp_url"
+#define thiny_url "<input type=hidden name=xxurl value="
+#define tail_url  "\">"
+
+char* mk0rz(char* post_url)
+{
+   FILE *fpr;
+   char buf[512];
+   char *strE;
+
+   chdir(BBSHOME);
+
+   sprintf(buf, "bin/shorten_url %s > %s ", post_url, tmp_url);
+   system(buf);
+
+   if(!(fpr = fopen(tmp_url, "r")))
+   {
+      //printf("CAN NOT OPEN %s !!!\n", tmp_url);
+      return NULL;
+   }
+
+   fgets(buf, sizeof(buf), fpr);
+
+   while(!strstr(buf, thiny_url))
+      fgets(buf, sizeof(buf), fpr);
+
+   str_ncpy(buf, buf+strlen(thiny_url)+1, sizeof(buf));
+   *(strE = strstr(buf, tail_url)) = '\0';
+
+   unlink(tmp_url);
+   return buf;
+}
+
+: src/util/shorten_url.c ·s¼W¦¹µ{¦¡¡AMakefile ­n¦P¨B§ï
+
+/*-------------------------------------------------------*/
+/* shorten_url.c ( NTHU CS MapleBBS Ver 3.10 )           */
+/*-------------------------------------------------------*/
+/* target : §Q¥Îlibcurl¦^¶Ç0rz.netµuurl                  */
+/* create : 06/08/28                                     */
+/* update :   /  /                                       */
+/* author : kevinblue.bbs@nightless.twbbs.org            */
+/*-------------------------------------------------------*/
+
+/*
+   0rz.net¦³2­ÓÄæ¦ì»Ý­n¶ñ¤W¤~¥i¥H¨Ï¥Îhttp post
+   ¤À§O¬°
+   1. <input type="text" name="url" size="30" length=505>
+   2. <input type="Submit" value="Make Shorter" style="border:1px solid gray;"
+>
+
+   <form action="http://0rz.net/create.php" method="post" target="_blank">
+   Give me the long URL:<input type="text" name="url" size="30" length=505>
+   <input type="Submit" value="Make Shorter" style="border:1px solid gray;">
+   </td></tr>
+   </textarea>
+   </form>
+
+   ¥Îªk¡G./shorten_url §Aªººô§}
+   ½d¨Ò¡G./shorten_url http://www.google.com.tw
+
+ */
+
+#include <stdio.h>
+#include <string.h>
+
+#include <curl/curl.h>
+#include <curl/types.h>
+#include <curl/easy.h>
+
+#define POSTURL "http://0rz.net/create.php" //modify this if 0rz.net change it
+s thiny-url create page
+
+int main(int argc, char *argv[])
+{
+   CURL *curl;
+   CURLcode res;
+
+   struct curl_httppost *formpost=NULL;
+   struct curl_httppost *lastptr=NULL;
+
+   curl_global_init(CURL_GLOBAL_ALL);
+
+   /*¶ñ¤Wurl*/
+   curl_formadd(&formpost,
+         &lastptr,
+         CURLFORM_COPYNAME, "url",
+         CURLFORM_COPYCONTENTS, argv[1],
+         CURLFORM_END);
+
+   /*¶ñ¤WSubmit*/
+   curl_formadd(&formpost,
+         &lastptr,
+         CURLFORM_COPYNAME, "Submit",
+         CURLFORM_COPYCONTENTS, "Make Shorter",
+         CURLFORM_END);
+
+   curl = curl_easy_init();
+
+   if(curl)
+   {
+      /* what URL that receives this POST */
+      curl_easy_setopt(curl, CURLOPT_URL, POSTURL);
+      curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+
+      res = curl_easy_perform(curl);
+
+      /* always cleanup */
+      curl_easy_cleanup(curl);
+
+      /* then cleanup the formpost chain */
+      curl_formfree(formpost);
+   }
+   return 0;
+}
+
+--
+   [m                                                      [1;47;34m¢«¢«¢«[40m¢©             [;40;37m
+   [1m·¥ºÝ©È³Â·Ðªº³Ã¥ë¬°¤F»´ÃP¸Ñ¨M°ÝÃD©Ò·Q¥X¨Óªº³Ð·N»P¥©«ä  [;47;30m£»[40;37m¢i[47;30m£»[40;37m¢i
+   [33m¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w  [37m¢i¢i¢i¢i
+                 [1m±a°Ê¤F¤HÃþªºµo©ú©M¶i¨B                  [;40;37m¢ª¢i¢i¢«
+                                                          [1;34m¢Û¢i  £rKidult73 [;40;37m[m
+
+--
+[1;36;42m   Origin:ªF§d¸ê¬ì«°°Ï©]¥¼¯v(nightless.twbbs.org)[;32;40m¢o¢n¢k [33m[FROM:61.216.2.244][m

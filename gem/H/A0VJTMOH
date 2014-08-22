@@ -1,0 +1,33 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: Re: ½Ð°Ýµoªí©M¾\ÅªÅv­­...
+®É¶¡: Mon Jul 29 14:09:55 2002                          Updated: 2002/10/17
+
+¡° ¤Þ­z¡mdream.bbs@sea.twbbs.org (£i ¬î®ü´Å £i)¡n¤§»Ê¨¥¡G
+> ¬O±Ä¨ú or ªº§PÂ_...¥u­n¦³¨ä¤¤¤@­ÓÅv­­´N¥i¥H¤F..
+> ÁÙ¬O and ªº§PÂ_..³]ªºÅv­­³£­n¦³¤~¯à°÷¾\Åª©O¡H
+> ­Õ­Y¬O or ªº¸Ü..
+> ¨º­n¦p¦ó­×§ï¦¨ and ©O?
+
+  ¬O or ªº¡A¥u­n¦³¨ä¤¤¤@­ÓÅv­­´N¥i¥H¤F
+
+  ¦pªG­n§ï¦¨ and¡A³]ªºÅv­­³£­n¦³¤~¯à°÷¾\Åªªº¸Ü
+  ½Ð§ï board.c
+
+: board.c:Ben_Perm()
+
+  ...
+  ...
+
+- if (!readlevel || (readlevel & ulevel))
++ if (!readlevel || (readlevel & ulevel) == readlevel)
+  {
+    bits = BRD_L_BIT | BRD_R_BIT;
+
+    postlevel = bhdr->postlevel;
+-   if (!postlevel || (postlevel & ulevel))
++   if (!postlevel || (postlevel & ulevel) == postlevel)
+      bits |= BRD_W_BIT;
+  }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

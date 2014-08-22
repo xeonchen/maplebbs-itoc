@@ -1,0 +1,30 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: new¤@­Ó·s±b¸¹®É¡A¥X²{¨Ï¥ÎªÌ±ø´Ú(¯¸³W)
+µo«H¯¸: °Ê¤O®Ö¤ß (2003/12/25 Thu 02:37:01)                Updated: 2004/01/11
+
+¡° ¤Þ­z¡mcyanofox.bbs@bbs.cs.nchu.edu.tw (§Ú¬O¦n¤H¤@±Úªº:()¡n¤§»Ê¨¥¡G
+> ¦p¦ó¦b¥Ó½Ð¤@­Ó·sid®É¡A¥ý¥X²{¯¸³W¡A¨Ï¥ÎªÌ¦P·N«á¦AÄ~Äò¤U­±ªº¨BÆJ
+
+: bbsd.c:acct_apply()
+
+  SCHEMA slot;
+  char buf[80];
+  char *userid;
+  int try, fd;
+
++ if (more("etc/rule", (char *) -1) >= 0)
++ {
++   if (vans("±z¬O§_¦P·N¥H¤W¯¸³W(Y/N)¡H[N] ") != 'y')
++     login_abort("\n«Ü©êºp¡A±z­Y¤£¦P·N¥»¯¸¯¸³W¡A±NµLªkµù¥U");
++ }
+
+  film_out(FILM_APPLY, 0);
+
+: etc/rule  ·s¼W³oÀÉ®×¡A¤º®e¬O¯¸³W
+
+  1. ¥»¯¸¯¸ªø³Ì¤j¡A¹H­I¯¸ªøªÌ¡A¬å±b¸¹ :p
+  2. ....
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

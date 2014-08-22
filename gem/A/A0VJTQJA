@@ -1,0 +1,179 @@
+§@ªÌ: Kudo (²H³J~~) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] expire ¼g¶i .BRD [transbrd.c]
+®É¶¡: Thu Apr 11 04:20:41 2002                          Updated: 2005/05/19
+
+/*-------------------------------------------------------*/
+/* util/transbrd.c     ( NTHU CS MapleBBS Ver 3.10 )     */
+/*-------------------------------------------------------*/
+/* target : M3 ¬ÝªOÂà´«µ{¦¡                              */
+/* create : 02/03/10                                     */
+/* update :   /  /                                       */
+/* author : Kudo.bbs@kudo.twbbs.org                      */
+/*-------------------------------------------------------*/
+/* syntax : transbrd                                     */
+/*-------------------------------------------------------*/
+
+
+#if 0
+
+  ¨Ï¥Î¤èªk¡G
+
+  0. For Maple 3.X To Maple 3.X
+  1. ¨Ï¥Î«e½Ð¥ý³Æ¥÷ .BRD
+  2. make transbrd.c
+  3. °õ¦æ transbrd, ²£¥Í BRD.NEW, ½Ð¦Û¦æ rename ¬° .BRD
+  4. Âà´«§¹«á¡A±N·s¥[¤JªºÄæ¦ì¡A¥[¤J struct.h ¸Ì
+  5. ±N¥þ³¡ source make clean «á­«·s make
+
+#endif
+
+
+#include "bbs.h"
+
+#define DEF_MAXP        3000          /* ¬ÝªO¤å³¹¹w³]¤W­­¼Æ¶q */
+#define DEF_MINP        500           /* ¬ÝªO¤å³¹¹w³]¤U­­¼Æ¶q */
+#define DEF_MAXT        365           /* ¬ÝªO¤å³¹¹w³]«O¯d¤Ñ¼Æ */
+
+typedef struct
+{
+  char bname[BNLEN + 1];        /* board ID */
+  int days;                     /* expired days */
+  int maxp;                     /* max post */
+  int minp;                     /* min post */
+}      Life;
+
+struct NEW
+{
+  char brdname[BNLEN + 1];      /* board name */
+  char title[BTLEN + 1];
+  char BM[BMLEN + 1];           /* BMs' uid, token '/' */
+
+  uschar bvote;                 /* ¦@¦³´X¶µ§ë²¼Á|¦æ¤¤ */
+
+  time_t bstamp;                /* «Ø¥ß¬ÝªOªº®É¶¡, unique */
+  usint readlevel;              /* ¾\Åª¤å³¹ªºÅv­­ */
+  usint postlevel;              /* µoªí¤å³¹ªºÅv­­ */
+  usint battr;                  /* ¬ÝªOÄÝ©Ê */
+  time_t btime;                 /* .DIR ªº st_mtime */
+  int bpost;                    /* ¦@¦³´X½g post */
+  time_t blast;                 /* ³Ì«á¤@½g post ªº®É¶¡ */
+  int maxpost;                /* ¤å³¹¤W­­ */
+  int minpost;                /* ¤å³¹¤U­­ */
+  int maxtime;                /* ¤å³¹«O¯d®É¶¡ */
+};
+
+typedef struct NEW NEW;
+
+int
+main()
+{
+  NEW new;
+  BRD old;
+  int fdr, fdw;
+  int count = 0, number;
+  char *ptr, *bname, buf[256];
+  Life table[MAXBOARD];
+  FILE *fp;
+
+  setgid(BBSGID);
+  setuid(BBSUID);
+  chdir(BBSHOME);
+
+  /* --------------------------------------------------- */
+  /* load expire.ctl                                     */
+  /* --------------------------------------------------- */
+
+  if (fp = fopen(FN_ETC_EXPIRE, "r"))
+  {
+    while (fgets(buf, sizeof(buf), fp) && buf[0])
+    {
+      if (buf[0] < '0')
+        continue;
+
+      bname = (char *) strtok(buf, " \t\r\n");
+      if (bname && *bname)
+      {
+        strcpy(table[count].bname, bname);
+
+        ptr = (char *) strtok(NULL, " \t\r\n");
+        if (ptr && (number = atoi(ptr)) > 0)
+        {
+          table[count].days = number;
+
+          ptr = (char *) strtok(NULL, " \t\r\n");
+          if (ptr && (number = atoi(ptr)) > 0)
+          {
+            table[count].maxp = number;
+
+            ptr = (char *) strtok(NULL, " \t\r\n");
+            if (ptr && (number = atoi(ptr)) > 0)
+            {
+              table[count].minp = number;
+            }
+          }
+        }
+        count++;
+      }
+    }
+    fclose(fp);
+  }
+  number = count;      /* ­É number ¨Ó¦sÅª¥X¨Óªº¸ê®Æ¼Æ¥Ø */
+
+  /* --------------------------------------------------- */
+  /* create BRD.NEW                                      */
+  /* --------------------------------------------------- */
+
+  if ((fdr = open(FN_BRD, O_RDONLY)) < 0)
+    exit(1);
+
+  fdw = open("BRD.NEW", O_WRONLY | O_CREAT, 0600);
+
+  while (read(fdr, &old, sizeof(BRD)) == sizeof(BRD))
+  {
+   strcpy(new.brdname, old.brdname);
+
+   for (count = 0;; count++)
+   {
+     if (count > number)
+     {
+       table[count].days = DEF_MAXT;
+       table[count].maxp = DEF_MAXP;
+       table[count].minp = DEF_MINP;
+       break;
+     }
+
+     if (strcmp(old.brdname, table[count].bname) != 0)
+       continue;
+     else
+       break;
+   }
+
+   strcpy(new.title, old.title);
+   strcpy(new.BM, old.BM);
+
+   new.bvote = old.bvote;
+   new.bstamp = old.bstamp;
+   new.readlevel = old.readlevel;
+   new.postlevel = old.postlevel;
+   new.battr = old.battr;
+   new.btime = old.btime;
+   new.bpost = old.bpost;
+   new.blast = old.blast;
+   new.maxpost = (table[count].maxp > 0) ? table[count].maxp : DEF_MAXP;
+   new.minpost = (table[count].minp > 0) ? table[count].minp : DEF_MINP;
+   new.maxtime = (table[count].days > 0) ? table[count].days : DEF_MAXT;
+
+   write(fdw, &new, sizeof(NEW));
+  }
+  close(fdr);
+  close(fdw);
+
+}
+
+--
+Chih-Kuan Chien (Kudo)
+kudo@ms21.url.com.tw
+
+--
+[1;32m¡¼ Origin: [33m²H³Jªº¤pºÛ [37mbbs.kudo.idv.tw
+[1;31m¡¼ From: [36mwww.kudo.idv.tw[m

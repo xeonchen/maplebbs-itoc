@@ -1,0 +1,131 @@
+µo«H¤H: guessi.bbs@cpu.tfcis.org (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¤â°ÊÂà¿ý¦Ü«ü©w"¤ÀÃþ" (­­¯¸°È)
+µo«H¯¸: °Ê¤O®Ö¤ß (2007/03/06 Tue 10:19:22)                Updated: 2007/03/20
+
+¥Î³~»¡©ú:
+
+¦]±`¦³¬¡°Ê«Å¶Ç»Ý±i¶K¦Ü¬Û¦P¤ÀÃþ¬ÝªO ¦Ò¶qCP°ÝÃD ¬G¼¶¼g¦¹¥\¯à
+
+¨Ï¥ÎªÌ¶K¤å©ó«ü©w¬ÝªO(¦b¦¹¬°Depart_All)¤å³¹¸g¬ÝªO¯¸°È¼f¾\«á
+
+¥Ñ¬ÝªO¯¸°È[¤j¼gM]«öÁä¾Þ§@«á Âà¿ý¦Ü«ü©w¬ÝªO(±N¤£­pºâCP¼Æ¥Ø)
+
+
+: post.c ·s¼Wdepart_post()©ódo_post()«e
+
+static int
+depart_post(xo)
+  XO *xo;
+{
+  char folder[64], fpath[64];
+  HDR post, *hdr;
+  BRD *brdp, *bend;
+  int pos, cur;
+
+  if (!HAS_PERM(PERM_ALLBOARD) || strcmp(currboard, "DepartAll"))
+  /* ¶È¬ÝªO¯¸°È ¨Ã«ü©w¬ÝªO */
+    return XO_NONE;
+
+  if (vans("½Ð½T»{Âà¿ý¦Ü¦U¨t©Ò¬ÝªO(Y/N)¡H[N] ") != 'y')
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
+  hdr_fpath(fpath, xo->dir, hdr);
+
+  hdr->xmode ^= POST_DIGEST; /* µ¹¤©¦Û­q¼Ð°O ¨Ñpost_attr()Åã¥Ü */
+  currchrono = hdr->chrono;
+  rec_put(xo->dir, hdr, sizeof(HDR), pos, cmpchrono);
+
+  brdp = bshm->bcache;
+  bend = brdp + bshm->number;
+
+  while (brdp < bend)
+  {
+    if (belong_depart(brdp) && strcmp(brdp->brdname, "DepartAll"))
+    /* Âà¿ý¦Ü«ü©w¤ÀÃþ ¦ý¤£¥]§t¥»¨­ */
+    {
+      brd_fpath(folder, brdp->brdname, fn_dir);
+      hdr_stamp(folder, HDR_COPY | 'A', &post, fpath);
+      strcpy(post.owner, hdr->owner);
+      sprintf(post.title, "[Âà¿ý] %s", hdr->title); /* ¥[µùÂà¿ý¦r¼Ë */
+      rec_bot(folder, &post, sizeof(HDR));
+      btime_update(brd_bno(brdp->brdname)); /* ¬ÝªO¾\Åª¬ö¿ý(ºñÂI)§ó·s */
+    }
+    brdp++;
+  }
+
+  vmsg("Âà¿ý§¹¦¨¡I");
+  return post_init(xo);
+}
+
+: post.c ·s¼Wbelong_depart()©ódepart_post()«e
+
+static int
+belong_depart(brd)
+  BRD *brd;
+{
+  [1;44m// ¥H¤U¤G¿ï¤@ [m
+
+  /* (¤@) Âà¿ý¨ì ¬ÝªO¤ÀÃþ¡u¨t©Ò¡vªº¬ÝªO */
+  return !strcmp(brd->class, "¨t©Ò");
+
+  /* (¤G) Âà¿ý¨ì gem/@/@Depart ¸Ìªº¬ÝªO */
+  return find_class("gem/@/@Depart", brd->brdname, 0);
+}
+
+: post.c ·s¼Wfind_class()©óbelong_depart()«e
+
+  [1;44m// ­Y¬O¿ï(¤G)¤~­n°µ³o­Ó [m
+
+static int
+find_class(folder, brdname, rc)
+  char *folder;
+  char *brdname;
+  int rc;
+{
+  int xmode;
+  char fpath[64];
+  HDR hdr;
+  FILE *fp;
+
+  if (rc)           /* ¤w¸g§ä¨ì */
+    return rc;
+
+  if (fp = fopen(folder, "r"))
+  {
+    while (fread(&hdr, sizeof(HDR), 1, fp) == 1)
+    {
+      xmode = hdr.xmode & (GEM_BOARD | GEM_FOLDER);
+
+      if (xmode == (GEM_BOARD | GEM_FOLDER))      /* ¬ÝªOºëµØ°Ï±¶®| */
+      {
+        if (!strcmp(hdr.xname, brdname))
+        {
+          rc = 1;
+          break;
+        }
+      }
+      else if (xmode == GEM_FOLDER)               /* ¨÷©v recursive ¶i¥h§ä */
+      {
+        hdr_fpath(fpath, folder, &hdr);
+        find_class(fpath, brdname, rc);
+      }
+    }
+
+    fclose(fp);
+  }
+
+  return rc;
+}
+
+: post.c:post_cb[] «öÁä¦Û­q
+
++ 'M', depart_post(),
+
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m59-115-96-53.dynamic.hinet[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

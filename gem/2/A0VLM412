@@ -1,0 +1,31 @@
+§@ªÌ: itoc (¡Ô-1 ¤p©óµ¥©ó¤ß¦º) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] bhttpd.c ²Ö¿n³X°Ý¤H¦¸
+®É¶¡: Sun Sep  7 19:00:12 2003                          Updated: 2005/05/19
+
+  À³Æ[²³­n¨D¡A¼g¤@­Ó«ÜÂ²³æªº(¤]ÆZ²Âªº)²Ö¿n³X°Ý¤H¦¸
+
+: bhttpd.c:main()
+
+    if (!(ptr = cb->key))               /* ¨ä¾l¿ù»~ªº³£¨q¥X­º­¶ */
+    {
++     rec_add("run/bhttp.counter", arg, 1);     /* ¶i­º­¶¤~ºâ²Ö¿n³X°Ý¤H¦¸ */
+      html_mainpage();
+      break;
+    }
+
+: bhttpd.c:mainpage_neck()
+
+  printf("<br>\r\n"
+    "<table cellspacing=0 cellpadding=1 border=0 width=80%%>\r\n"
+    "<tr>\r\n"
+-   "  <td width=100%% ...%s%sÅwªï¥úÁ{</td>\r\n"
++   "  <td width=100%% ...%s%s±z¬O²Ä%d¦ì¥úÁ{¥»¯¸ªº¨Ï¥ÎªÌ</td>\r\n"
+    "</tr>\r\n"
+    "</table>\r\n"
+    "<br>\r\n",
+    logined ? cuser.userid : "",
+-   logined ? "¡A" : "");
++   logined ? "¡A" : "", rec_num("run/bhttp.counter", 1));
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,114 @@
+µo«H¤H: sby.bbs@bbs.csie.mcu.edu.tw (¤£ª¾¤£Ä±´N¤Ñ«G¤F), ¬ÝªO: installbbs
+¼Ð  ÃD: [¤å¥ó] IPv6 BBS -- Åý IPv4 »P IPv6 ¦@¦s --
+µo«H¯¸: »Ê¶Ç¤j¾Ç¸ê¤u¯«¸Ü (Fri May 30 01:11:17 2003)       Updated: 2003/05/30
+
+[«e¨¥]
+
+    ¤p§Ì¤@®É¿³°_§â BBS §ï¦¨ IPv6 ¬Û®e, ´ú¸Õ¤F´X¤Ñ...¤j­P¤WÀ³¸Ó¨S¤°»ò°ÝÃD...
+
+    ¥Ñ©ó¤§«e¦n¹³¨S¬Ý¹LÃþ¦üªº¤å³¹, ´N¨ÓÄmÁà¤@¤U, ¤j®a¦³¿³½ìªº¸Ü¥i¥H°Ñ¦Ò¬Ý¬Ý,
+
+    ¤º®e¦p¦³ºÃ°ÝÅwªï¨Ó«H«ü¥¿ :)
+
+
+                                           Bor-Yeh Shen (sby@cs.mcu.edu.tw)
+
+
+[Ãö©ó OS ªº¤ä´©]
+
+    ­nÅý BBS ¦P®É´£¨Ñ IPv4 ©M IPv6, OS ¤@©w­n¦³¤ä´©¤~¦æ, ­È±o°ª¿³ªº¬O,
+
+    ²{¦b³\¦h OS ³£¦³´£¨Ñ IPv4/IPv6 dual stack (Linux, BSD, Windows, ...)
+
+    ¥u¬O¬Ý¦³¨S¦³ enable °_¨Ó, Ãö©ó³o¤è­±ªº¤º®eºô¸ô¤W¦³³\¦h¤å¥ó¥i¥H°Ñ¦Ò,
+
+    ´N¤£¦b¥»½gªº°Q½×½d³ò¤§¤º.
+
+
+[socket ¦ì§}µ²ºcªºÂà´«]
+
+    ²Ä¤@¨B»Ý­n±N©Ò¦³ IPv4 socket address Âà´«¦¨ IPv6,
+
+    (¤£¥²¾á¤ß IPv4 Address ·|¦³¤£¦Xªº°ÝÃD, ¦]¬° IPv6 ¦b³]­p®É´N¦³¦Ò¶q¨ì,
+
+    ¨t²Î·|¦Û¤v±N IPv4 Address mapped ¨ì IPv6 Address)
+
+    ex:
+        sockaddr_in §ï¦¨ sockaddr_in6, xxx.sin_len §ï¦¨ xxx.sin6_len, ...etc.
+
+    ·íµM, ¦pªG±zªº BBS ¦³¦b°µ release ªº¸Ü, ¬°¤FÁ×§K¨Ï¥Îªº¨t²Î¤£¤ä´© IPv6,
+
+    #ifdef ... #else ... #endif À³¸Ó¬O§K¤£¤Fªº :)
+
+
+    ¥H¤U¬O IPv4 ©M IPv6 socket address ªºµ²ºc, ¹ïÀ³µÛÂà´«´N¦n:
+
+/* IPv4 socket address structure */
+
+struct sockaddr_in {
+        u_char  sin_len;                /* length of this struct */
+        u_char  sin_family;             /* AF_INET */
+        u_short sin_port;               /* Transport layer port # */
+        struct  in_addr sin_addr;       /* IP4 address */
+        char    sin_zero[8];            /* unused */
+};
+
+
+/* IPv6 socket address structure */
+
+struct sockaddr_in6 {
+        u_int8_t        sin6_len;       /* length of this struct */
+        u_int8_t        sin6_family;    /* AF_INET6 */
+        u_int16_t       sin6_port;      /* Transport layer port # */
+        u_int32_t       sin6_flowinfo;  /* IP6 flow information */
+        struct in6_addr sin6_addr;      /* IP6 address */
+        u_int32_t       sin6_scope_id;  /* scope zone index */
+};
+
+
+[Address Family ªºÅÜ§ó]
+
+    ¥Ñ AF_INET §ï¦¨ AF_INET6
+
+
+[Protocal Family ªºÅÜ§ó]
+
+    ¥Ñ PF_INET §ï¦¨ PF_INET6
+
+
+[IP ¥¿¤Ï¸Ñ³¡¤À]
+
+    ¦b°µ IPv6 ªºÂà´«®É, ³q±`·|«ØÄ³¥Î getaddrinfo(), getnameinfo() ¨ú¥N
+
+    ­ì¦³ªº gethostbyname(), gethostbyaddr() µ¥©I¥s, ³o¨â­Ó¨ç¦¡·|§â
+
+    ©Ò¦³»P IPv4 & IPv6 ¨ó©w¬ÛÃöªº°Ê§@ÁôÂÃ°_¨Ó, ¦p¦¹¤@¨Ó§Ú­Ì¤£»Ý­n¦b¥G
+
+    ²{¦b¨Ï¥Îªº¨ì©³¬O IPv4 or IPv6, µ{¦¡¤]·|ÅÜ±o¸ûÂ²¼ä¤@¨Ç,
+
+    ¸Ô²Óªº¥Îªk¥i¥H°Ñ¦Ò man page, ¸Ì­±¼gªºÆZ²M·¡ªº :)
+
+    (¸ò«e­±¤ñ°_¨Ó, ³oÃäºâ¬O§ó°Ê¤ñ¸û¤jªº³¡¤À)
+
+
+[¨ä¥¦]
+
+¦]¬° IPv6 ¦r¦êªø«×³Ìªø¬O INET6_ADDRSTRLEN (46),
+
+©Ò¥H BBS ¬ö¿ý¤W¯¸¨Ó·½ªº¦a¤è¥i¯à»Ý­n­n§ï¤@¤U
+
+(¦pªG¤£°÷ªøªº¸Ü¤]³\­n§ó°Ê­ì¦³ªºµ²ºc)
+
+¨ä¥¦À³¸Ó´N¨S¤°»ò»Ý­n§ïªº¦a¤è¤F....(¦Ü¤Ö§Ú²{¦bªº·PÄ±¬O¦p¦¹:p)
+
+hmm....¤j­P¤W¬O³o¼Ë....ÁÙ¦³°ÝÃDªº¦a¤è¥i¥H¦A¤@°_¨Ó°Q½×¬Ý¬Ý :)
+
+
+--
+¥t¥~, ¯«¸Ü¥Ø«eªº IPv6 Address ¬O 3ffe:3600:1e::2bf
+
+¤]Åwªï¤j®a¨Ó°ÑÆ[°ÑÆ[....^^
+
+--
+[1;36m¡° Origin: [33m»Ê¶Ç¸ê¤u¯«¸Ü¯¸ [37m<bbs.csie.mcu.edu.tw>
+[1;36m¡° From  : [32m3ffe:3600:1e::2af[m

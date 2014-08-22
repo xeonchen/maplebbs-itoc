@@ -1,0 +1,132 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G602) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ­««Ø©Ò¦³¨Ï¥ÎªÌªº¤W¯¸³qª¾ÀÉ
+®É¶¡: 2004/10/11 Mon 02:19:41                           Updated: 2004/11/22
+
+  §Q¥Î FN_ALOHA ¨Ó­««Ø FN_FRIENZ
+
+: src/util/Makefile
+
+EXE =   ..... [1;33mfix_frienz[m
+
+: util/fix_frienz.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/fix_frienz.c    ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ­««Ø©Ò¦³¨Ï¥ÎªÌªº¤W¯¸³qª¾ÀÉ                   */
+/* create : 04/10/11                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+static int
+acct_uno(userid)
+  char *userid;
+{
+  int fd;
+  int userno;
+  char fpath[64];
+
+  usr_fpath(fpath, userid, FN_ACCT);
+  fd = open(fpath, O_RDONLY);
+  if (fd >= 0)
+  {
+    read(fd, &userno, sizeof(userno));
+    close(fd);
+    return userno;
+  }
+  return 0;
+}
+
+
+static void
+add_frienz(fpath, userid)
+  char *fpath, *userid;
+{
+  ALOHA aloha;
+  int fd;
+  char path[64];
+  FRIENZ frienz;
+
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    memset(&frienz, 0, sizeof(FRIENZ));
+    strcpy(frienz.userid, userid);
+    frienz.userno = acct_uno(userid);
+    if (frienz.userno > 0)
+    {
+      while (read(fd, &aloha, sizeof(ALOHA)) == sizeof(ALOHA))
+      {
+        usr_fpath(path, aloha.userid, FN_FRIENZ);
+        rec_add(path, &frienz, sizeof(FRIENZ));
+      }
+    }
+    close(fd);
+  }
+}
+
+
+int
+main()
+{
+  char c;
+  char fpath[64];
+  struct dirent *de;
+  DIR *dirp;
+  char *userid;
+
+  chdir(BBSHOME);
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    sprintf(fpath, "usr/%c", c);
+
+    if (!(dirp = opendir(fpath)))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      userid = de->d_name;
+      if (*userid <= ' ' || *userid == '.')
+        continue;
+
+      usr_fpath(fpath, userid, FN_FRIENZ);
+      unlink(fpath);
+    }
+
+    closedir(dirp);
+
+    printf("§R°£ frienz: ³B²z§¹ %c ¶}ÀYªº ID\n", c);
+  }
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    sprintf(fpath, "usr/%c", c);
+
+    if (!(dirp = opendir(fpath)))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      userid = de->d_name;
+      if (*userid <= ' ' || *userid == '.')
+        continue;
+
+      usr_fpath(fpath, userid, FN_ALOHA);
+      add_frienz(fpath, userid);
+    }
+
+    closedir(dirp);
+
+    printf("­««Ø frienz: ³B²z§¹ %c ¶}ÀYªº ID\n", c);
+  }
+
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

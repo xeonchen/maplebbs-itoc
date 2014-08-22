@@ -1,0 +1,25 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: Ãö©óºëµØ°Ï¥[±K
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/08/29 Sun 01:07:51)                Updated: 2004/08/29
+
+¡° ¤Þ­z¡mdinocho (³Ç¬¥£»¦w)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¤@¤U¡A¯¸¤W¦³¨Ï¥ÎªÌ¤Ï¬M»¡¦pªG­n«Ø¥ß¥[±KªººëµØ¤º®eªº¸Ü¡A
+> ¤å³¹¼ÐÃD¨ÌµM¬O·|³Q°O¿ý¦bºëµØ°Ï²§°Ê¤¤...
+> ¥L§Æ±æ¯à°÷¦b«Ø¥ß®É´N¿ï¾Ü­n¤£­n¥[±K¡A­n´N¤£¬ö¿ý¥B¥[±K¡A§_«h´N¤£¥[±K¥B¬ö¿ý¡C
+
+: gem.c:gem_add()
+
++ if (vans("¬O§_¶i¦æ¥[±K(Y/N)¡H[N] " == 'y'))
++   ghdr.xmode ^= GEM_RESTRICT
+
+  if (ans == 'i' || ans == 'n')
+    rec_ins(dir, &ghdr, sizeof(HDR), xo->pos + (ans == 'n'), 1);
+  else
+    rec_add(dir, &ghdr, sizeof(HDR));
+
++ if (!(ghdr.xmode & GEM_RESTRICT))
+    gem_log(dir, "·s¼W", &ghdr);
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;43m¢¢[46mùñ[m [1mMo[30mdi[mfy: [1;35m2004/08/29 Sun 01:08:04[m

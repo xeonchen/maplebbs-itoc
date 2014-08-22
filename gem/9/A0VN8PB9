@@ -1,0 +1,131 @@
+µo«H¤H: Dinsam.bbs@ccudream.twbbs.org («e¥@.. o.O) ¬ÝªO: plan
+¼Ð  ÃD: BLog for itoc-maple ¦w¸Ë¸É¥R
+µo«H¯¸: ¤¤¥¿¿v¹Ú¶é (Fri, 26 Sep 2003 20:17:24 +0800)      Updated: 2005/10/07
+
+
+SnowWolf©Ò´£¨Ñªºcode¬O¨Ï¥Î­Ó¤HºëµØ
+
+¦pªG§A­n§ï¦¨¬ÝªOºëµØ°Ï
+
+½Ð§ï gem.c:BlogMain() ¤Î gem.c:gem_blog()
+
+static void
+BlogMain(brdname, num)
+  char *brdname;
+  int num;
+{
+  char cmd[256], hash[35];
+
+  vs_bar("³¡¸¨®æ");
+
+  move(1, 0);
+  outs("½Ð¿ï¾Ü±z­n°õ¦æªº­«§@:\n"
+    "0.¦^¨ì¤W¤@¼h\n"
+    "1.»s§@³¡¸¨®æ¼ËªO®æ¦¡\n"
+    "  ¨Ï¥Î·sªº config ¥Ø¿ý¤U¼ËªO¸ê®Æ\n"
+    "  ³q±`¦b²Ä¤@¦¸¨Ï¥Î³¡¸¨®æ©Î¼ËªO§ó·sªº®É­Ô¨Ï¥Î\n"
+    "\n"
+    "2.­«·s»s§@³¡¸¨®æ\n"
+    "  ¥u¦b³¡¸¨®æ¸ê®Æ¾ã­Ó¶Ã±¼ªº®É­Ô¤~¨Ï¥Î\n"
+    "\n"
+    "3.±N¥»¤å¥[¤J³¡¸¨®æ\n"
+    "  ±N´å¼Ð©Ò¦b¦ì¸mªº¤å³¹¥[¤J³¡¸¨®æ\n"
+    "\n"
+    "4.§R°£°jÅT\n");
+
+  while (1)
+  {
+    switch (vans("½Ð¿ï¾Ü(0-3)¡H[0] "))
+    {
+    case '1':
+      sprintf(cmd, "bin/builddb.pl -c %s", brdname);
+      system(cmd);
+      break;
+    case '2':
+      sprintf(cmd, "bin/builddb.pl -a %s", brdname);
+      system(cmd);
+      break;
+    case '3':
+      sprintf(cmd, "bin/builddb.pl -f -n %d %s", num, brdname);
+      system(cmd);
+      break;
+    case '4':
+      if (vget(16, 0, "½Ð¿é¤J¸Ó½gªºÂø´ê­È¡G", hash, sizeof(hash), DOECHO) &&
+        vans(msg_del_ny) == 'y')
+      {
+        sprintf(cmd, "bin/bmysql %s %s", hash, brdname);
+        if (!strchr(cmd, ';'))    /* security reason */
+          system(cmd);
+      }
+      break;
+    default:
+      return;
+  }
+}
+
+
+static int
+gem_blog(xo)
+  XO *xo;
+{
+  char cmd[256], brdname[IDLEN + 1], *dir, *str;
+
+  if (!(xo->key & GEM_W_BIT))
+    return XO_NONE;
+
+  /* ¥Ñ xo->dir §ä¥X¥Ø«e¦b­þ¤@­ÓªOªººëµØ°Ï */
+  dir = xo->dir;
+
+  /* ¥u­­¬ÝªOºëµØ°Ï¨Ï¥Î */
+  if (dir[0] != 'g' || dir[4] != 'b')
+    return XO_NONE;
+
+  dir += 8;  /* ¸õ¹L "gem/brd/" */
+  if (str = strchr(dir, '/'))
+  {
+    *str = '\0';
+    strcpy(brdname, dir);
+    *str = '/';
+  }
+
+  switch (vans("1)°µ³¡¸¨®æ 2)§ó·s³¡¸¨®æ¡H[N] "))
+  {
+  case '1':
+    BlogMain(brdname, xo->pos);
+    break;
+
+  case '2':
+    str_lower(userid, cuser.userid);
+    sprintf(cmd, "bin/builddb.pl -f -n %d %s", xo->pos, brdname);
+    system(cmd);
+    vmsg("¸ê®Æ§ó·s§¹¦¨");
+    break;
+  }
+
+  return XO_FOOT;
+}
+
+
+
+-------------------------------------------------------------------
+
+  LocalVars.pm©ñ¦bweb¥Ø¿ý¤Uªº½Ð¤£­n¥ÎLocalVars.pm·íÀÉ¦W
+  ¦]¬°³o­ÓÀÉ®×¬O¥i¥H³Q¤U¸üªº
+  ¸Ì­±ªºBLOGdbpasswd¸ê°T«Ü®e©ö³QÅÑ¨ú
+  ¦pªG¨t²Î¤W«Ü¦h¦a¤è­n±K½Xµn¤J§A«o²ßºD¥Î¦P¤@²Õ±K½Xªº¸Ü ¨º´N......
+  ¥i¥H¥Î¤@­Ó¤ñ¸û¯S§OªºÀÉ¦W ¨Ò¦pxxx.pm
+
+  ¨º xxx.pm ¸Ì­±ªº ­×§ï
+
+-package LocalVars;
++package xxx;
+require Exporter;
+
+index.pl¡Bblog.pl¡Bbuilddb.pl¸Ì­±ªº ­×§ï
+
+-use LocalVars;
++use xxx;
+use DB_File;
+
+--
+[m[1;30m¡¯ Origin: ¤¤¥¿¿v¹Ú¶é (CcuDream.twbbs.org) ¡¹ From: 218.171.104.101[m

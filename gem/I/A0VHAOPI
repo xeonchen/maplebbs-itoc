@@ -1,0 +1,55 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¨Ï¥ÎªÌ¦Û©w¥D¿ï³æ(1)
+®É¶¡: Wed Jul 16 22:12:25 2003                          Updated: 2003/07/16
+
+  ¨Ï¥ÎªÌ¦Û©w¥D¿ï³æ¡G
+
+  1. ­º¥ý¡A¨Ï¥ÎªÌ­n¥ý½s¿è¦Û¤vªº¦Û©w¿ï³æ¤º®e
+  2. ¥´¶}²ßºD¤¤ªº¡u¦Û©w¥D¿ï³æ¡v
+  3. ­«·s¤W¯¸§Y¥i¦³¦Û¤vªº¥D¿ï³æ
+  4. ¦pªG¨Ï¥ÎªÌ«á®¬¤F¡A¥i¥H¦b¦Û©wªº¥D¿ï³æ¤¤«ö ^X¡A¦A­«·s¤W¯¸´N«ì´_
+     ­ì¨Óªº¤½ª©¿ï³æ
+  5. ¨Ï¥ÎªÌ©Ò¯à¿ï¾Üªº¿ï¶µ¥Ñ¯¸ªø¦bµ{¦¡¤¤©Ò­­¨î
+
+  ps. À³Æ[²³­n¨Dªº¥\¯à ~_~
+
+
+  ¨Ï¥ÎªÌ¦Û©w¥D¿ï³æ(1) ¼W¥[ ufo Äæ¦ì
+
+: ufo.h
+
+#define UFO_KIMONEWS    BFLAG(18)       /* itoc.010601: ©_¼¯·s»D */
++ #define UFO_USERSKIN   BFLAG(19)       /* itoc.030716: ¦Û©w¥D¿ï³æ */
+
+  ...
+  ...
+
+- #define NUMUFOS_USER    19      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 19 ­Ó ufo */
++ #define NUMUFOS_USER    20      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 20 ­Ó ufo */
+
+- #define STR_UFO         "-mpsnemPBQFANbwtSHK-----CAH"
++ #define STR_UFO         "-mpsnemPBQFANbwtSHKM----CAH"
+
+  ...
+  ...
+
+  "¤W¯¸ÂsÄý©_¼¯·s»D(ÂsÄý/¤£Åª)",        /* UFO_KIMONEWS */
+
+- "«O¯d",
++ "¦Û©w¥D¿ï³æ      (¦Û©w/¤½ª©)",        /* UFO_USERSKIN */
+
+
+: bbsd.c:tn_main()
+
++ if (cuser.ufo & UFO_USERSKIN)
++   skin();
++ else
+    menu();
+
+: maple.p
+
+void menu(void);
++ void skin(void);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

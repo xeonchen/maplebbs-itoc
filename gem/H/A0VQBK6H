@@ -1,0 +1,94 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (:MM:), ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¨Ï¥ÎªÌ­×§ï¦Û¤vªº¤å³¹¤£¯à§ï¼ÐÃD
+µo«H¯¸: XEON (Thu Dec 26 12:01:54 2002)                   Updated: 2005/10/07
+
+¡° ¤Þ­z¡mchonsi.bbs@WithHeart.twbbs.org (¦B¶ô¤¤ªº¯P¤õ - ¦BµK)¡n¤§»Ê¨¥¡G
+> ·í¨Ï¥ÎªÌ­×§ï¦Û¤vªº¤å³¹ªº®É­Ô...
+> Ctrl+x ·|Åã¥Ü¥X
+> [S]¦sÀÉ (A)©ñ±ó (T)§ï¼ÐÃD (E)Ä~Äò (R/W/D)Åª¼g§R¼È¦sÀÉ¡H
+> ¦¹®É¿ï¾Ü T «o¤£¯à­×§ï¼ÐÃD...
+> ¥u¯à°÷¦b¤å³¹¦Cªí«ö¤U T ­×§ï...
+
+  ¦pªG·Q§ïªº¸Ü..À³¸Ó¬O³o¼Ë¤l
+
+: edit.c:ve_filer()
+
+  case 't':
+-   if (ve_op > 0)              /* itoc.010301: ¤£¯àÀx¦s */
++   if (ve_op >= 0)             /* itoc.010301: ¤£¯àÀx¦s */
+    {
+      strcpy(buf, ve_title);
+      if (!vget(b_lines, 0, "¼ÐÃD¡G", ve_title, TTLEN + 1, GCARRY))
+        strcpy(ve_title, buf);
+    }
+    return VE_FOOTER;
+
+: post.c:post_edit()
+
+  hdr_fpath(fpath, xo->dir, hdr);
++ strcpy(ve_title, hdr->title);
+
+  ...
+  ...
+
++ if (strcmp(ve_title, hdr->title))     /* §ó°Ê¤F¼ÐÃD */
++ {
++   strcpy(hdr->title, ve_title);
++   currchrono = hdr->chrono;
++   rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
++     hdr->xid : xo->pos, cmpchrono);
++   return XO_INIT;   /* itoc.021226: XZ_POST ©M XZ_XPOST ¦@¥Î post_edit() */
++ }
+
+  /* return post_head(xo); */
+  return XO_HEAD;     /* itoc.021226: XZ_POST ©M XZ_XPOST ¦@¥Î post_edit() */
+}
+
+: mail.c:mbox_edit()
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+  hdr_fpath(fpath, xo->dir, hdr);
+
+  if (!strcmp(hdr->owner, cuser.userid) || HAS_PERM(PERM_ALLBOARD))
++ {
++   strcpy(ve_title, hdr->title);
+    vedit(fpath, 0);
++   if (strcmp(ve_title, hdr->title))     /* §ó°Ê¤F¼ÐÃD */
++   {
++     strcpy(hdr->title, ve_title);
++     currchrono = hdr->chrono;
++     rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
++       hdr->xid : xo->pos, cmpchrono);
++     return mbox_init(xo);
++   }
++ }
+  else
+    vedit(fpath, -1);   /* ¥u¯à½s¿è¤£¥iÀx¦s */
+
+  return mbox_head(xo);
+}
+
+: gem.c:gem_edit()
+
+  if (!(level & GEM_W_BIT) || ((hdr->xmode & GEM_RESERVED) && !(level & GEM_X_BIT)))
+  {
+    vedit(fpath, -1);
+  }
+  else
+  {
++   strcpy(ve_title, hdr->title);
+    if (vedit(fpath, 0) >= 0)
++   {
+      gem_log(xo->dir, "­×§ï", hdr);
++     if (strcmp(ve_title, hdr->title))     /* §ó°Ê¤F¼ÐÃD */
++     {
++       strcpy(hdr->title, ve_title);
++       rec_put(xo->dir, hdr, sizeof(HDR), xo->pos, NULL);
++       return gem_init(xo);
++      }
++   }
+  }
+
+--
+    [1;36m¢~¢w¢w Origin ¢¡ [37m°Ê¤O®Ö¤ß [33;45m processor.tfcis.org [36;40m ¡ã £\£]£^ ¢w¢w¢q[m
+    [1;36m¢q     Author ¢£ [32mitoc.Dorm-GD2.NCTU.edu.tw[m

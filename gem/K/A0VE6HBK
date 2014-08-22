@@ -1,0 +1,24 @@
+§@ªÌ: itoc (¨Ó¦Ûª÷¬Pªº¤ë²y¤H) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] ¤¹³\¤Þ¨¥¹L¦h
+®É¶¡: Mon Dec 30 13:23:05 2002                          Updated: 2003/04/23
+
+: edit.c quote_check()
+
+static int
+quote_check()
+{
+  ...
+  ...
+
+  if ((quot_line >> 2) <= post_line)    /* ¤å³¹¦æ¼Æ­n¦h©ó¤Þ¨¥¦æ¼Æ¥|¤À¤§¤@ */
+    return 0;
+
+- if (HAS_PERM(PERM_SYSOP))
+    return (vans("¤Þ¨¥¹L¦h (E)Ä~Äò½s¿è (W)±j¨î¼g¤J¡H[E] ") != 'w');
+
+- vmsg("¤Þ¨¥¤Ó¦h¡A½Ð [¼W¥[¤@¨Ç¤å³¹] ©Î [§R°£¤£¥²­n¤§¤Þ¨¥]");
+- return 1;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

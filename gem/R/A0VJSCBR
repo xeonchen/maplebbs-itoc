@@ -1,0 +1,87 @@
+µo«H¤H: PaulLiu.bbs@processor.tfcis.org (GrandPaul) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] Ãö©ó RFC 2045 / RFC 2047
+µo«H¯¸: XEON (Tue, 01 Apr 2003 19:22:16 +0800 (CST))      Updated: 2003/08/16
+
+¡° -------------- mail ªº³¡¤À -------------- ¡°
+
+: bmtad/Makefile ­Y¬O FreeBSD ­n§ï³o­Ó
+
+freebsd:
+!       .... -L../lib -ldao -lcrypt [1;33m-L/usr/local/lib -liconv[m -export ....
+
+: bmtad/bmtad.c
+
+- #define ANTI_NOTMYCHARSETMAIL
++ #undef  ANTI_NOTMYCHARSETMAIL
+
+  ...
+  ...
+
++ static char charset[32];
+
+static int
+mta_mailer(ap)
+  Agent *ap;
+
+  ...
+  ...
+
++     mm_getcharset(data + 13, charset, sizeof(charset));
+#ifdef ANTI_NOTMYCHARSETMAIL
+
+
+: bmtad/bmtad.c
+
+    cc = mmdecode(data, decode, data);
+    if (cc > 0)
+      ap->used = (data - ap->data) + cc;
++   if (*charset)
++     str_conv(charset, MYCHARSET, data, cc);
+
+
+: util/Makefile
+
+freebsd:
+       .... -L../lib -ldao -lcrypt  [1;33m-L/usr/local/lib -liconv[m
+
+: util/bbsmail.c
+: util/brdmail.c  ¤G­Óµ{¦¡§ïªk¤@¼Ë
+
+- #define ANTI_NOTMYCHARSETMAIL
++ #undef  ANTI_NOTMYCHARSETMAIL
+
+  ...
+  ...
+
+  HDR mhdr;
+! char buf[512], title[256], sender[256], fpath[64][1;33m, charset[32][m,
+       *str, *ptr, *family, decode;
+  int fd, fx;
+
+  ...
+  ...
+
+    if (!memcmp(buf, "Content-Type: ", 14))
+    {
++      mm_getcharset(str, charset, sizeof(charset));
+#ifdef ANTI_NOTMYCHARSETMAIL
+
+  ...
+  ...
+
+  while (fgets(buf, sizeof(buf), stdin) && buf[0])
+  {
+    if (decode)
+    {
+      fd = mmdecode(buf, decode, buf);
+      if (fd > 0)
+        buf[fd] = '\0';
++     if (*charset)
++       str_conv(charset, MYCHARSET, buf, fd);
+    }
+
+    fputs(buf, fp);
+  }
+--
+    [1;32m¢~¢w Origin ¢wùß [;36;40m°[1mÊ[;36;40m¤[1mO[;36;40m®[1mÖ[;36;40m¤[1mß [31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mcnal.csie.nctu.edu.tw                    [m

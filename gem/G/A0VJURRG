@@ -1,0 +1,157 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] menu.c xover.c °ÊºA´å¼Ð
+®É¶¡: Thu Jul  4 16:38:27 2002                          Updated: 2005/04/12
+
+  §â´å¼Ð > ´«¦¨·|ÅÜªº¡A¥Ñ¨Ï¥ÎªÌ¦Û©w
+
+: global.h
+
+VAR char hunt[32];
++ VAR int cursor_count;              /* ¥Ø«e¬O¥Î²Ä´X­Ó´å¼Ð */
++ VAR int cursor_max;                /* ¥þ³¡¦³´X­Ó´å¼Ð */
++ VAR char cursor_table[10][3];      /* ´å¼Ð */
+
+: acct.c u_xfile()
+
++   "¦Û©w´å¼Ð",
+    "¼È¦sÀÉ.1",
+  ...
+  ...
++   "cursor",
+    "buf.1",
+
+: bbsd.c:get_cursor_table() ¦b tn_motd() «e­±·s¼W¦¹¨ç¦¡
+
+static void
+get_cursor_table()
+{
+  FILE *fp;
+  char fpath[64], *str;
+  int i;
+
+  /* ¹w³]ªº´å¼Ð */
+  strcpy(cursor_table[0], "¡÷");
+  strcpy(cursor_table[1], "¡ñ");
+  strcpy(cursor_table[2], "¡ð");
+  cursor_max = 3;
+  cursor_count = 0;
+
+  usr_fpath(fpath, cuser.userid, "cursor");
+  if (!(fp = fopen(fpath, "r")))
+    return;
+
+  if (fgets(fpath, 25, fp))
+  {
+    for (i = 0; i < 10; i++)
+    {
+      str = fpath + i * 2;
+      if (!*str || *str == '\n')
+        break;
+      str_ncpy(cursor_table[i], str, 3);
+    }
+    cursor_max = i;
+  }
+}
+
+: bbsd.c:tn_motd()
+
++ get_cursor_table();
+
+#ifdef HAVE_FORCE_BOARD
+  brd_force();  /* itoc.000319: ±j¨î¾\Åª¤½§iªO */
+#endif
+}
+
+: menu.c:menu()
+
+      move(MENU_XPOS + cc, MENU_YPOS);
+      mptr = table[cc];
+      str = mptr->desc;
+-     prints(COLOR4 "> (%c)%s \033[m", *str, str + 1);
++     prints(COLOR4 "%s(%c)%s \033[m",
++       cursor_table[++cursor_count%cursor_max], *str, str + 1);
+      cx = cc;
+#else           /* ¨S¦³ CURSOR_BAR */
+      if (cx >= 0)
+      {
+        move(MENU_XPOS + cx, MENU_YPOS);
+-       outc(' ');
++       outs("  ");
+      }
+      move(MENU_XPOS + cc, MENU_YPOS);
+-     outc('>');
++     outs(cursor_table[++cursor_count % cursor_max]);
++     move(MENU_XPOS + cc, MENU_YPOS + 1);  /* itoc.020105: Á×§K¥ªÁä¥þ§Î°»´ú */
+      cx = cc;
+#endif
+    }
+    else                /* ­Y´å¼Ðªº¦ì¸m¨S¦³ÅÜ */
+    {
+#ifdef CURSOR_BAR
+      move(MENU_XPOS + cc, MENU_YPOS);
+      mptr = table[cc];
+      str = mptr->desc;
+-     prints(COLOR4 "> (%c)%s \033[m", *str, str + 1);
++     prints(COLOR4 "%s(%c)%s \033[m",
++       cursor_table[++cursor_count%cursor_max], *str, str + 1);
+#else
+      move(MENU_XPOS + cc, MENU_YPOS + 1);
+#endif
+    }
+
+menu_key:
+
+   cmd = vkey();
+  }
+}
+
+: xover.c:xover()
+
+        else
+        {
+          move(3 + cmd - num, 0);
+-         outc(' ');
++         outs("  ");
+
+          break;                /* ¥u²¾°Ê´å¼Ð */
+        }
+
+  ...
+  ...
+
+    pos = xo->pos;
+
+    if (xo->max > 0)            /* Thor:­Y¬OµLªF¦è´N¤£show¤F */
+    {
+      num = 3 + pos - xo->top;
+      move(num, 0);
+-     outc('>');
++     outs(cursor_table[++cursor_count % cursor_max]);
++     move(num, 1);     /* itoc.020105: Á×§K¥ªÁä¥þ§Î°»´ú */
+    }
+
+    cmd = vkey();
+
+  ...
+  ...
+
+          if (cmd < 0)          /* ¦b¥»­¶§ä¨ì match */
+          {
+            move(num, 0);
+-           outc(' ');
++           outs("  ");
+            /* cmd = XO_NONE; */
+            /* itoc.010913: ¬Y¨Ç·j´M­n§â b_lines ¶ñ¤W feeter */
+            cmd = cmd == -1 ? XO_NONE : XO_FOOT;
+          }
+
+: ------------------------------------------------------
+
+  usr/_/_/cursor ªº®æ¦¡¬O
+
+¡÷¡ö¢H
+
+  ¤@¦C¤Q­Ó´å¼Ð¡A¥i¥H¤£¨ì¤Q­Ó¡A¶W¹L¤Q­Ó¨S¥Î
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mapple.Dorm3.NCTU.edu.tw[37m µoªí[m

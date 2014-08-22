@@ -1,0 +1,350 @@
+§@ªÌ: itoc (cygreadline4.dll) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ­«­n¤å³¹¸m©³
+®É¶¡: 2004/05/16 Sun 16:52:10                           Updated: 2007/02/28
+
+  ±N­«­nªº¤å³¹©ñ¦b¬ÝªO¦Cªí³Ì«á
+
+  ­ì¤å©M¸m©³¤åªº¤º®e¬O³s°Êªº¡A­×§ï©Î±À¤å­ì¤å¤]·|ÅÜ°Ê¸m©³¤å
+
+: hdr.h   ¯uÃø¹L¡AºX¼Ð¥Îº¡¤F :(
+
+#define POST_RESERVED   0x00001000      /* ­­¨î¯Å¤å³¹¡A¶· sysop ¤~¯à§ó§ï */
+
++ #define POST_BOTTOM1  0x00002000      /* ¸m©³¤å³¹ªº¥¿¥» */
+#define POST_SCORE      0x00004000      /* ¼Ð°Oµû¤À¹Lªº */
++ #define POST_BOTTOM2  0x00008000      /* ¸m©³¤å³¹ªºÁÃ¥» */
++ #define POST_BOTTOM   (POST_BOTTOM1 | POST_BOTTOM2)
+
+: global.h
+
+#define FN_DIR          ".DIR"          /* index */
+#define FN_VCH          ".VCH"          /* vote control header */
+#define FN_NOTE         "note"          /* ¶iªOµe­± */
++ #define FN_BOTTOM     ".BOTTOM"       /* ¸m©³¤å³¹ index */
+
+: config.h
+
++ #define MAX_BOTTOM    5               /* ¸m©³¤å³¹³Ì¤j¼Æ¶q */
+
+: post.c:post_attr() ¸m©³²Å¸¹¥i¥H¦Û©w
+
++  if (mode & POST_BOTTOM)
++    attr |= 'B';
++  else
+#ifdef HAVE_REFUSEMARK
+   if (mode & POST_RESTRICT)
+
+: post.c:post_item() ¦³¤G³B­n§ï
+
++ if (hdr->xmode & POST_BOTTOM2)   /* ÁÃ¥»¤~»Ý­n¼Ð¡u­«­n¡v */
++   prints("  ­«­n%c%c", tag_char(hdr->chrono), post_attr(hdr));
++ else
+    prints("%6d%c%c", num, tag_char(hdr->chrono), post_attr(hdr));
+
+: post.c:post_bottom() ·s¼W¦b post_mark() ¤U­±
+
+static int
+post_bottom(xo)
+  XO *xo;
+{
+  if (bbstate & STAT_BOARD)
+  {
+    HDR *hdr;
+    int pos, xmode;
+    char fpath[64];
+
+    pos = xo->pos;
+    hdr = (HDR *) xo_pool + (pos - xo->top);
+    xmode = hdr->xmode;
+
+#ifdef HAVE_LABELMARK
+    if (xmode & POST_DELETE)    /* «Ý¬åªº¤å³¹¤£¯à¸m©³ */
+      return XO_NONE;
+#endif
+
+#ifdef HAVE_REFUSEMARK
+    if (xmode & POST_RESTRICT)  /* ¥[±K¤å³¹¤£¯à¸m©³ */
+      return XO_NONE;
+#endif
+
+    if (vans(xmode & POST_BOTTOM ?
+      "¨ú®ø¸m©³¤½§i(Y/N)¡H[N] " : "¥[¤J¸m©³¤½§i(Y/N)¡H[N] ") != 'y')
+      return XO_FOOT;
+
+    brd_fpath(fpath, currboard, FN_BOTTOM);
+    currchrono = hdr->chrono;
+
+    if (xmode & POST_BOTTOM)        /* ¦b¥¿¥»/ÁÃ¥»¨ú®ø¸m©³ */
+    {
+      xmode &= ~POST_BOTTOM;
+
+      /* ²¾°£ FN_BOTTOM ¤¤ÁÃ¥» */
+      rec_del(fpath, sizeof(HDR), 0, cmpchrono);
+    }
+    else                             /* ¦b¥¿¥»¥[¤W¸m©³ */
+    {
+      if (rec_num(fpath, sizeof(HDR)) >= MAX_BOTTOM)
+      {
+        vmsg("¸m©³½g¼Æ¹L¦h¡I");
+        return XO_FOOT;
+      }
+
+      /* ­Y¸m©³¤]¥[ mark¡A³o¼Ë¥i¥H¦P®É¸T¤î delete/rangdel/prune/label */
+      xmode |= POST_MARKED;
+
+      /* ±NÁÃ¥»¥[¤J FN_BOTTOM */
+      hdr->xmode = xmode ^ POST_BOTTOM2;
+      rec_add(fpath, hdr, sizeof(HDR));
+
+      xmode |= POST_BOTTOM1;
+    }
+
+    /* ¨ú®ø©Î¥[¤W¸m©³©ó¥¿¥» */
+    hdr->xmode = xmode;
+    rec_put(xo->dir, hdr, sizeof(HDR), pos, cmpchrono);
+
+    return post_load(xo);  /* ¥ß¨èÅã¥Ü¸m©³¤å³¹ */
+  }
+  return XO_NONE;
+}
+
+: post.c:post_cb[]
+
++ '_', post_bottom,             [1;44m // «öÁä¦Û©w [m
+
+  'h', post_help
+
+: xover.c:xo_load()
+
+    fstat(fd, &st);
+    max = st.st_size / recsiz;
+    if (max > 0)
+    {
++     char fpath[64];
++     int size;
++     int count = 0;    /* ¦³¦h¤Ö¸m©³¤å³¹ */
++
++     if (xo->key == XZ_POST)
++     {
++       brd_fpath(fpath, currboard, FN_BOTTOM);
++       if (!stat(fpath, &st))
++         max += (count = st.st_size / sizeof(HDR));
++     }
+
+      pos = xo->pos;
+
+      ...
+      ...
+
+      xo->pos = pos;
+      xo->top = top;
+
+      lseek(fd, (off_t) (recsiz * top), SEEK_SET);
+-     read(fd, xo_pool, recsiz * XO_TALL);
++     pos = recsiz * XO_TALL;
++     size = read(fd, xo_pool, pos);
++     if (count && (pos -= size))  /* ¦³¸m©³¤å³¹¦Ó¥BÁÙ¦³ªÅ¶¡ */
++     {
++       int fd2;
++       if ((fd2 = open(fpath, O_RDONLY)) >= 0)
++       {
++         top -= max - count;  /* «e­¶¤wÅª´X½g¸m©³¤å³¹ */
++         if (top < 0)
++           top = 0;
++         lseek(fd2, (off_t) (sizeof(HDR) * top), SEEK_SET);
++         read(fd2, xo_pool + size, pos);
++         close(fd2);
++       }
++     }
+    }
+    close(fd);
+  }
+
+: post.c:post_mark()
+
+#ifdef HAVE_LABELMARK
+    if (xmode & POST_DELETE)    /* «Ý¬åªº¤å³¹¤£¯à mark */
+      return XO_NONE;
+#endif
+
++   if (xmode & POST_BOTTOM)    /* ¸m©³ªº¤å³¹¤£¯à¸Ñ°£ mark */
++     return XO_NONE;
+
+: post.c:post_refuse()
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
++ if (hdr->xmode & POST_BOTTOM)  /* ¥[±K¤å³¹¤£¯à¸m©³ */
++   return XO_NONE;
+
+: post.c:post_title()
+
+  if (memcmp(fhdr, &mhdr, sizeof(HDR)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(fhdr, &mhdr, sizeof(HDR));
+    currchrono = fhdr->chrono;
+
++   if (fhdr->xmode & POST_BOTTOM2)
++     fhdr->xmode ^= POST_BOTTOM;       /* Á×§K¥¿¥»ÅÜ¦¨ÁÃ¥» */
+
+    rec_put(xo->dir, fhdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      fhdr->xid : pos, cmpchrono);
+
+    move(3 + cur, 0);
+    post_item(++pos, fhdr);
+
+    header_replace(xo, fhdr);
+
++   if (fhdr->xmode & POST_BOTTOM)      /* ¦P¨B¸m©³ªºÁÃ¥» */
++   {
++     char fpath[64];
++     brd_fpath(fpath, currboard, FN_BOTTOM);
++     fhdr->xmode ^= POST_BOTTOM;
++     rec_put(fpath, fhdr, sizeof(HDR), 0, cmpchrono);
++     return XO_LOAD;
++   }
+  }
+  return XO_FOOT;
+}
+  memcpy(&mhdr, hdr, sizeof(HDR));
+
+: post:post_score()
+
+  if (curraddscore)
+  {
+    currchrono = hdr->chrono;
+    rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono, addscore);
+
++   if (hdr->xmode & POST_BOTTOM)  /* ¦P¨B¸m©³ªºÁÃ¥» */
++   {
++     brd_fpath(fpath, currboard, FN_BOTTOM);
++     rec_ref(fpath, hdr, sizeof(HDR), 0, cmpchrono, addscore);
++   }
+    return XO_LOAD;
+  }
+
+: post.c:post_tag()
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
++ if (hdr->xmode & POST_BOTTOM2)   /* ¸T¤î¼ÐÅÒÁÃ¥» */
++   return XO_NONE;
+
+  if (xo->key == XZ_XPOST)
+    pos = hdr->xid;
+
+: post.c:post_visit()
+
+  ans = vans("³]©w©Ò¦³¤å³¹ (U)¥¼Åª (V)¤wÅª (W)«e¤wÅª«á¥¼Åª (Q)¨ú®ø¡H[Q] ");
+  if (ans == 'v' || ans == 'u' || ans == 'w')
+  {
++   int pos;
+
+    row = xo->top;
+    max = xo->max - row + 3;
+    if (max > b_lines)
+      max = b_lines;
+
+    hdr = (HDR *) xo_pool;
+-   brh_visit(ans == 'w' ? hdr[xo->pos - row].chrono : ans == 'u');
++   pos = xo->pos - row;
++   /* weiyu.20041010: ¦b¸m©³¤å¤W¿ï w µø¬°¥þ³¡¤wÅª */
++   brh_visit(ans == 'w' ? hdr[pos].xmode & POST_BOTTOM2 ? 0 :
++                          hdr[pos].chrono : ans == 'u');
+
+    row = 3;
+
+  ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ²Ä¤@¦¸¶iªO±N´å¼Ð©ñ¦b¥¼¸m©³ªº³Ì«á¤@½g
+
+: board.c:XoPost()
+
+    xo->key = XZ_POST;
+    xo->xyz = brd->title;
+
++   if (xo->pos == XO_TAIL)   /* ²Ä¤@¦¸¶iªO±N´å¼Ð©ñ¦b¥¼¸m©³ªº³Ì«á¤@½g */
++     xo->pos = (brd->btime < 0 ? rec_num(fpath, sizeof(HDR)) : brd->bpost) - 1;
+
+  ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¦b¦ê±µ¤¤¦pªG·j´M¨ì¸m©³¤å¡A¨º»ò¤]¸m©³
+
+: xpost.c:XoXpost()
+
++ static int XZ_Xcount;     /* XZ_XPOST ¥Î¸m©³¤å³¹°O¼Æ¾¹ */
+
+static int
+XoXpost(xo, hdr, on, off, fchk)
+  XO *xo;
+  HDR *hdr;             /* ·j´Mªº±ø¥ó */
+  int on, off;          /* ·j´Mªº½d³ò */
+  int (*fchk) ();       /* ·j´Mªº¨ç¦¡ */
+{
++ int loc_bottom[MAX_BOTTOM]; /* Àx©ñ¤w·j´M¨ìªº¸m©³¤å³¹¥¿¥» pos */
++ int i;
+
+  ...
+  ...
+
+- max = fsize / sizeof(HDR);
++ max = fsize / sizeof(HDR) + MAX_BOTTOM;
+  xlist = xypostI = (int *) malloc(sizeof(int) * max);
+
+  max = 0;
++ XZ_Xcount = 0;               /* Reset ¸m©³¤å³¹­p¼Æ¾¹ */
+  head = (HDR *) fimage;
+  tail = (HDR *) (fimage + fsize);
+
+  ...
+  ...
+
+    if (!(* fchk) (head, hdr))
+      continue;
+
++   if (head->xmode & POST_BOTTOM1) /* ÀË¬d¬O§_¬°¸m©³¤å¥¿¥» */
++     loc_bottom[XZ_Xcount++] = locus;
+
+    xlist[max++] = locus;
+  } while (++head < tail);
+
++ for (i = 0; i < XZ_Xcount; i++)
++   xlist[max + i] = loc_bottom[i];
+
+: xpost.c:xypost_pick()
+
+  do
+  {
+    pos = xyp[top++];
+    if (pos >= num)
+      continue;
+    *hdr = fimage[pos];
+    hdr->xid = pos;             /* ¥Î hdr->xid ¨Ó°O¿ý¨ä­ì¥ý¦b¬ÝªO¤¤ªº pos */
++   if ((max - top) < XZ_Xcount)
++   {
++     char fpath[64];
++     int fd2;
++     time_t chrono;
++
++     chrono = hdr->chrono;
++     brd_fpath(fpath, currboard, FN_BOTTOM);
++     if ((fd2 = open(fpath, O_RDONLY)) >= 0)
++     {
++       while (read(fd2, hdr, sizeof(HDR)) == sizeof(HDR))
++       {
++         if (hdr->chrono == chrono)
++           break;
++       }
++       close(fd2);
++     }
++   }
+    hdr++;
+  } while (top < max);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

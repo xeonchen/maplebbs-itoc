@@ -1,0 +1,24 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¦Ï¥¤¨ÑÀ³°Ó) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¶RÁô¨­Åv­­¡ã¬Ý¤£¨ì¦Û¤v....
+µo«H¯¸: ¤ë¤U©]·Q (Wed, 11 Jun 2003 05:07:14 +0800 (CST))  Updated: 2004/10/02
+
+¡° ¤Þ­z¡mTideWave.bbs@140.119.164.16 (¯Í»H¡ã­¸µ¾)¡n¤§»Ê¨¥¡G
+> ¤@¯ë¨Ï¥ÎªÌ  ªá¤F10ª÷¶R¤F¼È®ÉÁô¨­ªºÅv¤O
+> ¦ý¬O.....¦b  ¨Ï¥ÎªÌ¦Cªí  ¬Ý¤£¨ì¦Û¤v¤F.....
+
+  ­è¦n§Ú¤]¸I¤W³o°ÝÃD¡A¥u­ncan_see()§ï¤@¤U´N¥þ³¡OK¤F¡C
+
+: bmw.c:can_see()
+
+int                     /* 1:¥i¬Ý¨£ 0:¤£¥i¬Ý¨£ */
+can_see(my, up)
+  UTMP *my;
+  UTMP *up;
+{
+  usint mylevel, myufo, urufo;
+
++ if (my->userno == up->userno)
++   return 1;
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

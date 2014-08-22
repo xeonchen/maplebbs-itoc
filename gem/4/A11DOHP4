@@ -1,0 +1,48 @@
+§@ªÌ: itoc (Internet Explorer) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ªì¦¸¤W¯¸ªº¨Ï¥ÎªÌ¶i Hi_All ªO
+®É¶¡: Mon Mar  3 21:16:57 2003                          Updated: 2004/03/13
+
+  ªì¦¸¤W¯¸ªº¨Ï¥ÎªÌ¶i Hi_All ªO
+  (µ¹¥L­Ì post ¦Û§Ú¤¶²Ð¡A¤£±j­¢­n post)
+
+  Hi_All ªOªº postlevel ­n³]¦¨ PERM_BASIC ´N¦n
+  Åý¥¼³q¹L»{ÃÒªº¨Ï¥ÎªÌ¤]¯à post
+
+: maple.p
+
+void brh_save(void);
+void brd_force(void);
++ void brd_hiall(void);
+
+: board.c:brd_hiall() ·s¼W³o¨ç¦¡©ó brd_force() ¤U­±
+
+void
+brd_hiall()
+{
+  int bno;
+
+  bno = brd_bno("Hi_ALL");
+  vmsg("ªì¦¸¤W¯¸¡A¨Ó½g¦Û§Ú¤¶²Ð§a");
+  XoPost(bno);
+  xover(XZ_POST);
+
+#ifndef ENHANCED_VISIT
+  time(&brd_visit[bno]);
+#endif
+}
+
+: bbsd.c:tn_motd()
+
+#ifdef HAVE_FORCE_BOARD
+  brd_force();  /* itoc.000319: ±j¨î¾\Åª¤½§iªO */
+#endif
+
++ if (cuser.numlogins == 1)     /* ªì¦¸¤W¯¸¤~­n¥h Hi_ALL ªO */
++ {
++   brd_hiall();
++   cuser.numlogins++;      /* itoc.030217: ¥H§K¤W¯¸¥¼¹F¤@¤ÀÄÁ¡A¤£­p¦¸¼Æ */
++ }
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,62 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¦³ÃöÅwªïµe­±
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/12/14 Tue 00:29:19)                Updated: 2005/05/23
+
+¡° ¤Þ­z¡mpigco («¢)¡n¤§»Ê¨¥¡G
+> ½Ð°ÝÅwªïµe­±­n«ç»ò§ï¤~¯à¹F¨ì
+> ·|¥ý¼Æ¦³´X­ÓÅwªïµe­±¡C
+> ¦³¤T­Ó¨º´N±q¤T­Ó¤¤ÀH¾÷¼½©ñ¤@­Ó¡C
+> ³o¼Ë¹ï©óªÀ¹Î·Q¨ìÀ°¬¡°Ê¥´¼s§i¤ñ¸û¤è«K^^"...
+
+  ¦b note ªOºëµØ°Ï«Ø¤@­Ó¡u¤ÀÃþ¡v¡AÀÉ¦W¬O Welcome¡A¼ÐÃD¥ô·N
+  µM«á¦b³o¤ÀÃþ¸Ì¥[¡u¤å³¹¡v
+  ³o¨Ç¤å³¹´N·|¦b¤W¯¸®É³QÀH¾÷¼½©ñ
+
+: bbsd.c:tn_welcome() ·s¼W¦¹¨ç¦¡¦b tn_login() «e­±
+
+static void
+tn_welcome()
+{
+  char folder[64], fpath[64];
+  int pos;
+  HDR hdr;
+
+  gem_fpath(folder, BN_NOTE, "@/@Welcome");
+  if ((pos = rec_num(folder, sizeof(HDR))) > 0)
+  {
+    pos = ap_start % pos;
+    if (!rec_get(folder, &hdr, sizeof(HDR), pos))
+    {
+      hdr_fpath(fpath, folder, &hdr);
+      more(fpath, NULL);
+    }
+  }
+}
+
+: bbsd.c:tn_login()
+
+  if (cuser.userlevel)          /* not guest */
+  {
+    /* ------------------------------------------------- */
+    /* ®Ö¹ï user level ¨Ã±N .ACCT ¼g¦^                   */
+    /* ------------------------------------------------- */
+
+    cuser.lastlogin = ap_start;
+    str_ncpy(cuser.lasthost, fromhost, sizeof(cuser.lasthost));
+
+    login_level();
++ }
++
++ tn_welcome();
++
++ if (cuser.userlevel)          /* not guest */
++ {
+    /* ------------------------------------------------- */
+    /* ³]©w status                                       */
+    /* ------------------------------------------------- */
+
+    login_status(multi);
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

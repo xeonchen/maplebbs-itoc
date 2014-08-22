@@ -1,0 +1,25 @@
+µo«H¤H: itoc.bbs@wretch.csie.nctu.edu.tw (itoc) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ­n«ç»ò§â¼öªù¬ÝªO¦Û°Ê°Åµô¼½©ñ?
+µo«H¯¸: µL¦W¤p¯¸ (2004/01/12 Mon 12:24:59)                Updated: 2004/01/12
+
+¡° ¤Þ­z¡mBlackJoker.bbs@processor.tfcis.org (¶Â³Ç§J)¡n¤§»Ê¨¥¡G
+> ¹³µL¦W¤p¯¸¨º¼Ë¤l
+> §Ú¤w¸g¥[¸Ë¦n¤F¼öªù¬ÝªO±Æ¦æªO
+> ·Q§â¥¦¦Û°Ê°Åµô¦¨10¦æªº¬¡°Ê¬ÝªO
+
+: camera.c:main()
+
+  [1;44m// ¬Ý§A­n¥[¤J­þ¨Ç¡A´Nª½±µ§â¸ô®|¥[¶i¥h [m
++ mirror("gem/@/@-day", 1);         /* ¥»¤é¤Q¤j¼öªù¸ÜÃD */
++ mirror("gem/@/@-topmoney", 1);    /* »È¹ô´I¯Î«Ê¯«º] */
++ mirror("gem/@/@-topbrd", 1);      /* ¼öªù¬ÝªO±Æ¦æº] */
+
+  sprintf(fpath, "gem/brd/%s/@/@note", BN_CAMERA);
+  do_gem(BN_CAMERA, fpath);
+
+--
+[1;30m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37mBBS telnet://wretch.twbbs.org  ¶}­Ó¤HªO  ¶W§Ö ¤£¥Î³s¸p[30m±o§Ó©ó¤Ñ¤U[m
+[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H¤£¬p [37mitoc.Dorm11.NCTU.edu.tw[30m®ü[m

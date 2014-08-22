@@ -1,0 +1,42 @@
+發信人: whatup.bbs@segaa.com.tw (江楓漁火對愁眠) 看板: plan
+標  題: [blog] Lyceum system plugin: POP3 Authentication
+發信站: 幸運草之戀 (2006/05/10 Wed 11:48:43)              Updated: 2006/05/10
+
+    　　前言：
+    　　其實這個是設計給 BBS 用的，之前放出的 lifetype + pop3 認
+    證，也是為 BBS 設計的。現在有很多的站台強調整合，而這個 plug
+    in 就是強調讓 BBS 和 Blog 作整合。利用 BBS 的 pop3 來作登入
+    的認證，並且自動產生新的 blog site。
+
+
+    　　需求：
+
+        [*] 安裝 lyceum 。
+        [*] 安裝 PEAR　，因為利用到他的 packages 。
+
+
+
+    　　安裝：
+    　　將 POP3_Authentication.tar.gz 下載後，再解壓縮至 wp-cont
+    ent/systemplugin 下，並且修改裡面的 $host 和 $port 即可馬上
+    使用。其中的 $type 你可以參考 NET_POP3 的 source code ，他是
+    支援其他的 pop3 server 所設計的。記得到 lyceum system 裡去啟
+    用這個 plugin 。
+
+
+    　　注意事項：
+    　　Admin 是不受 BBS 裡帳號限制的，請用安裝時所設定的密碼登
+    入。
+
+
+    　　如果有任何問題，請留言，謝謝！
+
+
+  ref:
+
+  [*] http://lyceum.ibiblio.org/
+  [*] http://pear.php.net
+  [*] http://www.twkang.net/~whatup/php/POP3_Authentication.tar.gz
+---
+原文在：
+    http://0rz.net/881kB

@@ -1,0 +1,119 @@
+ß@™Ã: itoc (Æ÷§ﬂ∞ §O) ¨›™O: itoc
+º–√D: Re: [∞›√D] ≥s∏p®t≤Œ
+Æ…∂°: 2005/08/27 Sat 01:06:42                           Updated: 2005/08/28
+
+°∞ §ﬁ≠z°mid9455.bbs@csc241.twbbs.org (...~"~)°n§ßª ®•°G
+> ¶p™Gª°ß⁄∑Qß‚≥s∏p®t≤ŒßÔ¶®
+> ´ÿ•ﬂ≠”Boardaffairs¨›™O  ßY•i¶b∏Ã≠±≥s∏p
+> ¶”§£¨O•—XYZøÔ≥Ê∂i•hJoin≥s∏p π≥•º®”≥Ã¬¬§p¥Ã§@ºÀ
+
+: global.h
+
+#define BN_UNANONYMOUS  "UnAnonymous"   /* ∞Œ¶W™O™∫§Â≥π∑|Ω∆ªs§@•˜¶b≥o∏Ã */
++#define BN_NEWBOARD    "newboard"      [1;44m// ™O¶W¶€©w [m
+
+: post.c:post_switch()
+
+  if (brd = ask_board(bname, BRD_R_BIT, NULL))
+  {
++   if (!strcmp(brd->brdname, BN_NEWBOARD))
++     DL_func("bin/newbrd.so:XoNewBoard");
++   else
+
+    if ((bno = brd - bshm->bcache) >= 0 && currbno != bno)
+    {
+      XoPost(bno);
+      return XZ_POST;
+    }
+  }
+
+: xover.c:xover()
+
+  int pos, num, zone, sysmode;
+  XO *xo;
+  KeyFunc *xcmd, *cb;
+
++ if (cmd == XZ_POST && !strcmp(currboard, BN_NEWBOARD))
++ {
++   DL_func("bin/newbrd.so:XoNewBoard");
++   return;
++ }
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+> ®√•B•u≠n¶≥§H•”Ω–≥s∏p  ¨›™O´e≠±¥N∑|¶h≠”≤≈∏π
+
+: board.c:btime_refresh()
+
+    brd->btime = 1;
+
++   if (!strcmp(brd->brdname, BN_NEWBOARD))
++   {
++     NBRD nbrd;
++
++     strcpy(folder, "run/newbrd/"FN_DIR);
++     fd = rec_num(folder, sizeof(NBRD));
++
++     /* ¨›≥Ã´·§@Ωg¨Oß_§w∏g∂}™O */
++     if (fd > 0 && !rec_get(folder, &nbrd, sizeof(NBRD), fd - 1) &&
++       !(nbrd.mode & NBRD_FINISH) && (nbrd.mode & NBRD_NEWBOARD))
++       brd->blast = 0x1000;
++     brd->bpost = fd;
++     return;
++   }
+
+: board.c:class_item()
+
+  /* ≥B≤z §w≈™/•º≈™ */
++ if (!strcmp(brd->brdname, BN_NEWBOARD))
++ {
++   /* ¨›≥Ã´·§@Ωg¨Oß_§w∏g∂}™O®”®M©w§w≈™/•º≈™  */
++   str1 = (brd->blast & 0x1000) ? ICON_UNREAD_BRD : ICON_READ_BRD;
++ }
++ else
++ {
+#ifdef ENHANCED_VISIT
+    /* itoc.010407: ßÔ•Œ≥Ã´·§@Ωg§w≈™/•º≈™®”ßP¬_ */
+    brh_get(brd->bstamp, bno);
+    str1 = brh_unread(brd->blast) ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#else
+    str1 = brd->blast > brd_visit[bno] ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#endif
++ }
+
+: newbrd.c:nbrd_reply()
+
+        nbrd->mode ^= NBRD_FINISH;
+        currchrono = nbrd->btime;
+        rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
++       btime_update(brd_bno(BN_NEWBOARD));
+
+  ...
+  ...
+
+    rec_ref(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime, addreply);
++   btime_update(brd_bno(BN_NEWBOARD));
+
+: newbrd.c:nbrd_finish()
+
+  rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
++ btime_update(brd_bno(BN_NEWBOARD));
+
+: newbrd.c:nbrd_open()
+
+      rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
++     btime_update(brd_bno(BN_NEWBOARD));
+
+: newbrd.c:nbrd_delete()
+
+  rec_del(xo->dir, sizeof(NBRD), xo->pos, cmpbtime);
++ btime_update(brd_bno(BN_NEWBOARD));
+
+: newbrd.c:nbrd_add()
+
+  rec_add(dir, &nbrd, sizeof(NBRD));
++ btime_update(brd_bno(BN_NEWBOARD));
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [31m∞[1m §[;31;40mOÆ[1m÷§[;31;40mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m itoc.Dorm11.NCTU.edu.tw  [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

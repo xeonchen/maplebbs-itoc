@@ -1,0 +1,30 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: Maple_itoc
+¼Ð  ÃD: Re: [°ÝÃD] ÂIºqª©ªº¼ÊºÙ«ç»òÅã¥Ü¥X¨Ó©O¡H
+µo«H¯¸: °Ê¤O®Ö¤ß (04/21/04 10:32:58 Wed)                  Updated: 2004/04/21
+
+¡° ¤Þ­z¡mboybaby.bbs@fy.adsldns.org (¤pÄé¾i¼Ö¦h)¡n¤§»Ê¨¥¡G
+> ÂIºqª©¸Ì­±ªº¼ÊºÙÂIºq
+> «ç»òÅã¥Ü¥X¼ÊºÙªÌªº¦W¤l©O??
+
+  §ï hdr-dump.c ¯S¦a¥Î¨Ó¬Ý ktv ªOªº .DIR
+
+: hdr-dump.c:main()
+
+  while (read(fd, &hdr, sizeof(HDR)) == sizeof(HDR))
+  {
+    count++;
+-   printf("%04d %c/%s %s (%s) %s %s\n", count, hdr.xname[7], hdr.xname,
+-     hdr.owner, hdr.nick, hdr.date, hdr.title);
++   printf("%04d %c/%s %s (%s) %s %s\n", count, hdr.xname[7], hdr.xname,
++     hdr.owner + (strcmp(hdr.owner, STR_ANONYMOUS) ? 0 : IDLEN + 1),
++     hdr.nick, hdr.date, hdr.title);
+  }
+
+  µM«á¤W¤u§@¯¸°õ¦æ
+
+  % cd ~
+  % bin/hdr-dump brd/ktv/.DIR
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;45m¢¢[42m¢¡[m [1mMo[30mdi[mfy: [1;36m2004/04/21 Wed 10:32:58[m

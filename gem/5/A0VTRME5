@@ -1,0 +1,149 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¤ÈÄ±¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿]¯¸ªø§ïID¸ò§ïuserno¤]­n¶¶«K§ï.USR
+µo«H¯¸: ¤ë¤U©]·Q (2003/12/15 Mon 22:16:09)                Updated: 2004/01/28
+
+  ³o½g¬O°t¦X§â.USR©ñ¤Jshm¨º½gpatchªº­×¥¿¡C
+
+: maple / acct.c
+
+extern BCACHE *bshm;
++extern SCACHE *schema_shm;
+
+
+  acct_setup()«e­±§Û¤W³o¤ä
+
+static void /* amaki.031120: ³B²z¯¸ªøÅÜ§óID»Puserno */
+schema_rename(old, new)
+  ACCT *old, *new;
+{
+  int scheno;
+  SCHEMA u, *p;
+
+  if (old->userno == new->userno) /* ¨SÅÜ§óusernoªº³B²z */
+  {
+    scheno = old->userno - 1;
+    memset(&u, 0, sizeof(SCHEMA));
+    u.uptime = time(0);
+    strcpy(u.userid, new->userid);
+
+    rec_put(FN_SCHEMA, &u, sizeof(SCHEMA), scheno, NULL);
+    p = schema_shm->schema + scheno;
+    memcpy(p, &u, sizeof(SCHEMA));
+  }
+  else /* ¦³ÅÜ§óusernoªº³B²z */
+  {
+    /* amaki: ¥ý§â·sªº¼g¶i¥h */
+    scheno = new->userno - 1;
+    memset(&u, 0, sizeof(SCHEMA));
+    u.uptime = time(0);
+    strcpy(u.userid, new->userid);
+    rec_put(FN_SCHEMA, &u, sizeof(SCHEMA), scheno, NULL);
+    p = schema_shm->schema + scheno;
+    memcpy(p, &u, sizeof(SCHEMA));
+
+    /* ¦A¼gÂÂªº */
+    scheno = old->userno - 1;
+    memset(&u, 0, sizeof(SCHEMA));
+    u.uptime = time(0);
+    rec_put(FN_SCHEMA, &u, sizeof(SCHEMA), scheno, NULL);
+    p = schema_shm->schema + scheno;
+    memcpy(p, &u, sizeof(SCHEMA));
+  }
+}
+
+
+
+  §ïacct_setup()
+
+void
+acct_setup(u, adm)
+  ACCT *u;
+  int adm;
+{
+  ACCT x;
++ SCHEMA *schema;
+[1;32m![m int i, num, [1;32mID_dirty = 0[m;
+
+
+  ......
+  ......
+
+      vget(i, 0, "¨Ï¥ÎªÌ¥N¸¹(¤£§ï½Ð«ö Enter)¡G", str, IDLEN + 1, GCARRY);
+      if (!str_cmp(str, u->userid))
+        break;
++     if (!acct_userno(str))
++     {
++       ID_dirty = 1; /* amaki.031120: §ï¤FID³sSCHEMA¤]­n¤@°_§ï */
++       break;
++     }
+      vmsg("¿ù»~¡I¤w¦³¬Û¦P ID ªº¨Ï¥ÎªÌ");
+    }
+
+  ......
+  ......
+
+    vget(++i, 0, "¥Î¤á½s¸¹¡G", buf, 10, GCARRY);
+    if ((num = atoi(buf)) > 0)
+-     x.userno = num;
++   {
++     schema = schema_shm->schema + (num - 1);
++     if (num == u->userno || !*schema->userid)
++     {
++       x.userno = num;
++       ID_dirty = (num == u->userno) ? ID_dirty : 1;
++     }
++     else
++       zmsg("³o­Ó½s¸¹¤w¸g¦³¤H¨Ï¥Î¡I");
++   }
+
+  ......
+  ......
+
+  }
+
++ if (ID_dirty)
++   schema_rename(u, &x);
+
+  memcpy(u, &x, sizeof(x));
+  acct_save(u, adm);
+
+
+: maple / bbsd.c  ·sµù¥U±b¸¹¤]­n¼g¤Jshm
+
+#define MAXPORTS        1
+static int myports[MAXPORTS] = {23 /* , 3456 */};
+
+extern UCACHE *ushm;
++extern SCACHE *schema_shm;
+
+  §ïacct_apply()
+
+static void
+acct_apply()
+{
+[1;32m![m SCHEMA slot, [1;32m*p[m;
+  char buf[80];
+  char *userid;
+  int try, fd;
+
+  ......
+  ......
+
+  fd = open(FN_SCHEMA, O_RDWR | O_CREAT, 0600);
+  {
+    /* flock(fd, LOCK_EX); */
+    /* Thor.981205: ¥Î fcntl ¨ú¥Nflock, POSIX¼Ð·Ç¥Îªk */
+    f_exlock(fd);
+
+    cuser.userno = try = uniq_userno(fd);
+    write(fd, &slot, sizeof(slot));
++   p = schema_shm->schema + (cuser.userno - 1);
++   memcpy(p, &slot, sizeof(SCHEMA));
+    /* flock(fd, LOCK_UN); */
+    /* Thor.981205: ¥Î fcntl ¨ú¥Nflock, POSIX¼Ð·Ç¥Îªk */
+    f_unlock(fd);
+  }
+  close(fd);
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

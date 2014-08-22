@@ -1,0 +1,55 @@
+µo«H¤H: allen501pc.bbs@bbs.sa.ncyu.edu.tw (²×©ó¦£§¹¤F) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]Âà¿ý¤å³¹·|Åã¥ÜÂà¹F¥Øªº¬ÝªO¦ì¸m
+µo«H¯¸: ·sºñ¶é (2006/10/22 Sun 01:55:05)                  Updated: 2006/10/22
+
+Ãþ¦üpttªº¥\¯à Âà¿ý¤å³¹®É·|¦b¨Ó·½¤å³¹¤U¤èµù©ú¬ÝªO¥Øªº¦a»PÂà¿ý®É¶¡
+
+µe­±¦p¤U¡G
+[1;33;46m ¼ÐÃD [m sdgsdagsa
+[1;33;46m ®É¶¡ [m 2006/10/22 Sun 01:55:04
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+sadgdasgasd
+
+--
+    [1;32m¢~¢w Origin ¢wùß ·sºñ¶é´ú¸Õ¯¸ [31m --------------- [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44m220-129-166-187.dynamic.hinet.net           [m
+[32m¡° allen501pc   Âà¿ý¦Ü¬ÝªO sysop                                   10/22 01:55[m
+[32m¡° allen501pc   Âà¿ý¦Ü¬ÝªO sysop                                   10/22 01:55[m
+[32m¡° allen501pc   Âà¿ý¦Ü¬Y¯µ±K¬ÝªO                                   10/22 01:56[m
+
+: post.c:post_cross()
+
+  /* ´_­ì currboard¡Bcurrbattr */
+  if (method)
+  {
+    strcpy(currboard, tmpboard);
+    currbattr = tmpbattr;
+  }
+
++  if (!HAS_PERM(PERM_ALLADMIN))
++  {
++    time_t now;
++    struct tm *ptime;
++    usint level;
++
++    time(&now);
++    ptime = localtime(&now);
++    level = (bshm->bcache + xbno)->readlevel;
++    if (level == PERM_SYSOP || level == PERM_BOARD)
++      sprintf(buf, "¡° %-12s Âà¿ý¦Ü¬Y¯µ±K¬ÝªO", cuser.userid);
++    else
++      sprintf(buf, "¡° %-12s Âà¿ý¦Ü¬ÝªO %s", cuser.userid, xboard);
++    fpw = fopen(fpath, "a");
++    fprintf(fpw, "\033[32m%-67s%02d/%02d %02d:%02d\033[m\n",
++      buf, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
++    fclose(fpw);
++  }
+
+   vmsg("Âà¿ý§¹¦¨");
+   return XO_HEAD;
+}
+
+--
+    [0;1;32m¢~¢w Origin ¢wùß ·sºñ¶é [1;31m bbs.sa.ncyu.edu.tw [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44m220-129-166-187.dynamic.hinet.net     [m

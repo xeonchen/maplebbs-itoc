@@ -1,0 +1,60 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ±N¿ï³æ¤U­±ª¬ºA¦Cªº¤é´Á©M¸`¤é¤À¶}
+®É¶¡: 2005/05/28 Sat 14:40:48                           Updated: 2005/06/09
+
+  ±N¥D¿ï³æ¤U­±ª¬ºA¦Cªº¤é´Á©M¸`¼y¤À¶}
+  ­Y¨S¦³¸`¼y¡A´N¨C­Ó¤p®É¨q¤£¦Pªº¦r¼Ë
+
+  §ï struct FCACHE ­n­«¶} bbsd
+
+: struct.h:FCACHE
+
+typedef struct
+{
+  int shot[MOVIE_MAX];  /* Thor.980805: ¦X²z½d³ò¬° 0..MOVIE_MAX - 1 */
+  char film[MOVIE_SIZE];
+  char today[16];
++ char feast[16];
+} FCACHE;
+
+: camera.c:do_today()
+
+  time_t now;
+  struct tm *ptime;
+
++ char Hour[24][16] =       /* ¦b¨S¦³¸`¼y®É¡A¨C­Ó¤p®É¨q¤£¦Pªº¦r¼Ë */
++ {
++   [1;44m// ³o¸ÌÀH«K§A·Q«ç»ò¼g³£¥i¥H [m
++   "¥Õ¦Ï®É", "ª÷¤û®É", "Âù¤l®É", "¥¨ÃÉ®É", "·à¤l®É", "³B¤k®É",
++   "¤Ñ¯¯®É", "¤ÑÃÈ®É", "®g¤â®É", "¼¯½~®É", "¤ô²~®É", "Âù³½®É",
++   "¦¹¤@®É", "©¼¤@®É", "ÄÁ¨Å¥Û", "¿ß²´¥Û", "ª÷¥Ê¥Û", "´cÅ]ªG¹ê",
++   "¤ñ§Q®É", "¿c´Ë³ù", "¦I¤ú§Q", "¸²µå¤ú", "¦è¯Z¤ú", "´µ¬¥ºû¥§¨È",
++ };
+
+  ...
+  ...
+
+- sprintf(today, "%s %.2s",
++ sprintf(today, "%s ¬P´Á%.2s"
+    key1, "¤é¤@¤G¤T¥|¤­¤»" + (ptime->tm_wday << 1));
++ str_ncpy(fshm->feast, Hour[ptime->tm_hour], sizeof(fshm->feast));
+
+  ...
+  ...
+
+-         str_ncpy(today, str, sizeof(fshm->today));
++         str_ncpy(fshm->feast, str, sizeof(fshm->feast));
+-         if (str = (char *) strchr(today, '\n')) /* ³Ì«áªº '\n' ¤£­n */
++         if (str = (char *) strchr(fshm->feast, '\n')) /* ³Ì«áªº '\n' ¤£­n */
+
+: menu.c:status_foot()
+
+  sprintf(feeter, COLOR1 " %8.8s %02d:%02d " COLOR2
+-   " ¤H¼Æ %-4d §Ú¬O %-12s %s [©I¥s]%-9s  ",
++   " %13.13s ¤H¼Æ %-4d %s [©I¥s]%-9s  ",
+    fshm->today, ufo / 60, ufo % 60,
+-   total_user, cuser.userid, coinmsg, flagmsg);
++   fshm->feast, total_user, coinmsg, flagmsg);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

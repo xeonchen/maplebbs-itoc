@@ -1,0 +1,172 @@
+µo«H¤H: LHD.bbs@YoMin.twbbs.org (§Ú²Ö¤F) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¾ã¦æ¥ú´Î(5)¡Ðpost.c ¤å³¹¦Cªí
+µo«H¯¸: ¹C¥Á¤§®a (Mon, 14 Jul 2003 17:33:30 +0800 (CST))  Updated: 2004/12/24
+
+: maple.p
+
++ void hdr_outs_bar(HDR *hdr, int cc);
+
+: post.c:hdr_outs_bar()  ¥[¦b hdr_outs() «á­±
+
+#ifdef HAVE_LIGHTBAR
+void
+hdr_outs_bar(hdr, cc)           /* print HDR's subject */
+  HDR *hdr;
+  int cc;               /* ¦L¥X³Ì¦h cc - 1 ­Ó¦r */
+{
+  static char *type[4] = {"Re", "¡º", "\033[33m=>", "\033[32m¡»"};
+  uschar *title, *mark;
+  int ch, len;
+
+#ifdef CHECK_ONLINE
+  UTMP *online;
+#endif
+
+  if (cc)
+  {
+#ifdef HAVE_DECLARE     /* itoc.010117: ¤é´Á¤W¦â */
+    prints("\033[3%dm%s\033[37;44m ", cal_day(hdr->date) + 1, hdr->date + 3);
+#else
+    outs(hdr->date + 3);
+    outc(' ');
+#endif
+
+    mark = hdr->owner;
+    len = 13;
+
+#ifdef CHECK_ONLINE
+    if (online = utmp_get(mark))
+      outs("\033[37;44m");
+#endif
+
+    while (ch = *mark)
+    {
+      if ((--len == 0) || (ch == '@'))
+        ch = '.';
+      outc(ch);
+
+      if (ch == '.')
+        break;
+
+      mark++;
+    }
+
+    while (len--)
+    {
+      outc(' ');
+    }
+  }
+  else
+  {
+    cc = 64;
+  }
+
+#ifdef CHECK_ONLINE
+  if (online)
+    outs(str_ransi);
+#endif
+
+  title = str_ttl(mark = hdr->title);
+  ch = title == mark;
+  if (!strcmp(currtitle, title))
+    ch += 2;
+
+  prints("%s %-*.*s\033[m", type[ch], cc, cc, title);
+}
+#endif
+
+
+: post.c:post_item_bar()  ¥[¦b post_item() «á­±
+
+#ifdef HAVE_LIGHTBAR
+static int
+post_item_bar(xo, mode)
+  XO *xo;
+  int mode;
+{
+  HDR *hdr;
+  int num;
+
+#ifdef HAVE_SCORE
+  static char scorelist[36] =
+  {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+    'U', 'V', 'W', 'X', 'Y', 'Z'
+  };
+
+  hdr = (HDR *) xo_pool + xo->pos - xo->top;
+  num = xo->pos + 1;
+
+  prints("%s%6d%c%c",
+    mode ? "\033[1;44m" : "",
+    (hdr->xmode & POST_BOTTOM) ? -1 : num,
+    tag_char(hdr->chrono), post_attr(hdr));
+
+  if (hdr->xmode & POST_SCORE)
+  {
+    num = hdr->score;
+    prints("\033[1;3%cm%c \033[m%s",
+      num >= 0 ? '1' : '2', scorelist[abs(num)],
+      mode ? "\033[1;37;44m" : "");
+  }
+  else
+  {
+    outs("  ");
+  }
+
+  if (mode)
+    hdr_outs_bar(hdr, 46);    /* ¤Ö¤@®æ¨Ó©ñ¤À¼Æ */
+  else
+    hdr_outs(hdr, 46);
+#else
+  hdr = (HDR *) xo_pool + xo->pos - xo->top;
+  num = xo->pos + 1;
+
+  prints("%s%6d%c%c ",
+    mode ? "\033[1;44m" : "",
+    (hdr->xmode & POST_BOTTOM) ? -1 : num,
+    tag_char(hdr->chrono), post_attr(hdr));
+
+  if (mode)
+    hdr_outs_bar(hdr, 47);
+  else
+    hdr_outs(hdr, 47);
+#endif
+
+  return XO_NONE;
+}
+#endif
+
+: post.c:post_cb[]
+
+KeyFunc post_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, post_item_bar,          /* verit.20030129 : ½Ð°È¥²±N¦¹©ñ¦b²Ä¤@¶µ */
+#endif
+...
+
+: post.c:xpost_cb[]
+
+KeyFunc xpost_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, post_item_bar,         /* verit.20030129 : ½Ð°È¥²±N¦¹©ñ¦b²Ä¤@¶µ */
+#endif
+...
+
+: post.c:news_cb[]
+
+KeyFunc news_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, post_item_bar,         /* verit.20030129 : ½Ð°È¥²±N¦¹©ñ¦b²Ä¤@¶µ */
+#endif
+...
+
+--
+[m¢d¢e¢f¢g¢h¢f¢e¢d¢c¢b                [33m¢©  ¢¨      ¢i¢©¢¨¢i ¡´   [1;30mbbs.cis95.net[m
+[30;47m¢h¢f¢e¢c¢b¡Å¢d¢f¢g[0;35m   ©~µL©w©Òªº¶³   [33m¢ª¢i¢« ¢«¢ª ¢i¢ª¢«¢i ¡¶ ¢i¢h¢© [0;1m¹C¥Á¤§®a[m
+[1;34mÄÆ¦Û [31mcismpc19.cis.nctu.edu.tw         [0;33m¢i   ¢©¢¨ ¢i    ¢i ¢i ¢i  ¢i¡Etwbbs¡Eorg[m

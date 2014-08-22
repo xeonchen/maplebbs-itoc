@@ -1,0 +1,49 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] redir ªº¨Ï¥Î¤èªk
+®É¶¡: 2004/11/30 Tue 01:23:11
+
+  ·í .DIR ¿ò¥¢®É¡A¥i¥H°õ¦æ redir ¨Ó­««Ø
+
+  [¨Ï¥Î¤èªk]
+
+  ¤@¡B¦pªG­n­««Øªº¬O¬ÝªO .DIR
+
+    % cd ~/brd/brdname
+    % ~/bin/redir -b
+    % mv .DIR.re .DIR
+
+  ¤G¡B¦pªG­««Øªº¬O¬ÝªOºëµØ°Ï .DIR
+
+    % cd ~/gem/brd/brdname
+    % ~/bin/redir -g
+    % mv .DIR.re .DIR
+
+  ¤T¡B¦pªG­««Øªº¬O­Ó¤HºëµØ°Ï .DIR
+
+    % cd ~/usr/u/userid/gem
+    % ~/bin/redir -g
+    % mv .DIR.re .DIR
+
+  ¥|¡B¦pªG­n­««Øªº¬O«H½c .DIR
+
+    % cd ~/usr/u/userid
+    % ~/bin/redir -m
+    % mv .DIR.re .DIR
+
+
+  [¤wª¾°ÝÃD]
+
+    1. ¦pªG¤å³¹/«H¥ó¤º¤åÀÉÀYªº®æ¦¡¤£¹ïªº¸Ü¡A¨º»ò§@ªÌ/¼ÊºÙ/¼ÐÃDÄæ·|¥X²{°ÝÃD¡C
+       => ³o¨S¿ìªk¸Ñ¨M¡A¦]¬° redir ´N¬O¥h§ì¤å³¹¤º¤åÀÉÀY¨Ó­««Ø .DIR ªº¡C
+
+    2. ºëµØ°Ï­««Øªº .DIR¡AÁöµM¬[ºc¥¿½T¡A¦ý¬O³Ì¥~¼hªº¨÷©v¼ÐÃD·|ÅÜ¦¨¡uªu®ü¬B
+       ¿ò¡v¡A§@ªÌ¡B¼ÊºÙ³£·|ÅÜ¦¨¯¸ªø¡C
+       => ³o¨S¿ìªk¸Ñ¨M¡A¦]¬°³Ì¥~¼hªº¨÷©v¼ÐÃD´N¥u°O¿ý¦b .DIR ¸Ì­±¡A¬JµM¿ò¥¢
+          ¨º´N¨S±Ï¤F¡A©Ò¥H±o¾aªO¥D¤â°Ê¥h§ï¼ÐÃD¡A
+
+    3. ºëµØ°Ï­««Øªº .DIR¡A·|³à¥¢ºëµØ°Ï¯Á¤Þ¤ÎºëµØ°Ï²§°Ê¡C
+       => ³o¨SÃö«Y¡A¶] gem-index ®É´N·|¦Û°Ê«ì´_¯Á¤Þ¤F¡C¦Ó²§°Ê·|¦b¤U¤@¦¸¦³²§
+          °Ê®É¥X²{¡C
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

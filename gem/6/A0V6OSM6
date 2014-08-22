@@ -1,0 +1,16 @@
+§@ªÌ: itoc (:MM:) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD] ¥i¥H§ïÅÜ¿é¤JªÅ®æªº©³¦â¶Ü?
+®É¶¡: Mon Mar 10 19:10:16 2003                          Updated: 2003/03/10
+
+¡° ¤Þ­z¡mrocet.bbs@140.119.164.16 (¥Õ¥Øª°¯W)¡n¤§»Ê¨¥¡G
+> ¿é¤JªÅ®æªº©³¦â¥i¥H§ï¶Ü?
+> ¹³ [m   [±zªº±b¸¹] [30;47m[5m_[1m             [m
+
+: visio.c:o_standup()  ³o¬O§ï¦¨ºñ¦âªº¨Ò¤l¡AÃC¦â¦Û¦æ½Õ°t
+
+- #define o_standup()     o_ansi("\033[7m")
++ #define o_standup()     o_ansi("\033[42m")
+
+--
+    [1;32m¢~¢w¢w Origin ¢¡ [33;45m °Ê¤O®Ö¤ß [37m processor.tfcis.org [32;40m ¡ã £_£`£a ¢w¢w¢q[m
+    [1;32m¢q     Author ¢£ [36mitoc.Dorm-GD2.NCTU.edu.tw[m

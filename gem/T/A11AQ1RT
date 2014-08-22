@@ -1,0 +1,98 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¥©§J¤O¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¬ÝªO¦Cªí/¤ÀÃþ¦Cªí§Y®É¨Ì¬ÝªO¤H®ð±Æ§Ç
+µo«H¯¸: ¤ë¤U©]·Q (2003/12/31 Wed 12:45:13)                Updated: 2006/02/23
+
+¡° ¤Þ­z¡mEfen.bbs@backwind.g1.dorm.ncku.edu.tw (,,,,,,)¡n¤§»Ê¨¥¡G
+> pttªº§Y®É¼öªù¬Ýª©¦³¿ìªk§Ë¶Ü¡H
+
+  ­n§ï³o­Ó§A­n¦³°µ¬ÝªO¤H®ðªºµ{¦¡¡C
+
+  µM«á«Ø¤@­Ó¤ÀÃþ¥s HOT¡A¸Ì­±ÀH«K©ñ¤J¤@­Ó¬ÝªO (¦]¬°¨S¦³¬ÝªOªº¤ÀÃþ¤£·|¥X²{)
+
+: board.c:mantime_cmp() ¦bclass_load()«e¥[¤W³o¤ä¨ç¦¡
+
+static int
+mantime_cmp(a, b)
+  short *a;
+  short *b;
+{
+  /* ¥Ñ¦h±Æ¨ì¤Ö */
+  return bshm->mantime[*b] - bshm->mantime[*a];
+}
+
+: board.c:class_load()
+
++ static int class_hot = 0;
+
+static int
+class_load(xo)
+  XO *xo;
+{
+  short *cbase, *chead, *ctail;
+  int chn;                    /* ClassHeader number */
++ int bnum = 0;
+
+  ......
+  ......
+
+  do
+  {
+    chn = *chead++;
+    if (chn >= 0)       /* ¤@¯ë¬ÝªO */
+    {
+      val = bits[chn];
+      if (!(val & BRD_L_BIT) || (val & zap) || !(brd[chn].brdname[0]))
+        continue;
+
+      [1;44m// 10³o­ÓÁ{¬É­È¦Û©w [m
++     if (class_hot)
++     {
++       if (bshm->mantime[chn] < 10) /* ¥u¦C¥X¤H®ð¶W¹L 10 ªº¬ÝªO */
++         continue;
++       bnum++;
++     }
+    }
+
+    ......
+    ......
+
+    max++;
+    *cbase++ = chn;
+  } while (chead < ctail);
+
++ if (bnum > 0)
++   qsort(cbase - bnum, bnum, sizeof(short), mantime_cmp);
+
+  xo->max = max;
+  if (xo->pos >= max)
+    xo->pos = xo->top = 0;
+
+: board.c:class_browse()
+
+  chp = (short *) xo->xyz + xo->pos;
+  chn = *chp;
+  if (chn < 0)          /* ¶i¤J¤ÀÃþ */
+  {
++   short *chx;
++   char *img, *str;
+
++   img = class_img;
++   chx = (short *) img + (CH_END - chn);
++   str = img + *chx;
+
+    [1;44m// "HOT/" ¦WºÙ¥i¦Û©w¡A­Y§ï¦W¤]­n¶¶«K§ï«á­±ªºªø«× 4 [m
++   if (!strncmp(str, "HOT/", 4))
++   {
++     class_hot = 1;
++     chn = CH_END;
++   }
+
+    if (!XoClass(chn))
+      return XO_NONE;
+
++   if (class_hot)
++     class_hot = 0;      /* Â÷¶} HOT Class ¦A²M°£ class_hot ¼Ð°O */
+  }
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

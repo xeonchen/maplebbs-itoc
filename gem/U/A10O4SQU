@@ -1,0 +1,454 @@
+µo«H¤H: simple.bbs@bbs.wfc.edu.tw (¾i§L¤d¤é ¥Î¦b¤@®É) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¼Ö³z±m-¤j¼Ö³z(­×§ïª©)
+µo«H¯¸: ¥d¥¬©_¿Õ (2004/10/27 Wed 00:39:26)                Updated: 2006/01/24
+
+: src/so/Makefile
+
+SO =    ... [1;33mlottery.so[m
+
+: so/lottery.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* lottery.c    ( YZU WindTopBBS Ver 3.00 )              */
+/*-------------------------------------------------------*/
+/* target : ±m¨é¹CÀ¸                                     */
+/* create : 02/01/12                                     */
+/* update : 03/05/26                                     */
+/* author : verit.bbs@bbs.yzu.edu.tw                     */
+/* modify : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/* modify : simple.bbs@bbs.wfc.edu.tw                    */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+static int choose_num[6];       /* ©Ò¿ïªº¤»­Ó¸¹½X */
+static int choose_count;        /* ¤w¸g¿ï¤F´X­Ó¸¹½X */
+
+
+/*-------------------------------------------------------*/
+/* µe­±­«Ã¸                                              */
+/*-------------------------------------------------------*/
+
+
+static void
+lottery_screen(fpath)
+  char *fpath;
+{
+  FILE *fp;
+  char buf[ANSILINELEN];
+
+  vs_bar("¼Ö³z±m¨é¹CÀ¸");
+
+  if (fp = fopen(fpath, "r"))
+  {
+    while (fgets(buf, ANSILINELEN, fp))
+      outs(buf);
+    fclose(fp);
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* ±N¿ï¾Üªº¼Ö³z¸¹½X±H¨ì¦Û¤v«H½c                          */
+/*-------------------------------------------------------*/
+
+
+static void
+lottery_mail_one()
+{
+  int i;
+  FILE *fp;
+  char fpath[64];
+
+  sprintf(fpath, "tmp/%s.lottery", cuser.userid);
+
+  if (fp = fopen(fpath, "w"))
+  {
+    fprintf(fp, "%s\n", Now());
+    fprintf(fp, "±z©ÒÁÊ¶Rªº¼Ö³z¸¹½X¬°¡G");
+    for (i = 0; i < 6; i++)
+      fprintf(fp, "%d ", choose_num[i]);
+    fprintf(fp, "\n");
+    fclose(fp);
+
+    mail_self(fpath, cuser.userid, "[³Æ §Ñ ¿ý] ±m¨é¬ö¿ý", MAIL_READ);
+    unlink(fpath);
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* ¼Ö³z¨t²Î¬ö¿ý                                          */
+/*-------------------------------------------------------*/
+
+
+static int
+int_cmp(a, b)
+  int *a;
+  int *b;
+{
+  return *a - *b;
+}
+
+
+static void
+lottery_log()
+{
+  int i;
+  BUY_LOTTERY log;
+
+  qsort(choose_num, 6, sizeof(int), int_cmp);
+
+  memset(&log, 0, sizeof(BUY_LOTTERY));
+  strcpy(log.userid, cuser.userid);
+  for (i = 0; i < 6; i++)
+    log.num[i] = choose_num[i];
+
+  rec_add(FN_RUN_LOTTERY, &log, sizeof(BUY_LOTTERY));
+}
+
+
+/*-------------------------------------------------------*/
+/* µe±±¨î´å¼Ð                                            */
+/*-------------------------------------------------------*/
+
+
+static void
+draw_cursor(x, y, mode)
+  int x, y;
+  int mode;                     /* 1:¿ï¨ú 0:¨ú®ø¿ï¨ú */
+{
+  move(2 * x - 1, 4 + y * 8);
+  outc(mode == 1 ? '[' : ' ');
+  move(2 * x - 1, 7 + y * 8);
+  outc(mode == 1 ? ']' : ' ');
+}
+
+
+/*-------------------------------------------------------*/
+/* µe¼Ö³z±m¨é¤Uª`µe­±                                    */
+/*-------------------------------------------------------*/
+
+
+static void
+draw_numbers()
+{
+  int i, x, index;
+
+  vs_bar("¼Ö³z±m¨é¤Uª`");
+
+  x = 4;
+  index = 1;
+
+  move(x++, 1);
+  outs("¢~¢w¢w¢w¢s¢w¢w¢w¢s¢w¢w¢w¢s¢w¢w¢w¢s¢w¢w¢w¢s¢w¢w¢w¢s¢w¢w¢w¢¡"
+    "¡@¡@¡@¢~¢w¢w¢w¢¡ ");
+  for (i = 0; i < 7; i++, index += 7)
+  {
+    move(x++, 1);
+    prints("¢x  %02d  ¢x  %02d  ¢x  %02d  ¢x"
+      "  %02d  ¢x  %02d  ¢x  %02d  ¢x  %02d  ¢x      ¢x      ¢x",
+      index, index + 1, index + 2,
+      index + 3, index + 4, index + 5, index + 6);
+    move(x++, 1);
+    if (i < 6)
+      outs("¢u¢w¢w¢w¢q¢w¢w¢w¢q¢w¢w¢w¢q¢w¢w¢w¢q¢w¢w¢w¢q¢w¢w¢w¢q¢w¢w¢w¢t"
+        "¡@¡@¡@¢u¢w¢w¢w¢t");
+  }
+  outs("¢¢¢w¢w¢w¢r¢w¢w¢w¢r¢w¢w¢w¢r¢w¢w¢w¢r¢w¢w¢w¢r¢w¢w¢w¢r¢w¢w¢w¢£"
+    "¡@¡@¡@¢¢¢w¢w¢w¢£");
+}
+
+
+/*-------------------------------------------------------*/
+/* µe¥X¨Ï¥ÎªÌ¿ï¾Üªº¼Ö³z¸¹½X                              */
+/*-------------------------------------------------------*/
+
+
+static void
+draw_choose()
+{
+  int x;
+
+  for (x = 0; x < choose_count; x++)
+  {
+    move(2 * x + 5, 68);
+    prints(" %02d", choose_num[x]);
+  }
+  for (; x < 6; x++)
+  {
+    move(2 * x + 5, 68);
+    outs("   ");
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* ¿ï¨ú¼Ö³z¸¹½X                                          */
+/*-------------------------------------------------------*/
+
+
+static int                      /* 1:¤w¿ï§¹¤»­Ó¸¹½X */
+do_choose(num)
+  int num;                      /* ©Ò¿ï¨úªº¸¹½X */
+{
+  int i;
+  int choose_flag;              /* -1:¿ï¨ú >=0:¨ú®ø¿ï¨ú */
+
+  choose_flag = -1;
+
+  for (i = 0; i < choose_count; i++)
+  {
+    if (choose_num[i] == num)
+    {
+      choose_flag = i;
+      break;
+    }
+  }
+
+  if (choose_flag >= 0)         /* ¨ú®ø */
+  {
+    choose_count--;
+    for (i = choose_flag; i < choose_count; i++)
+      choose_num[i] = choose_num[i + 1];
+    draw_choose();
+  }
+  else                          /* ¿ï¨ú */
+  {
+    if (choose_count == 6)
+    {
+      vmsg("±z¤w¸g¿ï¤F¤»­Ó¸¹½X");
+      return 1;
+    }
+    else
+    {
+      choose_num[choose_count] = num;
+      choose_count++;
+      draw_choose();
+    }
+  }
+  return 0;
+}
+
+
+/*-------------------------------------------------------*/
+/* ¼Ö³z¤Uª`¸¹½X¿ï¾Ü                                      */
+/*-------------------------------------------------------*/
+
+
+static void
+random_choose()
+{
+  int i, j;
+
+  /* ³y¥X¤»­Ó¤£¦Pªº¼Æ¦r */
+  for (i = 0; i < 6; i++)
+  {
+    choose_num[i] = rnd(49) + 1;
+    for (j = 0; j < i; j++)
+    {
+      if (choose_num[i] == choose_num[j])
+      {
+        i--;
+        break;
+      }
+    }
+  }
+}
+
+
+static void
+lottery_buy_one()
+{
+  int cx, cy, ch;
+
+  if (cuser.money < 1000)
+  {
+    vmsg("±zªº»È¹ô¤£°÷ÁÊ¶R±m¨é");
+    return;
+  }
+
+  if (vans("¨C±i±m¨é»ù®æ¬° 1000 »È¹ô¡A¬O§_­nÁÊ¶R©O(Y/N)¡H[Y] ") == 'n')
+    return;
+
+  draw_numbers();
+
+  if (vans("¬O§_­n¹q¸£¿ï¸¹(Y/N)¡H[N] ") == 'y')
+  {
+    random_choose();
+
+#if 1  /* ¯Âºé¥u¬O¬°¤F¨q¥X¿ï¸¹µ²ªG¡A­n¤£µM¤£»Ý­n³o¬q */
+    choose_count = 0;
+    for (ch = 0; ch < 6; ch++)
+      do_choose(choose_num[ch]);
+    vmsg("¹q¸£¿ï¸¹µ²ªG");
+#endif
+  }
+  else     /* ¤â°Ê¿ï¸¹ */
+  {
+    choose_count = 0;
+    memset(choose_num, 0, sizeof(choose_num));
+    cx = 3;
+    cy = 0;
+
+    while (1)
+    {
+      outz("¡¹ ¾Þ§@»¡©ú (¤è¦V)²¾°Ê (Enter)¿ï¨ú/¨ú®ø (q)Â÷¶}");
+
+      for (;;)
+      {
+        draw_cursor(cx, cy, 1);
+        ch = vkey();
+        draw_cursor(cx, cy, 0);
+
+        switch (ch)
+        {
+        case '\n':
+          if (do_choose((cx - 3) * 7 + cy + 1))
+            goto end_choose;
+          break;
+        case KEY_DOWN:
+          cx = (cx == 9) ? 3 : cx + 1;
+          break;
+        case KEY_UP:
+          cx = (cx == 3) ? 9 : cx - 1;
+          break;
+        case KEY_LEFT:
+          cy = (cy == 0) ? 6 : cy - 1;
+          break;
+        case KEY_RIGHT:
+          cy = (cy == 6) ? 0 : cy + 1;
+          break;
+        case 'q':
+          return;
+        }
+      }
+
+  end_choose:
+
+      if (vans("¬O§_­n½T©w³o¤»­Ó¸¹½X(Y/N)¡H[N] ") == 'y')
+        break;
+    }
+  }
+
+  cuser.money -= 1000;
+  lottery_log();
+
+  if (vans("¬O§_­n«O¯d±m¨é(Y/N)¡H[Y] ") != 'n')
+    lottery_mail_one();
+}
+
+
+static void
+lottery_buy_some()
+{
+  int i, j, num;
+  char fpath[64];
+  FILE *fp;
+
+  if (cuser.money < 1000)
+  {
+    vmsg("±zªº»È¹ô¤£°÷ÁÊ¶R±m¨é");
+    return;
+  }
+
+  vget(b_lines, 0, "½Ð¿é¤J±ý¶R±i¼Æ¡G", fpath, 5, DOECHO);
+  if ((num = atoi(fpath)) <= 0)
+    return;
+
+  if (cuser.money < num * 1000)
+  {
+    vmsg("±zªº»È¹ô¤£°÷ÁÊ¶R±m¨é");
+    return;
+  }
+
+  fp = NULL;
+  if (vans("¬O§_­n«O¯d±m¨é(Y/N)¡H[Y] ") != 'n')
+  {
+    sprintf(fpath, "tmp/%s.lottery", cuser.userid);
+    if (fp  = fopen(fpath, "w"))
+    {
+      fprintf(fp, "%s\n", Now());
+      fprintf(fp, "±z©ÒÁÊ¶Rªº¼Ö³z¸¹½X¬°¡G");
+    }
+  }
+
+  for (i = 0; i < num; i++)
+  {
+    random_choose();
+    lottery_log();
+
+    if (fp)
+    {
+      for (j = 0; j < 6; j++)
+        fprintf(fp, "%d ", choose_num[j]);
+      fprintf(fp, "\n");
+    }
+  }
+
+  if (fp)
+  {
+    fclose(fp);
+    mail_self(fpath, cuser.userid, "[³Æ §Ñ ¿ý] ±m¨é¬ö¿ý", MAIL_READ);
+    unlink(fpath);
+  }
+
+  cuser.money -= num * 1000;
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+int
+main_lottery()
+{
+  double money;
+
+  if (HAS_STATUS(STATUS_COINLOCK))
+  {
+    vmsg(MSG_COINLOCK);
+    return XEASY;
+  }
+
+  srand(time(NULL) + cuser.userno);
+
+  while (1)
+  {
+    lottery_screen("etc/game/lottery.main");
+
+    /* Åã¥Ü²Ö¿n¼úª÷ */
+    money = 0;
+    rec_get(LAST_KEEP_MONEY, &money, sizeof(money), 0);
+    money += rec_num(FN_RUN_LOTTERY, sizeof(BUY_LOTTERY)) * 1000;
+    move(20, 10);
+    prints("¥Ø«e²Ö¿n¼úª÷¦³ %.0f ¤¸", money);
+
+    switch (vkey())
+    {
+    case 'b':
+      lottery_buy_one();
+      break;
+
+    case 's':
+      lottery_buy_some();
+      break;
+
+    case 'h':
+      lottery_screen("etc/game/lottery.rule");
+      vmsg(NULL);
+      break;
+
+    default:
+      return 0;
+    }
+  }
+}
+
+--
+[m[1;32m¡° Origin: [33m§d»ñ§Þ³N¾Ç°|¹qºâ¤¤¤ß ¥d¥¬©_¿Õ [37m<bbs.wfc.edu.tw>[m
+[1;31m¡» From: [36mbbs.wfc.edu.tw[m

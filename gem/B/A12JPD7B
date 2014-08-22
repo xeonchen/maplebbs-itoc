@@ -1,0 +1,44 @@
+µo«H¤H: starlition.bbs@bbs.ycsh.tp.edu.tw (­n¤W¬K¥ú½Ð¥ý»{Ã ¬ÝªO: plan
+¼Ð  ÃD: Re: µwºÐÃz¤F~~«ç»ò¿ì
+µo«H¯¸: ¥Ã¬K«¢«¢ (2006/10/23 Mon 01:01:22)                Updated: 2006/10/23
+
+¡° ¤Þ­z¡mandy71.bbs@micro.bio.ncue.edu.tw (§Æ±æ¨C¤Ñ³£¯à§ó·R¤pp)¡n¤§»Ê¨¥¡G
+> Ä±±o³Æ¤ÀªºÀÉ®×¦³ÂI¦h~~­n¦p¦ó³]©wÅý¯»¤[¤§«eªº³Æ¥÷¦Û°Ê§R°£?
+> ³Â·Ð¤j¤j¸Ñµª...ÁÂÁÂ
+
+«Ø¥ß¤@­Óshell script
+
+% joe /home/bbs/bin/rmbak.sh
+
+¤º®e¦p¤U
+
+#!/bin/sh
+DELDATE=`date -v-[1;33;40m30[md +%y%m%d`
+rm -rf /home/bbs/bak/brd${DELDATE}/
+rm -rf /home/bbs/bak/gem${DELDATE}/
+rm -rf /home/bbs/bak/usr${DELDATE}/
+rm -rf /home/bbs/bak/oth${DELDATE}/
+
+¤¤¶¡ªº30§ï¦¨§A­n«O¯d¦h¤Ö¤Ñ
+
+µM«á¥Îcrontab ¨C¤Ñ¥h¶]....
+
+--
+[1;37m¡° Site:[m [1;33m¥Ã ¬K «¢ «¢[m [1;37m<bbs.ycsh.tp.edu.tw>[m
+[1;31m¡» From:[m [1;36m140.128.194.72[m (140.128.194.72)
+
+µo«H¤H: appleboy.bbs@bbs.ee.ndhu.edu.tw (°ª¶¯¹D©ú¬f¼Ý) ¬ÝªO: plan
+¼Ð  ÃD: Re: µwºÐÃz¤F~~«ç»ò¿ì
+µo«H¯¸: «á¤s¬P«° (2006/10/23 Mon 13:39:33)
+
+#«O¯d14¤Ñªº³Æ¥÷
+
+RETENTION_PERIOD=14
+
+find /home/bbs/bak/ -type d -mtime +$RETENTION_PERIOD -exec rm -rf '{}' \;
+
+--
+                                         Wu-boy Blog http://blog.wu-boy.com
+                                            <appleboy@alumni.ee.ccu.edu.tw>
+--
+[1;36m¡° Origin: «á¤s¬P«° <bbs.ee.ndhu.edu.tw> ¡» From: dns.ee.ndhu.edu.tw[m

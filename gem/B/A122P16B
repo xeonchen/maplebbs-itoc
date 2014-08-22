@@ -1,0 +1,301 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] «H¥ó¦Û°ÊÂà±H¨ì¥~¯¸ Internet «H½c
+®É¶¡: 2006/03/31 Fri 09:23:38                           Updated: 2006/03/31
+
+¡° ¤Þ­z¡mguessi.bbs@bbs.ee.ndhu.edu.tw (¨S)¡n¤§»Ê¨¥¡G
+> ·Q¼g¤@­Ó¥\¯à"¦Û°ÊÂà±H" ·í¨Ï¥ÎªÌ¦¬¨ú«H¥ó®É¦Û°ÊÂà±H¨ì¯¸¥~«H½c (Ãþ¦ü©ó³Æ¥÷?)
+
+  ³]©w¥~³¡«H½c
+
+: global.h
+
+#define FN_ACL          "acl"           /* ¤W¯¸¦aÂI³]©w */
++ #define FN_FORWARD    "forward"       /* ¦Û°ÊÂà±H³]©w */
+
+: maple.p ¥[¤@¦æ
+
++ int m_setforward(void);
+
+: menu.c ¾A·íªº¿ï³æ¥[¤J³o¿ï¶µ
+
++ m_setforward, PERM_BASIC, M_SMAIL,
++ "AutoForward¢u ¦Û°ÊÂà±H ¢t",
+
+: mail.c:m_setforward() ¦b mail_hold() «á­±·s¼W³o­Ó¨ç¦¡
+
+int
+m_setforward()
+{
+  char fpath[64], ip[50];
+  FILE *fp;
+
+  usr_fpath(fpath, cuser.userid, FN_FORWARD);
+  if (fp = fopen(fpath, "r"))
+  {
+    fscanf(fp, "%s", ip);
+    fclose(fp);
+  }
+  else
+  {
+    ip[0] = '\0';
+  }
+
+  vget(b_lines - 1, 0, "½Ð¿é¤J«H¥ó¦Û°ÊÂà±Hªº E-mail¡G", ip, 50, GCARRY);
+
+  if (ip[0] && !not_addr(ip) &&
+    vans("½T©w¶}±Ò¦Û°ÊÂà«H¥\\¯à(Y/N)¡H[N] ") == 'y')
+  {
+    if (fp = fopen(fpath, "w"))
+    {
+      fprintf(fp, "%s", ip);
+      fclose(fp);
+      vmsg("³]©w§¹¦¨");
+      return XEASY;
+    }
+  }
+
+  unlink(fpath);
+  vmsg("¨ú®ø¦Û°ÊÂà±H©ÎµL®Ä E-mail");
+  return XEASY;
+}
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  Âà±H¯¸¤º¨Ó«H¦Ü¥~³¡«H½c
+
+: mail.c:forward_mail() ¦b mail_send() «e­±·s¼W³o­Ó¨ç¦¡
+
+/* cuser.userid ±N¡u¼ÐÃD title¡BÀÉ®×¦b fpath¡vªº«H¥ó±Hµ¹ userid ªº¥~³¡«H½c */
+static void
+forward_mail(fpath, userid, title)
+  char *fpath, *userid, *title;
+{
+  FILE *fp;
+  char ip[80];
+
+  usr_fpath(ip, userid, FN_FORWARD);
+  if (fp = fopen(ip, "r"))
+  {
+    fscanf(fp, "%s", ip);
+    fclose(fp);
+
+    if (ip[0])
+      bsmtp(fpath, title, ip, 0);
+  }
+}
+
+: mail.c:mail_send()
+
+    rec_add(folder, &hdr, sizeof(HDR));
++   forward_mail(fpath, rcpt, ve_title);
+
+: mail.c:multi_send()
+
+        rec_add(buf, &hdr, sizeof(HDR));
++       forward_mail(fpath, userid, title);
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  Âà±H¯¸¥~¨Ó«H¦Ü¥~³¡«H½c
+
+: bmtad.c:forward_mail() ¦b bbs_mail() «e­±·s¼W³o­Ó¨ç¦¡
+
+/* hdr->owner ±N¡u¼ÐÃD hdr->title¡BÀÉ®×¦b folder ¤U hdr->xname¡v
+   ªº«H¥ó±Hµ¹ userid ªº¥~³¡«H½c */
+
+static void
+forward_mail(hdr, folder, userid)
+  HDR *hdr;
+  char *folder;
+  char *userid;
+{
+  FILE *fp;
+  char ip[80], fpath[64];
+
+  usr_fpath(ip, userid, FN_FORWARD);
+  if (fp = fopen(ip, "r"))
+  {
+    fscanf(fp, "%s", ip);
+    fclose(fp);
+
+    if (ip[0])
+    {
+      hdr_fpath(fpath, folder, hdr);
+      bbsmtp(fpath, hdr->title, ip, hdr->owner);
+    }
+  }
+}
+
+: bmtad.c:bbs_mail()
+
+  rec_add(folder, &hdr, sizeof(HDR));
++ forward_mail(&hdr, folder, userid);
+
+: bmtad.c:bbsmtp() ¦b forward_mail() «e­±·s¼W³o­Ó¨ç¦¡
+
+static int                              /* >=0:¦¨¥\ <0:¥¢±Ñ */
+bbsmtp(fpath, title, rcpt, sender)      /* ±q bsmtp() §Û¨Óªº */
+  char *fpath, *title, *rcpt, *sender;
+{
+  int sock;
+  time_t stamp;
+  FILE *fp, *fr, *fw;
+  char *str, buf[512], from[80], msgid[80];
+  ACCT acct;
+
+  if (acct_fetch(sender, &acct) < 0)
+    return -1;
+
+  time(&stamp);
+  sprintf(from, "%s.bbs@%s", acct.userid, MYHOSTNAME);
+
+  str = strchr(rcpt, '@') + 1;
+  sock = dns_smtp(str);
+  if (sock >= 0)
+  {
+    sleep(1);                   /* wait for mail server response */
+
+    fr = fdopen(sock, "r");
+    fw = fdopen(sock, "w");
+
+    fgets(buf, sizeof(buf), fr);
+    if (memcmp(buf, "220", 3))
+      goto smtp_error;
+    while (buf[3] == '-')
+      fgets(buf, sizeof(buf), fr);
+
+    fprintf(fw, "HELO %s\r\n", MYHOSTNAME);
+    fflush(fw);
+    do
+    {
+      fgets(buf, sizeof(buf), fr);
+      if (memcmp(buf, "250", 3))
+        goto smtp_error;
+    } while (buf[3] == '-');
+
+    fprintf(fw, "MAIL FROM:<%s>\r\n", from);
+    fflush(fw);
+    do
+    {
+      fgets(buf, sizeof(buf), fr);
+      if (memcmp(buf, "250", 3))
+        goto smtp_error;
+    } while (buf[3] == '-');
+
+    fprintf(fw, "RCPT TO:<%s>\r\n", rcpt);
+    fflush(fw);
+    do
+    {
+      fgets(buf, sizeof(buf), fr);
+      if (memcmp(buf, "250", 3))
+        goto smtp_error;
+    } while (buf[3] == '-');
+
+    fprintf(fw, "DATA\r\n", rcpt);
+    fflush(fw);
+    do
+    {
+      fgets(buf, sizeof(buf), fr);
+      if (memcmp(buf, "354", 3))
+        goto smtp_error;
+    } while (buf[3] == '-');
+
+    /* ------------------------------------------------- */
+    /* begin of mail header                              */
+    /* ------------------------------------------------- */
+
+    archiv32(stamp, msgid);
+
+    /* Thor.990125: ¾¨¥i¯àªº¹³ RFC 822 ¤Î sendmail ªº§@ªk, §K±o§O¤H¤£±µ:p */
+    fprintf(fw, "From: \"%s\" <%s>\r\nTo: %s\r\n",
+      acct.username, from, rcpt);
+    /* itoc.030411: mail ¿é¥X RFC 2047 */
+    output_rfc2047_qp(fw, "Subject: ", title, MYCHARSET, "\r\n");
+    /* itoc.030323: mail ¿é¥X RFC 2045 */
+    fprintf(fw, "X-Sender: %s (%s)\r\n"
+      "Date: %s\r\nMessage-Id: <%s@%s>\r\n"
+      "Mime-Version: 1.0\r\n"
+      "Content-Type: %s; charset=%s\r\n"
+      "Content-Transfer-Encoding: 8bit\r\n"
+      "X-Disclaimer: [%s] ¹ï¥»«H¤º®e®¤¤£­t³d\r\n\r\n",
+      acct.userid, acct.username,
+      Atime(&stamp), msgid, MYHOSTNAME,
+      "text/plain", MYCHARSET,
+      str_site);
+
+    /* ------------------------------------------------- */
+    /* begin of mail body                                */
+    /* ------------------------------------------------- */
+
+    if (fp = fopen(fpath, "r"))
+    {
+      char *ptr;
+
+      str = buf;
+      *str++ = '.';
+      while (fgets(str, sizeof(buf) - 3, fp))
+      {
+        if (ptr = strchr(str, '\n'))
+        {
+          *ptr++ = '\r';
+          *ptr++ = '\n';
+          *ptr = '\0';
+        }
+        fputs((*str == '.' ? buf : str), fw);
+      }
+      fclose(fp);
+    }
+#ifdef HAVE_SIGNED_MAIL
+    if (!rec_get(FN_RUN_PRIVATE, buf, 8, 0))
+    {
+      time_t prichro;
+
+      buf[8] = '\0';    /* Thor.990413: buf ¥Î¤£¨ì¤F¡A­É¨Ó¥Î¥Î */
+      prichro = chrono32(buf);
+      archiv32(str_hash(msgid, prichro), buf);
+      fprintf(fw,"¡° X-Sign: %s$%s %s\r\n",
+        msgid, genpasswd(buf), Btime(&stamp));
+    }
+#endif
+    fputs("\r\n.\r\n", fw);
+    fflush(fw);
+
+    fgets(buf, sizeof(buf), fr);
+    if (memcmp(buf, "250", 3))
+      goto smtp_error;
+
+    fputs("QUIT\r\n", fw);
+    fflush(fw);
+    fclose(fw);
+    fclose(fr);
+    goto smtp_log;
+
+smtp_error:
+
+    /* itoc.041128.µù¸Ñ: ¤Z¬O¨«¨ì³o¸Ìªº¡Abuf ¬O¹ï¤è¦^ÂÐªº¿ù»~°T®§ */
+    fclose(fr);
+    fclose(fw);
+    sprintf(from, "\t%.70s\n", buf);
+    sock = -1;
+  }
+  else
+  {
+    strcpy(from, "\tSMTP ³s½u¥¢±Ñ\n");
+  }
+
+smtp_log:
+
+  /* --------------------------------------------------- */
+  /* °O¿ý±H«H                                            */
+  /* --------------------------------------------------- */
+
+  sprintf(buf, "%s %-13s%c> %s\n%s\t%s\n\t%s\n",
+    Btime(&stamp), acct.userid, '-', rcpt,
+    sock >= 0 ? "" : from, title, fpath);
+  f_cat(FN_RUN_MAIL_LOG, buf);
+
+  return sock;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

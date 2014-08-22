@@ -1,0 +1,72 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ÀË¬Ý¬ÝªO³]©w
+µo«H¯¸: µL¦W¤p¯¸ (2006/11/09 Thu 16:22:29)                Updated: 2006/11/09
+
+¦]¬°¤£³ßÅwNECKER¤Ó¦h¦r ...[¬O§_µû¤À][¤H®ð¼Æ­È][¥i§_±À¤å] (¦n¦h o.O)
+
+¤§«e¼g¤F³o­Ó¤p¥\¯à~ ¾ã¦X¦¨"¬d¸ß¬ÝªO³]©w"
+
+
+[32m:/src/maple/post.c:·s¼Wpost_showBRD_setting()[m
+
+/* ----------------------------------------------------- */
+/* ÃB¥~¥\¯à¡Gwrite / score                               */
+/* ----------------------------------------------------- */
+
+static int
+post_showBRD_setting(xo)
+  XO *xo;
+{
+  char *blist;
+
+  blist = (bshm->bcache + currbno)->BM; /* ÀËµøªO¥D²M³æ¥Î */
+
+  move(b_lines - 10, 0);
+  clrtobot();  /* Á×§Kµe­±´Ý¯d */
+
+  prints("\033[36m"MSG_SEPERATOR"\033[m");
+  prints("\n¬ÝªO:[%s]  ªO¥D:[%s]\n",
+    currboard, blist[0] > ' ' ? blist : "¼x¨D¤¤");
+  prints("\n ¬O§_Âà«H - %s",
+    (currbattr & BRD_NOTRAN) ? "¯¸¤º¬ÝªO" : "Âà«H¬ÝªO Âà«H¬ÝªO¹w³]¬°¸ó¯¸¶K¤å");
+  prints("\n ¥i§_±À¤å - %s",
+    (currbattr & BRD_NOSCORE) ? "¤£¥iµû¤À" : "¶}©ñ±À¤å");
+  prints("\n °O¿ý½g¼Æ - %s",
+    (currbattr & BRD_NOCOUNT) ? "¤£°µ°O¿ý" : "°O¿ý");
+  prints("\n ¼öªù¸ÜÃD - %s",
+    (currbattr & BRD_NOSTAT) ? "¤£°µ²Î­p" : "²Î­p¸ê®Æ°O¿ý©ó¼öªù¸ÜÃD");
+  prints("\n §ë²¼µ²ªG - %s",
+    (currbattr & BRD_NOVOTE) ? "¤£°µ°O¿ý" : "±N°O¿ýµ²ªG©ó[Record]¬ÝªO");
+
+  if (cuser.userlevel)
+  {
+    prints("\n\n±z¥Ø«e%s¦¹¬ÝªOªººÞ²zªÌ",
+      (HAS_PERM(PERM_BM) && blist[0] > ' ' &&
+      is_bm(blist, cuser.userid)) ? "¬O" : "¤£¬O");
+  }
+  else
+  {
+    prints("\n\n±z¥Ø«e¨­¤À¬°³X«È");
+  }
+  vmsg(NULL);
+
+  return post_body(xo);
+}
+
+
+
+[32m:/src/maple/post.c:post_cb[][m
+
++  'I', post_showBRD_setting,  /* ¨ú[I]nfo­º¦r ¤ñ¸û¦n°O :p */
+
+
+[32m:/src/include/theme.h[m
+
+µe­±NECKER ¹ïÀ³­×§ï¦h¾l¤£¥²­nªºÅã¥ÜÅo :p
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H¤£[37m134-208-34-179.ndhu.edu.tw[30m®ü[m

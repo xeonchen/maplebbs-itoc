@@ -1,0 +1,122 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ²¾°£¹L´Á³Æ¥÷
+®É¶¡: 2006/06/22 Thu 10:16:02                           Updated: 2006/06/22
+
+/*-------------------------------------------------------*/
+/* util/rmbackup.c  ( NTHU MapleBBS Ver 3.10 )           */
+/*-------------------------------------------------------*/
+/* target : ²¾°£¹L´Á³Æ¥÷                                 */
+/* create : 06/06/22                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+#if 0
+
+¥»µ{¦¡¬O®³¨Ó²¾°£ BBS ªº©w´Á³Æ¥÷¡A°õ¦æªº¤é´Á©M backup* ¤@¼Ë
+
+¡· ¨C¶g«ö¬P´Á´X³Æ¥÷¡G#define CASE_BACKUP_BY_WDAY
+­Y crontab ³Æ¥÷ªº³¡¤À¼g¦¨³o¼Ë
+4 3 * * 2  bin/backupbrd > /dev/null 2>&1
+4 3 * * 3  bin/backupgem > /dev/null 2>&1
+4 3 * * 4  bin/backupusr > /dev/null 2>&1
+4 3 * * 5  bin/backupoth > /dev/null 2>&1
+¨º»ò´N¦b crontab ¸Ì­±¥[³o¨Ç¨Ó§R°£³Æ¥÷
+4 3 * * 2  bin/rmbackup -b > /dev/null 2>&1
+4 3 * * 3  bin/rmbackup -g > /dev/null 2>&1
+4 3 * * 4  bin/rmbackup -u > /dev/null 2>&1
+4 3 * * 5  bin/rmbackup -o > /dev/null 2>&1
+
+¡· ¨C¤ë«ö¤é³Æ¥÷¡G#define CASE_BACKUP_BY_DAY
+­Y crontab ³Æ¥÷ªº³¡¤À¼g¦¨³o¼Ë
+4 3 1,16 * *  bin/backupbrd > /dev/null 2>&1
+4 3 5,20 * *  bin/backupgem > /dev/null 2>&1
+4 3 9,24 * *  bin/backupusr > /dev/null 2>&1
+4 3 12,27 * *  bin/backupoth > /dev/null 2>&1
+¨º»ò´N¦b crontab ¸Ì­±¥[³o¨Ç¨Ó§R°£³Æ¥÷
+4 2 1,16 * *  bin/rmbackup -b > /dev/null 2>&1
+4 2 5,20 * *  bin/rmbackup -g > /dev/null 2>&1
+4 2 9,24 * *  bin/rmbackup -u > /dev/null 2>&1
+4 2 12,27 * *  bin/rmbackup -o > /dev/null 2>&1
+
+#endif
+
+#include <time.h>
+
+#define BAKPATH         "/home/bbs/bak"     /* ³Æ¥÷ÀÉªº¸ô®|¡A§Û config.h */
+
+
+/* ¥H¤U¤GªÌ¿ï¤@­Ó #define¡A¥t¤@­Ó #undef */
+#define CASE_BACKUP_BY_WDAY    /* ¨C¶g«ö¬P´Á´X³Æ¥÷ */
+#undef  CASE_BACKUP_BY_DAY     /* ¨C¤ë«ö¤é³Æ¥÷ */
+
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  int type;
+  int yy, mm, dd;
+  char *dir;
+  char cmd[256];
+  time_t now;
+  struct tm *ptime;
+
+  type = getopt(argc, argv, "bguo");
+  if (type == 'b')
+    dir = "brd";
+  else if (type == 'g')
+    dir = "gem";
+  else if (type == 'u')
+    dir = "usr";
+  else if (type == 'o')
+    dir = "oth";
+  else
+  {
+    printf("%s [-b | -g | -u | -o]\n", argv[0]);
+    return 0;
+  }
+
+
+#ifdef CASE_BACKUP_BY_WDAY
+
+  /* ²M°£¤K¶g«eªº³Æ¥÷ */
+  time(&now);
+  now -= 86400 * 7 * 8;
+  ptime = localtime(&now);
+  yy = ptime->tm_year % 100;
+  mm = ptime->tm_mon + 1;
+  dd = ptime->tm_mday;
+
+#elif defined(CASE_BACKUP_BY_DAY)
+
+  /* ²M°£¤G­Ó¤ë«eªº³Æ¥÷ */
+  time(&now);
+  ptime = localtime(&now);
+  yy = ptime->tm_year % 100;
+  mm = ptime->tm_mon + 1;
+  dd = ptime->tm_mday;
+  mm -= 2;
+  if (mm <= 0)
+  {
+    yy--;
+    mm += 12;
+  }
+
+#else
+
+  return 0;
+
+#endif
+
+  sprintf(cmd, "rm -rf %s/%s%02d%02d%02d",
+    BAKPATH, dir, yy, mm, dd);
+
+  system(cmd);
+
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-1.EE.NCTU.edu.tw[37m µoªí[m

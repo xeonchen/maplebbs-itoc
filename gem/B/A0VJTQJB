@@ -1,0 +1,93 @@
+§@ªÌ: Kudo (²H³J~~) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] expire ¼g¶i .BRD [µ{¦¡³¡¤À]
+®É¶¡: Thu Apr 11 04:29:48 2002                          Updated: 2005/05/19
+
+: global.h
+
+- #define FN_ETC_EXPIRE   "etc/expire.conf"       /* ¬ÝªO¤å³¹½g¼Æ¤W­­³]©w */
+
+: struct.h
+
+typedef struct BoardHeader
+{
+  char brdname[BNLEN + 1];      /* board name */
+  char title[BTLEN + 1];
+  char BM[BMLEN + 1];           /* BMs' uid, token '/' */
+
+  uschar bvote;                 /* ¦@¦³´X¶µ§ë²¼Á|¦æ¤¤ */
+
+  time_t bstamp;                /* «Ø¥ß¬ÝªOªº®É¶¡, unique */
+  usint readlevel;              /* ¾\Åª¤å³¹ªºÅv­­ */
+  usint postlevel;              /* µoªí¤å³¹ªºÅv­­ */
+  usint battr;                  /* ¬ÝªOÄÝ©Ê */
+  time_t btime;                 /* .DIR ªº st_mtime */
+  int bpost;                    /* ¦@¦³´X½g post */
+  time_t blast;                 /* ³Ì«á¤@½g post ªº®É¶¡ */
+
++ int maxpost;                  /* ¤å³¹¤W­­(½g) */
++ int minpost;                  /* ¤å³¹¤U­­(½g) */
++ int maxtime;                  /* ¤å³¹«O¯d®É¶¡(¤Ñ) */
+}           BRD;
+
+: acct.c
+
+/* ----------------------------------------------------- */
+/* ¬ÝªOºÞ²z                                              */
+/* ----------------------------------------------------- */
+
++ #define DEF_MAXP        3000          /* ¬ÝªO¤å³¹¹w³]¤W­­¼Æ¶q */
++ #define DEF_MINP        500           /* ¬ÝªO¤å³¹¹w³]¤U­­¼Æ¶q */
++ #define DEF_MAXT        365           /* ¬ÝªO¤å³¹¹w³]«O¯d¤Ñ¼Æ */
+
+: acct.c:m_setbrd()
+
+  default:      /* ¹w³]¤£ÅÜ°Ê */
+  }
+
++ if (vget(++i, 0, "³]©w¤å³¹¤W¤U­­(Y/N)¡H[N] ", data, 3, LCECHO) == 'y')
++ {
++   sprintf(data, "%d", brd->maxpost);
++   if (vget(++i, 0, "¤å³¹¤W­­", data, 6, GCARRY))
++     brd->maxpost = ((len = atoi(data)) > 0) ? len : DEF_MAXP;
++
++   sprintf(data, "%d", brd->minpost);
++   if (vget(++i, 16, "¤å³¹¤U­­", data, 6, GCARRY))
++     brd->minpost = ((len = atoi(data)) > 0) ? len : DEF_MINP;
++
++   sprintf(data, "%d", brd->maxtime);
++   if (vget(++i, 36, "¤å³¹«O¯d¤Ñ¼Æ", data, 6, GCARRY))
++     brd->maxtime = ((len = atoi(data)) > 0) ? len : DEF_MAXT;
++ }
+
+  if (vget(++i, 0, "³]©wÄÝ©Ê(Y/N)¡H[N] ", data, 3, LCECHO) == 'y')
+  {
+
+: acct.c:m_newbrd()
+
+  newboard.postlevel = PERM_POST;
+  newboard.battr = BRD_NOTRAN;
+
++ newboard.maxpost = DEF_MAXP;
++ newboard.minpost = DEF_MINP;
++ newboard.maxtime = DEF_MAXT;
+
+  if (m_setbrd(&newboard))
+    return -1;
+
+: acct.c:brd_edit()
+
+  prints("¬ÝªO¦WºÙ¡G%s\n¬ÝªO»¡©ú¡G%s\nªO¥D¦W³æ¡G%s\n",
+    newbh.brdname, newbh.title, newbh.BM);
++  prints("¤å³¹¤W­­¡G%d   ¤å³¹¤U­­¡G%d   ¤å³¹«O¯d´Á­­¡G%d\n",
++    newbh.maxpost, newbh.minpost, newbh.maxtime);
+
+  bitmsg(MSG_READPERM, STR_PERM, newbh.readlevel);
+  bitmsg(MSG_POSTPERM, STR_PERM, newbh.postlevel);
+
+--
+Chih-Kuan Chien (Kudo)
+kudo@ms21.url.com.tw
+
+--
+[1;32m¡¼ Origin: [33m²H³Jªº¤pºÛ [37mbbs.kudo.idv.tw
+[1;31m¡¼ From: [36mwww.kudo.idv.tw[m

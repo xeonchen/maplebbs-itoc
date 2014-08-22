@@ -1,0 +1,41 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý¤jD¤å³¹ªºdeleted
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/03/08 Mon 23:31:01)                Updated: 2004/09/10
+
+¡° ¤Þ­z¡mmaya.bbs@maya.csie.ncku.edu.tw ( ¢i  ¢i  ¢i  ¢i  ¢i)¡n¤§»Ê¨¥¡G
+> §Ú·Q§â¤jDªº¤å³¹¹³¤pdªº¤å³¹¤@¼Ë·h¨ìdeleted
+
+  ¤jD ©M tag ^D §R°£ªº¤å³¹°e¥h [deleted] ªO
+
+: post.c:delpost()
+
+static void
+delpost(xo, hdr)
+  XO *xo;
+  HDR *hdr;
+{
+- char fpath[64];
+
+- cancel_post(hdr);
+- hdr_fpath(fpath, xo->dir, hdr);
+- unlink(fpath);
++ move_post(hdr, xo->dir, 1);
+}
+
+
+  n ^N §R°£ªº¤å³¹°e¥h [deleted] ªO
+
+: post.c:post_delabel()
+
+    else
+    {
+-     /* ³s½u¬å«H */
+-     cancel_post(hdr);
+-     hdr_fpath(fold, folder, hdr);
+-     unlink(fold);
++     move_post(hdr, folder, 1);
+    }
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

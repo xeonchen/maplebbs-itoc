@@ -1,0 +1,23 @@
+µo«H¤H: root.bbs@bbs.math.ncyu.edu.tw (¸ô¯S) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¥Í¤é¹Ø¬PIDÅÜ¦â
+µo«H¯¸: ¤­ªêÀ° (Mon, 12 May 2003 13:26:23 +0800 (CST))    Updated: 2004/10/02
+
+: ulist.c:ulist_item()
+
+  fcolor =
+#ifdef HAVE_BRDPAL
+    up->mode == M_READA && !strcmp(currboard, up->mateid) ? COLOR_BRDGOOD :
+#endif
++   up->status & STATUS_BIRTHDAY ? "\033[1;35m" :
+    ftype & FTYPE_NORMAL ? COLOR_NORMAL :
+    ftype & FTYPE_BOTHGOOD ? COLOR_BOTHGOOD :
+    ftype & FTYPE_MYGOOD ? COLOR_MYGOOD :
+    ftype & FTYPE_OGOOD ? COLOR_OGOOD :
+    ftype & FTYPE_SELF ? COLOR_SELF :
+    ftype & FTYPE_MYBAD ? COLOR_MYBAD :
+    "";
+
+--
+[1;37m ¢q¢w¢w¢w¢w¡ô¢w [31m¢Ý¢ú¢ñ¢ï¢ñ¢ö[37m¢w¢w[33;41mbbs.math.ncyu.edu.tw[;1;37m¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¡÷
+ [1;37m¢x[33;41m¤­ ªê À°[;1;37m¢x[m
+[1;37m ¢q¢w¢w¢w¢w¢q¢w[36m¢Ï¢ý¢ü¢ð¢í¢ú[37m¢w¢w¢w¡÷ [35mswcy186-36.adsl.seed.net.tw             [m

@@ -1,0 +1,20 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] µµÁô¦b¨Ï¥ÎªÌ¦W³æªºÃC¦âÅÜµµ¦â
+®É¶¡: Tue Jul 16 23:05:57 2002                          Updated: 2004/10/02
+
+¡° ¤Þ­z¡mdream.bbs@sea.twbbs.org (£i ¬î®ü´Å £i)¡n¤§»Ê¨¥¡G
+> ¨º­Ó 0717ª©«áªº µµÁô§ï¦¨ ¤@±Ò°Ê..
+> id«e´N·|¸òÁô¨­¤@¼Ë¦h¥X¤F­Ó )
+> ¯à¤£¯à§ï¦¨ >
+
+  ¦³ UFO_SUPERCLOAK «hÅÜ¦¨ >
+
+: ulist.c:ulist_item()
+
+  §â prints() ¸Ì­±ªº
+  ufo & UFO_CLOAK ? ')' : ' '
+  §ï¦¨
+  ufo & UFO_SUPERCLOAK ? '>' : ufo & UFO_CLOAK ? ')' : ' '
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32ma128124.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

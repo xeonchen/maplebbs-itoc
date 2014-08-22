@@ -1,0 +1,19 @@
+發信人: DarkKiller.bbs@abpe.org (悸動), 看板: MaplePlan
+標  題: [文件] gdb 的用法
+發信站: 小鹿鹿 BBS (Sat Nov 17 13:10:14 2001)
+
+compile 的時候加入 -ggdb (加到 Makefile 的 CFLAGS)，這樣你用 gdb 去看
+core 的時候打 (l)ist 就可以看到原始程式碼。
+
+然後接下來就可以用 bt (== backtrace) 看看 stack 的情況。
+
+用 up 可以到上一層，用 down 可以到下一層，打 (p)rintf var 可以看到 var
+這個變數的情況，打 var.value (如果 var 是一個 structure) 可以看到他的
+值。
+
+打 help 可以看到更多資訊，或是平常沒事也可以 man gdb、info gdb 看看。
+
+--
+                                    Gea-Suan Lin <gslin@informath.net>
+--
+※ Origin: 小鹿鹿 <Deer.abpe.org> ◆ From: infopc06.math.nctu.edu.tw

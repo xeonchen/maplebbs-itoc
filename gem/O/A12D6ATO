@@ -1,0 +1,27 @@
+µo´H§H: kevin.bbs@cpu.tfcis.org (µl§l¿∞¡`≤Î•D) ¨›™O: plan
+º–  √D: Re: [∞›√D] BSD6.0§Ustandalone∂]§£∞_®”ÀÁ
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2006/07/26 Wed 05:48:06)
+
+ß⁄§]¨OƒÈFreeBSD6.1°A§]πJ®Ï∏ÚßA¶PºÀ∞›√D
+inetd.conf©Mservices≥]©w≥£ßÀ¶n§F
+¥N¨O®SøÏ™k≥s§W¶€§v™∫ftpd∏Útelnetd
+•ª®”∑Qª°•Œstandalone∂]¶n§F
+¨›§F§@§U/etc/rc.confª°≥o≠”¿…¨O®Ãæ⁄/etc/defaults/rc.conf≥o§@≠”
+ß‰§F§@§Uµo≤{6.1πw≥]¨O®S¶≥∂}±“inetd™∫°A≥ssshd∏Úftpd≥£®S¶≥∂}±“=.=||
+©Û¨Oß⁄ß‚inetd_enable="NO"ßÔ¶®inetd_enable="YES"
+∂∂´Kß‚sshd©Mftpd≥£ßÔ¶®YES°Aß⁄√i¥k°A©“•H≈˝•Lreboot
+∞›√D∏—®M°A•i•Htelnet§]•i•H•Œssh©Mftp°A¥N∫‚•Œstandalone≥£®S∞›√D:p
+≈o≠˘•z¡Y§@∞Ô°AµπßA∞—¶“¨›¨›
+
+°∞ §ﬁ≠z°mBeastXIII (Beast. XIII)°n§ßª ®•°G
+> ƒÈ§FFreeBSD6.1...•Œ≥Ã∞Æ≤b™∫®t≤Œ∂}æ˜
+> ¶w∏À¶nitoc≥Ã∑s™©•ª.. make≥£®Sø˘ª~
+> camera, account≥£∂]§F
+> §]•Œroot∂]bbsd§F
+> ¶˝telnet§£∂i•h.. ¶≥§HπJπL√˛¶¸™∫∞›√Dπ¿:(
+
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m       163.23.57.23       [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m
+[1;36m=[m ¢o¢m[1m¢k¢k[31mModify[37m ¢k¢m[m¢n¢o[1;30m¢o[33m°›[37m:[32m Wed, 26 Jul 2006 05:49:52 CST [37m:[33m°›[37m:[30m][36m=[m

@@ -1,0 +1,39 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ·s¼W¤£¦P id ªº guest
+®É¶¡: Sun Aug 17 21:06:37 2003                          Updated: 2003/09/29
+
+  ·s¼W¤£¦P id ªº³X«È¡A¨Ò¦p·s¼W id ¬° adam ©M eve
+
+  µù¥U¤G°¦·s id ¥s adam ©M eve¡A¸ê®Æ/±K½X¥ô·N
+  ²Ä¤G¦¸¤W¯¸¥H«á¡A´N¤£·|°Ý±K½X¤F
+
+: global.h
+
+#define STR_GUEST       "guest"
++ #define STR_GUEST2      "adam"
++ #define STR_GUEST3      "eve"
+
+: bbsd.c:login_user()
+
+  move(b_lines, 0);
+- outs("   ¡° °ÑÆ[±b¸¹¡G\033[1;32m" STR_GUEST "\033[m"
+-   "  ¥Ó½Ð·s±b¸¹¡G\033[1;31m" STR_NEW "\033[m");
++ outs("   ¡° °ÑÆ[±b¸¹¡G\033[1;32m" STR_GUEST STR_GUEST2 STR_GUEST3 "\033[m"
++   "  ¥Ó½Ð·s±b¸¹¡G\033[1;31m" STR_NEW "\033[m");
+
+  ...
+  ...
+
+-     outs("\n¥»¨t²Î¥Ø«e¼È°±½u¤Wµù¥U, ½Ð¥Î " STR_GUEST " ¶i¤J");
++     outs("\n¥»¨t²Î¥Ø«e¼È°±½u¤Wµù¥U, ½Ð¥Î "
++       STR_GUEST STR_GUEST2 STR_GUEST3 " ¶i¤J");
+
+  ...
+  ...
+
+-   else if (str_cmp(uid, STR_GUEST))   /* ¤@¯ë¨Ï¥ÎªÌ */
++   else if (str_cmp(uid, STR_GUEST) && /* ¤@¯ë¨Ï¥ÎªÌ */
++     str_cmp(uid, STR_GUEST2) && str_cmp(uid, STR_GUEST3))
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

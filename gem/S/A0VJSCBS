@@ -1,0 +1,102 @@
+µo«H¤H: PaulLiu.bbs@processor.tfcis.org (GrandPaul) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] Ãö©ó RFC 2045 / RFC 2047
+µo«H¯¸: XEON (Tue, 01 Apr 2003 19:22:16 +0800 (CST))      Updated: 2005/08/31
+
+¡° -------------- news ªº³¡¤À -------------- ¡°
+
+: innbbsd/Makefile ­Y¬O FreeBSD ­n§ï³o­Ó
+
+freebsd:
+        ... -L./lib -linn [1;33m-L/usr/local/lib -liconv[m" LIBCRYPT=-lcrypt target
+
+: innbbsd/inntobbs.h
+
+! extern char *SUBJECT, *FROM, *SITE, *DATE,
+              *GROUPS, *MSGID, *CONTROL[1;33m, *CONTENTTYPE, *CONTENTENCODE[m;
+
+: innbbsd/inntobbs.c
+
+enum HeaderValue        /* ©Ò¦³¦³¥Î¨ìªº header */
+{
+  SUBJECT_H,
+  FROM_H,
+  SITE_H,
+  DATE_H,
+  GROUPS_H,
+  MSGID_H,
+  CONTROL_H,
++ CONTENTTYPE_H,
++ CONTENTENCODE_H,
+
+  LASTHEADER
+};
+
+static header_t headertable[LASTHEADER] =
+{
+  "Subject",                    SUBJECT_H,
+  "From",                       FROM_H,
+  "Organization",               SITE_H,
+  "Date",                       DATE_H,
+  "Newsgroups",                 GROUPS_H,
+  "Message-ID",                 MSGID_H,
+  "Control",                    CONTROL_H,
++ "Content-Type",               CONTENTTYPE_H,
++ "Content-Transfer-Encoding",  CONTENTENCODE_H,
+};
+
+static char *HEADER[LASTHEADER];
+
+char *BODY;
+! char *SUBJECT, *FROM, *SITE, *DATE, *PATH,
+       *GROUPS, *MSGID, *CONTROL[1;33m, *CONTENTTYPE, *CONTENTENCODE[m;
+
+
+  ...
+  ...
+
+  MSGID = HEADER[MSGID_H];
+  CONTROL = HEADER[CONTROL_H];
++ CONTENTTYPE = HEADER[CONTENTTYPE_H];
++ CONTENTENCODE = HEADER[CONTENTENCODE_H];
+}
+
+
+: innbbsd/rec_article.c
+
+static int
+receive_article()
+{
+  newsfeeds_t *nf;
+  char myaddr[128], mynick[128], mysubject[128], myfrom[128], mydate[80];
+  char poolx[256];
++ char charset[32], decode;
++ int cc;
+
+  ...
+  ...
+
+  parse_date();
+  strcpy(mydate, (char *) Btime(&datevalue));
+  DATE = mydate;
+
+
++ /* Âà charset */
++ mm_getencode(CONTENTENCODE, &decode);
++ cc = mmdecode(BODY, decode, BODY);
++ mm_getcharset(CONTENTTYPE, charset, sizeof(charset));
++ if (!*charset)
++   strcpy(charset, nf->charset);
++ str_conv(charset, MYCHARSET, BODY, cc);
+
+- if (*nf->charset == 'g')
++ if (!str_cmp(charset, "gb2312"))
+  {
+-   gb2b5(BODY);
+    gb2b5(FROM);
+    gb2b5(SUBJECT);
+    gb2b5(SITE);
+  }
+
+--
+    [1;32m¢~¢w Origin ¢wùß [;36;40m°[1mÊ[;36;40m¤[1mO[;36;40m®[1mÖ[;36;40m¤[1mß [31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mcnal.csie.nctu.edu.tw                    [m

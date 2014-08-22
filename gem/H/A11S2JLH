@@ -1,0 +1,20 @@
+µo«H¤H: binbin.bbs@cpu.tfcis.org (»æ°®) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] «öENTERª½±µ¥H³X«È¨­¤À¶i¯¸
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/01/09 Mon 00:28:00)                Updated: 2006/01/09
+
+> bbsd.c: login_user()
+
+    vget(b_lines - 2, 0, "[±zªº±b¸¹] ", uid, IDLEN + 1, DOECHO);
+
++   if (!*uid)
++     strcpy(uid, STR_GUEST);
+
+----
+
+WebBBS ©M¤@¯ë½×¾Â³£¤£¥Î¿é¤J±b¸¹´N¥H³X«È¨­¤À¶i¯¸°ÑÆ[
+
+Ä±±o BBS ¤]¥i¥H¬Ù¥h¿é¤J´N¥H³X«È¨­¤À¶i¯¸
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m binbin.Dorm6.NCTU.edu.tw [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

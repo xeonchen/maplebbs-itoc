@@ -1,0 +1,114 @@
+§@ªÌ: itoc (§@·~¦nÃø¼g) ¬ÝªO: plan
+¼ÐÃD: [¶¢²á] MS-Windows ¤U§ï¤pÂû¦sÀÉ/.ACCT/...µ¥
+®É¶¡: Mon Dec 30 16:11:10 2002
+
+  0. ³o½g±Ð§A«ç»ò¦b MS-Windows ¤U­×§ï¤pÂû¦sÀÉ¡A
+     ¬Û¶Ç³\¦h¤H¹ï MS-Windows »·¤ñ¹ï Un*x ¼ô½m
+
+  1. ­º¥ý§A­nª¾¹D¤pÂû¦sÀÉ¬O¦s¦b­þ­ÓÀÉ®×
+
+     [ªk¤@] ¥Î²qªº
+
+       ¨Ó¨ì ~/usr/u/userid/ ¤U ls -a
+       ¬ÝÀÉ¦W²q¤@²q¤]ª¾¹D¬O chicken
+
+     [ªk¤G] ¬Ýµ{¦¡
+
+       ¦b pipglobal.h ¸Ì­±¦³¼g #define FN_PIP  "chicken"
+
+     [ªk¤T] ¬ÝÀÉ®×§ó·s®É¶¡
+
+       ª±¤@¤U¤pÂû¡A§ó·s¦sÀÉ®É¶¡
+       ¨Ó¨ì ~/usr/u/userid/ ¤U ls -la
+       ¬Ý³Ì·sªº§ó·s®É¶¡´N§ä¨ì chicken
+
+  2. §â chicken ³oÀÉ®×§ì¦^¨Ó¸Ë¦³ MS-Windows ªº¹q¸£
+
+  3. ¸Ë­Ó³nÅé¥s GameMaster ©Î FPE ©Î UltraEdit ...
+     ÀH«K¤°»òÃþ¦üªº³nÅé³£¦n
+     ¨ä¤¤ UltraEdit ¬O¦@¨É³nÅé¡Aºô¸ô¤WÀH«K³£¦³±o§ì
+     ¬Ý¤£À´­^¤å¡A§ä§ä¤¤¤å¤Æµ{¦¡¡A¤]¥i¥H»´ÃP§ä¨ì
+
+  4. µM«á¥Î³o³nÅé¶}±Ò chicken ³o­ÓÀÉ®×
+     ·|¬Ý¨ìÃþ¦ü¹³¤U­±³o¼ËªºªF¦è
+
+     03 48 76 2B 47 F6 00 3D A2 7F 3E A5 00 64 10 44
+     52 04 16 1A 4D 4F 6E 32 27 0D B4 27 56 12 BB C9 ...
+
+     ¤@°ï 00 ¨ì FF ªº¤Q¤»¶i¦ìª±·N
+     ³o¨ÇÄæ¦ì´N¬O¤pÂûªº¸ê®Æ¡AÀH«K§A«ç»ò§ï
+     §ï§¹¦sÀÉ¡A¥á¦^¥h¥D¾÷¤WÂÐ»\­ìÀÉ®×
+     (ª`·N¡GÂÐ»\ÀÉ®×®É¡A¨º userid ¤£­n¦b¯¸¤W¡A¥H§K¥X¿ù)
+     ¦A«×ª±¹q¤lÂû¹CÀ¸ªº®É­Ô¡A´N·|±o¨ì·sªº¼Æ­È
+
+  5. ¨C­ÓÄæ¦ì·N«ä¦p¤U¡G (xx yy ³£ªí¥Ü 00 ~ FF)
+
+     xx xx xx xx xx xx xx xx xx xx xx xx 00 yy yy yy
+     ¤pÂûªº©m¦W (³Ì«á¤@©w¬O '\0')           ¤pÂûªº¥Í¤é
+
+     yy yy yy yy yy 00 xx xx xx xx yy yy yy yy xx xx
+     (³Ì«á¤@©w¬O '\0')   ¥Í¤é(¦~)    ¥Í¤é(¤ë)   ¥Í¤é(¤é)
+
+     xx xx yy yy yy yy xx xx xx xx yy yy yy yy xx xx
+            ©Ê     §O   ª¬     ºA    ´_¬¡¦¸¼Æ   20·³µ²§½
+
+     xx xx yy yy yy yy xx xx xx xx yy yy yy yy xx xx
+            ·R     ¤H   ¥i§_¹J¤ý¤l  ¥ô     °È   ¤H©MÃdª«ªº¤¬°ÊÃö«Y
+     xx xx yy yy yy yy xx xx xx xx yy yy yy yy xx xx
+             §Ö ¼Ö «×    º¡ ·N «×   ÅÊ·R«ü¼Æ    «H¥õ
+     xx xx yy yy yy yy xx xx xx xx yy yy yy yy xx xx
+            ¸o     Ä^   ·P     ¨ü   ¨S¥ÎÄæ¦ì    ¨S¥ÎÄæ¦ì
+     xx xx yy yy yy yy xx xx xx xx yy yy yy yy xx xx
+            ¨S¥ÎÄæ¦ì    Åé     ­«   ¯h ³Ò «×    ¯f®ð
+
+     ...... «á­±¥H¦¹Ãþ±À¡A¨C¥|¦ì¤¸²Õ¬O¤@­Ó¾ã¼Æ
+
+     §¹¾ãªº¨C­ÓÄæ¦ì·N«ä¡A¥i¥H¦b pipstruct.h ªº struct CHICKEN
+     ¸Ì­±¬Ý¨ì
+
+  6. ³Ì«á¥u¬O­n´£¿ô¤@¤U¡A°O±o­n³Æ¥÷ chicken ÀÉ¡A¥H§K§ïÄê¤F
+
+> ---------------------------------------------------------------- <
+
+  0. ¦pªG­n§ïªº¬O¨Ï¥ÎªÌ¸ê®Æ¡A¤]¬O¬Û¦Pªº¤èªk
+
+  1. ­º¥ý§A­nª¾¹D¨Ï¥ÎªÌ¸ê®Æ¦sÀÉ¬O¦s¦b­þ­ÓÀÉ®×
+
+     [ªk¤@] ¥Î²qªº
+
+       ¨Ó¨ì ~/usr/u/userid/ ¤U ls -a
+       ¬ÝÀÉ¦W²q¤@²q .ACCT ´N¹³ account¡AÀ³¸Ó¬O¥¦
+
+     [ªk¤G] ¬Ýµ{¦¡
+
+       µ{¦¡¨º»ò¦h¦a¤è³£»¡¬O .ACCT ¤F
+       ¦pªG§A¦A¤£ª¾¹D¡A§Ú¤]¨S¿ìªk¤F
+
+     [ªk¤T] ¬ÝÀÉ®×§ó·s®É¶¡
+
+       ¤W¯¸¥H«á°¨¤Wµn¥X¡A§ó·s¦sÀÉ®É¶¡
+       ¨Ó¨ì ~/usr/u/userid/ ¤U ls -l
+       ¬Ý³Ì·sªº§ó·s®É¶¡´N§ä¨ì .ACCT .BRH log
+       ½s¿è¤@¤U log ªº¤º®e¡A¬Ý°_¨Ó´N¹³¬Oµn¤J¨Ó·½ªº°O¿ý
+       .ACCT .BRH ´N¥u¦n¥Î²qªº¡A¶â¶â¡A§Ú¬Û«H§A·|²q .ACCT ªº
+
+  2. §â .ACCT ³oÀÉ®×§ì¦^¨Ó¸Ë¦³ MS-Windows ªº¹q¸£
+
+  3. ¥Î³nÅé½s¿è .ACCT ¤]¬O¤@¼Ë·|¬Ý¨ì¤@°ï 00 ~ FF¡A
+     ¨C­ÓÄæ¦ì©Ò¥Nªíªº·N«ä½Ð°Ñ·Ó struct.h ªº struct ACCT¡A
+     ¨Ì§Ç¬O userno userid passwd realname ...
+
+  4. §ï§¹¦sÀÉ¡A¥á¦^¥h¥D¾÷¤WÂÐ»\­ìÀÉ®×
+     (ª`·N¡GÂÐ»\ÀÉ®×®É¡A¨º userid ¤£­n¦b¯¸¤W¡A¥H§K¥X¿ù)
+     ¦A«×¤W¯¸ªº®É­Ô¡A´N·|±o¨ì·sªº¸ê®Æ
+
+  5. ·íµM¡A¨ä¹ê¯¸¤Wªº 0Admin/User ´N¥i¥H³]©w¨Ï¥ÎªÌ¸ê®Æ¤F¡A
+     ©Ò¥H¨ä¹ê¤£¥Î³o»ò³Â·Ð
+     ¦b¦¹¡A¥u¬O°µ¬°¤@­Ó¨Ò¤l
+
+> ---------------------------------------------------------------- <
+
+  ¦P¼Ëªº¹D²z¡A¦pªG­n§ï .DIR .BRD .USR ... µ¥¡A¤]³£¥i¥H³o¼Ë°µ
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

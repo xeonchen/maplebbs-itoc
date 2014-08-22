@@ -1,0 +1,51 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [½Ð¯q] ¦³¨S¦³¨ººØ"¦n¤Íª©¥[¤JÁÜ½Ð¨ç"
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/11/22 Mon 02:18:49)                Updated: 2004/11/24
+
+¡° ¤Þ­z¡mvividcat46.bbs@bbs.wretch.cc (¯¦±K¼w£»³Í¯S)¡n¤§»Ê¨¥¡G
+> ¦]¬°¯¸¤º¦³«Ü¦hªº¦n¤Íª©¸ò­Ó¤Hª©
+> ³Q¹ï¤è¥[¤Jªº¤H³£¤£ª¾¹D
+> ¦pªG¨º­Óª©ªºª©¥D¥D°Ê¥[¤J¹ï¤è¬°ªO¤Í
+> [1;37mµM«á¥i¥H«ö­ÓÁä´N±H¤@«Ê«Hµ¹¹ï¤èÁÜ½Ð¥L¥[¤J[m
+
+: pal.c:pal_add()
+
+    pal_edit(&pal, DOECHO);
+    strcpy(pal.userid, acct.userid);
+    pal.userno = userno;
+    rec_add(xo->dir, &pal, sizeof(PAL));
+
+    utmp_admset(userno, STATUS_PALDIRTY);
+
++   if (xo->dir[0] == 'b' &&                    /* ªO¤Í¤~»Ý­n±H«H */
++     vans("¬O§_µo¨ç³qª¾¥L(Y/N)¡H[N] ") == 'y')
++   {
++     char fpath[64], *title;
++     FILE *fp;
++
++     sprintf(fpath, "tmp/pal_add.%s", cuser.userid);   /* ¼È¦sÀÉ */
++     if (fp = fopen(fpath, "w"))
++     {
++       title = "¥[¤JªO¤Í³qª¾";
++
++       /* ¤å³¹ÀÉÀY */
++       fprintf(fp, "%s %s (%s)\n",
++         str_author1, cuser.userid, cuser.username);
++       fprintf(fp, "¼ÐÃD: %s\n®É¶¡: %s\n\n", title, Now());
++
++       /* ¤å³¹¤º®e */
++       fprintf(fp, "%s ±N±z¥[¤J [%s] ªºªO¤Í\n\n", cuser.userid, currboard);
++       fclose(fp);
++
++       mail_him(fpath, acct.userid, title, 0);
++       unlink(fpath);
++     }
++   }
+
+    xo->pos = XO_TAIL;          /* ©ñ¦b³Ì«á */
+    return pal_init(xo);
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

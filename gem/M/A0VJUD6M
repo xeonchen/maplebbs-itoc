@@ -1,0 +1,112 @@
+§@ªÌ: itoc (¤£¤Óµo®i¹êÅç«Ç) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] µL²áªº NPC
+®É¶¡: Tue Sep  3 11:54:28 2002                          Updated: 2006/01/07
+
+  ¥á¤ô²yµ¹ userlevel=0 (¤]´N¬O guest) ªº NPC (non-player-char.)
+  NPC ·|¦^¤ô²yµ¹§A
+
+  ¦pªG¥á NPC ³o ID ¤ô²y
+  °Ý "½Ð°Ý¦p¦ó¶}ªO"  NPC ·|µª "¶}ªO½Ð¦Ü [newboard] ªO post"
+  °Ý "½Ð°Ý¯¸ªø¬O½Ö"  NPC ·|µª "¥»¯¸ªº¯¸ªø¬O sysop"
+  ¦pªG¸ò NPC ÀH«K¥á¤ô²y¡ANPC ¤]·|¦^§A¸Ü
+
+: bmw.c:bmw_rqst()
+
+  int i, j, userno, locus;
+  BMW bmw[BMW_PER_USER], *mptr, **mslot;
++ char fpath[64];
+
+    do
+    {
+      mptr = &bmw[i];
+
+      ...
+      ...
+
+      bmw_lslot[locus++] = *mptr;       /* structure copy */
+
++     /* ·í NPC ¦¬¨ì§O¤H¥á¨Óªº¤ô²y®É¡A¦Û°Ê¦^¸Ü */
++     if (!strcmp(cuser.userid, "NPC"))  /* NPC ªº ID ¬O "NPC" */
++     {
++       if (mptr->caller)
++       {
++         BMW new;
++
++         time(&new.btime);
++         new.caller = cutmp;
++         new.sender = cuser.userno;
++         new.recver = mptr->sender;
++         strcpy(new.userid, cuser.userid);
++         strcpy(new.msg, mptr->msg);
++         bmw_npcAI(new.msg);
++         bmw_send(mptr->caller, &new);
++
++         usr_fpath(fpath, cuser.userid, fn_bmw);
++         rec_add(fpath, &new, sizeof(BMW));
++
++         usr_fpath(fpath, cuser.userid, fn_amw);
++         if (fp = fopen(fpath, "a"))
++         {
++           fprintf(fp, BMW_FORMAT2 " %s\n",
++             new.userid, new.msg, Btime(&new.btime));
++           fclose(fp);
++         }
++       }
++     }
+    } while (++i < j);
+
+: bmw.c:bmw_npcAI() ·s¼W©ó bmw_edit() «e­±
+
+static void
+bmw_npcAI(msg)      /* Non-Player-Char ªº¤H¤u´¼¼z */
+  char *msg;        /* bmw.msg ªø«×¬O 69 */
+{
+  /* input msg ¬O¨Ï¥ÎªÌ©Ò¿é¤J­nµ¹ guest ªº¤ô²y */
+  /* output ¤]¥Î msg¡A¬O NPC ¦^µ¹ cuser.userid ªº¤ô²y */
+
+  int find;
+  FILE *fp;
+  char rule[80], ans[80], *str;
+
+  find = 0;
+  if (fp = fopen("etc/npc", "r"))
+  {
+    while (fgets(rule, 80, fp) && fgets(ans, 80, fp))  /* ¤@¦¸ fget ¤G¦æ */
+    {
+      if (str = strchr(rule, '\n'))
+        *str = '\0';
+      if (strstr(msg, rule))
+      {
+        if (str = strchr(ans, '\n'))
+          *str = '\0';
+        str_ncpy(msg, ans, 60);
+        find = 1;
+        break;
+      }
+    }
+
+    fclose(fp);
+  }
+
+  if (!find)        /* ¦pªG rule ¸Ì­±¨S¦³¡A´NÀH«K¦^µª */
+    strcpy(msg, "Á¿¤Ó¤pÁn¤F¡A§ÚÅ¥¤£¨ì");
+}
+
+: etc/npc ·s¼W³o­ÓÀÉ®×¡G©_¼Æ¦æ¬O³W«h¡A°¸¼Æ¦æ¬O­n¦^µªªº¸Ü¡A½d¨Ò¦p¤U¡G
+: ¦pªG­n§ï NPC ªº AI¡A´N§ï etc/npc §Y¥i
+
+> ---------- ½d¨Ò±q¤U¤@¦æ¶}©l¡A¤£¥]¬A¥»¦æ ---------- <
+¦­¦w
+¤£¦­¤F°Ú¡A§Ú¨C¤Ñ³£ºÎ¨ì¤¤¤Èªº»¡
+¤Ñ®ð
+¤µ¤Ñ¤Ñ®ð¥i¦nªº«Ü©O¡ã
+¬°¤°»ò
+§A³o»òÁo©ú³£¤£ª¾¹D¤F¡A§Ú«ç»ò¥i¯à·|ª¾¹D
+¶}ªO
+¶}ªO½Ð¦Ü [newboard] ªO post
+¯¸ªø
+¥»¯¸ªº¯¸ªø¬O sysop
+> ---------- ½d¨Ò¨ì¤W¤@¦æµ²§ô¡A¤£¥]¬A¥»¦æ ---------- <
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-5.EE.NCTU.edu.tw[37m µoªí[m

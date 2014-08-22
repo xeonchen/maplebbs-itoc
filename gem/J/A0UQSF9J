@@ -1,0 +1,76 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] §â©Ò¦³ footer/feeter ´«¦¨ 80 char
+®É¶¡: Sun Jun 16 13:36:00 2002                          Updated: 2002/10/17
+
+¡° ¤Þ­z¡mtandrian.bbs@ntcb.twbbs.org.tw (¤Û°ìÅ]«°«á¯ª)¡n¤§»Ê¨¥¡G
+> - len = 65 - strlen(title) - strlen(currboard);
+> + len = 67 - strlen(title) - strlen(currboard);
+> §Úµo²{§â 65 -->  67  ­è¦n¶ñº¡~~
+
+  ´N¬O¬G·N¼g 65 ¶ñ¨ì 78 char ªº°Ú :p
+
+  ¦]¬°¬Û¶Ç¬Y¨Ç³nÅé¦b 80 char ·|¦³¸õ¦æªº²{¶H
+  ©Ò¥H©Ò¦³ªºµe­±³£¬O°µ¨ì 78 char ¦Ó¤w
+
+  §A¦pªG­n§ï¦¨¥þ³¡³£ 80¡A¤j·§¬O§ï¥H¤U³o¨Ç¦a¤è
+
+: menu.c vs_head()
+
+  len = 67 - strlen(title) - strlen(currboard);
+
+: menu.c status_foot()
+
+  /* itoc.010717: §ï¤@¤U feeter ¨Ïªø«×©M FEETER_XXX ¤@­P */
+  sprintf(feeter, "...", ...);
+
+: more.c more()
+
+  /* itoc: STRLEN + strlen(COLOR1) + strlen(COLOR2) = 100 */
+  for (key = 100 - strlen(buf); key > 0; key--)     /* ­É¥Î key */
+
+: more.c more()
+
+  prints("....  ");  ³Ì«á¦h¤G®æªÅ®æ
+
+  if (!pos && ((ptr = strstr(word, str_post1)) ||
+    (ptr = strstr(word, str_post2))))
+  {
+    ptr[-1] = ptr[4] = '\0';
+    prints("\033[47;34m %s \033[44;37m%-53.53s\033[47;34m %s \033[44;37m%-13s  \033[m\n", head[0], word, ptr, ptr + 5);
+  }
+  else if (pos < 5)   /* lkchu.990430: ¦h¦L¡u¨Ó·½¡vÄæ¦ì*/
+  {
+     prints("\033[47;34m %s \033[44;37m%-72.72s  \033[m\n", head[pos], word);
+     if (pos == 4)     /* lkchu.990430: ¦³ Origin Äæ¦ì, pos ¤~·|¼Æ¨ì 4 */
+       have_origin = 1;
+  }
+
+: global.h
+
+/* ----------------------------------------------------- */
+/* °T®§¦r¦ê¡Gmore() ®Éªº footer ³£§ì¥X¨Ó©w¸q¦b³o         */
+/* ----------------------------------------------------- */
+/* itoc.010914.µù¸Ñ: ³æ¤@½g¡A©Ò¥H¥s FOOTER¡A³£¬O 80 char */
+
+/* ----------------------------------------------------- */
+/* °T®§¦r¦ê¡Gxo_foot() ®Éªº feeter ³£§ì¥X¨Ó©w¸q¦b³o      */
+/* ----------------------------------------------------- */
+/* itoc.010914.µù¸Ñ: ¦Cªí¦h½g¡A©Ò¥H¥s FEETER¡A³£¬O 80 char */
+
+  ©Ò¦³ªº FOOTER_* FEETER_* ³£¥[¤W¤G®æªÅ¥Õ
+
+
+: *.c ªº *_neck() ©Î *_head() ¤¤ªº
+
+  outs("[¡ö]Â÷¶} [¡÷]¾\\Åª [^P]µoªí [b]¶iªOµe­± [d]§R°£ [V]§ë²¼ .... \n"
+    COLOR3 "  ½s¸¹   ¤é ´Á  §@  ªÌ       ¤å  ³¹  ¼Ð  ÃD                                     \033[m");
+
+  COLOR3 ¨º¦æ³Ì«á­n¦h¤G­ÓªÅ¥Õ
+
+
+
+--
+  ¤j·§¬O³o¨Ç¡A¥i¯à¦³¨Ç²Ó³¡·|º|±¼
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

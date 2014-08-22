@@ -1,0 +1,66 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: itoc
+¼Ð  ÃD: [¤å¥ó] ºëµØ°Ïªº½g¼Æ¤W­­©M®e¶q¤W­­
+µo«H¯¸: Àº¤Ñ±^ (Sun, 06 Jul 2003 15:21:41 +0800 (CST))    Updated: 2003/07/15
+
+  (3) ­Ó¤HºëµØ°Ï¤W­­³]©w
+
+: include/perm.h:
+
+- #define PERM_9          0x00000100
++ #define PERM_MYGEM      0x00000100      /* ­Ó¤HºëµØ°ÏµL¤W­­ */
+
+: include/perm.h:
+
+- #define STR_PERM        "bctpjm#x-------@PTCM--L*B#-RACBS"
++ #define STR_PERM        "bctpjm#xO------@PTCM--L*B#-RACBS"
+
+: include/perm.h:perm_tbl[]
+
+- "«O¯d",                       /* PERM_9 */
++ "­Ó¤HºëµØ°ÏµL¤W­­",           /* PERM_MYGEM */
+
+: maple/bbsd.c:acct_apply()
+
+  cuser.ufo = UFO_DEFAULT_NEW;
+  cuser.numlogins = 1;
++ cuser.gemsize_n = 1000;       /* ­Ó¤HºëµØ°Ï¹w³]¤W­­ 1000 ½g */
++ cuser.gemsize_k = 100 << 10;  /* ­Ó¤HºëµØ°Ï¹w³]¤W­­ 100 KB */
+
+: maple/acct.c:acct_show()
+
+  prints("  \033[32m¥úÁ{¤é´Á¡G\033[37m%s", Btime(&u->lastlogin));
+
++ prints("  \033[32mºëµØ°Ï½g¼Æ¤W­­¡G\033[37m%-29d\033[32m®e¶q¤W­­¡G"
++   "\033[37m%dKB\n", u->gemsize_n, u->gemsize_k / 1024);
+
+: maple/acct.c:acct_setup()
+
+    sprintf(buf, "%d", u->numemails);
+    vget(++i, 0, "µo«H¦¸¼Æ¡G", buf, 10, GCARRY);
+    if ((num = atoi(buf)) >= 0)
+      x.numemails = num;
+
+    vget(++i, 0, "¤W¯¸¦aÂI¡G", x.lasthost, sizeof(x.lasthost), GCARRY);
+    vget(++i, 0, "¶l¥ó«H½c¡G", x.email, sizeof(x.email), GCARRY);
+
++   if (vget(++i, 0, "³]©wºëµØ°Ï¤W­­(Y/N)¡H[N] ", buf, 3, LCECHO) == 'y')
++   {
++     sprintf(buf, "%d", u->gemsize_n);
++     if (vget(++i, 0, "½g¼Æ¤W­­", buf, 6, GCARRY))
++     {
++       int gemsize = atoi(buf);
++       if (gemsize > 0)
++         x.gemsize_n = gemsize;
++     }
++     sprintf(buf, "%d", u->gemsize_k >> 10);
++     if (vget(i, 16, "®e¶q¤W­­(KB)", buf, 12, GCARRY))
++     {
++       int gemsize = atoi(buf);
++       if (gemsize > 0)
++         x.gemsize_k = gemsize << 10;
++     }
++   }
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [35;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m218-163-206-115.HINET-IP.hinet.net[m

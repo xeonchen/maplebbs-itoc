@@ -1,0 +1,42 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: Maple_itoc
+¼Ð  ÃD: Re: Âà´«¥­¥xªº°ÝÃD
+µo«H¯¸: °Ê¤O®Ö¤ß (04/02/04 00:31:45 Fri)
+
+¡° ¤Þ­z¡mBlackJoker (ÂP­ù)¡n¤§»Ê¨¥¡G
+> ­ìwinª©¥»ªºMaple BBS ­n§ï¬[¦blinux
+> ½Ð°Ý­ìgem usr brd src µ¥  ¸ê®Æ ­n¦p¦ó©ñ¨ìlinux©O
+
+  0. ¥H¤U³£¬O¥H¨Ï¥ÎªÌ±b¸¹ bbs ªº¨­¤À°õ¦æ
+
+  1. ©ó Cygwin °õ¦æ
+
+    % cd /home
+    % tar cfz /tmp/bbs.tgz bbs
+
+  2. ¤W¶Ç bbs.tgz ¨ì FreeBSD/Linux
+     (°²³]©ñ¦b /tmp/bbs.tgz)
+
+  3. ¦b FreeBSD/Linux ¤W§ì MapleBBS-3.10-DATE-PACK.tgz
+     (°²³]©ñ¦b /tmp/MapleBBS-3.10-PACK-SRC.tgz)
+
+  4. ©ó FreeBSD/Linux °õ¦æ
+
+    % cd /tmp
+    % tar xfz /tmp/MapleBBS-3.10-DATE-SRC.tgz
+
+    % cd /home
+    % tar xfz /tmp/bbs.tgz
+
+    % cd /home/bbs
+    % rm -rf src
+    % cp -rf /tmp/src ./
+
+    % cd /home/bbs/src
+    % make clean linux install
+
+--
+  ¤Ï¥¿­ì«h´N¬O¡usrc/ ´«¥t¤@ª©¥»ªº¡A¨ä¥LªF¦è«h³£¤£ÅÜ¡v
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

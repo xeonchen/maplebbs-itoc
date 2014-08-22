@@ -1,0 +1,63 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: itoc
+¼Ð  ÃD: [¤å¥ó] ½u¤W¤H¼Æ mrtg ¹Ïªí
+µo«H¯¸: Àº¤Ñ±^ (Wed, 17 Sep 2003 22:30:08 +0800 (CST))    Updated: 2003/09/17
+
+: src/util/Makefile
+
+EXE =   ... [1;33mshowNum[m
+
+: src/util/showNum.c ·s¼W¦¹µ{¦¡
+
+#include "bbs.h"
+
+static UCACHE *ushm;
+
+static inline void
+init_ushm()
+{
+  ushm = shm_new(UTMPSHM_KEY, sizeof(UCACHE));
+}
+
+int
+main()
+{
+  init_ushm();
+  printf("0\n%d\n0\n0\n", ushm->count);
+  exit(0);
+}
+
+
+·íµM mrtg »P apache ­n¥ý¦w¸Ë¦n......
+
+±N ~bbs/bin/showNum ½Æ»s¨ì /usr/home/mrtg/bin/showNum
+
+½s¿è¤@­Ó mrtg ªº cfg ÀÉ®×...  ¤º®e¦p¤U...
+
+Target[BBS]: `/usr/home/mrtg/bin/showNum`   # ­n¬Ý§A§â showNum ©ñ­þ¸Ì
+MaxBytes[BBS]: 2500                         # ³q±`¥Î MAXACTIVE
+Title[BBS]: BBS ½u¤W¤H¼Æ MRTG ¹Ï
+PageTop[BBS]: BBS ½u¤W¤H¼Æ MRTG ¹Ï
+Options[BBS]: gauge, growright
+YLegend[BBS]: BBS OnLine
+ShortLegend[BBS]: ¤H
+WorkDir: /usr/home/mrtg/www/bbs             # ¦Û­q...  ·íµM apache ­n¯à¦s¨ú
+LegendO[BBS]: ½u¤W¤H¼Æ
+Language: big5
+
+¼g¤J¨t²Î crontab ¤¤......  ¤º®eµø±¡ªp¦Ó©w......
+*/5 * * * * root /usr/local/bin/mrtg /usr/local/etc/mrtg/mrtg_bbs.cfg
+
+½d¨Ò¡G
+http://bbs.bio.ncue.edu.tw/mrtg/bbs/bbs.html
+
+--
+[0m[1mùÝùùùùùùùùùùùùùùùùùß[35m®É¶¡¤w°µ¤F¿ï¾Ü  ¤°»ò¤H¥s°µªB¤Í  °¸¦Ó¸IÀY  ¤ß±¡«o¯à¤@ÂI´N³q[0m
+[0m[1mùø[33;46m--[31m¡´[33m-¢w [37m¢c¢d[30m¢b  [37;40mùø[0;35m¦]¬°§Ú­Ì´¿¦³¹L  ²z·QÃþ¦üªº¥Í¬¡ ¤Ó¦h·P¨ü µ´«D¤T¨¥¨â»y¯à§Î®e[37m
+[0m[1mùø[33;46m¢¬¢x¢­      [37m¢c¢b[40mùø[0;34m¥i¯à¦³®É§Ú­ÌÅU¼{¤Ó¦h  ¤Ó¦h¨M©w»Ý­n§Ú­Ì¥h¿ï¾Ü[37m
+[m[1mùø[;34;46m¡t[1;32m¢¨¢© [;34;46m¡t[;32;46m¢¨¢©   [1;37;40mùø[m¾á¤ß·|¥Ç¿ù  Ãø§K·|¨ü®À  ©¯¦n¤@¸ô¤W¦³§A³­§Ú   [37m   ¡´   ¡´[0m
+[m[1mùø[32;46m¢¨¢i¢i¢©    ¢¨¢©[37;40mùø[m»P§A¤À¨Éªº§Ö¼Ö  ³Ó¹L¿W¦Û¾Ö¦³  ¦Ü¤µ§Ú¤´²`²`·P°Ê[37mùü[31m¡½[37mùý /[36m¡½[37mùû[0m
+[m[1mùø[;33;42m        ¢¨¢©    [1;37;40mùø[m¦n¤Í¦p¦P¤@®°µ¡  ¯àÅýµø³¥¤£¦P               [37;1m     //    \\[0m
+
+--
+ [1;44m¢z[42m¢q[m Or[1mig[30min[m: [42m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [31;47m micro.bio.ncue.edu.tw [m
+ [1;43m¢|[41m¢}[m A[1mut[30mho[mr: [1;36mBioStar [30m±q [35m163.23.212.99 [30mµoªí[m

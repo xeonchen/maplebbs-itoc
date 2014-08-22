@@ -1,0 +1,27 @@
+µo«H¤H: drewlin.bbs@bbs.seehere.idv.tw (¶¯¤¤¸ê¬ã93ªÀªø) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¦b¨Ï¥ÎªÌ²M³æ «ör ¶i¤J«H½c
+µo«H¯¸: seehere ÂÅ¦â¶Ç»¡ (22 Apr 2003 20:17:48 +0800)     Updated: 2003/05/01
+
+: ulist.c:ulist_readmail() ¥[¤J·s¨ç¦¡©ó ulist_ship() ¤U­±
+
+static int
+ulist_readmail(xo)
+  XO *xo;
+{
+  if (!cuser.userlevel)
+    return XO_NONE;
+
+  xover(XZ_MBOX);
+  return ulist_init(xo);
+}
+
+: ulist.c:ulist_cb[]
+
+  'S', ulist_ship,
++ 'b', ulist_readmail,
+
+--
+[0m[34m¡@[36;44;1mÂ[40mÅ[;34m¡@¡¯[34m**¡C£»¡î¡L¡ï**[0;34m¡¯**¡C£»[1m¡î¡L¡C£»¡î¡L¡ï¡C£»[0;34m¡î¡C[1m£»¡î¡L¡ï**¡¯¡¯¡C
+[0m[34m¡@[36;44;1m¦[40mâ[;34m¡@¡@¡@[34m¢s¢r¢s[0;34m¢r[1m¢s¢r¢s[0;34m¢r[1m¡» Origin : [36mÂÅ¦â¶Ç»¡[34m¡@bbs.seehere.idv.tw[0m
+[0m[34m¡@[36;44;1m¶[40mÇ[;34m¡@¡@¢s¢r[34m¢s¢r[0;34m¢s[1m¢r¢s¢r¡º From :[0m [30;1m61-222-227-131.HINET-IP.hinet.net
+[0m[34m¡@[36;44;1m»[40m¡[;34m¡@¡¯**[34m¡C£»¡î¡L¡ï**[0;34m¡¯**¡C[1m£»¡î¡L¡C£»¡î¡L¡ï[0;34m¡C£»¡î[1m¡L¡C£»¡î[0;34m¡L¡ï**[1m¡¯¡¯[0m

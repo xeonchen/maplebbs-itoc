@@ -1,0 +1,116 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¤ÈÄ±¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: Re: [­×§ï]§â.USR©ñ¤Jshm¸Ì
+µo«H¯¸: ¤ë¤U©]·Q (2003/12/17 Wed 02:43:23)                Updated: 2005/03/18
+
+¡° ¤Þ­z¡mamaki (¤ÈÄ±¦Ï)¡n¤§»Ê¨¥¡G
+>   2. Â²¤Æ¾ã²zusernoªº¤u§@¡AÅÜ¦¨¥u»Ý­n¼g¤@¤äÂ²³æªºutility§Y¥i§¹¤u(À³¸Ó«Ü¦n¼g¡A
+>      ´N¬O¶}±ÒshmµM«á¶}©l³v¤@§â.USRªº¦ì¸m¶ñ¤J.ACCT¸Ì¡A¥u¦³¤£¥¿½Tªº¤~­n§ï)¡C
+
+  ©ñ¦bcrontab¸Ì©w´Á¶]¡A¤£­n¨C¤Ñ¶]¡A³o«Ü¾ÞµwºÐªº-_-;;;
+
+/*-------------------------------------------------------*/
+/* util/checkUSERNO.c   ( NTHU CS MapleBBS Ver 3.00 )    */
+/*-------------------------------------------------------*/
+/* target : -??auserno                                   */
+/* author : amaki.bbs@luna.twbbs.org                     */
+/* create : 03/12/16                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+#include "bbs.h"
+
+static SCACHE *schema_shm;
+
+
+int
+main()
+{
+  int fd, count, c, dirty = 0;
+  SCHEMA *sch, *sch_set, *seek_set, *shm_set;
+  struct stat st;
+
+  chdir(BBSHOME);
+
+  schema_shm = shm_new(SCHESHM_KEY, sizeof(SCACHE));
+
+  fd = open(FN_SCHEMA, O_RDONLY, 0600);  /* amaki.ÁÙ¨S¦³.USR¨º·Ç³Æ­Ë¯¸¤F */
+  fstat(fd, &st);
+
+  /* amaki. °²³]¦³300­Ó©t¨àID¥B¨S¦³¥ô¦óªÅ¶¡¥i¥Î */
+  count = st.st_size + sizeof(SCHEMA) * 300;
+  seek_set = sch = (SCHEMA *) malloc(count);
+  read(fd, sch, count);
+  count = count / sizeof(SCHEMA);
+  close(fd);
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    char buf[64];
+    struct dirent *de;
+    DIR *dirp;
+
+    sprintf(buf, BBSHOME "/usr/%c", c);
+    chdir(buf);
+
+    if (!(dirp = opendir(".")))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      ACCT cuser;
+      char *fname;
+
+      fname = de->d_name;
+      if (*fname <= ' ' || *fname == '.')
+        continue;
+
+      sprintf(buf, "%s/.ACCT", fname);
+      if ((fd = open(buf, O_RDWR | O_CREAT, 0600)) < 0);
+        continue;
+      f_exlock(fd);
+
+      memset(&cuser, 0, sizeof(ACCT));
+      read(fd, &cuser, sizeof(cuser));
+      sch_set = sch + cuser.userno - 1;
+      if (strncmp(sch_set->userid, cuser.userid, strlen(cuser.userid))
+      {                 /* amaki.©t¨àID */
+        dirty = 1;
+        do
+        {
+          if (!seek_set->userid[0])
+          {
+            shm_set = schema_shm->schema + (seek_set - sch);
+            strcpy(shm_set->userid, cuser.userid);
+            strcpy(seek_set->userid, cuser.userid);
+            shm_set->uptime = seek_set->uptime = time(0);
+
+            cuser.userno = (seek_set - sch) + 1;
+            lseek(fd, -sizeof(ACCT), SEEK_CUR);
+            write(fd, &cuser, sizeof(ACCT));
+            break;
+          }
+        } while (++seek_set < sch + count);
+      }
+      f_unlock(fd);
+      close(fd);
+    }
+    closedir(dirp);
+  }
+
+
+  if (dirty)
+  {
+    chdir(BBSHOME);
+    unlink(FN_SCHEMA);
+    if (seek_set < sch + schema_shm->number)
+      rec_add(FN_SCHEMA, sch, sizeof(SCHEMA) * schema_shm->number);
+    else
+      rec_add(FN_SCHEMA, sch, sizeof(SCHEMA) *
+        (schema_shm->number = seek_set - sch + 1));
+  }
+  free(sch);
+}
+
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

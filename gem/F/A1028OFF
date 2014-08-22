@@ -1,0 +1,26 @@
+µo«H¤H: itoc.bbs@kulu.twbbs.org (¦Ñ¤Ò¤lªºÀY?!), ¬ÝªO: itoc
+¼Ð  ÃD: [¤å¥ó] ¤À¯¸¾÷¨î
+µo«H¯¸: ©BÂP©BÂP¤õÁç¯¸ (Mon Jun  3 15:55:10 2002)         Updated: 2002/06/03
+
+  ¦pªG¬O¹³ kkcity ¨º¼Ëªº¤À¯¸¾÷¨î
+  ¥Î board ¨Ó§ï´N¥i¥H¤F
+  ¦]¬° user ¬O¦@¥Îªº
+
+  1. brd_fpath()
+     sprintf(fpath, "brd/%s/%s", sitename, brdname);
+
+  2. gem_fpath()
+     sprintf(fpath, "gem/brd/%s/%s", sitename, brdname);
+
+  3. ask_board()
+     vget(sitename);
+     vget(brdname);
+
+  4. ¨C¶i¤J¤@­Ó¡u¯¸¡v
+     ´N­«·s board_main()
+     f_img(sitename.img, &fsize);
+
+  5. ¨ä¥L¬É­±ªº§ïÅÜ
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

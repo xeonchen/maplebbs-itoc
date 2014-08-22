@@ -1,0 +1,74 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (§Ú¦b­úª_....²\ºw...) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¤å³¹¦¬¿ýºëµØ°Ï¥[¤W¼Ð°O¢ï¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Fri, 22 Aug 2003 17:46:42 +0800 (CST))  Updated: 2006/07/07
+
+    ¦¹µ{¦¡¥i¥HÅýªO¥D¦Û¦æ¼Ð°O¦¬¨ìºëµØ°Ïªº¤å³¹¡A´N¹³¢õ¤@¼Ë¡C
+
+    «öÁä¦Û³]¡A¤º³]¬O Ctrl + G
+
+==============================================================================
+
+: hdr.h
+
+- #define POST_3        0x00000004
++ #define POST_GEM      0x00000004  /* ¦¬¿ýºëµØ°Ï¼Ð°O */
+
+: post.c:post_attr()
+
++ if ((bbstate & STAT_BOARD) && (mode & POST_GEM))      /* ªO¥D¤~¬Ý±o¨ì G/B */
++  attr |= (mode & POST_MARKED ? 'B' : 'G');        /* ­Y¦³ mark+gem¡AÅã¥Ü B */
++ else
+
+#ifdef HAVE_LABELMARK
+  if (mode & POST_DELETE)
+    attr |= 'T';
+  else
+#endif
+
+: post.c:post_gem_mark()    ·s¼W¾ã¤ä¨ç¦¡¦b post_mark() ¤U­±
+
+static int
+post_gem_mark(xo)       /* qazq.030822: ¦¬¿ýºëµØ°Ï¼Ð°O */
+  XO *xo;
+{
+  if (bbstate & STAT_BOARD)
+  {
+    HDR *hdr;
+    int pos, cur, xmode;
+
+    pos = xo->pos;
+    cur = pos - xo->top;
+    hdr = (HDR *) xo_pool + cur;
+    xmode = hdr->xmode;
+
+#ifdef HAVE_LABELMARK
+    if (xmode & POST_DELETE)    /* «Ý¬åªº¤å³¹¤£¯à mark */
+      return XO_NONE;
+#endif
+
+    hdr->xmode = xmode ^ POST_GEM;
+    currchrono = hdr->chrono;
+
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono);
+    move(3 + cur, 7);
+    outc(post_attr(hdr));
+
+    return pos + 1 + XO_MOVE;   /* ¸õ¦Ü¤U¤@¶µ */
+  }
+  return XO_NONE;
+}
+
+
+: post.c:post_cb[]
+
++ Ctrl('G'), post_gem_mark, /* qazq.030822: ¦¬¿ýºëµØ°Ï¼Ð°O */
+
+
+: post.c:xpost_cb[]
+
++ Ctrl('G'), post_gem_mark, /* qazq.030822: ¦¬¿ýºëµØ°Ï¼Ð°O */
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m bbs.cs.nchu.edu.tw [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-251-124.HINET-IP.hinet.net [30mµoªí[m

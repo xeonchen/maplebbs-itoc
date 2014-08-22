@@ -1,0 +1,136 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] Âù­«»{ÃÒ
+µo«H¯¸: µL¦W¤p¯¸ (2006/03/31 Fri 18:02:59)                Updated: 2007/05/18
+
+[­×¥¿] user.c »Ý¯¸ªø¼f®Öµù¥U³æ«á¤~ºâµù¥U¦¨¥\ ¡ö¢{
+                                               ¢x
+ °w¹ï¦¹½g°µ²Ó¸`­×¥¿ ­×¥¿¹L»{ÃÒ«á±H°e«H¥ó¤º®e ¢s¢}
+ ¹ï©ó­ì­×¥¿¤å¤º®e»¡©ú¤å¦r¯Êº|¸É»ô ¨Ñ¦U¦ì°Ñ¦Ò ¢}
+
+  ¥ý§¹¦¨ Email »{ÃÒ¡A¤~¯à¶ñµù¥U³æ
+  µù¥U³æ¼f®Ö³q¹L«á¤~¯à®³¨ì PERM_VALID
+
+
+[32m:/src/include/perm.h ·s¼WÅv­­[m
+- #define PERM_9          0x00000100
++ #define PERM_MVALID     0x00000100      /* VALID ªì¨B»{ÃÒ */
+
+
+[1;32m![m#define STR_PERM        "bctpjm#x[1;32mM[m------@PTCM--L*B#-RACBS"
+
+- "«O¯d",                       /* PERM_9 */
++ "³q¹Lªì¨B»{ÃÒ",               /* PERM_MVALID */
+
+
+[32m:/src/include/global.h[m  [32m(¦P®É·s«ØÀÉ®×etc/mjustified)[m
+  #define FN_ETC_JUSTIFIED  "etc/justified"
++ #define FN_ETC_MJUSTIFIED "etc/mjustified"
+
+  #define MSG_REG_VALID   "±z¤w¸g³q¹L¨­¤À»{ÃÒ¡A½Ð­«·s¤W¯¸"
++ #define MSG_REG_MVALID  "±z¤w¸g³q¹Lªì¨B»{ÃÒ¡A½Ð­«·s¤W¯¸"
+
+  VAR char *msg_reg_valid INI(MSG_REG_VALID);
++ VAR char *msg_reg_mvalid INI(MSG_REG_MVALID);
+
+
+[32m:/src/so/admutil.c:a_xfile()[m
+-   "»{ÃÒ³q¹L³qª¾",
++   "³q¹L§¹¾ã»{ÃÒ",
++   "³q¹Lªì¨B»{ÃÒ",
+
+    FN_ETC_JUSTIFIED,
++   FN_ETC_MJUSTIFIED,
+
+
+[32m:/src/daemon/bmtad.c:bbs_valid()[m
+
+  /* ´£¤ÉÅv­­ */
+- acct.userlevel |= PERM_VALID;
++ acct.userlevel |= PERM_MVALID;
+
+- if (!hdr_stamp(folder, HDR_LINK, &hdr, FN_ETC_JUSTIFIED))
++ if (!hdr_stamp(folder, HDR_LINK, &hdr, FN_ETC_MJUSTIFIED))
+
+
+[32m:/src/util/mailpost.c:verify_user()[m
+-  acct.userlevel |= PERM_VALID;
++  acct.userlevel |= PERM_MVALID;
+
+
+[32m:/src/util/mailpost.c:justify_user()[m
+
+-  if (!hdr_stamp(fpath, HDR_LINK, &hdr, FN_ETC_JUSTIFIED))
++  if (!hdr_stamp(fpath, HDR_LINK, &hdr, FN_ETC_MJUSTIFIED))
+   {
+-    strcpy(hdr.title, "±z¤w¸g³q¹L¨­¤À»{ÃÒ¤F¡I");
++    strcpy(hdr.title, "±z¤w¸g³q¹Lªì¨B»{ÃÒ¤F¡I");
+
+
+[32m:/src/maple/user.c:do_pop3()[m
+-     acct_setperm(&acct, PERM_VALID, 0);
++     acct_setperm(&acct, PERM_MVALID, 0);
+
+      /* ±H«H³qª¾¨Ï¥ÎªÌ */
+-     mail_self(FN_ETC_JUSTIFIED, str_sysop, msg_reg_valid, 0);
++     mail_self(FN_ETC_MJUSTIFIED, str_sysop, msg_reg_mvalid, 0);
+      cutmp->status |= STATUS_BIFF;
+-     vmsg(msg_reg_valid);
++     vmsg(msg_reg_mvalid);
+
+
+[32m:/src/maple/user.c:u_verify()[m
+
+- if (HAS_PERM(PERM_VALID))
++ if (HAS_PERM(PERM_MVALID))
+  {
+-   zmsg("±zªº¨­¤À½T»{¤w¸g§¹¦¨¡A¤£»Ý¶ñ¼g»{ÃÒ½X");
++   zmsg("±zªºªì¨B½T»{¤w¸g§¹¦¨¡A¤£»Ý¶ñ¼g»{ÃÒ½X");
+
+-         acct_setperm(&acct, PERM_VALID, 0);
++         acct_setperm(&acct, PERM_MVALID, 0);
+
+        /* ±H«H³qª¾¨Ï¥ÎªÌ */
+-       mail_self(FN_ETC_JUSTIFIED, str_sysop, msg_reg_valid, 0);
++       mail_self(FN_ETC_MJUSTIFIED, str_sysop, msg_reg_mvalid, 0);
+
+-       vmsg(msg_reg_valid);
++       vmsg(msg_reg_mvalid);
+
+
+[32m:/src/maple/user.c:u_register()[m
+
++ if (!HAS_PERM(PERM_MVALID))
++ {
++   zmsg("±z©|¥¼³q¹Lªì¨B»{ÃÒ¡AµLªk¶ñµù¥U³æ");
++   return XEASY;
++ }
+
+[32m:/src/maple/bbsd.c:login_level()[m
+
+#ifdef JUSTIFY_PERIODICAL
+    if ((level & PERM_VALID) && (cuser.tvalid + VALID_PERIOD < ap_start))
+    {
+-     level ^= PERM_VALID;
++     level &= ~PERM_VALID;
++     level &= ~PERM_MVALID; /* ª½±µ®³°£VALID & MVALID */
+                             /* ­«·s»{ÃÒ ¸ê®Æ³£update  */
+
+      /* itoc.011116: ¥D°Êµo«H³qª¾¨Ï¥ÎªÌ¡A¤@ª½°e«H¤£ª¾¹D·|¤£·|¤Ó¯ÓªÅ¶¡ !? */
+      mail_self(FN_ETC_REREG, str_sysop, "±zªº»{ÃÒ¤w¸g¹L´Á¡A½Ð­«·s»{ÃÒ", 0);
+    }
+#endif
+
+³Ì«á ·íµM§O§Ñ¤F­×¥¿¥H¤UÀÉ®× ¤å¦r»¡©ú¤º®e
+
+etc/justified
+etc/mjustified
+gem/@/@notify
+gem/@/@e-mail
+
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î [37m61-231-204-84.dynamic.hinet.net[30m®ü[m

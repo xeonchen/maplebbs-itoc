@@ -1,0 +1,64 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (:MM:), ¬ÝªO: plan
+¼Ð  ÃD: Re: Ãö©ó®ð¶H³ø§iªº¥\¯à..
+µo«H¯¸: XEON (Mon, 03 Mar 2003 00:56:07 +0800 (CST))      Updated: 2003/03/19
+
+¡° ¤Þ­z¡malbert.bbs@rtbbs.twbbs.org (¤G¤Q¤@¤Ñ)¡n¤§»Ê¨¥¡G
+> ÁöµM¥Ø«e®ð¶H§½ºô­¶¤£¦A´£¨Ñ¤å¦r¼Ò¦¡ªº¹w³ø³æ¤F¡A
+> ¦ý¬O¨ä¹êÁÙ¬O¦³¹w³ø³æªº¡A¥u¬O¨S¦³Åã¥Ü¦bºô­¶¤W¦Ó¤w¡C
+> ©Ò¦³³Ì·sªº¤å¦r¼Ò¤Ñ®ð³ø§i¥i¥H¨ì¥H¤U¦ì§}¨ú±o
+> ftp://ftpsv.cwb.gov.tw/pub/forecast/
+> ¤£¹L¦]¬°­ì¥»ªº®ð¶H³ø§i¥\¯à¬O¥Î webx ¨ÓÅª¨úªº¡A
+> ¤£¤ä´© ftp protocol¡A©Ò¥H¥i¯àµ{¦¡­n§ï¤@¤U¤F¡C
+
+: crontab -e ¥[¤J
+
+# ®ð¶H³ø§i¡A¨C¤p®É§ì¤@¦¸
+1 * * * * src/sh/weather.sh > /dev/null 2>&1
+
+: src/sh/weather.sh ªº¤º®e (°O±o­n chmod 700 weather.sh)
+: /bin/lynx ¤]³\¬O /usr/local/bin/lynx¡A¬Ý¦Û¤vªº lynx ¸ô®|©ñ¦b­þ
+
+#!/bin/sh
+# lynx ªº¸ô®|½Ð¦Û¦æ§ï¡A³q±`¬O /bin/lynx ©Î /usr/local/bin/lynx
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W041.txt > gem/@/@W041
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W031.txt > gem/@/@W031
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W001.txt > gem/@/@W001
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W002.txt > gem/@/@W002
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W003.txt > gem/@/@W003
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W016.txt > gem/@/@W016
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W020.txt > gem/@/@W020
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W042.txt > gem/@/@W042
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W043.txt > gem/@/@W043
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W010.txt > gem/@/@W010
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W018.txt > gem/@/@W018
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W011.txt > gem/@/@W011
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W012.txt > gem/@/@W012
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W044.txt > gem/@/@W044
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W015.txt > gem/@/@W015
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W014.txt > gem/@/@W014
+/bin/lynx --source ftp://ftpsv.cwb.gov.tw/pub/forecast/W032.txt > gem/@/@W032
+
+: ¦bºëµØ¤½§GÄæ¸Ì Ctrl+P => (D)¸ê®Æ => ¼ÐÃD => W???
+: ¥H¤W¦U­ÓÀÉ®×¼ÐÃD¤À§O¬°
+
+     1  ¡º ¤¤¥¡®ð¶H§½²{¦b¤Ñ®ðÆ[´ú³ø§i                    @W041
+     2  ¡º ¤¤¥¡®ð¶H§½¹ê»Ú¤Ñ®ðÆ[´ú³ø§i                    @W031
+     3  ¡º ¹ê»Ú¤Ñ®ð·§ªp                                  @W001
+     4  ¡º ¤µ¤Ñ¥Õ¤Ñ¤Ñ®ð¹w³ø                              @W002
+     5  ¡º ©ú¤é¥Õ¤Ñ¤Ñ®ð¹w³ø                              @W003
+     6  ¡º ¤¤¥¡®ð¶H§½®ð¶H³ø§i                            @W016
+     7  ¡º ©ú©]¦Ü«á¤Ñ­â±á¤Ñ®ð                            @W043
+     8  ¡º ¤Ñ®ðµÎ¾A«×«ü¼Æ¹w³ø¡]¥Ò¡^                      @W020
+     9  ¡º ¤Ñ®ðµÎ¾A«×«ü¼Æ¹w³ø¡]¤A¡^                      @W032
+    10  ¡º ¤@¶g¤Ñ®ð¹w³ø                                  @W011
+    11  ¡º ¤@¶g®È¹C¤Ñ®ð¹w³ø                              @W012
+    12  ¡º ¤@¶g¹A·~®ð¶H¹w³ø                              @W044
+    13  ¡º °ê»Ú¦U¥D­n³£¥«¤Ñ®ð¹w³ø                        @W010
+    14  ¡º ¤j³°¥D­n«°¥«¤Ñ®ð¹w³ø                          @W018
+    15  ¡º ¤µ©]¦Ü©ú¤Ñ²M±á¤Ñ®ð¹w³ø                        @W042
+    16  ¡º ¤ëªø´Á¤Ñ®ð®i±æ                                @W014
+    17  ¡º ©uªø´Á¤Ñ®ð®i±æ                                @W015
+
+--
+    [1;32m¢~¢w¢w Origin ¢¡ [33;45m °Ê¤O®Ö¤ß [37m processor.tfcis.org [32;40m ¡ã £_£`£a ¢w¢w¢q[m
+    [1;32m¢q     Author ¢£ [36mitoc.Dorm-GD2.NCTU.edu.tw[m

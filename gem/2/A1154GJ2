@@ -1,0 +1,40 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] Cross-Post ¥ÎÃº»@³æªº¤è¦¡ ?
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/05 Tue 12:01:25)                Updated: 2005/04/05
+
+¡° ¤Þ­z¡mallean.bbs@micro.bio.ncue.edu.tw (allean)¡n¤§»Ê¨¥¡G
+>     ¦³¨Ç¨Ï¥ÎªÌ¤£·Qµ¥¤T¤Ñ.¯à¤£¯à¸ò ptt ¤@¼Ë.
+>     ¥ÎÃº»@³æªº¤è¦¡.¸Ñ¶}Åv­­ ?
+
+  ¦b°±Åv®É¶¡¥¼º¡®É¡A¥i¥ÎÃº¶O¨Ó´£«e´_Åv
+
+: user.c:u_deny()
+
+    else
+    {
+      ptime = gmtime(&diff);
+      sprintf(msg, "±zÁÙ­nµ¥ %d ¤Ñ %d ®É %d ¤À %d ¬í",
+        ptime->tm_yday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+      vmsg(msg);
+
++     if (!HAS_STATUS(STATUS_COINLOCK) &&
++       cuser.money >= 100000 &&            [1;44m //»ù®æ¦Û©w [m
++       vans("¬O§_Ãº¿ú´£«e¸Ñ°£°±Åv¡H[N] ") == 'y')
++     {
++       if (acct_load(&acct, cuser.userid) >= 0)
++       {
++         cuser.money -= 100000;            [1;44m //»ù®æ¦Û©w [m
++         time(&acct.tvalid);
++#ifdef JUSTIFY_PERIODICAL
++         acct_setperm(&acct, 0, PERM_ALLVALID | PERM_ALLDENY);
++#else
++         acct_setperm(&acct, 0, PERM_ALLDENY);
++#endif
++         vmsg("¤U¦¸½Ð¤Å¦A¥Ç");
++       }
++     }
+    }
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

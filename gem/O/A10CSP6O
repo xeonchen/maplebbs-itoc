@@ -1,0 +1,308 @@
+µo«H¤H: hialan.bbs@processor.tfcis.org (hialan) ¬ÝªO: plan
+¼Ð  ÃD: yahoo ½u¤W¦r¨å
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/02/16 Mon 03:09:02)                Updated: 2004/02/16
+
+¤§«e chwaian ´£¨Ñ¤F¦n´X­Ó..
+
+§Ú§â­ì¥ý dreye.c §ï¤@§ïÅý¥L¤ä´© Yahoo ªº½u¤W¦r¨å
+
+°Ñ¦Ò¯¸:
+telnet://at.twbbs.org --> ¦UºØªA°È -> ¨|¼Ö¤¤¤ß -> ©_¼¯¦r¨å
+
+
+/*-------------------------------------------------------*/
+/* dict.c        (YZU WindTopBBS Ver 3.02 )              */
+/*-------------------------------------------------------*/
+/* target : Yahoo ½u¤W¦r¨å                               */
+/* create : 01/07/09                                     */
+/* update :   /  /                                       */
+/* author : statue.bbs@bbs.yzu.edu.tw                    */
+/* change : hialan.bbs@venice.twbbs.org                  */
+/*-------------------------------------------------------*/
+
+#if 0
+
+  ´¶³q
+  http://tw.dictionary.yahoo.com/word/hello
+
+  ¤ù»y
+  http://tw.dictionary.yahoo.com/word/hello?t=i
+
+  ¦P¸q¦r/¤Ï¸q¦r
+  http://tw.dictionary.yahoo.com/word/hello?t=s
+
+#endif
+
+
+#include "bbs.h"
+
+#ifdef HAVE_NETTOOL
+
+#define mouts(y,x,s)        { move(y,x); outs(s); }
+
+#define HTTP_PORT           80
+#define SERVER_yahoo        "tw.dictionary.yahoo.com"
+#define CGI_yahoo           "/word/"
+#define REF                "http://tw.dictionary.yahoo.com/"
+
+
+static void
+url_encode(dst, src)        /* URL encoding */
+  uschar *dst;              /* Thor.990331: ­n src ªº¤T­¿ªÅ¶¡ */
+  uschar *src;
+{
+  for (; *src; src++)
+  {
+    if (*src == ' ')
+      *dst++ = '+';
+    else if (is_alnum(*src))
+      *dst++ = *src;
+    else
+    {
+      register cc = *src;
+      *dst++ = '%';
+      *dst++ = radix32[cc >> 4];
+      *dst++ = radix32[cc & 0xf];
+    }
+  }
+  *dst = '\0';
+}
+
+
+static void
+write_file(sockfd, fp)
+  int sockfd;
+  FILE *fp;
+{
+  static char pool[2048];
+  int cc, i;
+  char *xhead, *xtail;
+  int show, start_show;
+  int space;                /* ¦b html ¤¤¡A³sÄòªº space ¥u·|ºâ¤@¦¸ */
+
+  char *start_str[] =
+  {
+    "<!-- view content_start-->",
+    "<!-- end show top-->",
+    "<!--end 650 footer-->",
+    NULL
+  };
+
+  char *stop_str[] =
+  {
+    "<!-- show top-->",
+    "<!--begin 650 footer-->",
+    NULL
+  };
+
+  char *newline_str[] =         /* ¨ú¥N´«¦æ¦r¤¸ªº²Å¸¹ */
+  {
+    "<br>",
+    "</td>",
+    "</li>",
+    "<blockquote>",
+    NULL
+  };
+
+  /* parser return message from web server */
+  xhead = pool;
+  xtail = pool;
+  show = 1;
+  start_show=0;
+  space = 0;
+
+  for (;;xhead++)
+  {
+    if (xhead >= xtail)
+    {
+      xhead = pool;
+      cc = read(sockfd, xhead, sizeof(pool));
+      if (cc <= 0)
+        break;
+      xtail = xhead + cc;
+    }
+
+    if (!start_show)
+    {
+      for (i = 0; start_str[i] != NULL; i++)
+      {
+        if (!str_ncmp(xhead, start_str[i], strlen(start_str[i])))
+        {
+          start_show = 1;
+          xhead += strlen(start_str[i]);
+          break;
+        }
+      }
+    }
+    else if (start_show)
+    {
+      for (i = 0; stop_str[i] != NULL; i++)
+      {
+        if (!str_ncmp(xhead, stop_str[i], strlen(stop_str[i])))
+        {
+          start_show = 0;
+          xhead += strlen(stop_str[i]);
+          break;
+        }
+      }
+    }
+
+    if (!start_show)
+      continue;
+
+    for (i = 0; newline_str[i] != NULL; i++)
+    {
+      if (!str_ncmp(xhead, newline_str[i], strlen(newline_str[i])))
+      {
+        fputc('\n', fp);
+        xhead += strlen(newline_str[i]);
+        space = 0;
+        break;
+      }
+    }
+
+    if (!str_ncmp(xhead, "&nbsp;", 6))
+    {
+      fputc(' ', fp);
+      xhead += 6;
+      space = 0;
+    }
+
+    if (!str_ncmp(xhead, "&#169;", 6))
+    {
+      fputs("(C)", fp);
+      xhead += 6;
+      space = 0;
+    }
+
+    if (!str_ncmp(xhead, "<li>", 4))
+    {
+      fputs("  £»", fp);
+      xhead += 4;
+      space = 0;
+    }
+
+    /* ¼ÐÅÒ²¤¹L */
+
+    cc = *xhead;
+    switch(cc)
+    {
+    case '<':
+      show = 0;
+      continue;
+    case '>':
+      show = 1;
+      continue;
+    case '\n':
+    case '\r':
+      continue;
+    case ' ':
+      if (space)
+        continue;
+      space = 1;
+    }
+
+    if (show)
+      fputc(cc, fp);
+
+    if (cc != ' ')
+      space = 0;
+  }
+  fputc('\n', fp);
+}
+
+
+static int
+http_conn(server, s)
+  char *server;
+  char *s;
+{
+  int sockfd;
+  FILE *fp;
+  char fname[64], *str;
+
+  if ((sockfd = dns_open(server, HTTP_PORT)) < 0)
+  {
+    vmsg("µLªk»P¦øªA¾¹¨ú±o³sµ²¡A¬d¸ß¥¢±Ñ");
+    return 0;
+  }
+  else
+  {
+    mouts(22, 0, "¥¿¦b³s±µ¦øªA¾¹¡A½Ðµy«á(«ö¥ô·NÁäÂ÷¶}).............");
+    refresh();
+  }
+  write(sockfd, s, strlen(s));
+  shutdown(sockfd, 1);
+
+  sprintf(fname, "tmp/%s.yahoo_dict", cuser.userid);
+
+  fp = fopen(fname, "w");
+
+  str = strchr(s + 4, ' ');
+
+  if (str)
+    *str = '\0';
+  fprintf(fp, "¸Ó­¶³sµ²: http://%s%s\n\n", server, s + 4);
+
+  write_file(sockfd, fp);
+  fclose(fp);
+
+  close(sockfd);
+  more(fname, NULL);
+  unlink(fname);
+  return 0;
+}
+
+
+static void
+yahoo_dict(word, ans)
+  char *word;
+  char ans;
+{
+  char atrn[256], sendform[512];
+  char ue_word[90];
+
+  url_encode(ue_word, word);
+
+  if (ans == '2' || ans == '3')
+    sprintf(atrn, "%s?t=%c", ue_word, ans == '2' ? 's' : 'i');
+  else
+    sprintf(atrn, "%s", ue_word);
+
+  sprintf(sendform, "GET %s%s HTTP/1.0\n\n", CGI_yahoo, atrn);
+
+  http_conn(SERVER_yahoo, sendform);
+}
+
+
+int
+main_dreye()
+{
+  char ans[5];
+  char word[30];
+
+  while (1)
+  {
+    clear();
+    move(0, 23);
+    outs("\033[1;37;44m¡· Yahoo! ½u¤W¦r¨å v0.1 ¡·\033[m");
+    move(3, 0);
+    outs("¦¹¦r¨å¨Ó·½¬° Yahoo! ½u¤W¦r¨å¡C\n");
+    prints("WWW: %s\n", REF);
+    outs("author: statue.bbs@bbs.yzu.edu.tw\n");
+    if (!vget(8, 0, "¬d¸ß¦r·J¡G", word, 30, DOECHO))
+      break;
+
+    if (vget(9, 0, "1)·N¸q 2)¤ù»y 3)¦P¸q¦r/¤Ï¸q¦r Q)Â÷¶} [1] ", ans, 3, LCECHO) == 'q')
+      break;
+
+    yahoo_dict(word, ans[0]);
+  }
+
+  return 0;
+}
+#endif  /* HAVE_NETTOOL */
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mhialan [30m±q [35m61-229-111-30.HINET-IP.hinet.net [30mµoªí[m

@@ -1,0 +1,80 @@
+§@ªÌ: itoc (¤Ó¶§ªá¨à~) ¯¸¤º: plan
+¼ÐÃD: [¤å¥ó] showSTRUCT ªº¤èªk
+®É¶¡: Sat Dec 21 02:14:54 2002                          Updated: 2006/03/15
+
+  ½Õ¾\¨Ï¥ÎªÌµù¥U³æ
+
+: src/util/Makefile
+
+EXE =   ... [1;33mshowRFORM[m
+
+: src/util/showRFORM.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/showRFORM.c     ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : show register form                           */
+/* create : 01/10/05                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+/* syntax : showRFORM [target_user]                      */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+static void
+showRFORM(r)
+  RFORM *r;
+{
+  printf("¥Î¤á½s¸¹¡G%d\n", r->userno);
+  printf("¶ñªí®É¶¡¡G%s\n", Btime(&r->rtime));
+  printf("¥Ó½Ð¥N¸¹¡G%s\n", r->userid);
+  printf("ªA°È³æ¦ì¡G%s\n", r->career);
+  printf("¥Ø«e¦í§}¡G%s\n", r->address);
+  printf("³sµ¸¹q¸Ü¡G%s\n", r->phone);
+  printf("¼f®Ö¯¸ªø¡G%s\n", r->agent);
+  printf("°h¥ó²z¥Ñ¡G%s\n", r->reply);
+  printf(MSG_SEPERATOR "\n");
+}
+
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  int show_allrform;
+  RFORM rform;
+  FILE *fp;
+
+  if (argc < 2)
+    show_allrform = 1;
+  else
+    show_allrform = 0;
+
+  chdir(BBSHOME);
+
+  if (!(fp = fopen(FN_RUN_RFORM_LOG, "r")))
+    return -1;
+
+  while (fread(&rform, sizeof(RFORM), 1, fp) == 1)
+  {
+    if (show_allrform || !str_cmp(rform.userid, argv[1]))
+      showRFORM(&rform);
+  }
+
+  fclose(fp);
+
+  return 0;
+}
+
+
+  ³o¬[ºc©M showBRD.c ¬O§¹¥þ¤@¼Ëªº
+  ©Ò¦³ªº record ¥]¬A PAL/ALOHA/BRD/ACCT/VCH/MF/... ³£¥i¥H¦pªkªw»s¼g¤@°¦µ{¦¡
+  ´N¥u­n§ï 1.¸ô®| 2.STRUCT 3.showSTRUCT()
+  ¤T­Ó³¡¤À§Y¥i
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

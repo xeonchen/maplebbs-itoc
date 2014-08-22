@@ -1,0 +1,56 @@
+µo«H¤H: itoc.bbs@bbs.wretch.cc (°Ú°Ú°Ú°Ú~) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]±K¤åÂà«H¦³°ÝÃD
+µo«H¯¸: µL¦W¤p¯¸ (2005/09/10 Sat 00:29:19)                Updated: 2005/09/10
+
+¡° ¤Þ­z¡mallen501pc.bbs@bbs.sa.ncyu.edu.tw (¤­ªê­n¨«¦Û¤vªº­·®æ!)¡n¤§»Ê¨¥¡G
+> ¦ý¬O§ÚÁÙ¬O·|ÅÜ¦¨±K¤å¥i¥HÂà«H,¬O«ç»ò¦^¨Æ?
+> §Ú³oÃäªº¯¸¬Opost§¹¤å³¹«á,¤â°Ê«ö¤U^y¥[±Kªº...
+
+  ¦]¬°post§¹¤å³¹«á¡A«H´N¤w¸g½T©w­nÂà¥X¥h¤F
+  ¦¹®É¤â°Ê«ö¤U^y¬O¤£·|¸TÂà¥X¥h¤F
+
+  post§¹¤å³¹«á^xÀx¦s®É¡A¿ï (X)Refuse¥[±K¦sÀÉ ©Î [L]ocal¦s¬°¯¸¤ºÀÉ
+  ´N¤£·|Âà¥X¥h¤F
+
+  ¦pªG§A§Æ±æ post ¤å³¹«á¦A ^y ªº¤å³¹¯à¤£Âà¥X¥h
+  ¨º»ò³o¼Ë§ï
+
+: bbslink.c:deal_sover()
+
+  if (bntp->chrono > 0)         /* ·s«H */
+  {
++   int fd;
++   char folder[64];
++   HDR hdr;
+
+    mtime = bntp->chrono;
++   brd_fpath(folder, board, FN_DIR);
++   if ((fd = open(folder, O_RDONLY)) >= 0)
++   {
++     while (read(fd, &hdr, sizeof(HDR)) == sizeof(HDR))
++     {
++       if (mtime == hdr.chrono)
++       {
++         if (hdr.xmode & POST_RESTRICT)
++         {
++           close(fd);
++           return;
++         }
++         break;
++       }
++     }
++     close(fd);
++   }
+    str_ncpy(sover.title, bntp->title, sizeof(sover.title));
+    sprintf(sover.msgid, "%s$%s@" MYHOSTNAME, filename, board);
+  }
+
+
+  ¦ý¬O ^y ªº°Ê§@ÁÙ¬O­n§Ö¡A­n¤£µM­Y ctrontab ©w®É bbslink ¤wÂà¥X¥h
+  ¨º¤]¨Ó¤£¤Î¤F
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H¤£¬p [37mitoc.Dorm11.NCTU.edu.tw[30m®ü[m

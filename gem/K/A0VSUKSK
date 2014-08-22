@@ -1,0 +1,30 @@
+§@ªÌ: itoc (League) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¨t²Î­t¸ü
+®É¶¡: 2003/12/04 Thu 23:32:03                           Updated: 2003/12/04
+
+  ¬Y¨Ç§@·~¨t²Î¥i¯à¨S¦³ getloadavg() ªº¥\¯à
+  ¨º»ò´N¤£¯à¨Ï¥Î
+
+: admutil.c:a_sysload() ·s¼W¦b a_resetsys() «e­±
+
+int
+a_sysload()
+{
+  char buf[80];
+
+  double load[3];
+  getloadavg(load, 3);
+
+  /* ³o¤T­Ó¼Æ­È¤À§Oªí¥Ü¹L¥h 1, 5, 15 ¤ÀÄÁªº­t¸ü */
+  sprintf(buf, "¨t²Î­t¸ü %.2f %.2f %.2f", load[0], load[1], load[2]);
+  vmsg(buf);
+  return XEASY;
+}
+
+: menu.c:menu_admin[]
+
++ "bin/admutil.so:a_sysload", PERM_ALLADMIN, - M_SYSTEM,
++ "Load       ¢« ¨t²Î­t¸ü ¢¨",
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

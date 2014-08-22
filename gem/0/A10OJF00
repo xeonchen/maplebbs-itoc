@@ -1,0 +1,31 @@
+µo«H¤H: chwaian.bbs@cpu.tfcis.org (µL¨¥) ¬ÝªO: plan
+¼Ð  ÃD: «öTAB¶i¤J¤Q¤j¼öªù¸ÜÃD
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/11/04 Thu 11:55:21)                Updated: 2004/11/04
+
+¦b¹ï©¤¬Y­ÓBBS¬Ý¨ì³o­Ó¥\¯à Ä±±o«Ü¹ê¥Î´N®³¶i¨Ó¤F
+
+µ{¦¡½X¥u¦³´X¦æ @_@
+
+: board.c:day_line() ·s¼W¦¹¨ç¦¡¦b Select() «á­±
+
+static int
+class_dayline(xo)
+  XO *xo;
+{
+  more("gem/@/@-day", NULL);    /* ¤µ¤é¼öªù¸ÜÃD */
+
+  return class_head(xo);
+}
+
+: board.c:class_cb[]
+
+#ifdef MY_FAVORITE
+  'a', class_addMF,
+  'f', class_MF,
+#endif
++  KEY_TAB, class_dayline,       /* ¤µ¤é¼öªù¸ÜÃD */  [1;44m // «öÁä¦Û©w [m
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mchwaian [30m±q [31m61-216-216-171.dynamic.hinet.net [30mµoªí[m

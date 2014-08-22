@@ -1,0 +1,30 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð±Ðnocemªº³]©w
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/09/07 Tue 18:56:37)                Updated: 2004/09/07
+
+¡° ¤Þ­z¡mtantu.bbs@Deer.twbbs.org (¤Ñ¹Ï)¡n¤§»Ê¨¥¡G
+> ¦]¬°¨C¤Ñ­n¬Ý¤@¤U innd/ncmperm.bbs
+> ¨Ã¥B§â¦¬¨ìªºissue perm¥Ñno§ï¬°yes
+> ¬O§_¦³¤°»ò¿ìªk,¥i¥HÅý¦¬¨ìªºissue perm¦Û°Ê¥þ¬°yes ?
+
+: nocem.c:NCMupdate()
+
+static void
+NCMupdate(issuer, type)
+  char *issuer, *type;
+{
+  ncmperm_t ncm;
+
+  memset(&ncm, 0, sizeof(ncmperm_t));
+  str_ncpy(ncm.issuer, issuer, sizeof(ncm.issuer));
+  str_ncpy(ncm.type, type, sizeof(ncm.type));
+- ncm.perm = 0;
++ ncm.perm = 1;
+  rec_add("innd/ncmperm.bbs", &ncm, sizeof(ncmperm_t));
+  read_ncmperm();
+}
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

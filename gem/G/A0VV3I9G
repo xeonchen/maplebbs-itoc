@@ -1,0 +1,40 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: Ãö©ó§ë²¼¨t²Î...
+®É¶¡: 2003/12/31 Wed 02:46:02                           Updated: 2005/04/12
+
+¡° ¤Þ­z¡mdavidliu.bbs@bbs.sjsmit.edu.tw (David)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¤@¤UMapleBBS itocª©©Ò´£¨Ñªº§ë²¼¨t²Î¬O§_·|±N
+> ¦P¤@E-Mail»{ÃÒ¦ý¤£¦PIDªº¨Ï¥ÎªÌµø¬°¦P¤@¤H¦Ó¤£±o­«½Æ§ë²¼?
+
+: strcut.h:VLOG
+
+typedef struct
+{
+  char userid[IDLEN + 1];
++ char email[60];
+  char numvotes;                /* §ë´X±i */
+  usint choice;
+}      VLOG;
+
+: vote.c:vote_join()
+
+  /* ¥[¤J°O¿ýÀÉ */
+  memset(&vlog, 0, sizeof(VLOG));
+  strcpy(vlog.userid, cuser.userid);
++ strcpy(vlog.email, cuser.email);
+  vlog.numvotes = count;
+  vlog.choice = choice;
+
+: vote.c:vlog_seek()
+
+-     if (!strcmp(old.userid, cuser.userid))
++     if (!strcmp(old.userid, cuser.userid) ||
++         !str_cmp(old.email, cuser.email))
+      {
+        rc = 1;
+        break;
+      }
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

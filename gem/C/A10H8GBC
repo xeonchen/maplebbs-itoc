@@ -1,0 +1,66 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¦Ï¥¤¨ÑÀ³°Ó) ¬ÝªO: plan
+¼Ð  ÃD: Re: ÅýAnnounce¬ÝªOºëµØ°Ïtitle¸òµÛªO¥Dªº­×§ï¶]
+µo«H¯¸: ¤ë¤U©]·Q (Thu, 15 May 2003 01:17:51 +0800 (CST))  Updated: 2005/04/12
+
+  ³o¼ËªO¥D§ï¥DÃD¡A(A)nnounce¡÷Class ´N·|¸òµÛ§ï:)
+
+: maple.p
+
+int brd_new(BRD *brd);
++ void brd_classchange(char *folder, char *oldname, BRD *newbrd);
+void brd_edit(int bno);
+
+: acct.c:brd_classchange()
+
+- static void
++ void
+brd_classchange(folder, oldname, newbrd)
+  char *folder;
+  char *oldname;
+  BRD *newbrd;
+
+: manage.c:post_brdtitle()
+
+    if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+    {
+      memcpy(oldbrd, &newbrd, sizeof(BRD));
+      rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
++     brd_classchange("gem/@/@"CLASS_INIFILE, oldbrd->brdname, &newbrd);
+      return XO_HEAD;
+    }
+
+: acct.c:brd_edit()
+
+    if (!brd_set(&newbh, 11))
+    {
+      if (memcmp(&newbh, bhdr, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+      {
+        bname = bhdr->brdname;
+        if (strcmp(bname, newbh.brdname))
+        {
+          char src[64], dst[64];
+          /* Thor.980806: ¯S§Oª`·N¦pªG board¤£¦b¦P¤@partitionùØªº¸Ü·|¦³°ÝÃD */
+          gem_fpath(src, bname, NULL);
+          gem_fpath(dst, newbh.brdname, NULL);
+          rename(src, dst);
+          rename(src + 4, dst + 4);
+-         brd_classchange("gem/@/@"CLASS_INIFILE, bname, &newbh);
+        }
+        memcpy(bhdr, &newbh, sizeof(BRD));
+        rec_put(FN_BRD, &newbh, sizeof(BRD), bno, NULL);
++       brd_classchange("gem/@/@"CLASS_INIFILE, bname, &newbh);
+      }
+    }
+
+: acct.c:brd_title()
+
+    if (vans("¬O§_­×§ï¤¤¤åªO¦W±Ô­z(Y/N)¡H[N] ") == 'y')
+    {
+      vget(b_lines, 0, "¬ÝªO¥DÃD¡G", newbh.title, BTLEN + 1, GCARRY);
+      memcpy(bhdr, &newbh, sizeof(BRD));
+      rec_put(FN_BRD, &newbh, sizeof(BRD), bno, NULL);
++     brd_classchange("gem/@/@"CLASS_INIFILE, bhdr->brdname, &newbh);
+    }
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

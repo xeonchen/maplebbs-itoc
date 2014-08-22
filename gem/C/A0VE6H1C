@@ -1,0 +1,394 @@
+§@ªÌ: itoc (¤Ó¶§ªá¨à~) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¹wÄý
+®É¶¡: Sun Dec 22 17:29:07 2002                          Updated: 2006/04/17
+
+  [µù] °µ¤F¥»¥\¯à·s¼W¡A´NµL»Ý°µ "¬ÝªO»¡©ú" ³o½g¥\¯àªº·s¼W
+
+  ­º¥ý·s¼W¬ÝªO»¡©úªºµ{¦¡
+
+: global.h
+
+#define FN_VCH          ".VCH"          /* vote control header */
+#define FN_NOTE         "note"          /* ¶iªOµe­± */
+[1;33m+[m #define FN_EXPLAIN      "explain"       /* ¬ÝªO»¡©ú */
+
+: global.h
+
+VAR char *fn_plans      INI(FN_PLANS);
+VAR char *fn_note       INI(FN_NOTE);
+[1;33m+[m VAR char *fn_explain    INI(FN_EXPLAIN);
+
+: board.c:class_explain() ·s¼W³o¨ç¦¡¦b class_help() ¤§«e
+
+static int
+class_explain(xo)
+  XO *xo;
+{
+  int mode, chn;
+  char *img, *str;
+  short *chp, *chx;
+  char fpath[64], brdname[BNLEN + 1], *blist;
+  BRD *brd;
+
+  chp = (short *) xo->xyz + xo->pos;
+  chn = *chp;
+
+  if (chn >= 0)     /* ¤@¯ë¬ÝªO */
+  {
+    brd = bshm->bcache + chn;
+    blist = brd->BM;
+    if (!(blist[0] > ' ' && is_bm(blist, cuser.userid)))
+      return XO_NONE;
+  }
+  else              /* ¤ÀÃþ¸s²Õ */
+  {
+    if (!HAS_PERM(PERM_ALLBOARD))
+      return XO_NONE;
+  }
+
+  mode = vans("¬ÝªO»¡©ú (D)§R°£ (E)­×§ï (Q)¨ú®ø¡H[E] ");
+  if (mode != 'q')
+  {
+    if (chn >= 0)
+    {
+      brd_fpath(fpath, brd->brdname, fn_explain);
+    }
+    else
+    {
+      img = class_img;
+      chx = (short *) img + (CH_END - chn);
+      str_ncpy(brdname, img + *chx, IDLEN + 1);
+      if (str = strchr(brdname, '/'))         /* skip '/' */
+        *str = '\0';
+      sprintf(fpath, "run/%s.%s", fn_explain, brdname);
+    }
+
+    if (mode == 'd')
+    {
+      unlink(fpath);
+    }
+    else
+    {
+      if (vedit(fpath, 0))  /* Thor.981020: ª`·N³Qtalkªº°ÝÃD */
+        vmsg(msg_cancel);
+      return class_head(xo);
+    }
+  }
+  return XO_FOOT;
+}
+
+: board.c:class_cb[]
+
+[1;33m+[m 'l', class_explain,         [1;44m // «öÁä¦Û©w [m
+  'h', class_help,
+
+> ---------------------------------------------------------------- <
+
+  ±µ¤U¨Ó·s¼W xo_knee() ªº³¡¤À
+
+  §â XO ®æ¦¡§ï¦¨ head + neck + body + knee + foot
+  ¨ä¤¤ knee ¬O¹wÄý
+  ¨Ï¥ÎªÌ¦b¬ÝªO¦Cªí/¤å³¹¦Cªí/¨Ï¥ÎªÌ¦W³æ/¦n¤Í¦W³æ/...µ¥¦a¤è«ö !
+  ¤Á´«¹wÄý¼Ò¦¡¡A¥i¥H¹wÄý¤å³¹/Query/¬ÝªO»¡©ú/...
+
+: modes.h
+
+#define XO_RSIZ         256             /* max record length */
+[1;31m-[m #define XO_TALL         (b_lines - 3)
+
+: global.h
+
+VAR int b_lines;                /* bottom line */
+[1;33m+[m VAR int XO_TALL;                /* page size = b_lines - 3 */
+
+: bbsd.c:term_init()
+
+  else
+  {
+    b_lines = 23;
+    b_cols = 79;
+  }
+
+  d_cols = b_cols - 79;
+
+[1;33m+[m XO_TALL = b_lines - 3;
+}
+
+: visio.c:iac_count()
+
+      /* fuse.030518: ½u¤W½Õ¾ãµe­±¤j¤p¡A­«§ì b_lines */
+      if ((*look) == TELOPT_NAWS)
+      {
+[1;33m+[m       int knee;
+[1;33m+[m       knee = XO_TALL == b_lines - 7;
+        b_lines = ntohs(* (short *) (look + 3)) - 1;
+        b_cols = ntohs(* (short *) (look + 1)) - 1;
+        if (b_lines >= T_LINES)
+          b_lines = T_LINES - 1;
+        else if (b_lines < 23)
+          b_lines = 23;
+        if (b_cols >= T_COLS)
+          b_cols = T_COLS - 1;
+        else if (b_cols < 79)
+          b_cols = 79;
+        d_cols = b_cols - 79;
+[1;33m+[m       XO_TALL = knee ? b_lines - 7 : b_lines - 3;
+      }
+
+: talk.c
+
+[1;31m-[m static pickup ulist_pool[MAXACTIVE];
+[1;33m+[m pickup ulist_pool[MAXACTIVE];
+static int pickup_ship = 0;     /* 0:¬G¶m !=0:¤Í½Ë±Ô­z */
+
+: board.c
+
+[1;31m-[m static char *class_img;
+[1;33m+[m char *class_img;
+static XO board_xo;
+BRD *xbrd;
+
+: xover.c:xover()
+
+    else if (cmd >= '1' && cmd <= '9')
+    {
+      cmd = xo_jump(cmd, zone);
+    }
+[1;33m+[m   else if (cmd == '!')
+[1;33m+[m   {
+[1;33m+[m     XO_TALL = (XO_TALL == b_lines - 3) ? b_lines - 7 : b_lines - 3;
+[1;33m+[m     cmd = XO_LOAD;
+[1;33m+[m   }
+    else
+
+: xover.c:xover()
+
+    if (xo->max > 0)            /* Thor:­Y¬OµLªF¦è´N¤£show¤F */
+    {
+      num = 3 + pos - xo->top;
+      move(num, 0);
+      outc('>');
+[1;33m+[m     xo_knee(xo, zone);
+    }
+
+: xover.c:preview_file()
+: xover.c:preview_userid()
+: xover.c:preview_tip()
+: xover.c:xo_knee()
+
+  ³o¨Ç¨ç¦¡¥[¦b xover() ¤§«e­±
+
+static void
+preview_file(fpath, skipline)
+  char *fpath;
+  int skipline;
+{
+  int i;
+  char buf[ANSILINELEN], *str;
+  FILE *fp;
+
+  if (!(fp = fopen(fpath, "r")))
+    return;
+
+  for (i = 0; i < skipline; i++)        /* ²¤¹L«e´X¦æ */
+    fgets(buf, ANSILINELEN, fp);
+
+  for (i = 0; i < 3;)                   /* ¹wÄý¤T¦æ */
+  {
+    if (fgets(buf, SCR_WIDTH + 1, fp))
+    {
+      if (*buf == '>' || *buf == '\n')
+        continue;
+      if (i == 2)
+      {
+        if (str = strchr(fpath, '\n'))
+          *str = '\0';  /* §â '\n' ´«¦¨ '\0'¡AÁ×§K§â foot ¦Y¤F */
+      }
+      outx(buf);
+      i++;
+    }
+    else
+      break;
+  }
+
+  outs(str_ransi);      /* ÁÙ­ì ansi-code Á×§K¤å³¹¸Ì­±¨S¦³ÁÙ­ì */
+  fclose(fp);
+}
+
+
+static void
+preview_userid(userid)
+  char *userid;
+{
+  ACCT acct;
+
+  acct_load(&acct, userid);
+  prints("%s(%s) ¤W¯¸ %d ¦¸¡A¤å³¹ %d ½g¡A%s³q¹L¨­¤À»{ÃÒ\n",
+    userid, acct.username, acct.numlogins, acct.numposts,
+    acct.userlevel & PERM_VALID ? "¤w¸g" : "©|¥¼");
+  prints("¤W¦¸(%s)¨Ó¦Û(%s)", Btime(&acct.lastlogin), acct.lasthost);
+}
+
+
+static void
+preview_tip()
+{
+  int i, j, msg_num;
+  char msg[128];
+  FILE *fp;
+
+  if (!(fp = fopen(FN_ETC_TIP, "r")))
+    return;
+
+  fgets(msg, 128, fp);
+  msg_num = atoi(msg);         /* ²Ä¤@¦æ°O¿ýÁ`½g¼Æ */
+  i = time(0) % msg_num + 1;
+  j = 0;
+
+  while (j < i)                        /* ¨ú²Ä i ­Ó tip */
+  {
+    fgets(msg, 128, fp);
+    if (msg[0] == '#')
+      j++;
+  }
+
+  fgets(msg, 128, fp);
+  outs(msg);
+  fgets(msg, 128, fp);
+  outs(msg);
+  fclose(fp);
+}
+
+
+static void
+xo_knee(xo, zone)
+  XO *xo;
+  int zone;
+{
+  int cur;
+  char fpath[64];
+
+  if (XO_TALL == b_lines - 3)
+    return;
+
+  for (cur = b_lines - 4; cur < b_lines; cur++)
+  {
+    move(cur, 0);
+    clrtoeol();
+  }
+  move(b_lines - 4, 0);
+  prints("%s\n", msg_seperator);
+
+  cur = xo->pos - xo->top;
+
+  switch (zone)
+  {
+  /* ------------ */
+  /* ¹wÄý¬ÝªO»¡©ú */
+  /* ------------ */
+  case XZ_CLASS:
+    {
+      short *chp;
+      int chn;
+      chp = (short *) xo->xyz + xo->pos;
+      chn = *chp;
+      if (chn >= 0)     /* ¤@¯ë¬ÝªO */
+      {
+        extern BCACHE *bshm;
+        brd_fpath(fpath, (bshm->bcache + chn)->brdname, fn_explain);
+      }
+      else              /* ¤ÀÃþ¸s²Õ */
+      {
+        extern char *class_img;
+        char *img, *str;
+        short *chx;
+        char brdname[IDLEN + 1];
+        img = class_img;
+        chx = (short *) img + (CH_END - chn);
+        str_ncpy(brdname, img + *chx, IDLEN + 1);
+        if (str = strchr(brdname, '/'))     /* skip '/' */
+          *str = '\0';
+        sprintf(fpath, "run/%s.%s", fn_explain, brdname);
+      }
+      preview_file(fpath, 0);
+    }
+    break;
+
+  /* ------------ */
+  /* ¹wÄý Query   */
+  /* ------------ */
+  case XZ_ULIST:
+    {
+      typedef UTMP *pickup;
+      extern pickup ulist_pool[];
+      preview_userid(ulist_pool[xo->pos]->userid);
+    }
+    break;
+
+  case XZ_PAL:
+    preview_userid(((PAL *) xo_pool + cur)->userid);
+    break;
+
+#ifdef HAVE_ALOHA
+  case XZ_ALOHA:
+    preview_userid(((ALOHA *) xo_pool + cur)->userid);
+    break;
+#endif
+
+  case XZ_BMW:
+    preview_userid(((BMW *) xo_pool + cur)->userid);
+    break;
+
+  /* ------------ */
+  /* ¹wÄý¤å³¹«H¥ó */
+  /* ------------ */
+  case XZ_XPOST:
+  case XZ_MBOX:
+  case XZ_POST:
+    {
+      HDR *hdr;
+      hdr = (HDR *) xo_pool + cur;
+      if (hdr->xmode & POST_RESTRICT)
+        break;
+      hdr_fpath(fpath, xo->dir, hdr);
+      preview_file(fpath, 4);
+    }
+    break;
+
+  /* ------------ */
+  /* ¹wÄý¤å³¹     */
+  /* ------------ */
+#ifdef HAVE_SONG
+  case XZ_SONG:
+#endif
+  case XZ_GEM:
+    {
+      HDR *hdr;
+      hdr = (HDR *) xo_pool + cur;
+      if (hdr->xmode & (GEM_FOLDER | GEM_RESTRICT))
+        break;
+      hdr_fpath(fpath, xo->dir, hdr);
+      preview_file(fpath, 4);
+    }
+    break;
+
+  /* ------------ */
+  /* ¹wÄý Tip     */
+  /* ------------ */
+  case XZ_VOTE:
+#ifdef MY_FAVORITE
+  case XZ_MF:
+#endif
+#ifdef HAVE_COSIGN
+  case XZ_COSIGN:
+#endif
+#ifdef HAVE_XYNEWS
+  case XZ_NEWS:
+#endif
+    preview_tip();
+    break;
+  }
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

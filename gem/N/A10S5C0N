@@ -1,0 +1,89 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] Â²Åé¤ä´© (3)
+®É¶¡: 2004/12/17 Fri 18:06:19                           Updated: 2004/12/17
+
+  Âù¦â¦r®É·|¥X¿ù¡A¤£¹L³o´Nºâ¤F :p
+
+: visio.c:prints()
+
+- for (str = buf; cc = *str; str++)
++ for (str = trans2gb ? b52gb(buf) : buf; cc = *str; str++)
+    outc(cc);
+
+: visio.c:outs()
+
++ if (trans2gb)
++   str = b52gb(str);
+
+  while (ch = *str)
+
+: visio.c:outx()
+
++ if (trans2gb)     /* ¦pªG¬OÂ²Åé´N¤£ outx ¤F¡A¬Ù³Â·Ð */
++ {
++   outs(str);
++   return;
++ }
+
+  while (ch = *str)
+
+: window.c:draw_line()
+
+  /* ¦L¥X (x, y) ¦Ü (x, y + strip_ansi_len(msg) - 1) */
+- ptr = msg;
++ ptr = trans2gb ? b52gb(msg) : msg;
+
+: post.c:hdr_outs()
+
++ if (trans2gb)
++ {
++   char tempid[IDLEN + 2];
++
++   str_ncpy(tempid, hdr->owner, sizeof(tempid));
++   if (mark = strchr(tempid, '@'))
++     *mark = '\0';
++   if (mark = strchr(tempid, '.'))
++     mark[1] = '\0';
++   prints("%-13.12s", tempid);
++ }
++ else
++ {
+    mark = hdr->owner;
+    len = IDLEN + 1;
+
+    ...
+    ...
+
+    while (len--)
+    {
+      outc(' ');
+    }
++ }
+
+  ...
+  ...
+
+  /* --------------------------------------------------- */
+  /* ¦L¥X¼ÐÃD                                            */
+  /* --------------------------------------------------- */
+
++ if (trans2gb)
++ {
++#ifdef HAVE_DECLARE
++   square = 0;         /* ¦pªG¬OÂ²Åé´N¤£ Declaration ¤F¡A¬Ù³Â·Ð */
++#endif
++   prints(" %.*s", cc, title);
++ }
++ else
++ {
+    mark = title + cc;
+    cc = ' ';
+
+    ...
+    ...
+
+    } while ((cc = *title++) && (title < mark));
++ }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

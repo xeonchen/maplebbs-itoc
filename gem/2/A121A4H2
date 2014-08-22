@@ -1,0 +1,414 @@
+µo«H¤H: lzch.bbs@lzch.twbbs.org (³á­C) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] dict.c Yahoo! ½u¤W¦r¨å
+µo«H¯¸: ¢°¢³¢°¢¶ (2006/03/13 Mon 13:03:08)                Updated: 2006/03/13
+
+: src/game/Makefile
+
+SO = ......  tetris.so [1;33;40mdict.so[m
+
+.o.so:  ;  ......   .so -L../lib -ldao [1;33;40m-L/usr/local/lib -liconv[m
+
+freebsd:
+        @$(MAKE) CC=gcc ......  -I../include [1;33;40m-I/usr/local/include[m" $(SO)
+
+: src/game/dict.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* dict.c        (YZU WindTopBBS Ver 3.02 )              */
+/*-------------------------------------------------------*/
+/* target : Yahoo ½u¤W¦r¨å                               */
+/* create : 01/07/09                                     */
+/* update :   /  /                                       */
+/* author : statue.bbs@bbs.yzu.edu.tw                    */
+/* change : hialan.bbs@venice.twbbs.org                  */
+/* change : lzch.bbs@snow.ice.ntnu.edu.tw 20060313       */
+/*-------------------------------------------------------*/
+
+#if 0
+
+  ´¶³q
+  http://tw.dictionary.yahoo.com/search?p=hello
+
+#endif
+
+
+#include "bbs.h"
+#include "iconv.h"
+
+#ifdef HAVE_NETTOOL
+
+#define mouts(y,x,s)        { move(y,x); outs(s); }
+
+#define HTTP_PORT           80
+#define SERVER_yahoo        "tw.dictionary.yahoo.com"
+#define CGI_yahoo           "/search?p="
+#define REF                "http://tw.dictionary.yahoo.com/"
+
+
+static int
+encode_from_utf8_to_big5_and_more_out(server, s)
+  char *server;
+  char *s;
+{
+  FILE *fin, *fout;
+  char *encFrom = "UTF-8", *encTo = "BIG-5";
+  char fname_utf[64], fname_big[64];
+  char bufin[1024], bufout[1024], *sin, *sout;
+  int lenin, lenout, i;
+  iconv_t c_pt;
+
+  sprintf(fname_utf, "tmp/%s.yahoo_dict", cuser.userid);
+  sprintf(fname_big, "tmp/%s.yahoo_dict.for_more", cuser.userid);
+
+  if ((fin = fopen(fname_utf, "rt")) == NULL) {
+    return -1;
+  }
+  if ((fout = fopen(fname_big, "wt")) == NULL) {
+    return -1;
+  }
+
+  if ((c_pt = iconv_open(encTo, encFrom)) == (iconv_t)-1) {
+    return -1;
+  }
+
+  while( fgets( bufin, 1024, fin ) != NULL ){
+      lenin = strlen(bufin);
+      lenout = 1024;
+      sin = bufin;
+      sout = bufout;
+      iconv( c_pt, &sin, &lenin, &sout, &lenout );
+
+      for( sin++, lenin--; lenin > 0; sin++, lenin--){
+          iconv( c_pt, &sin, &lenin, &sout, &lenout );
+      }
+
+      bufout[1024-lenout] = '\0';
+
+      /* skip DJ: []*/
+      if( !strncmp( bufout, " DJ: []", 7 )){
+              continue;
+      }
+      /* skip KK: []*/
+      if( !strncmp( bufout, " KK: []", 7 ) ){
+              continue;
+      }
+
+      /* ¹J¨ì¼ÐÃD */
+      if( !strncmp( bufout, "lzch_h200000000", 15 ) ){
+
+          /* §â«á­±ªº¦r©¿²¤±¼ (¦b¤@¤j°ïªÅ¥Õ«á­±) */
+          for( i = 0; strncmp( &bufout[i], "   ", 3 ) != 0 && i < 1024; i++ )
+              ;
+          bufout[i] = '\n';
+          bufout[i+1] = '\0';
+          fprintf( fout, "\n%s", bufout+15 ); /* µ¹¼ÐÃD¤@­Ó enter */
+
+          /* ³æ¦r»P¸ÑÄÀªº¤À¹j½u */
+          for( i = 0; i < 39; i++ ){
+              fprintf( fout, "¢w"  );
+          }
+          fprintf( fout, "\n"  );
+          continue;
+      }
+
+      /* ¹J¨ìÄ¶µü */
+      if( !strncmp( bufout, "lzch_explain000", 15 ) ){
+          fprintf( fout, "¡° %s", bufout+15 );
+          continue;
+      }
+
+      /* ¹J¨ìµü©Ê */
+      if( !strncmp( bufout, "lzch_pcixin0000", 15 ) ){
+          bufout[strlen(bufout) - 1] = '\0';
+          fprintf( fout, "> > %s < <\n", bufout+15 );
+          continue;
+      }
+
+      /* ´¶³qªº¿é¥X */
+      fprintf( fout, "%s", bufout );
+  }
+
+  fprintf(fout, "\n\n--\nYahoo!©_¼¯¦r¨å\nhttp://%s%s\n\n", server, s + 4);
+  fclose(fout);
+  more(fname_big, NULL);
+  unlink(fname_big);
+  iconv_close(c_pt);
+  fclose(fin);
+  fclose(fout);
+
+  return 0;
+}
+
+
+static void
+url_encode(dst, src)        /* URL encoding */
+  uschar *dst;              /* Thor.990331: ­n src ªº¤T­¿ªÅ¶¡ */
+  uschar *src;
+{
+  for (; *src; src++)
+  {
+    if (*src == ' ')
+      *dst++ = '+';
+    else if (is_alnum(*src))
+      *dst++ = *src;
+    else
+    {
+      register cc = *src;
+      *dst++ = '%';
+      *dst++ = radix32[cc >> 4];
+      *dst++ = radix32[cc & 0xf];
+    }
+  }
+  *dst = '\0';
+}
+
+
+static void
+write_file(sockfd, fp)
+  int sockfd;
+  FILE *fp;
+{
+  static char pool[2048];
+  int cc, i;
+  char *xhead, *xtail;
+  int show, start_show;
+  int space;                /* ¦b html ¤¤¡A³sÄòªº space ¥u·|ºâ¤@¦¸ */
+
+  char *start_str[] =
+  {
+    "<blockquote>",
+    NULL
+  };
+
+  char *stop_str[] =
+  {
+    "<div id=\"morevoc\">",
+    "<div id=\"emlist\">",
+    "</blockquote>",
+    "document.write(\"",
+    NULL
+  };
+
+  char *newline_str[] =         /* ¨ú¥N´«¦æ¦r¤¸ªº²Å¸¹ */
+  {
+    "<br>",
+    "</td>",
+    "<h2>",                   /* ¬d´Mªº³æ¦r lzch_h200000000 */
+    "<div class=chinese>",    /* ¤¤¤åµo­µ */
+    "<div class=peng>",       /* ­^¤å¨Ò¥y lzch_peng000000 */
+    "<div class=pchi>",       /* ­^¤å¨Ò¥yªºÂ½Ä¶ lzch_pchi000000 */
+    "<div class=pexplain>",   /* (­^)¤¤Ä¶ (¤¤)­^Ä¶ lzch_explain000 */
+    "<div class=ptitle>",     /* ¤¤¤å¦r¨å¸Ìªº­^¤å¬ÛÃö³æ¦r¡A­^¤å¦r¨å¸Ìªº­µ¼Ð */
+    "<div class=pcixin>",     /* µü©Ê lzch_pcixin0000 */
+    NULL
+  };
+
+  /* parser return message from web server */
+  xhead = pool;
+  xtail = pool;
+  show = 1;
+  start_show=0;
+  space = 0;
+
+  for (;;xhead++)
+  {
+    if (xhead >= xtail)
+    {
+      xhead = pool;
+      cc = read(sockfd, xhead, sizeof(pool));
+
+    /* lzch test */
+    /*  for( i = 0; i < 2048; i++ ){    fputc( pool[i], lzch );  } */
+
+      if (cc <= 0)
+        break;
+      xtail = xhead + cc;
+    }
+
+    if (!start_show)
+    {
+      for (i = 0; start_str[i] != NULL; i++)
+      {
+        if (!str_ncmp(xhead, start_str[i], strlen(start_str[i])))
+        {
+          start_show = 1;
+          xhead += strlen(start_str[i]);
+          break;
+        }
+      }
+    }
+    else if (start_show)
+    {
+      for (i = 0; stop_str[i] != NULL; i++)
+      {
+        if (!str_ncmp(xhead, stop_str[i], strlen(stop_str[i])))
+        {
+          start_show = 0;
+          xhead += strlen(stop_str[i]);
+          break;
+        }
+      }
+    }
+
+    if (!start_show)
+      continue;
+
+    for (i = 0; newline_str[i] != NULL; i++)
+    {
+      if (!str_ncmp(xhead, newline_str[i], strlen(newline_str[i])))
+      {
+        fputc('\n', fp);
+        if( !strncmp( xhead, "<h2>", 4 ) ){
+            fprintf( fp, "lzch_h200000000" ); /* ¼Ð°O¦¹¬°¼ÐÃD */
+        }
+        else if( !strncmp( xhead, "<div class=pcixin>", 18 ) ){
+            fprintf( fp, "lzch_pcixin0000" ); /* ¼Ð°O¦¹¬°µü©Ê */
+        }
+        else if( !strncmp( xhead, "<div class=pexplain>", 20 ) ){
+            fprintf( fp, "lzch_explain000" ); /* ¼Ð°O¦¹¬°Ä¶µü */
+        }
+        else if( !strncmp( xhead, "<br>\n<li>", 9 ) ){
+            fprintf( fp, "lzch_explain000" ); /* ¼Ð°O¦¹¬°Ä¶µü */
+        }
+        else if( !strncmp( xhead, "<div class=peng>", 16 ) ){
+        }
+        else if( !strncmp( xhead, "<div class=pchi>", 16 ) ){
+        }
+        else if( !strncmp( xhead, "<div class=ptitle>", 18 ) ){
+        }
+        xhead += strlen(newline_str[i]);
+        space = 0;
+        break;
+      }
+    }
+
+    /* ¼ÐÅÒ²¤¹L */
+    cc = *xhead;
+    switch(cc)
+    {
+    case '<':
+      show = 0;
+      continue;
+    case '>':
+      show = 1;
+      continue;
+    case '\n':
+    case '\r':
+      continue;
+    case ' ':
+      if (space)
+        continue;
+      space = 1;
+    }
+
+    if (show)
+      fputc(cc, fp);
+
+    if (cc != ' ')
+      space = 0;
+  }
+  fputc('\n', fp);
+}
+
+
+static int
+http_conn(server, s)
+  char *server;
+  char *s;
+{
+  int sockfd;
+  FILE *fp;
+  char fname[64], *str;
+
+  if ((sockfd = dns_open(server, HTTP_PORT)) < 0)
+  {
+    vmsg("µLªk»P¦øªA¾¹¨ú±o³sµ²¡A¬d¸ß¥¢±Ñ");
+    return 0;
+  }
+  else
+  {
+    mouts(22, 0, "¥¿¦b³s±µ¦øªA¾¹¡A½Ðµy«á(«ö¥ô·NÁäÂ÷¶}).............");
+    refresh();
+  }
+  write(sockfd, s, strlen(s));
+  shutdown(sockfd, 1);
+
+  sprintf(fname, "tmp/%s.yahoo_dict", cuser.userid);
+
+  fp = fopen(fname, "w");
+
+  str = strchr(s + 4, ' ');
+
+  if (str)
+    *str = '\0';
+
+  write_file(sockfd, fp);
+  fclose(fp);
+
+  close(sockfd);
+
+  if( encode_from_utf8_to_big5_and_more_out( server, s ) == -1 ){
+      more(fname, NULL);
+  }
+
+/*  more(fname, NULL);*/
+  unlink(fname);
+  return 0;
+}
+
+
+static void
+yahoo_dict(word)
+  char *word;
+{
+  char atrn[256], sendform[512];
+  char ue_word[90];
+
+  url_encode(ue_word, word);
+
+  sprintf(atrn, "%s", ue_word);
+
+  sprintf(sendform, "GET %s%s HTTP/1.0\n\n", CGI_yahoo, atrn);
+
+  http_conn(SERVER_yahoo, sendform);
+}
+
+
+int
+main_dreye()
+{
+  char word[30];
+
+  while (1)
+  {
+    clear();
+    move(0, 23);
+    outs("\033[1;37;44m¡· Yahoo! ½u¤W¦r¨å v0.1 ¡·\033[m");
+    move(3, 0);
+    outs("¦¹¦r¨å¨Ó·½¬° Yahoo! ½u¤W¦r¨å¡C\n");
+    prints("WWW: %s\n", REF);
+    outs("author: statue.bbs@bbs.yzu.edu.tw\n");
+    if (!vget(8, 0, "¬d¸ß¦r·J¡G", word, 30, DOECHO))
+      break;
+
+    yahoo_dict(word);
+  }
+
+  return 0;
+}
+#endif  /* HAVE_NETTOOL */
+
+
+==
+§Úªº OS ¬O freebsd 6.0 release
+linux §ï Makefile ªº¤èªk¥i¯à¤£¤Ó¤@¼Ë...
+code ¼gªº¤£¬O«Ü¦n¡AÁ`¤§¤èªk¬O¥Î iconv() §â yahoo ¦r¨åªº½s½XÂà¦¨ big5
+¦³¿³½ìªº¦A¦Û¤v§ï§a :)
+
+ÁÙ¬O¦³ bug ªº.. ¥u¬O§Ú¤£¤Óª¾¹D¬O¬°¤°»ò?? (¤£·|§ï°Õ...)
+
+http://xcin.linux.org.tw/i18n/pc2000/p4/node2.html
+http://netlab.cse.yzu.edu.tw/~statue/freebsd/zh-tut/converter.html#ICONV
+http://opensvn.csie.org/pttbbs/tags/stable.rc/docs/FAQ
+--
+[1;32m¡¼ Origin: [33mlzch.twbbs.org  [31m¡¼ From: [36m140.122.37.121[m

@@ -1,0 +1,25 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] µµÁô¦b¨Ï¥ÎªÌ¦W³æªºÃC¦âÅÜµµ¦â
+®É¶¡: Tue Jul 16 23:05:57 2002                          Updated: 2004/10/02
+
+¡° ¤Þ­z¡mjohnny.bbs@bbs.hwsh.ylc.edu.tw (¬õÀs)¡n¤§»Ê¨¥¡G
+> ©Ò¥H§Ú­Ì¤~·|·Q¡A¬O¤£¬OµµÁô®ÉIDÃC¦âÅÜ¦¨µµ¦âªº§r¡I
+> ¥H«K¿ëÃÑ¡I
+
+: ulist.c:ulist_item()
+
+  fcolor =
+#ifdef HAVE_BRDMATE
+    up->mode == M_READA && !strcmp(currboard, up->mateid) ? COLOR_BRDMATE :
+#endif
++   up->ufo & UFO_SUPERCLOAK ? "\033[35m" :
+    ftype & FTYPE_NORMAL ? COLOR_NORMAL :
+    ftype & FTYPE_BOTHGOOD ? COLOR_BOTHGOOD :
+    ftype & FTYPE_MYGOOD ? COLOR_MYGOOD :
+    ftype & FTYPE_OGOOD ? COLOR_OGOOD :
+    ftype & FTYPE_SELF ? COLOR_SELF :
+    ftype & FTYPE_MYBAD ? COLOR_MYBAD :
+    "";
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32ma128124.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

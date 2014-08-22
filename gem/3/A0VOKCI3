@@ -1,0 +1,164 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¤Ö°µ¡B¤Ö·Q¡B¦h©ñ¶}) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] Â²©öªºÅý¨Ï¥ÎªÌ°ÊºA§ó¸Ô²Ó¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Mon, 13 Oct 2003 02:22:47 +0800 (CST))  Updated: 2003/10/19
+
+    ¥Ø«e¦b¨Ï¥ÎªÌ¦Cªí©Ò¬Ý¨ìªº°ÊºA¡A¥þ³¡³£©w¸q¦b ~/src/include/modes.h
+
+    ¦Ó¦³¨Ç°ÊºA·|¥[¦b modes.h ©w¸qªº«á­±¡A¬O§Q¥Î cutmp->mateid ¿ì¨ìªº¡C
+
+    ©Ò¥H¥u­n§Q¥Î¤@­ÓªÅ¦r¦êªº mode ¥[¤WÀH®É¥i¥H­×§ïªº cutmp->mateid
+
+    ´N¥i¥HÅý¨Ï¥ÎªÌ¦W³æªº°ÊºA¦h¼Ë¤Æ¡C
+
+
+
+
+    ¤£¹L¦b¨Ï¥ÎªÌ¦Cªí©Ò¬Ý¨ìªº°ÊºA©M¬d¸ßµe­±ªº¤£¤Ó¤@¼Ë¡C
+
+    ¬d¸ßµe­±ªº¬O¤£§¹¾ãªº¡C¡]µLªkÅã¥Ü cutmp->mateid ¡^
+
+    ¨Ò¦p¡A¦Cªí¬Ý¨ì¡y¬d¸ßqazq¡z¡A¦ý¬O¬d¸ß¸Ó¨Ï¥ÎªÌªº°ÊºA¥u·|Åã¥Ü¡y¬d¸ß¡z¡C
+
+    ©Ò¥H talk.c ­n¬Û¹ïªº§@¤@¤U­×§ï¡C
+
+    ¤£µM¦]¬°¬O§Q¥Î¤@­ÓªÅªº mode¡A·|¾É­P¬d¸ß¨Ï¥ÎªÌªº®É­Ô´N·|¥X²{ªÅ¥Õ...
+
+    ¡]¤£§ï¨ä¹ê¤]¨S®t°Õ¡A¦Cªí¬O§¹¾ã¥¿½Tªº§Y¥i¡C ^^a¡^
+
+
+
+    ¤U­±¦³­×§ï¤èªk©M½d¨Ò...
+
+==============================================================================
+
+: src/include/modes.h
+
+  "©I¥s",           /* M_PAGE */
+  "¬d¸ß",           /* M_QUERY */
+[1;31m- "µo§b",           /* M_IDLE */
+[1;33m+ "",               /* M_IDLE */[m
+
+  "¨ä¥L"            /* M_XMODE */
+
+
+    ¦b³oÃä¡A§Ú¬Oª½±µ²{¦¨ªº M_IDLE §ï¦¨ªÅ¦r¦ê¡C
+
+    ¦]¬°¼vÅT¤£¤j....
+
+    ¤]¥i¥H¦Û¤v¥t¥~©w¸q¤@­Ó M_IDLE2 ¡]¦WºÙ¦Û¤v·Q§a :P¡^
+
+    ·íµM¡A¤U­±ªºµ{¦¡¦Û¤v´N­n°µ¤@¤U¬Û¹ïªº½Õ¾ã¡C
+
+    ¡]©Î³\ talk.c:bmode() ¤]­n°µ¤@¤U­×§ï....^^a¡^
+
+
+
+
+    ¤W­±ªº§ï¦n¤§«á¡A°ò¥»¤W´N¥i¥HÅý°ÊºA§ó¦h¼Ë¤Æ¤F.....
+
+    ¥u­n¦b­nÅã¥Ü°ÊºAªºµ{¦¡¤@¶i¤J¡A°¨¤W§â¥D°ÊºA§ï¦¨ M_IDLE
+
+    µM«á±µµÛ­×§ï cutmp->mateid
+
+    ¤U­±¬O½d¨Ò.....
+
+
+: src/so/dreye.c:main_dreye()
+
+int
+main_dreye()
+{
+  char ans[3];
+  char word[30];
+
+  clear();
+
+[1;33m+ utmp_mode(M_IDLE);            /* qazq.031011: ¥[¤J¸Ô²Ó°ÊºA */
+[1;33m+ strcpy(cutmp->mateid, "Ä¶ÂI³q¦r¨å");      [m
+
+  while (1)
+  {
+
+
+
+: src/maple/ulist.c:ulist_nickchange()
+
+  if (!cuser.userlevel)
+    return XO_NONE;
+
+  /* ¼ÊºÙ¬O cuser. cumtp-> ³£¤@°_´« */
+
+[1;33m+ utmp_mode(M_IDLE);            /* qazq.031011: ¥[¤J¸Ô²Ó°ÊºA */
+[1;33m+ strcpy(cutmp->mateid, "ÅÜ´«¼ÊºÙ¤¤");    [m
+
+  strcpy(buf, str = cuser.username);
+
+
+==============================================================================
+
+    °ò¥»¤W´N¬O³o¼Ë¡A¦b¶i¤J¸Óµ{¦¡ªº®É­Ô¡A´N°µ¥X³o¼Ëªº­×§ï....
+
+
+  utmp_mode(M_IDLE);
+  strcpy(cutmp->mateid, "XXXXXXXXXX");
+
+
+    XXXXXXXXXX ´N¬O·Q­nÅã¥Üªº°ÊºA¡C
+
+    [1;32;4m¤£¹L¡Iª`·N¡I³Ì¦h¥u¯à¢°¢¯­Ó¦r¤¸¡I¡I[m
+
+
+
+
+
+    [1m¤U­±ªº­×§ï¬O¬°¤FÅý¬d¸ßªº®É­Ô¥i¥H§¹¾ãÅã¥Ü°ÊºA¡C[m
+
+    ¥i°µ¥i¤£°µ...
+
+==============================================================================
+
+: src/maple/talk.c:do_query()
+
+  UTMP *up;
+  int userno;
+[1;32m![m char *userid[1;32m, buf[20][m;
+
+  .....
+  .....
+
+  up = utmp_find(userno);
+[1;33m+ if (up && can_see(cutmp, up))     /* qazq.031010: §¹¾ãªº¬d¸ß°ÊºAÅã¥Ü */[m
+[1;33m+ {[m
+[1;33m+   sprintf(buf, "%s%s", bmode(up, 1), [m
+[1;33m+     (up->mode >= M_TALK && up->mode <= M_IDLE) ? up->mateid : "");[m
+[1;33m+ }[m
+[1;33m+ else[m
+[1;33m+   sprintf(buf, "¤£¦b¯¸¤W");[m
+
+  .....
+  .....
+
+  prints("[»{ÃÒ] %s³q¹L»{ÃÒ [°ÊºA] %-16.16s [°]²£] %s%s\n",
+    acct->userlevel & PERM_VALID ? "¤w¸g" : "©|¥¼",
+[1;31m-   (up && can_see(cutmp, up)) ? bmode(up, 1) : "¤£¦b¯¸¤W",[m
+[1;33m+   buf, [m
+    fortune[rich],
+    m_query(userid) ? " \033[1;31m¦³·s«H¥ó\033[m" : "");
+
+: src/maple/talk.c:bmode()
+
+  if (mode == M_TALK)
+  {
+    /* itoc.020829: up ¦b Talk ®É¡A­Y up->mateid Áô§Î«h¬Ý¤£¨£ */
+    if (!utmp_get(mateid))
+      mateid = "µL¦W¤ó";
+  }
+
+[1;31m- sprintf(modestr, "%s:%s", word, mateid);[m
+[1;33m+ sprintf(modestr, "%s%s", word, mateid);   /* ®³±¼«_¸¹ */[m
+  return (modestr);
+}
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-216-137-57.HINET-IP.hinet.net [30mµoªí[m

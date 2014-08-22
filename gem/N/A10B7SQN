@@ -1,0 +1,47 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¦p¦ó¥[¤@¥\¯àÅv­­¡H
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/05/25 Tue 23:30:11)                Updated: 2002/05/26
+
+¡° ¤Þ­z¡mSnowAngel.bbs@wretch.twbbs.org (ÄÆµM¦ü³·)¡n¤§»Ê¨¥¡G
+>         ¦p¦ó¥[¤@¥\¯àÅv­­¡H
+
+: perm.h  ÀH«K¿ï¤@­ÓªÅªºÄæ¦ì¡A¨Ò¦p PERM_9¡A§ï¦¨ PERM_DENYRANGEDEL
+
+- #define PERM_9            0x00000100
++ #define PERM_DENYRANGEDEL 0x00000100
+
+  ...
+  ...
+
+  ¦pªG¿ïªº¬O PERM_9¡A¨º¨Ç´N¬O§ï STR_PERM ¹ïÀ³ªº²Ä¤E­Ó
+  §â - §ï¦¨¨ä¥L¥ô·N¦r¤¸
+
+
+- #define STR_PERM        "bctpjm#x-------@PTCM--L*B#-RACBS"
++ #define STR_PERM        "bctpjm#xa------@PTCM--L*B#-RACBS"
+
+  ...
+  ...
+
+  ³o­Ó¬O¦b³]©wÅv­­®É¥X²{ªº»¡©ú
+
+- "«O¯d",                       /* PERM_9 */
++ "¤£¯à¤j¢Ò",                   /* PERM_DENYRANGEDEL */
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ±µ¤U¨Ó´N¬Ý§A­n®³³o­ÓÅv­­°µ¤°»ò¨Æ¤F¡A¨Ò¦p
+
+>         ¥i¥H³]©w¬Y¨Ç¦³ªO¥DÅv­­ªºID
+>         ¤£¯à¨Ï¥Î¤jDªº¥\¯à¡A½Ð°Ý­n¦p¦ó­×§ï¡H
+
+: post.c:post_rangedel()
+
+- if (!(bbstate & STAT_BOARD))
++ if (!(bbstate & STAT_BOARD) || HAS_PERM(PERM_DENYRANGEDEL))
+    return XO_NONE;
+
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

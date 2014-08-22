@@ -1,0 +1,63 @@
+§@ªÌ: itoc (SS ­n§¹³J¤F) ¯¸¤º: plan
+¼ÐÃD: [°ÝÃD] ©w´Á²M±¼¹L°ªªº process
+®É¶¡: Sun Jan 12 00:24:10 2003
+
+¡° ¤Þ­z¡mYangwenli.bbs@bbs.sa.ncyu.edu.tw (·¨«Â§Q)¡n¤§»Ê¨¥¡G
+>     ³Ì«á¥u¦n¦Û¤v¼g­Ó¤pshell script¡A©w®É±N±Æ¦W«e¤T¦Wªº bbsd kill±¼¡C
+
+  §â³oµ{¦¡ gcc ¤@¤U
+  µM«á©ñ¶i crontab ©w®É¶]
+  ¥i¥H kill ±¼¶W¹L 5% ªº bbsd
+
+#include <stdio.h>
+
+#define THRESHOLD       5       /* top >= 5% ´N¬å */
+
+int
+main()
+{
+  int line;
+  FILE *fp;
+  char a[20], b[20], c[20], d[20], e[20], f[20];
+  char g[20], h[20], i[20], j[20], k[20];
+  char cmd[128], *str1, *str2;
+  char *tmpfile = "/tmp/killtop";
+
+  sprintf(cmd, "top | grep -w bbsd | sed -n '9,11p' > %s", tmpfile);
+  system(cmd);
+
+  if (!(fp = fopen(tmpfile, "r")))
+    return -1;
+
+  for (line = 9; line <= 11; line++)
+  {
+    if (fscanf(fp, "%s %s %s %s %s %s %s %s %s %s %s",
+      a, b, c, d, e, f, g, h, i, j, k) == 11)
+    {
+      if (((str1 = (char *) strchr(i, '.')) ||
+        (str1 = (char *) strchr(i, '%'))) &&
+        ((str2 = (char *) strchr(i, '.')) ||
+        (str2 = (char *) strchr(j, '%'))))
+      {
+        /* ¥h±¼ usage ªº . ©M % */
+        *str1 = '\0';
+        *str2 = '\0';
+
+        /* ­Y³o process ­t¸ü¹L°ª¡A´N kill ±¼ */
+        if (atoi(i) >= THRESHOLD || atoi(j) >= THRESHOLD)
+        {
+          /* ¥Î kill -9 ¥H§K¦º·í¤F¬å¤£±¼ */
+          sprintf(cmd, "kill -9 %s", a);
+          system(cmd);
+        }
+      }
+    }
+  }
+
+  fclose(fp);
+  unlink(tmpfile);
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

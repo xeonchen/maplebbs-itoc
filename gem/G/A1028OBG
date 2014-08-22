@@ -1,0 +1,23 @@
+§@ªÌ: games.bbs@help.cse.ttit.edu.tw (¨IºÎ¤¤), ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] refresh() ªº»¡©ú
+®É¶¡: ¯µ±K±¡¤H¸ê°T¯¸ (Fri May  5 17:12:23 1995)
+
+¡° ¤Þ­z¡yopus.bbs@bbs.cs.nthu (¯B¥Í­Y¹Ú)¡z¤§»Ê¨¥¡G
+: ½Ð°Ý refresh() ·f°t clrtoeol() ¸Ó«ç»ò¥Î¡A
+: §Ú¥Î°_¨Ó·|¥X²{´Ý¼v¡C
+
+  ½Ð¬Ý refresh(), visio.c §Q¥Î¤@­Óµ²ºc¦s©ñ¾ã­Ó¿Ã¹õªº¸ê®Æ, ©Ò¥H refresh()
+  ¥u°µ·sÂÂ¸ê®Æ¶¡ªº¤ñ¹ï, ¦pªG¦³¤£¦P¤~¦L¥X, ¦Ó¦ì¸m¬O¨úµ´¹ï¦ì§}, ¨S¦³¦Ò¼{¨ì
+  ANSI ½Xªº±¡§Î...
+
+  Á|¨Ò :  °²³]¥Ø«e¿Ã¹õ¬°    [1234567890]
+            ­n»\±¼ªº¦r¬°    [*[1;33mabc]
+
+          µ²ªG·|ÅÜ¦¨        [[1;33mabc[m4567890]
+
+  ¦]¬° refresh() »{¬°¤w¸g³£»\±¼¤F... ¦ý¹ê»Ú¤W¥Ñ©ó ANSI ½Xªº¼vÅT, ·|¦³´Ý¯d
+
+  µ{¦¡­n§ï¬°  clrtoeol(); outs("\033[1;33mabc"); refresh();
+
+--
+µ{¦¡­×§ï     ¡GÂ²ÅãÅ²           games.bbs@help.cse.ttit.edu.tw

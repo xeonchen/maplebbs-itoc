@@ -1,0 +1,39 @@
+µo«H¤H: cpd.bbs@pitch.twbbs.org (always on my mind) ¬ÝªO: itoc
+¼Ð  ÃD: Re: ¦p¦óÅýªO¥D¥i¥H§ó§ï¥LªO¤W¥L¤H¤å³¹ªº¼ÐÃD?
+µo«H¯¸: pitch¤p¯¸ (2004/01/12 Mon 00:14:24)               Updated: 2004/01/12
+
+¡° ¤Þ­z¡mcyanofox.bbs@bbs.cs.nchu.edu.tw (§Ú¬O¦n¤H¤@±Úªº:()¡n¤§»Ê¨¥¡G
+> ªO¥D¥i¥H­×§ï¥L¤H¤å³¹ªº¤º®e
+> ¦ý¬O­n¦p¦ó¤]¯à«ö¤jT§ï¥L¤H¤å³¹¼ÐÃD©O?
+
+: post.c : post_title()  ³o¬OªO¥D¥i¥H§ï¼ÐÃDªº³¡¤À
+
+- if (strcmp(cuser.userid, mhdr.owner) && !HAS_PERM(PERM_ALLBOARD))
++ if (strcmp(cuser.userid, mhdr.owner) && !(bbstate & STAT_BOARD))
+     return XO_NONE;
+
+: post.c : post_edit()  ³o¬OªO¥D¥i¥H§ï¤º®eªº³¡¤À
+
+  /* ­ì§@ªÌ­×§ï */
+- else if (!strcmp(hdr->owner, cuser.userid) && HAS_PERM(PERM_POST))
++ else if ((!strcmp(hdr->owner, cuser.userid) && HAS_PERM(PERM_POST)) ||
++   (bbstate & STAT_BOARD))
+
+: edit.c : ve_banner()  ³o¬OªO¥D¥i¥H§ï¤º®eªº³¡¤À
+
+  if (!modify)
+  {
+    ...
+    ...
+  }
+  else
+  {
+    [1;44m// ª©­±¦Û©w¡A¤Ï¥¿´N¬O¥[¤W cuser.userid ¨Ó°Ï¤À¬OªO¥DÁÙ¬O­ì§@ªÌ§ïªº */[m
+-   fprintf(fp, "...%s...\n", Now());
++   fprintf(fp, "...%s...%s...\n", Now(), cuser.userid);
+  }
+
+--
+[;1;30mOrigin¡G[32mùÝùù¢¡         ¢x[30m       pitch¤p¯¸[m
+      [;1;42m  ùòùùùå¡C[37m ùá¢z¢w¢u¢w¢{  [;32;47m pitch.twbbs.org [m
+      [;1;32m  ùã    [32m¢| ùã[32m¢|¢w¢|  ¢|[m   From¡G[sw67-105-240.adsl.seed.net.tw][m

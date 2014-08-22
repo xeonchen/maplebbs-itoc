@@ -1,0 +1,170 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (­óºq¤p¦Ï), ¬ÝªO: plan
+¼Ð  ÃD: Re: [­×§ï]¶i¶¥¤å³¹¼Ð°O
+µo«H¯¸: ¤ë¤U©]·Q (Mon, 17 Mar 2003 01:29:09 +0800 (CST))  Updated: 2004/12/23
+
+  «ö M ¼Ð°O±m¦âªº mark
+  «ö m ¨ú®ø mark ©Î¬O°ª«G«×ªº mark
+
+: include/hdr.h
+
+  post.xmodeªº©w¸q·s¼W (­nª`·N¤£¯à¸ò¨ä¥LºX¼Ð½Ä¬ð)
+
++ #define POST_MARKED1    0x00100000
++ #define POST_MARKED2    0x00200000
++ #define POST_MARKED3    0x00400000
++ #define POST_MARKED4    0x00800000
++ #define POST_MARKED5    0x01000000
++ #define POST_MARKED6    0x02000000
++ #define POST_MARKEDCOLOR    (POST_MARKED1 | POST_MARKED2 | POST_MARKED3 | \
++                              POST_MARKED4 | POST_MARKED5 | POST_MARKED6)
+
+: post.c:post_cb[]
+: post.c:xpost_cb[]
+
+  'm', post_mark,
++ 'M', post_advmark,
+
+: post.c:post_advmark() ·s¼W¦¹¨ç¦¡©ó post_mark() «á­±
+
+static int
+post_advmark(xo)
+  XO *xo;
+{
+  HDR *hdr;
+  int pos, cur, xmode;
+
+  if (!(bbstate & STAT_BOARD))
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+  xmode = hdr->xmode;
+
+#ifdef HAVE_LABELMARK
+  if (xmode & POST_DELETE)     /* «Ý¬åªº¤å³¹¤£¯à mark */
+    return XO_NONE;
+#endif
+  if (xmode & (POST_MARKED | POST_MARKEDCOLOR)) /* ¤w¸g¦³¨ä¥L mark ¤F */
+    return XO_NONE;
+
+  switch (vans("¡· ¼Ð°OÃC¦â 1)¬õ¦â 2)ºñ¦â 3)¶À¦â 4)ÂÅ¦â 5)µµ¦â 6)«C¦â¡G[Q] "))
+  {
+  case '1':
+    xmode ^= POST_MARKED1;
+    break;
+  case '2':
+    xmode ^= POST_MARKED2;
+    break;
+  case '3':
+    xmode ^= POST_MARKED3;
+    break;
+  case '4':
+    xmode ^= POST_MARKED4;
+    break;
+  case '5':
+    xmode ^= POST_MARKED5;
+    break;
+  case '6':
+    xmode ^= POST_MARKED6;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  hdr->xmode = xmode;
+
+  currchrono = hdr->chrono;
+  rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+    hdr->xid : pos, cmpchrono);
+
+  move(3 + cur, 0);
+  post_item((xo->key == XZ_XPOST ? hdr->xid : pos) + 1, hdr);
+
+  return XO_FOOT;
+}
+
+: post.c:post_mark()
+
+#ifdef HAVE_LABELMARK
+    if (xmode & POST_DELETE)     /* «Ý¬åªº¤å³¹¤£¯à mark */
+      return XO_NONE;
+#endif
+
++   /* ¦pªG¤w¸g¦³¥ô¦óÃC¦â¼Ð°O¡A¨º»ò¨ú®ø©Ò¦³¼Ð°O */
++   if (xmode & POST_MARKEDCOLOR)
++     hdr->xmode = xmode & ~POST_MARKEDCOLOR;
++   else
+      hdr->xmode = xmode ^ POST_MARKED;
+
+    currchrono = hdr->chrono;
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono);
+
+: post.c:post_attr()
+
+- if (mode & POST_MARKED)
++ if (mode & (POST_MARKED | POST_MARKEDCOLOR))
+    attr |= 'M';
+
+: post.c:post_item() §â prints("%6d%c%c", ...); ´«±¼¡A¤@¦@¦³¤G³B
+
+- prints("%6d%c%c", num, tag_char(hdr->chrono), post_attr(hdr));
++ prints("%6d%c\033[%sm%c\033[m",
++   num, tag_char(hdr->chrono),
++   hdr->xmode & POST_MARKED ? "1;37" :
++#ifdef HAVE_ADVANCE_MARKED
++   hdr->xmode & POST_MARKED1 ? "1;31" :
++   hdr->xmode & POST_MARKED2 ? "1;32" :
++   hdr->xmode & POST_MARKED3 ? "1;33" :
++   hdr->xmode & POST_MARKED4 ? "1;34" :
++   hdr->xmode & POST_MARKED5 ? "1;35" :
++   hdr->xmode & POST_MARKED6 ? "1;36" :
++#endif
++   "", post_attr(hdr));
+
+: post.c:post_delete()
+
+- if (hdr->xmode & POST_MARKED)
++ if (hdr->xmode & (POST_MARKED | POST_MARKEDCOLOR))
+    return XO_NONE;
+
+: post.c:post_mark()
+: post.c:post_refuse()
+: post.c:post_label()
+
+    move(3 + cur, 7);
+-   outc(post_attr(hdr));
++   post_item((xo->key == XZ_XPOST ? hdr->xid : pos) + 1, hdr);
+
+: post.c:post_visit()
+
+-   row = 3;
+-   do
+-   {
+-     move(row, 7);
+-     outc(post_attr(hdr++));
+-   } while (++row < max);
++   return post_body(xo);
+  }
+
+: manage.c:post_terminator()
+
+-       if ((xmode & POST_MARKED) ||
++       if ((xmode & (POST_MARKED | POST_MARKEDCOLOR)) ||
+          ((mode & 1) && strcmp(keyOwner, hdr->owner)) ||
+          ((mode & 2) && strcmp(keyTitle, str_ttl(hdr->title))))
+
+: post.c:chkpost()
+
+- return (hdr->xmode & POST_MARKED);
++ return (hdr->xmode & (POST_MARKED | POST_MARKEDCOLOR));
+
+--
+  markªº¼Ð°O±Ä¥Î«G¦â¦³­Ó¦n³B¬O^X¤§«á¤å³¹­Y¬O¦³³Qmark°_¨Ó¡A«h¤å³¹ªºx¼Ð°O·|ÅÜ¦¨
+
+  «G¦â¡A¦pªG¦³¤@½g¤å³¹^X + m(©Î¬OM)¡A«h¤å³¹«e­±ªºx·|ÅÜ¦¨ª©¥Dmark°_¨ÓªºÃC¦â³á!
+
+  ¤Ï¤§¥u¦³^X¦ÓµLmark¡A«h¸Óx¼Ð°O´N¤£·|«G©Î¬OÅÜ¦â¡A¤è«Kª©¥D°Ï§O¡C
+--
+  [1;33mOrigin: luna.twbbs.org[m

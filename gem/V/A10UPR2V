@@ -1,0 +1,71 @@
+µo«H¤H: allan914.bbs@cnmc31.hs.ntnu.edu.tw (Allan) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ±m¦â¼Ð°O¤À¦â·j´M
+µo«H¯¸: ²Ä¤C»â°ì (2005/01/18 Tue 13:09:57)                Updated: 2006/09/23
+
+µ¹¦³°µ  [¥\¯à] post.c ±m¦â¤å³¹¼Ð°O  ªº¤H¥Îªº:P
+
+: xpost.c  ¦b filter_mark() «e­±¥[
+
++ static int postmarkcolor;       /* ±m¦âm¤å·j´M:Àx¦sÃC¦â */
+
+: xpost.c:filter_mark()
+
+filter_mark(head, hdr)
+  HDR *head;    /* «Ý´úª« */
+  HDR *hdr;     /* ±ø¥ó */
+{
++  switch(postmarkcolor)
++  {
++  case '1':
++    return (head->xmode & POST_MARKED1);
++    break;
++  case '2':
++    return (head->xmode & POST_MARKED2);
++    break;
++  case '3':
++    return (head->xmode & POST_MARKED3);
++    break;
++  case '4':
++    return (head->xmode & POST_MARKED4);
++    break;
++  case '5':
++    return (head->xmode & POST_MARKED5);
++    break;
++  case '6':
++    return (head->xmode & POST_MARKED6);
++    break;
++  case '7':
++    return (head->xmode & POST_MARKED);
++    break;
++  case '8':
++    return (head->xmode & (POST_MARKED | POST_MARKEDCOLOR));
++    break;
++  default:
++    return (head->xmode & (POST_MARKED | POST_MARKEDCOLOR));
++  }
+
+-  return (head->xmode & POST_MARKED);
+}
+
+: xpost.c:XoXmark()
+
+  if (xz[XZ_XPOST - XO_ZONE].xo)        /* itoc.020308: ¤£±o²Ö¿n¶i¤J¤G¦¸ */
+  {
+    vmsg(MSG_XYDENY);
+    return XO_FOOT;
+  }
+
++  postmarkcolor = vans("¡· ¼Ð°OÃC¦â 1)¬õ¦â 2)ºñ¦â 3)¶À¦â 4)ÂÅ¦â "
++    "5)µµ¦â 6)«C¦â 7)¥Õ¦â 8)¥þ³¡¡G[8] ");
+- strcpy(HintWord, "\033[1;33m©Ò¦³ mark ¤å³¹\033[m");
++ strcpy(Hintword, "\033[1;33m «ü©wÃC¦âªº mark ¤å³¹\033[m");
+  HintAuthor[0] = '\0';
+
+  return XoXpost(xo, NULL, 0, INT_MAX, filter_mark);
+
+--
+²Ä¤@¦¸¼g¥\¯à  ¼gªº¤£¤Óº}«GÁÙ½Ð¦h¦h¥]²[m_m
+ÁÙ½Ð¦U¦ì«e½úÀ°¦£¬Ý¤@¤U­þ¸Ì¦³¿ù³o¼Ë Orz
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m ®v¤jªþ¤¤£»²Ä¤C»â°ì [36;47m cnmc31.hs.ntnu.edu.tw [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mallan914 [30m±q [31m220-137-75-13.dynamic.hinet.net [30mµoªí[m

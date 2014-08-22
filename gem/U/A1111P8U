@@ -1,0 +1,1108 @@
+µo«H¤H: TKyo.bbs@cpu.tfcis.org (·t¶Â¶Q¤½¤l) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]IP/FQDN ªíºÞ²z¤¶­±
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/01/25 Tue 18:06:54)                Updated: 2006/04/17
+
+#if 0
+
+  ¥\¯àÂ²¤¶ :
+
+         1.±N­ì¥»¥H¤å¦r°O¸üªº IP/FQDN ªíµ¹ xover() ¤¶­±¤Æ, ¤è«KºÞ²z
+         2.¦³®Ä´î¤Öµn¤J®É·j´M¤¾ªø IP/FQDN ¤å¦rÀÉ©Ò¯Ó¶Oªº®É¶¡
+         3.IP ªí¥H range ¨Ó°µ§PÂ_, FQDN ªí«h¥HÃöÁä¦r°µ§PÂ_
+
+  ³]©w½d¨Ò :
+
+       ¥æ¤j - 140.113.xxx.xxx
+
+       ·s¼W IP ªí®É
+
+         IP ½d³ò°_ÂI¡G140.113.0.0
+         IP ½d³ò²×ÂI¡G140.113.255.255
+                »¡©ú¡G°ê¥ß¥æ³q¤j¾Ç
+
+       ·s¼W FQDN ªí®É
+
+         FQDN ÃöÁä¦r¡G.nctu.edu.tw
+                »¡©ú¡G°ê¥ß¥æ³q¤j¾Ç
+
+  §ó¬½ªº¨Ò¤l :
+
+       TANET - 140.xxx.xxx.xxx
+
+       ·s¼W IP ªí®É
+
+         IP ½d³ò°_ÂI¡G140.0.0.0
+         IP ½d³ò²×ÂI¡G140.255.255.255
+
+       ·s¼W FQDN ªí®É
+
+         FQDN ÃöÁä¦r¡G.edu.tw
+                »¡©ú¡GTANET
+
+  Q : ³o®É¦³¨Ç¤H·|°Ý, ¦pªG§Ú³]©w¤F TANET ¤Î¥æ¤j, «ö 's' ±Æ§Ç«á, TANET ªº³]©w
+      ·|¦b«e­±, ¨º¨t²Î§PÂ_®É, fromhost ¤£´N¥Ã»·³£¬OÅã¥Ü TANET ¶Ü?
+
+  A : ©Ò¥H, ´£¨Ñ¤F 'L' Âê©w IP/FQDN ¸ê®Æªº¥\¯à, ³QÂê©wªº¸ê®Æ·|¸m³»
+      ¥B«ö 's' ±Æ§Ç®É, ³QÂê©wªº IP/FQDN ¥u·|¸ò¦P¬°Âê©wªº IP/FQDN ¸ê®Æ¸m³»±Æ§Ç
+
+#endif
+
+: src/include/global.h
+
+  /* --------------------------------------------------- */
+  /* etc/ ¥Ø¿ý¤U¨t²ÎÀÉ®×                                 */
+  /* --------------------------------------------------- */
+    .
+    .
+    .
++ #ifdef HAVE_WHERE
+
++ #define FN_ETC_IPT      "etc/ipt.dat"   /* ¨Ó·½ IP ¸ê®Æªí */
++ #define FN_ETC_FQDNT    "etc/fqdnt.dat" /* ¨Ó·½ FQDN ¸ê®Æªí */
+
++ #endif
+
+: src/include/modes.h : °²³] XO_ZONE ³Ì«á¬°ºëµØ°Ï, »Ý¸ò xz[] ¦P¨B
+
+  #define XZ_GEM          (XO_ZONE + 13)          /* ºëµØ°Ï */
++ #define XZ_ADMIP        (XO_ZONE + 14)          /*  IP ºÞ²z */
++ #define XZ_ADMFQDN      (XO_ZONE + 15)          /* FQDN ºÞ²z */
+
+: src/include/struct.h : ¾A·í¦ì¸m¥[¤J
+
++ #ifdef HAVE_WHERE
+
++ typedef struct
++ {
++   time_t stamp;                 /* ½s¸¹ */
++   int xmode;                    /* ¼Ò¦¡ */
++   u_long ip_range_src;          /* IP ½d³ò°_ÂI */
++   u_long ip_range_dest;         /* IP ½d³ò²×ÂI */
++   char cname[34];               /* »¡©ú */
++ }       IPT;
+
++ typedef struct
++ {
++   time_t stamp;                 /* ½s¸¹ */
++   int xmode;                    /* ¼Ò¦¡ */
++   char query[38];               /* FQDN ÃöÁä¦r */
++   char cname[34];               /* »¡©ú */
++ }       FQDNT;
+
++ #endif                          /* HAVE_WHERE */
+
+: src/include/theme.h : ¾A·í¦ì¸m¥[¤J
+
+
++ #define COLOR_LOCKED    "\033[1;36m"    /* Âê¦íªº IP/FQDN */
++ #define COLOR_NORMAL    "\033[0;37m"    /* ¤@¯ë IP/FQDN */
+
++ #define NECKER_ADMIP    "[¡ö]Â÷¶} [T]­×§ï IP ¸ê®Æ»¡©ú [t]¼ÐÅÒ" \
++ " [d/D]§R°£ [^D]¼ÐÅÒ§R°£\n" \
++ "COLOR3 "  ½s¸¹    IP ½d³ò°_ÂI      IP ½d³ò²×ÂI      " \
++ "»¡              ©ú%*s                \033[m"
+
++ #define NECKER_ADMFQDN  "[¡ö]Â÷¶} [T]­×§ï FQDN ¸ê®Æ»¡©ú [t]¼ÐÅÒ" \
++ " [d/D]§R°£ [^D]¼ÐÅÒ§R°£\n" \
++ COLOR3 "  ½s¸¹    FQDN ÃöÁä¦r                           " \
++ "»¡              ©ú%*s            \033[m"
+
++ #define FEETER_ADMIP    \
++ COLOR1 " ¢×¢ÞºÞ²z " COLOR2 " (a)·s¼W (E)­×§ï (s)±Æ§Ç (¡ô/¡õ)¤W¤U" \
++ " (PgUp/PgDn)¤W¤U­¶ (¡ö)Â÷¶}     "
+
++ #define FEETER_ADMFQDN  \
++ COLOR1 " FQDNºÞ²z " COLOR2 " (a)·s¼W (E)­×§ï (s)±Æ§Ç (¡ô/¡õ)¤W¤U" \
++ " (PgUp/PgDn)¤W¤U­¶ (¡ö)Â÷¶}     "
+
+: src/maple/xover.c : xz[]
+
+- {NULL, NULL, M_GEM, FEETER_GEM}               /* XZ_GEM */
++ {NULL, NULL, M_GEM, FEETER_GEM},              /* XZ_GEM */
++ {NULL, NULL, M_SYSTEM, FEETER_ADMIP},         /* XZ_ADMIP */
++ {NULL, NULL, M_SYSTEM, FEETER_ADMFQDN}        /* XZ_ADMFQDN */
+
+: src/maple/menu.c : ¾A·í¿ï³æ¥[¤J
+
++ "bin/admip.so:admip_main", PERM_ALLADMIN, - M_SYSTEM,
++ "IP-Manage     IP ºÞ²z",
+
++ "bin/admfqdn.so:admfqdn_main", PERM_ALLADMIN, - M_SYSTEM,
++ "FQDN-Manage   FQDN ºÞ²z",
+
+
+: src/maple/bbsd.c
+
+/* utmp_setup() ¤W¤è¥[¤J 4 ­Ó function */
+
+static u_long
+trans_inaddr(ipdata)
+  u_long ipdata;
+{
+  uschar *addr = (uschar *) &ipdata;
+
+  return ((addr[0] << 24) + (addr[1] << 16) + (addr[2] << 8) + addr[3]);
+}
+
+static int
+chkfqdnt(fqdnt, key, from)
+  FQDNT *fqdnt;
+  char *key;
+  char *from;
+{
+  if (str_sub(key, fqdnt->query))
+  {
+    strcpy(from, fqdnt->cname);
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+chkipt(ipt, key, from)
+  IPT *ipt;
+  u_long *key;
+  char *from;
+{
+  u_long i, j;
+
+  i = trans_inaddr(ipt->ip_range_src);
+  j = trans_inaddr(ipt->ip_range_dest);
+
+  if ((*key != -1) && (*key >= i && *key <= j))
+  {
+    strcpy(from, ipt->cname);
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
+belong_table(fpath, data, size, key, from, fchk)
+  char *fpath;
+  void *data;
+  int size;
+  void *key;
+  char *from;
+  int (*fchk) ();
+{
+  int pos, i;
+
+  pos = 0;
+  i = 0;
+  while (!rec_get(fpath, data, size, pos))
+  {
+    if ((i = fchk(data, key, from)))
+      break;
+    pos++;
+  }
+
+  return i;
+}
+
+: src/maple/bbsd.c : utmp_setup()
+  .
+  .
+  .
+    char name[40];
++   FQDNT fqdnt;
+
+    /* ¥ý¤ñ¹ï FQDN */
+    str_lower(name, fromhost);
+-   if (!belong_list(FN_ETC_FQDN, name, utmp.from))
++   if (!(belong_table(FN_ETC_FQDNT, &fqdnt, sizeof(FQDNT),
+      name, utmp.from, chkfqdnt)))
+    {
++     IPT ipt;
+      /* ¦A¤ñ¹ï ip */
+-     sprintf(name, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
+-     if (!belong_list(FN_ETC_HOST, name, utmp.from))
++   if (!(belong_table(FN_ETC_IPT, &ipt, sizeof(IPT),
+      &utmp.in_addr, utmp.from, chkipt)))
+    str_ncpy(utmp.from, fromhost, sizeof(utmp.from));
+    }
+
+: src/so/admip.c ·s¼W³o°¦µ{¦¡
+
+/*-------------------------------------------------------*/
+/* admip.c          ( NTHU CS MapleBBS Ver 3.10 )        */
+/*-------------------------------------------------------*/
+/* target : IP      ºÞ²zµ{¦¡                             */
+/* author : kyo.bbs@cszone.org                           */
+/* create : 05/01/11                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#ifdef HAVE_WHERE
+
+extern XZ xz[];
+extern char xo_pool[];
+
+#define IPT_LOCKED      0x01            /* Don't move */
+
+static char *
+trans_addr(ipdata)
+  u_long ipdata;
+{
+  static char buf[16];
+  uschar *addr = (uschar *) &ipdata;
+
+  sprintf(buf, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
+  return buf;
+}
+
+static u_long
+trans_inaddr(ipdata)
+  u_long ipdata;
+{
+  uschar *addr = (uschar *) &ipdata;
+
+  return ((addr[0] << 24) + (addr[1] << 16) + (addr[2] << 8) + addr[3]);
+}
+
+static int
+admip_edit(ipt, echo)
+  IPT *ipt;
+  int echo;
+{
+  char buf[16];
+  u_long i;
+
+  if (echo == GCARRY)
+    strcpy(buf, trans_addr(ipt->ip_range_src));
+
+  for (;;)
+  {
+    if (!(vget(b_lines, 0, "IP ½d³ò°_ÂI¡G", buf, 16, echo)))
+      return 0;
+    i = inet_addr(buf);
+    if (i == -1)
+      vmsg("IP ¿é¤J®æ¦¡¿ù»~¡I");
+    else
+    {
+      ipt->ip_range_src = i;
+      break;
+    }
+  }
+
+  if (echo == GCARRY)
+    strcpy(buf, trans_addr(ipt->ip_range_dest));
+
+  for (;;)
+  {
+    if (!(vget(b_lines, 0, "IP ½d³ò²×ÂI¡G", buf, 16, echo)))
+      return 0;
+    i = inet_addr(buf);
+    if (i == -1)
+      vmsg("IP ¿é¤J®æ¦¡¿ù»~");
+    else
+    {
+      ipt->ip_range_dest = i;
+      break;
+    }
+  }
+
+  if (trans_inaddr(ipt->ip_range_src) > trans_inaddr(ipt->ip_range_dest))
+  {
+    vmsg("IP ½d³òÀË¬d¿ù»~!!\nIP ½d³ò²×ÂI¥²¶·¤j©ó©Îµ¥©ó IP ½d³ò°_ÂI");
+    return 0;
+  }
+
+  if (!(vget(b_lines, 0, "»¡©ú¡G", ipt->cname, 34, echo)))
+    return 0;
+
+  return 1;
+}
+
+
+static int
+admip_add(xo)
+  XO *xo;
+{
+  IPT ipt;
+
+  memset(&ipt, 0, sizeof(IPT));
+
+  if (admip_edit(&ipt, DOECHO))
+  {
+    time(&ipt.stamp);
+    rec_add(FN_ETC_IPT, &ipt, sizeof(IPT));
+  }
+
+  return XO_INIT;
+}
+
+static int
+admip_change(xo)
+  XO *xo;
+{
+  IPT *ipt, old_ipt;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  ipt = (IPT *) xo_pool + cur;
+
+  old_ipt = *ipt;
+
+  if (admip_edit(&old_ipt, GCARRY))
+  {
+    if (memcmp(ipt, &old_ipt, sizeof(IPT)))
+    {
+      if (vans("½T©w­n­×§ï¶Ü¡H[N] ") == 'y')
+      {
+        rec_put(FN_ETC_IPT, &old_ipt, sizeof(IPT), pos);
+        return XO_LOAD;
+      }
+    }
+  }
+
+  return XO_FOOT;
+}
+
+static int
+admip_title(xo)
+  XO *xo;
+{
+  IPT *ipt, old_ipt;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  ipt = (IPT *) xo_pool + cur;
+
+  old_ipt = *ipt;
+
+  if (vget(b_lines, 0, "»¡©ú¡G", old_ipt.cname, 34, GCARRY))
+  {
+    if (memcmp(ipt, &old_ipt, sizeof(IPT)))
+    {
+      rec_put(FN_ETC_IPT, &old_ipt, sizeof(IPT), pos);
+      return XO_LOAD;
+    }
+  }
+
+  return XO_FOOT;
+}
+
+static int
+admip_query(xo)
+  XO *xo;
+{
+  char *menu[] = {"QQ",
+      "A  ·s¼W IP ¸ê®Æ",
+      "T  ­×§ï IP ¸ê®Æ»¡©ú",
+      "E  ­×§ï IP ¸ê®Æ",
+      "Q  ¨ú®ø", NULL};
+
+  switch (pans(-1, -1, "¥\\¯à¿ï³æ", menu))
+  {
+    case 'a':
+      return admip_add(xo);
+    case 't':
+      return admip_title(xo);
+    case 'e':
+      return admip_change(xo);
+    default:
+      return XO_NONE;
+  }
+}
+
+static int
+admip_delete(xo)
+  XO *xo;
+{
+  if (vans(msg_del_ny) == 'y')
+  {
+    if (!rec_del(xo->dir, sizeof(IPT), xo->pos, NULL, NULL))
+    {
+      IPT *ipt;
+      ipt = (IPT *) xo_pool + (xo->pos - xo->top);
+      return XO_LOAD;
+    }
+  }
+  return XO_FOOT;
+}
+
+static int
+admip_rangedel(xo)
+  XO *xo;
+{
+  return xo_rangedel(xo, sizeof(IPT), NULL, NULL);
+}
+
+
+static int
+vfyadmip(ipt, pos)
+  IPT *ipt;
+  int pos;
+{
+  return Tagger(ipt->stamp, pos, TAG_NIN);
+}
+
+
+static int
+admip_prune(xo)
+  XO *xo;
+{
+  return xo_prune(xo, sizeof(IPT), vfyadmip, NULL);
+}
+
+static int
+admip_attr(mode)
+  int mode;
+{
+  return (mode & IPT_LOCKED) ? 'L' : ' ';
+}
+
+static void
+admip_item(num, ipt)
+  int num;
+  IPT *ipt;
+{
+  prints("%6d %s%c\033[m %c%-15s  ",
+    num, (ipt->xmode & IPT_LOCKED) ? COLOR_LOCKED : COLOR_NORMAL,
+    admip_attr(ipt->xmode),
+    tag_char(ipt->stamp), trans_addr(ipt->ip_range_src));
+
+  prints("%-15s  %s\n", trans_addr(ipt->ip_range_dest),
+    ipt->cname);
+}
+
+static int
+admip_body(xo)
+  XO *xo;
+{
+  IPT *ipt;
+  int max, num, tail;
+
+  max = xo->max;
+  if (max <= 0)
+  {
+    if (vans("·s¼W IP ¸ê®Æ¡H[N] ") == 'y')
+      return admip_add(xo);
+
+    return XO_QUIT;
+  }
+
+  ipt = (IPT *) xo_pool;
+  num = xo->top;
+  tail = num + XO_TALL;
+  if (max > tail)
+    max = tail;
+
+  move(3, 0);
+  do
+  {
+    admip_item(++num, ipt++);
+  } while (num < max);
+  clrtobot();
+
+  return XO_FOOT;       /* itoc.010403: §â b_lines ¶ñ¤W feeter */
+}
+
+
+static int
+admip_head(xo)
+  XO *xo;
+{
+  vs_head("¢×¢ÞºÞ²z", str_site);
+  prints(NECKER_ADMIP, d_cols, "");
+
+  return admip_body(xo);
+}
+
+
+static int
+admip_load(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(IPT));
+  return admip_body(xo);
+}
+
+static int
+admip_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(IPT));
+  return admip_head(xo);
+}
+
+static int
+admip_tag(xo)
+  XO *xo;
+{
+  IPT *ipt;
+  int tag, pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  ipt = (IPT *) xo_pool + cur;
+
+  if (tag = Tagger(ipt->stamp, pos, TAG_TOGGLE))
+  {
+    move(3 + cur, 0);
+    admip_item(++pos, ipt);
+  }
+
+  return xo->pos + 1 + XO_MOVE; /* lkchu.981201: ¸õ¦Ü¤U¤@¶µ */
+}
+
+static int
+ipt_cmp(a, b)
+  IPT *a, *b;
+{
+  int iSeq, jSeq;
+  u_long i, j, k;
+
+  iSeq = (a->xmode & IPT_LOCKED) ? 1 : 0;
+  jSeq = (b->xmode & IPT_LOCKED) ? 1 : 0;
+
+  i = trans_inaddr(a->ip_range_src);
+  j = trans_inaddr(b->ip_range_src);
+
+  i = (i > j) ? 1 :
+      (i < j) ? -1 :
+      0;
+
+  j = trans_inaddr(a->ip_range_dest);
+  k = trans_inaddr(b->ip_range_dest);
+
+  j = (j > k) ? 1 :
+      (j < k) ? -1 :
+      0;
+
+  if (!iSeq && !jSeq)
+    return (i == 0) ? ((j == 0) ? str_cmp(a->cname, b->cname) : j) : i;
+  else if (!jSeq)
+    return -1;
+  else if (!iSeq)
+    return 1;
+  else
+    return (i == 0) ? ((j == 0) ? str_cmp(a->cname, b->cname) : j) : i;
+}
+
+static int
+admip_sort(xo)
+  XO *xo;
+{
+  rec_sync(xo->dir, sizeof(IPT), ipt_cmp, NULL);
+  return admip_load(xo);
+}
+
+static int
+admip_move(xo)
+  XO *xo;
+{
+  IPT *ipt;
+  int pos, cur, i;
+  char buf[40], ans[5];
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  ipt = (IPT *) xo_pool + cur;
+
+
+
+  sprintf(buf, "½Ð¿é¤J²Ä %d ¿ï¶µªº·s¦ì¸m¡G", pos + 1);
+  if (vget(b_lines, 0, buf, ans, 5, DOECHO))
+  {
+    i = atoi(ans) - 1;
+    if (i < 0)
+      i = 0;
+    else if (i >= xo->max)
+      i = xo->max - 1;
+
+    if (i != pos)
+    {
+      if (!rec_del(xo->dir, sizeof(IPT), pos, NULL, NULL))
+      {
+        rec_ins(xo->dir, ipt, sizeof(IPT), i, 1);
+        xo->pos = i;
+        return admip_load(xo);
+      }
+    }
+  }
+  return XO_FOOT;
+}
+
+static
+admip_lock(xo)
+  XO *xo;
+{
+  int pos, cur;
+  IPT *ipt;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  ipt = (IPT *) xo_pool + cur;
+
+  ipt->xmode ^= IPT_LOCKED;
+
+  rec_put(xo->dir, ipt, sizeof(IPT), pos);
+
+  move(3 + cur, 0);
+  admip_item(++pos, ipt);
+
+  return XO_NONE;
+}
+
+static int
+admip_help(xo)
+  XO *xo;
+{
+  return XO_NONE;
+}
+
+static KeyFunc admip_cb[] =
+{
+  XO_INIT, admip_init,
+  XO_LOAD, admip_load,
+  XO_HEAD, admip_head,
+  XO_BODY, admip_body,
+
+  'r', admip_query,
+  'a', admip_add,
+  'E', admip_change,
+  'T', admip_title,
+  Ctrl('D'), admip_prune,
+  'd', admip_delete,
+  'D', admip_rangedel,
+  't', admip_tag,
+  's', admip_sort,
+  'm', admip_move,
+  'l', admip_lock,
+  'h', admip_help
+};
+
+int
+admip_main()
+{
+  XO *xo;
+
+  xz[XZ_ADMIP - XO_ZONE].xo = xo = xo_new(FN_ETC_IPT);
+  xz[XZ_ADMIP - XO_ZONE].cb = admip_cb;
+  xo->pos = 0;
+
+  xover(XZ_ADMIP);
+  free(xo);
+
+  return 0;
+}
+
+#endif                          /* HAVE_WHERE */
+
+: src/so/admfqdn.c ·s¼W³o°¦µ{¦¡
+
+/*-------------------------------------------------------*/
+/* admfqdn.c        ( NTHU CS MapleBBS Ver 3.10 )        */
+/*-------------------------------------------------------*/
+/* target : FQDN ºÞ²zµ{¦¡                                */
+/* author : kyo.bbs@cszone.org                           */
+/* create : 05/01/11                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#ifdef HAVE_WHERE
+
+extern XZ xz[];
+extern char xo_pool[];
+
+#define FQDNT_LOCKED      0x01            /* Don't move */
+
+static int
+admfqdn_edit(fqdnt, echo)
+  FQDNT *fqdnt;
+  int echo;
+{
+
+  if (!(vget(b_lines, 0, "FQDN ÃöÁä¦r¡G", fqdnt->query, 38, echo)))
+    return 0;
+
+  str_lower(fqdnt->query, fqdnt->query);
+
+  if (!(vget(b_lines, 0, "»¡©ú¡G", fqdnt->cname, 34, echo)))
+    return 0;
+
+  return 1;
+}
+
+
+static int
+admfqdn_add(xo)
+  XO *xo;
+{
+  FQDNT fqdnt;
+
+  memset(&fqdnt, 0, sizeof(FQDNT));
+
+  if (admfqdn_edit(&fqdnt, DOECHO))
+  {
+    time(&fqdnt.stamp);
+    rec_add(FN_ETC_FQDNT, &fqdnt, sizeof(FQDNT));
+  }
+
+  return XO_INIT;
+}
+
+static int
+admfqdn_change(xo)
+  XO *xo;
+{
+  FQDNT *fqdnt, old_fqdnt;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  fqdnt = (FQDNT *) xo_pool + cur;
+
+  old_fqdnt = *fqdnt;
+
+  if (admfqdn_edit(&old_fqdnt, GCARRY))
+  {
+    if (memcmp(fqdnt, &old_fqdnt, sizeof(FQDNT)))
+    {
+      if (vans("½T©w­n­×§ï¶Ü¡H[N] ") == 'y')
+      {
+        rec_put(FN_ETC_FQDNT, &old_fqdnt, sizeof(FQDNT), pos);
+        return XO_LOAD;
+      }
+    }
+  }
+
+  return XO_FOOT;
+}
+
+static int
+admfqdn_title(xo)
+  XO *xo;
+{
+  FQDNT *fqdnt, old_fqdnt;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  fqdnt = (FQDNT *) xo_pool + cur;
+
+  old_fqdnt = *fqdnt;
+
+  if (vget(b_lines, 0, "»¡©ú¡G", old_fqdnt.cname, 34, GCARRY))
+  {
+    if (memcmp(fqdnt, &old_fqdnt, sizeof(FQDNT)))
+    {
+      rec_put(FN_ETC_FQDNT, &old_fqdnt, sizeof(FQDNT), pos);
+      return XO_LOAD;
+    }
+  }
+
+  return XO_FOOT;
+}
+
+static int
+admfqdn_query(xo)
+  XO *xo;
+{
+  char *menu[] = {"QQ",
+      "A  ·s¼W FQDN ¸ê®Æ",
+      "T  ­×§ï FQDN ¸ê®Æ»¡©ú",
+      "E  ­×§ï FQDN ¸ê®Æ",
+      "Q  ¨ú®ø", NULL};
+
+  switch (pans(-1, -1, "¥\\¯à¿ï³æ", menu))
+  {
+    case 'a':
+      return admfqdn_add(xo);
+    case 't':
+      return admfqdn_title(xo);
+    case 'e':
+      return admfqdn_change(xo);
+    default:
+      return XO_NONE;
+  }
+}
+
+static int
+admfqdn_delete(xo)
+  XO *xo;
+{
+  if (vans(msg_del_ny) == 'y')
+  {
+    if (!rec_del(xo->dir, sizeof(FQDNT), xo->pos, NULL, NULL))
+    {
+      FQDNT *fqdnt;
+      fqdnt = (FQDNT *) xo_pool + (xo->pos - xo->top);
+      return XO_LOAD;
+    }
+  }
+  return XO_FOOT;
+}
+
+static int
+admfqdn_rangedel(xo)
+  XO *xo;
+{
+  return xo_rangedel(xo, sizeof(FQDNT), NULL, NULL);
+}
+
+
+static int
+vfyadmfqdn(fqdnt, pos)
+  FQDNT *fqdnt;
+  int pos;
+{
+  return Tagger(fqdnt->stamp, pos, TAG_NIN);
+}
+
+
+static int
+admfqdn_prune(xo)
+  XO *xo;
+{
+  return xo_prune(xo, sizeof(FQDNT), vfyadmfqdn, NULL);
+}
+
+static int
+admfqdn_attr(mode)
+  int mode;
+{
+  return (mode & FQDNT_LOCKED) ? 'L' : ' ';
+}
+
+static void
+admfqdn_item(num, fqdnt)
+  int num;
+  FQDNT *fqdnt;
+{
+  prints("%6d %s%c\033[m %c%-37s %s\n",
+    num, (fqdnt->xmode & FQDNT_LOCKED) ? COLOR_LOCKED : COLOR_NORMAL,
+    admfqdn_attr(fqdnt->xmode),
+    tag_char(fqdnt->stamp), fqdnt->query, fqdnt->cname);
+}
+
+static int
+admfqdn_body(xo)
+  XO *xo;
+{
+  FQDNT *fqdnt;
+  int max, num, tail;
+
+  max = xo->max;
+  if (max <= 0)
+  {
+    if (vans("·s¼W FQDN ¸ê®Æ¡H[N] ") == 'y')
+      return admfqdn_add(xo);
+
+    return XO_QUIT;
+  }
+
+  fqdnt = (FQDNT *) xo_pool;
+  num = xo->top;
+  tail = num + XO_TALL;
+  if (max > tail)
+    max = tail;
+
+  move(3, 0);
+  do
+  {
+    admfqdn_item(++num, fqdnt++);
+  } while (num < max);
+  clrtobot();
+
+  return XO_FOOT;       /* itoc.010403: §â b_lines ¶ñ¤W feeter */
+}
+
+
+static int
+admfqdn_head(xo)
+  XO *xo;
+{
+  vs_head("FQDNºÞ²z", str_site);
+  prints(NECKER_ADMFQDN, d_cols, "");
+
+  return admfqdn_body(xo);
+}
+
+
+static int
+admfqdn_load(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(FQDNT));
+  return admfqdn_body(xo);
+}
+
+
+static int
+admfqdn_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(FQDNT));
+  return admfqdn_head(xo);
+}
+
+static int
+admfqdn_tag(xo)
+  XO *xo;
+{
+  FQDNT *fqdnt;
+  int tag, pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  fqdnt = (FQDNT *) xo_pool + cur;
+
+  if (tag = Tagger(fqdnt->stamp, pos, TAG_TOGGLE))
+  {
+    move(3 + cur, 0);
+    admfqdn_item(++pos, fqdnt);
+  }
+
+  return xo->pos + 1 + XO_MOVE; /* lkchu.981201: ¸õ¦Ü¤U¤@¶µ */
+}
+
+static int
+fqdnt_cmp(a, b)
+  FQDNT *a, *b;
+{
+  int iSeq, jSeq;
+  int i, j;
+
+  iSeq = (a->xmode & FQDNT_LOCKED) ? 1 : 0;
+  jSeq = (b->xmode & FQDNT_LOCKED) ? 1 : 0;
+
+  i = str_cmp(a->query, b->query);
+  j = str_cmp(a->cname, b->cname);
+
+  if (!iSeq && !jSeq)
+    return (i == 0) ? j : i;
+  else if (!jSeq)
+    return -1;
+  else if (!iSeq)
+    return 1;
+  else
+    return (i == 0) ? j : i;
+}
+
+static int
+admfqdn_sort(xo)
+  XO *xo;
+{
+  rec_sync(xo->dir, sizeof(FQDNT), fqdnt_cmp, NULL);
+  return admfqdn_load(xo);
+}
+
+static int
+admfqdn_move(xo)
+  XO *xo;
+{
+  FQDNT *fqdnt;
+  int pos, cur, i;
+  char buf[40], ans[5];
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  fqdnt = (FQDNT *) xo_pool + cur;
+
+  sprintf(buf, "½Ð¿é¤J²Ä %d ¿ï¶µªº·s¦ì¸m¡G", pos + 1);
+  if (vget(b_lines, 0, buf, ans, 5, DOECHO))
+  {
+    i = atoi(ans) - 1;
+    if (i < 0)
+      i = 0;
+    else if (i >= xo->max)
+      i = xo->max - 1;
+
+    if (i != pos)
+    {
+      if (!rec_del(xo->dir, sizeof(FQDNT), pos, NULL, NULL))
+      {
+        rec_ins(xo->dir, fqdnt, sizeof(FQDNT), i, 1);
+        xo->pos = i;
+        return admfqdn_load(xo);
+      }
+    }
+  }
+  return XO_FOOT;
+}
+
+static
+admfqdn_lock(xo)
+  XO *xo;
+{
+  int pos, cur;
+  FQDNT *fqdnt;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  fqdnt = (FQDNT *) xo_pool + cur;
+
+  fqdnt->xmode ^= FQDNT_LOCKED;
+
+  rec_put(xo->dir, fqdnt, sizeof(FQDNT), pos);
+
+  move(3 + cur, 0);
+  admfqdn_item(++pos, fqdnt);
+
+  return XO_NONE;
+}
+
+static int
+admfqdn_help(xo)
+  XO *xo;
+{
+  return XO_NONE;
+}
+
+static KeyFunc admfqdn_cb[] =
+{
+  XO_INIT, admfqdn_init,
+  XO_LOAD, admfqdn_load,
+  XO_HEAD, admfqdn_head,
+  XO_BODY, admfqdn_body,
+
+  'r', admfqdn_query,
+  'a', admfqdn_add,
+  'E', admfqdn_change,
+  'T', admfqdn_title,
+  Ctrl('D'), admfqdn_prune,
+  'd', admfqdn_delete,
+  'D', admfqdn_rangedel,
+  't', admfqdn_tag,
+  's', admfqdn_sort,
+  'm', admfqdn_move,
+  'l', admfqdn_lock,
+  'h', admfqdn_help
+};
+
+int
+admfqdn_main()
+{
+  XO *xo;
+
+  xz[XZ_ADMFQDN - XO_ZONE].xo = xo = xo_new(FN_ETC_FQDNT);
+  xz[XZ_ADMFQDN - XO_ZONE].cb = admfqdn_cb;
+  xo->pos = 0;
+
+  xover(XZ_ADMFQDN);
+  free(xo);
+
+  return 0;
+}
+
+#endif                          /* HAVE_WHERE */
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mTKyo [30m±q [31mcszone.twbbs.org [30mµoªí[m

@@ -1,0 +1,280 @@
+§@ªÌ: itoc (AsPSQwel) ¬İªO: plan
+¼ĞÃD: [¥\¯à] grade.c ¥æ¤j¦¨ÁZ¬d¸ß
+®É¶¡: Wed Feb 12 21:26:55 2003                          Updated: 2003/12/29
+
+: menu.c ¦b¾A·íªº¿ï³æ¥[¤W
+
++ "bin/grade.so:main_grade", 0, - M_XMODE,
++ "Grade      ¡ñ ¦¨ÁZ¬dº] ¡ğ",
+
+: game/Makefile
+
+SO =    ... [1;33mgrade.so[m
+
+: game/grade.c ·s¼W³oµ{¦¡
+
+/*-------------------------------------------------------*/
+/* grade.c        ( NTHU CS MapleBBS Ver 3.10 )          */
+/*-------------------------------------------------------*/
+/* target : ¥æ³q¤j¾Ç¬d¦¨ÁZ¨t²Î                           */
+/* create : 02/06/26                                     */
+/* update : 02/07/26                                     */
+/* author : eric.bbs@boring.twbbs.tw                     */
+/* modify : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+#ifdef HAVE_NETTOOL
+
+#define mouts(x,y,s)    { move(x, y); outs(s); }
+#define HTTP_PORT       80
+#define SERVER_grade    "140.113.101.141"
+#define CGI_grade       "/REGCGI"
+
+
+static char *
+html_strip(p, c, len)
+  char *p, *c;
+  int len;
+{
+  int i;
+
+  p += 4;        /* <td> */
+  for (i = 0; *p != '<'; i++)
+  {
+    if (i < len)
+      *c++ = *p;
+    p++;
+  }
+  *c = '\0';
+
+  return p;
+}
+
+
+static int
+http_conn(server, s, sid)
+  char *server, *s, *sid;
+{
+  int sockfd, i;
+  int sum, sub, gpa, pass, nocount, graduate;
+  char *p, *xtail;
+  char pool[8192], fpath[64];
+  char cid[7], cname[31], cs[5], cscore[11], ct[2];
+  FILE *fp;
+
+  mouts(b_lines - 1, 0, "³s±µ¦øªA¾¹¤¤¡A½Ğµy­Ô.............");
+  refresh();
+
+  if ((sockfd = dns_open(server, HTTP_PORT)) < 0)
+  {
+    vmsg("µLªk»P¦øªA¾¹¨ú±o³sµ²¡A¬d¸ß¥¢±Ñ¡I");
+    return -1;
+  }
+
+  /* parser return message from web server */
+  write(sockfd, s, strlen(s));
+  /* read(sockfd, p = pool, sizeof(pool)); */        /* ¤Ó¤j¤F¡A¤@¦¸Åª¤£§¹ */
+  p = xtail = pool;
+  for (;;)
+  {
+    if (p >= xtail)
+    {
+      i = read(sockfd, p, sizeof(pool));
+      if (i <= 0)
+        break;
+      xtail = p + i;
+    }
+    p++;
+  }
+  shutdown(sockfd, 1);
+  close(sockfd);
+
+  sprintf(fpath, "tmp/%s.grade", cuser.userid);
+  fp = fopen(fpath, "w");
+
+  /* itoc.µù¸Ñ: ·s¥Í¨S¦³¾ú¦~¦¨ÁZ®É¡A·|¦]¬° pool ÁÙ´İ¦s«e¤@­Ó¤Hªº¸ê®Æ¡A
+     ¬GÅã¥Ü«e¤@­Ó¤Hªº¦¨ÁZ©Î³y¦¨§PÂ_¿ù»~¡A©Ò¥H­n¥ı§â³Ì«á¤@­Ó(²Ä¤G­Ó)
+     </TABLE> §ä¥X¨Ó */
+  xtail = strstr(pool, "</TABLE>");
+  xtail = strstr(xtail + 1, "</TABLE>");/* §ä³Ì«á¤@­Ó </TABLE> */
+
+  sum = 0;        /* ¥[ÅvÁ`¤À */
+  sub = 0;        /* ­×²ßªºÁ`¾Ç¤À */
+  pass = 0;        /* ¤Î®æªº¾Ç¤À */
+  nocount = 0;        /* ¤£¦C¤J¥­§¡ªº¾Ç¤À */
+  gpa = 0;        /* ¥[Åv GPA Á`¤À */
+  graduate = atoi(sid) % 1000 >= 200 ? 1 : 0;        /* ¬ã¨s¥ÍÁÙ¬O¤j¾Ç¥Í */
+
+  p = pool;
+
+  fputs("      ¢~ùùùùùùùŞùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùŞùùùùùŞùùùùùùùùùùùŞùùùù¢¡\n", fp);
+  fputs("      ùø½Ò¸¹  ùø½Ò¦W                          ùø¾Ç¤Àùø ¤À¼Æ     ùø¿ï­×ùø\n", fp);
+  fputs("      ùàùùùùùùùáùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùáùùùùùáùùùùùùùùùùùáùùùùùâ\n", fp);
+
+  for (;;)
+  {
+    p = strstr(p, "<td>");
+
+    if (!p || p >= xtail)        /* ¨ì³Ì«á¤F©Î·s¥Í®Ú¥»¨S¸ê®Æ */
+      break;
+
+    p = html_strip(p, cid, 6);           /* ½Ò¸¹ */
+    p = html_strip(p, cname, 30);        /* ½Ò¦W */
+    p = html_strip(p, cs, 4);            /* ¾Ç¤À */
+    p = html_strip(p, cscore, 10);       /* ¤À¼Æ */
+    p = html_strip(p, ct, 1);            /* ¿ï§O */
+
+    fprintf(fp, "      ùø\033[35m%-6s\033[mùø\033[33m%-30s\033[mùø"
+      "\033[32m%-4s\033[mùø\033[36m%-10s\033[mùø\033[31m%-4s\033[mùø\n",
+      cid, cname, cs, cscore, ct);
+
+    if (!str_ncmp(cscore, "¦¨ÁZ¥¼°e¹F", 10) || !str_ncmp(cscore, "Tr", 2))        /* ©è§K¡B¦¨ÁZ¥¼°e¹F¼È¤£ºâ¤J¥­§¡¡B¾Ç¤À */
+    {
+      continue;
+    }
+    else if (!str_ncmp(cscore, "Withdraw", 8))        /* Withdraw ¤£ºâ¤J¥­§¡ */
+    {
+      i = atoi(cs);
+      nocount += i;
+      sub += i;
+    }
+    else if (!str_ncmp(cscore, "Pass", 4))        /* Pass ¤£ºâ¤J¥­§¡ */
+    {
+      i = atoi(cs);
+      pass += i;
+      nocount += i;
+      sub += i;
+    }
+    else                                        /* ¦³¦¨ÁZ */
+    {
+      i = atoi(cs);
+      sockfd = atoi(cscore);
+      sum += sockfd * i;        /* «ö¾Ç¤À¥[Åv */
+      sub += i;
+
+      if (sockfd >= (graduate ? 70 : 60))        /* ¬ã¨s¥Í 70 ¤À¤Î®æ¡F¤j¾Ç¥Í 60 ¤À¤Î®æ */
+      {
+        pass += i;
+
+        if (graduate)
+          gpa += i * (sockfd >= 85 ? 4 : sockfd >= 75 ? 3 : 2);
+        else
+          gpa += i * (sockfd >= 80 ? 4 : sockfd >= 70 ? 3 : 2);
+      }
+    }
+  }
+  fputs("      ùüùùùùùùùäùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùäùùùùùäùùùùùùùùùùùäùùùùùı\n", fp);
+
+  i = sub - nocount;
+  fprintf(fp, "\n      ¡i¥­§¡¡j\033[1;31m%.2f\033[m  ¡i¾Ç¤À¡j%d/%d  ¡iGPA¡j%.2f\n",
+    i ? sum / (double) i : 0,
+    pass, sub,
+    i ? gpa / (double) i : 0);                /* Á×§K°£¼Æ¬° 0 */
+
+  fclose(fp);
+
+  if (more(fpath, (char *) -1) >= 0)
+  {
+    if (vans("±z­n±N¬d¸ßµ²ªG±H¦^«H½c¶Ü¡H[N] ") == 'y')
+      mail_self(fpath, cuser.userid, "[³Æ §Ñ ¿ı] ¦¨ÁZ¬d¸ß", 0);
+  }
+  unlink(fpath);
+
+  return 0;
+}
+
+
+static int
+grade(sid, id, choice)
+  char *sid, *id;
+  int choice;
+{
+  char pool[1024];
+  char atrn[256], sendform[512], serid[80], *p;
+  int sockfd, i;
+
+  if ((sockfd = dns_open(SERVER_grade, HTTP_PORT)) < 0)
+  {
+    vmsg("µLªk»P¦øªA¾¹¨ú±o³sµ²¡A¬d¸ß¥¢±Ñ¡I");
+    return -1;
+  }
+  else
+  {
+    mouts(b_lines - 1, 0, "³s±µ¦øªA¾¹¤¤¡A½Ğµy­Ô.............");
+    refresh();
+  }
+
+  sprintf(atrn, "F=CHKPASS&CHKKIND=2&userid=%s&passwd=%s", sid, id);
+  sprintf(sendform, "GET /regcgi?%s HTTP/1.0\n\n", atrn);
+  write(sockfd, sendform, strlen(sendform));
+
+  /* parse */
+  read(sockfd, pool, sizeof(pool));
+  close(sockfd);
+
+  /* itoc.µù¸Ñ: ¤£¯à¥Î¦³¨S¦³ strstr(pool, "SERID") ¨ÓÀË¬d¡C
+     ·í«e¤@­Ó¤H¥¿½T¿é¤J¬d¸ß®É¡A·|±q sockfd ¤¤Åª¥X¸ûªøªº¸ê®Æ¶i pool¡A
+     «á¤@­Ó¤H­Y¿é¤J¿ù»~¡A·|±q sockfd ¤¤Åª¥X¸ûµuªº¸ê®Æ¶i pool¡A
+     ¦]¬° pool ¨S¦³²MªÅ¡A«á¤@­Ó¤Hªº pool «á¬q¤¤¤´µM·|¦³«e¤@­Ó¤Hªº SERID¡A
+     «á¤@­Ó¤H´N·|»~¬d¨ì«e¤@­Ó¤Hªº¦¨ÁZ */
+
+  if (strstr(pool, "<b>"))
+  {
+    vmsg("¬dµL¦¹¾Ç¸¹©Î±K½X¿é¤J¿ù»~¡A½Ğ­«·s¿é¤J¡I");
+    return 0;
+  }
+
+  if (p = strstr(pool, "SERID"))
+  {
+    p = p + 14;
+    for (i = 0;; i++)
+    {
+      serid[i] = p[i];
+      if (p[i] == '"')
+      {
+        serid[i] = 0;
+        break;
+      }
+    }
+  }
+
+  sprintf(atrn, "F=SHOWSCORE&SERID=%s&USERID=%s%%20%%20%%20&CHOICE=%s",
+    serid, sid, choice ? "2.¬d¸ß¾ú¦~¦¨ÁZ" : "1.¬d¸ß¥»¾Ç´Á¦¨ÁZ");
+  sprintf(sendform, "GET /REGCGI?%s HTTP/1.0\n\n", atrn);
+  http_conn(SERVER_grade, sendform, sid);
+
+  return 0;
+}
+
+
+int
+main_grade()
+{
+  char sid[8];        /* ¾Ç¸¹ */
+  char id[11];        /* ¨­¤ÀÃÒ¦r¸¹ */
+  char ans[3];
+  int choice;        /* 0:¾Ç´Á¦¨ÁZ 1:¾ú©¡¦¨ÁZ */
+
+  while (1)
+  {
+    clear();
+    mouts(0, 25, "\033[1;37;44m¡· ¥æ³q¤j¾Ç¦¨ÁZ¬d¸ß ¡·\033[m");
+    mouts(3, 0, "¸ê®Æ¨Ó·½¡Ghttp://"SERVER_grade);
+
+    if (!vget(5, 0, "½Ğ¿é¤J¾Ç¸¹¡G", sid, 8, DOECHO))
+      break;
+    if (!vget(6, 0, "½Ğ¿é¤J¨­¤ÀÃÒ¦r¸¹¡G", id, 11, NOECHO))
+      break;
+    choice = vget(7,0, "½Ğ¿ï¾Ü (1)¥»¾Ç´Á¦¨ÁZ (2)¾ú¦~¦¨ÁZ¡G[1] ",
+      ans, 3, DOECHO) == '2';
+    grade(sid, id, choice);
+  }
+  return 0;
+}
+#endif    /* HAVE_NETTOOL */
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

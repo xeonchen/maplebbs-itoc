@@ -1,0 +1,63 @@
+§@ªÌ: itoc (©BÂP¬°¤°»ò³o»ò¦h¤H) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¶}ÀYµe­±¦³ tip
+®É¶¡: Fri Dec 13 18:39:57 2002                          Updated: 2002/02/13
+
+  ¶}ÀYµe­±¦³ tip
+  ¬Û¶Ç³o¬O Ptt ªº¯S¦â¤§¤@
+
+: bbsd.c:show_tip()   ¥[¦b tn_main() ¤§«e
+
+static inline void
+show_tip(randnum)
+  int randnum;
+{
+  int i, j, msg_num;
+  char msg[128];
+  FILE *fp;
+
+  if (!(fp = fopen(FN_ETC_TIP, "r")))
+    return;
+
+  fgets(msg, 128, fp);
+  msg_num = atoi(msg);          /* ²Ä¤@¦æ°O¿ýÁ`½g¼Æ */
+  i = randnum % msg_num + 1;
+  j = 0;
+
+  while (j < i)                 /* ¨ú²Ä i ­Ó tip */
+  {
+    fgets(msg, 128, fp);
+    if (msg[0] == '#')
+      j++;
+  }
+
+  /* ®æ¦¡­n¨Ì @opening.? ¦ÓÅÜ */
+  move(b_lines - 6, 0);
+  fgets(msg, 128, fp);
+  prints("            %s", msg);
+  fgets(msg, 128, fp);
+  prints("            %s", msg);
+  fclose(fp);
+}
+
+: bbsd.c:tn_main()
+
+static inline void
+tn_main()
+{
++ int randnum;
+
+  ...
+  ...
+
+- film_out((time(&ap_start) % 3) + FILM_OPENING0, 3);   /* ¶Ã¼ÆÅã¥Ü¶}ÀYµe­± */
++ randnum = time(&ap_start);
++ film_out((randnum % 3) + FILM_OPENING0, 0);   /* ¶Ã¼ÆÅã¥Ü¶}ÀYµe­± */
++ show_tip(randnum);
+
+  currpid = getpid();
+
+--
+  ¦pªG­n¥Î DL_get("bin/xyz.so:x_tip") ¤]¬O¥i¥H
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

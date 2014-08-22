@@ -1,0 +1,117 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¶¢²á] Á×§K so/vote.c ¦b½ä½Lµo¿ú®É¼Æ­È·¸¦ì
+µo«H¯¸: §u­·¡E²·¤ë¡EÀº¤Ñ±^ (2005/06/26 Sun 15:52:31)      Updated: 2005/06/26
+
+¡° ¤Þ­z¡mBioStar (¼ê´ò¤p¶³³¶)¡n¤§»Ê¨¥¡G
+> ­è¤~·Q¨ì......
+> ½äª`¯à¤£¯à¬Oª÷¹ô©O¡H
+> ¶W·¥´I»¨¤j¤õ«÷......
+> À³¸Ó§ó¨ë¿E......
+
+: include/struct.h struct VCH ¤¤±q nouse ®³¤@­Ó¨Ó¥Î......
+
+-  char nouse[96];
++  char gold;           /* °O¿ý½äª`³æ¦ì¬Oª÷¹ô:1 ©Î»È¹ô:0 */
++  char nouse[95];
+
+: so/vote.c:vch_edit()
+
+  else if (echo == DOECHO)      /* ¥u¦³·s¼W®É¤~¯à§ïÅÜ½ä½Lªº²¼»ù */
+  {
+    /* ½ä½L´N¥u¯à¿ï¤@¶µ */
+    vch->maxblt = 1;
+
++   if (vans("½äª`³æ¦ì­n¥Îª÷¹ô¶Ü(Y/N)¡H[N] ") == 'y')
++   {
++     vget(b_lines - 5, 0, "½Ð°Ý¨C²¼°â»ù¦h¤Öª÷¹ô¡H(100¡ã1000)¡G",
++       ans, 7, DOECHO);
++     vch->gold = 1;
++   }
++   else
++   {
+      vget(b_lines - 5, 0, "½Ð°Ý¨C²¼°â»ù¦h¤Ö»È¹ô¡H(100¡ã100000)¡G",
+        ans, 7, DOECHO);
++     vch->gold = 0;
++   }
+
+: so/vote.c:delvch()
+
+      while (read(fd, &vlog, sizeof(VLOG)) == sizeof(VLOG))
+      {
++       if (vch->gold)
++         paycheck.gold = vlog.numvotes * vch->price;
++       else
+          paycheck.money = vlog.numvotes * vch->price;
+        usr_fpath(buf, vlog.userid, FN_PAYCHECK);
+        rec_add(buf, &paycheck, sizeof(PAYCHECK));
+      }
+
+: so/vote.c:viote_join()
+
+  if (vch->vgamble == '$')
+  {
+-   if (cuser.money < vch->price)
++   if ((vch->gold && cuser.gold < vch->price) ||
++     (!vch->gold && cuser.money < vch->price))
+    {
+      vmsg("±zªº¿ú¤£°÷°Ñ¥[½ä½L");
+      return XO_FOOT;
+    }
+
+¡]¤¤²¤¡^
+
++    if (vch->gold)
++      sprintf(buf, "¨C±i½ä²¼ %d ª÷¹ô¡A½Ð°Ý­n¶R´X±i¡H[1] ", vch->price)
++    else
+       sprintf(buf, "¨C±i½ä²¼ %d »È¹ô¡A½Ð°Ý­n¶R´X±i¡H[1] ", vch->price);
+
+¡]¤¤²¤¡^
+
+-     if (cuser.money >= fd)
++     if ((vch->gold && cuser.gold >= fd) ||
++       (!vch->gold && cuser.money >= fd))
+        break;
+
+¡]¤¤²¤¡^
+
+  if (vch->vgamble == '$')
+  {
++   if (vch->gold)
++     cuser.gold -= fd;   /* fd ¬O­n¥Iªº½äª÷ */
++   else
+      cuser.money -= fd;  /* fd ¬O­n¥Iªº½äª÷ */
+  }
+
+: so/vote.c:vlog_pay()
+
++   if (vch->gold)
++     fprintf(fp, "ªO¥D %s ©âÀY¡A¥iÀò±o %d ª÷¹ô\n", vch->owner, money);
++   else
+      fprintf(fp, "ªO¥D %s ©âÀY¡A¥iÀò±o %d »È¹ô\n", vch->owner, money);
+
+    memset(&paycheck, 0, sizeof(PAYCHECK));
+    time(&paycheck.tissue);
++   if (vch->gold)
++     paycheck.gold = money;
++   else
+      paycheck.money = money;
+
+¡]¤¤²¤¡^
++         if (vch->gold)
++         {
++           fprintf(fp, "%s ¶R¤F %d ±i¡A¦@¥iÀò±o %d ª÷¹ô\n",
++             vlog.userid, vlog.numvotes, money);
++           paycheck.gold = money;
++         }
++         else
++         {
+            fprintf(fp, "%s ¶R¤F %d ±i¡A¦@¥iÀò±o %d »È¹ô\n",
+              vlog.userid, vlog.numvotes, money);
+            paycheck.money = money;
++         }
+
+          sprintf(paycheck.reason, "[½ä½L] %s", currboard);
+
+--
+ [1;41m¡÷[44m¡õ[m O[1mri[30mgi[mn: [1;43m ¹ü¤Æ®v¤j¥Íª«¨t£»§u­·¡E²·¤ë¡EÀº¤Ñ±^ [47m micro.bio.ncue.edu.tw [m
+ [1;45m¡ô[42m¡ö[m Au[1mt[30mho[mr: [1;33mBioStar[m ±q [1;34m61-64-116-235-adsl-zha.STATIC.so-net.net.tw[m µoªí

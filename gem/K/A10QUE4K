@@ -1,0 +1,355 @@
+µo«H¤H: shakalaca.bbs@bittern.csie.nctu.edu.tw.bbs@aurora. ¬ÝªO: plan
+¼Ð  ÃD: [doc] bbs + gallery
+µo«H¯¸: aurora (2004/03/08 Mon 19:07:12)                  Updated: 2004/04/28
+
+: so/Makefile ­Y¬O FreeBSD ³o¼Ë§ï
+
+SO =    .... [1;33mgallery.so[m
+
+.SUFFIXES:
+.SUFFIXES: .c .o .so
+
+.c.o:   ;  $(CC) $(CFLAGS) -c $*.c
+.o.so:  ;  ld -s -G $*.o -o $*.so -L../lib -ldao [1;33m-lmd[m
+
+: so/Makefile ­Y¬O Linux ³o¼Ë§ï
+
+SO =    .... [1;33mgallery.so[m
+
+SUFFIXES:
+SUFFIXES: .c .o .so
+
+c.o:    ;  $(CC) $(CFLAGS) -c $*.c
+o.so:   ;  ld -s -G $*.o -o $*.so -L../lib -ldao [1;33m-lssl[m
+
+: menu.c ¾A·íªº¿ï³æ¥[¤J
+
+  "bin/gallery.so:create_account", 0, - M_XMODE,
+  "Gallery    ¡ñ ·s¼W¬ÛÃ¯ ¡ð",
+
+: so/gallery.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* gallery.c    ( NTHU CS MapleBBS Ver 2.36 )            */
+/*-------------------------------------------------------*/
+/* target : create gallery account                       */
+/* create : 04/03/08                                     */
+/* update : 04/03/08                                     */
+/* author : shakalaca.bbs@php.twbbs.org                  */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#define ALBUM_PATH      "/home/data/www/albums"
+#define FN_GALLERY_LOG  "run/gallery.log"
+
+
+typedef struct
+{
+  char username[32];
+  char fullname[32];
+  char password[64];
+  char email[64];
+  char uid[32];
+  char lastactiondate[64];
+} GalleryUser;
+
+
+/* ------------------------------------------------------------------ */
+
+static void
+f_add(fpath, msg)   /* ¥é f_cat()¡A°ßÅv­­§ï¬° 0664 */
+  char *fpath;
+  char *msg;
+{
+  int fd;
+
+  if ((fd = open(fpath, O_WRONLY | O_CREAT | O_APPEND, 0664)) >= 0)
+  {
+    write(fd, msg, strlen(msg));
+    close(fd);
+  }
+}
+
+
+static void
+f_join(from, to)    /* ®ÄªGÃþ¦ü f_suck()¡A°ßÅv­­§ï¬° 0664 */
+  char *from, *to;
+{
+  int in, out, len;
+  char buf[512];
+
+  if ((in = open(from, O_RDONLY)) >= 0)
+  {
+    if ((out = open(to, O_WRONLY | O_CREAT | O_APPEND, 0664)) >= 0)
+    {
+      while (len = read(in, buf, sizeof(buf)))
+        write(out, buf, len);
+
+      close(out);
+    }
+    close(in);
+  }
+}
+
+
+/* ------------------------------------------------------------------ */
+
+
+static int      /* 1:¦¨¥\ 0:¥¢±Ñ */
+create_file(u, hash)
+  GalleryUser u;
+  char *hash;
+{
+  char fpath[64], input[1024];
+
+  sprintf(fpath, "%s/.users/%s", ALBUM_PATH, hash);
+
+  if (!dashf(fpath))     /* ­nÀË¬d hash ¬O¤£¬O¦³­«ÂÐ */
+  {
+    sprintf(input, "O:12:\"gallery_user\":13:{s:8:\"username\";%s;"
+      "s:8:\"fullname\";%s;s:8:\"password\";%s;s:5:\"email\";%s;s:7:\"isAdmin\";b:0;"
+      "s:15:\"canCreateAlbums\";s:1:\"0\";s:3:\"uid\";%s;s:15:\"defaultLanguage\";"
+      "s:5:\"en_US\";s:7:\"version\";i:5;s:15:\"recoverPassHash\";N;"
+      "s:10:\"lastAction\";s:8:\"register\";s:14:\"lastActionDate\";%s;"
+      "s:9:\"origEmail\";%s;}",
+      u.username, u.fullname, u.password, u.email, u.uid,
+      u.lastactiondate, u.email);
+
+    f_add(fpath, input);
+    return 1;
+  }
+
+  return 0;
+}
+
+
+static int      /* 1:¦¨¥\ 0:¥¢±Ñ */
+create_album(u, hash)
+  GalleryUser u;
+  char *hash;
+{
+  char fpath[128], file[128], buf[256], buf2[128];
+  time_t now;
+
+  sprintf(fpath, "%s/%s", ALBUM_PATH, cuser.userid);
+
+  if (!dashd(fpath))
+  {
+    if (mkdir(fpath, 0775) == -1)
+    {
+      /* ­n§â­è¤~²£¥Íªº hashfile §R°£ */
+      sprintf(fpath, "%s/.users/%s", ALBUM_PATH, hash);
+      unlink(fpath);
+      return 0;
+    }
+
+    time(&now);
+
+    sprintf(file, "%s/photos.dat", fpath);
+    f_add(file, "N;");
+
+    sprintf(file, "%s/album.dat", fpath);
+
+    sprintf(buf2, "%s ªº¬ÛÃ¯", cuser.userid);
+    sprintf(buf, "O:5:\"album\":5:{s:6:\"fields\";a:57:{s:5:\"title\";s:%d:\"%s\";",
+      strlen(buf2), buf2);
+    f_add(file, buf);
+
+    f_join("etc/gallery/album.dat.head", file);
+
+    sprintf(buf, "s:11:\"clicks_date\";i:%ld;", now);
+    f_add(file, buf);
+
+    f_join("etc/gallery/album.dat.body", file);
+
+    sprintf(buf, "s:4:\"name\";s:%d:\"%s\";s:5:\"owner\";%s;s:13:\"last_mod_time\";i:%ld;",
+      strlen(cuser.userid), cuser.userid, u.uid, now);
+    f_add(file, buf);
+
+    f_join("etc/gallery/album.dat.foot", file);
+  }
+
+  return 1;
+}
+
+
+#ifdef LINUX
+
+#include <openssl/md5.h>
+
+static char *
+gen_salt(password)
+  char *password;
+{
+#define MD5ENCODELEN    16
+  int i;
+  MD5_CTX ctx;
+  char buf[MD5ENCODELEN];
+  static char retbuf[2 * MD5ENCODELEN + 1];
+
+  MD5Init(&ctx);
+  MD5Update(&ctx, (uschar *) password, (usint) strlen(password));
+  MD5Final(buf, &ctx);
+
+  for (i = 0; i < MD5ENCODELEN; i++)
+    sprintf(retbuf + (i << 1), "%02x", buf[i]);
+
+  return retbuf;
+}
+
+#else
+
+#include <md5.h>
+
+static char *
+gen_salt(password)        /* ¿é¤J­ì©l±K½X¡A¿é¥X¥[±K±K½X */
+  char *password;
+{
+  int i, ch;
+  char salt[5], tmpbuf[64], buf[33];
+  static char retbuf[64];
+
+  for (i = 0; i < 4; i++)
+  {
+    ch = rand() % (109 - 48 + 1) + 48;
+    if (ch > 57)
+      ch += 7;
+    if (ch > 90)
+      ch += 6;
+    salt[i] = ch;
+  }
+  salt[4] = '\0';
+
+  sprintf(tmpbuf, "%s%s", salt, password);
+  MD5Data(tmpbuf, strlen(tmpbuf), buf);
+  sprintf(retbuf, "%s%s", salt, buf);
+
+  return retbuf;
+}
+#endif
+
+
+static void
+gallery_log(mode)
+  char *mode;
+{
+  char buf[128];
+
+  sprintf(buf, "%s %s (%s)\n", Now(), mode, cuser.userid);
+
+  f_add(FN_GALLERY_LOG, buf);
+}
+
+
+int
+create_account()
+{
+  GalleryUser gu;
+  char buf[128], *ptr;
+  time_t now;
+
+  sprintf(buf, "%s/%s", ALBUM_PATH, cuser.userid);
+
+  if (dashd(buf))
+  {
+    vmsg("±z¤w¸g¥Ó½Ð¹L¬ÛÃ¯¤F¡I");
+    return XEASY;
+  }
+
+  time(&now);
+  sprintf(gu.username, "s:%d:\"%s\"", strlen(cuser.userid), cuser.userid);
+  sprintf(gu.fullname, "s:%d:\"%s\"", strlen(cuser.username), cuser.username);
+  sprintf(gu.email, "s:%d:\"%s\"", strlen(cuser.email), cuser.email);
+  sprintf(gu.lastactiondate, "i:%ld", now);
+
+  for (;;)
+  {
+    vget(b_lines, 0, "½Ð³]©w±K½X¡G", buf, PSWDLEN + 1, NOECHO);
+    if ((strlen(buf) < 3) || !strcmp(buf, cuser.userid))
+    {
+      vmsg("±K½X¤ÓÂ²³æ¡A©ö¾D¤J«I¡A¦Ü¤Ö­n 4 ­Ó¦r¡A½Ð­«·s¿é¤J");
+      continue;
+    }
+
+    vget(b_lines, 0, "½ÐÀË¬d±K½X¡G", buf + PSWDLEN + 2, PSWDLEN + 1, NOECHO);
+    if (!strcmp(buf, buf + PSWDLEN + 2))
+      break;
+
+    vmsg("±K½X¿é¤J¿ù»~, ½Ð­«·s¿é¤J±K½X");
+  }
+
+  srand(now + cuser.userno);
+  ptr = gen_salt(buf);
+  sprintf(gu.password, "s:%d:\"%s\"", strlen(ptr), ptr);
+
+  /* ½T«O¦P¤@®É¶¡¤£¦P¤H«Øªº hash ¤£¦P */
+  sprintf(buf, "%ld_%ld", now, rand());
+  sprintf(gu.uid, "s:%d:\"%s\"", strlen(buf), buf);
+
+  umask(0002);
+
+  if (!create_file(gu, buf))
+  {
+    gallery_log("ERROR CREATING USER PROFILE");
+    vmsg("¿ù»~¡GµLªk«Ø¥ß¸ê®ÆÀÉ¡A½Ð³qª¾¯¸ªø¡I");
+  }
+  else if (!create_album(gu, buf))
+  {
+    gallery_log("ERROR CREATING DIRECTORY");
+    vmsg("¿ù»~¡GµLªk«Ø¥ß¬ÛÃ¯¡A½Ð³qª¾¯¸ªø¡I");
+  }
+  else
+  {
+    gallery_log("CREATE ALBUM");
+    vmsg("¤w«Ø¥ß¸ê®Æ :)");
+  }
+
+  return XEASY;
+}
+
+
+
+µ{¦¡»¡©ú¡G
+
+* ¥ý¸Ë gallery §a¡AFreeBSD ¥i¥H¥Î ports : /usr/ports/www/gallery
+  ¤£µM´N¥h http://gallery.sf.net §ì¡C
+
+* FreeBSD ¤w¸g¹w³]¸Ë md5 ¤F¡A¦pªG¨ä¥L¨t²Î¨S¦³¸Ë MD5 ªº¸Ü¡A½Ð¦Û¦æ¦w¸Ë¡C
+
+* ¥h§ì ftp://php.twbbs.org/pub/bbs/gallery/etc ¸Ì­±ªºªF¦è¡A©ñ¨ì BBS ®a¥Ø¿ý
+  ¤Uªº etc/gallery ¸Ì­±¡C³o¬O album.dat ªº¤º®e¡Aª½±µ®³¨Ó¥ÎµM«á´«¤W¦Û­qªºÄæ
+  ¦ì¡Agallery ·|«ÜÁo©úªº§â¸Ó¸ê®Æ§¨·í§@¬O¬ÛÃ¯¡C
+
+  ·íµM³oÃä¥i¥H§@«Ü¦hÅÜ¤Æ¡A¦b album.dat.head ªº³Ì«á´X­ÓÄæ¦ì¦³¤@­Ó¬O
+
+    s:15:"parentAlbumName";i:0;
+
+  «üªº¬O¸Ó¥Ø¿ýªº¤÷¥Ø¿ý¬°¦ó¡A¦pªG·Q§â bbs ¨Ï¥ÎªÌ¥Ó½Ðªº¥Ø¿ý³£©ñ¨ì¬Y­Ó
+  ¸ê®Æ§¨¤U­±ªº¸Ü (¤ñ¦p bbs)¡A¥ý¥Î gallery «Ø¥ß bbs ¬ÛÃ¯¡AµM«á­×§ï
+  album.dat.head¡A§â¤W­±¨º¨Ç¦r¦ê§ï¬°
+
+    s:15:"parentAlbumName";s:3:"bbs";
+
+  "bbs" «e­±ªº 3 ´N¬O«ü "bbs" ³o­Ó¦r¦êªºªø«×¡A¨Ì¦¹Ãþ±À¥i¥H´«¦¨
+  §A·Q­nªº¸ê®Æ§¨¦WºÙ¡C
+
+* ­n§â³o¤G­Ó¥Ø¿ýªºÅv­­
+  /home/data/www/albums
+  /home/data/www/albums/.users
+  Åý bbs ¨­¤À¥i¥H¼g¤J¡C
+
+* ³o¼Ë¤lÀ³¸Ó´N¦æ¤F :D
+
+  ¦pªG¦³°ÝÃDÅwªï´£¥X :)
+
+  µ{¦¡¥Ø«e¤£½T©w¬O§_¬° bug free¡A¦pªG¦]¬°¨Ï¥Î³o¤äµ{¦¡³y¦¨ CPU ¿N±¼¡A
+  ¸ê®Æ®ø¥¢¡A°O¾ÐÅé¤£¨£¡A³Q¤H¤J«I¡A¤kªB¤Í¶]±¼©Î¬OªÑ¥«®M¨c¡A¥»¤H¤£­t³d¡C :pp
+
+--
+                                                      §ÚªºÃ±¦WÀÉ¥u¦³¤Q­Ó¦r.
+--
+ [1;37m  ^..^    [33m¡¹ [1;36m< ½Þ ÀY ¬ö ¤½ ¶é - php.twbbs.org (140.113.208.200) >[m
+ [1;37m-w @@ w-- [1;34m                         < bittern.csie.nctu.edu.tw >[m

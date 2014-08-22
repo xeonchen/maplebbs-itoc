@@ -1,0 +1,45 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¤ÈÄ±¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: [­×§ï]¶i¤J¦W³æ®É°µusernoÀË¬d
+µo«H¯¸: ¤ë¤U©]·Q (2003/12/15 Mon 22:04:19)                Updated: 2004/05/11
+
+  ¦pªG§A¦³°µ§â.USR©ñ¤Jshm³o½g­×§ï¡A¨º»òpal_body()´N¥i¥H¶¶«K°µÀË¬duserno¦Ó¥B¤£
+
+  »ÝÅªµwºÐ¡A§K±o§â.ACCT¾ÞÃz¡C
+
+: pal.c
+
+  «e­±¥[¤@¤U
+
+extern XZ xz[];
++extern SCACHE *schema_shm;
+
+  §ïpal_body()
+
+static int
+pal_body(xo)
+  XO *xo;
+{
+  PAL *pal;
+  BRD *brd;
++ SCHEMA *schema;
+  char *dir, buf[80];
+  int num, max, tail;
+
+  ......
+  ......
+  do
+  {
++   schema = schema_shm->schema + (pal->userno - 1);
++   if (str_ncmp(schema->userid, pal->userid, strlen(pal->userid)))
++   {
++     rec_del(xo->dir, sizeof(PAL), num, NULL, NULL);
++     sprintf(buf, "±zªº¦W³æ¸Ì%s(No.%d)³o­ÓID¤w¸gÅÜ§ó¹L©Î¬O³Q¬å±¼", pal->userid, pal->userno);
++     vmsg(buf);
++     return XO_LOAD; /* amaki. ­«·sÅª¤@¦¸ÀÉ®×¡A¦]¬°xpool¤w¸g¤£¹ï */
++   }
++   else
+      pal_item(++num, pal++);
+  } while (num < max);
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

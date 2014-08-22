@@ -1,0 +1,50 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¬d¸ß¨Ï¥ÎªÌ¤W¯¸¨Ó·½
+µo«H¯¸: µL¦W¤p¯¸ (2006/06/07 Wed 15:40:30)                Updated: 2006/06/07
+
+Admin¿ï³æ·s¼W¬d¸ß¨Ï¥ÎªÌ¤W¯¸¨Ó·½ :p
+
+[32m:/src/maple/menu.c[m
+
++  "bin/admutil.so:a_show_from", PERM_ALLREG, - M_SYSTEM,
++  "ShowFrom   ¢« ¨Ó·½Åã¥Ü ¢¨",
+
+[32m:/src/so/admutil.c ·s¼W[m
+
+int
+a_show_from()
+{
+  ACCT acct;
+  char fpath[64], tmp[64], last[4], cmd[128];
+
+  if (vans("¬O§_¬d¸ß(Y/N)¡H[N] ") != 'y')
+    return XEASY; /* ¹w³]¤£¬d¸ß */
+
+  if (acct_get(msg_uid, &acct) > 0)
+  {
+    usr_fpath(fpath, acct.userid, FN_LOG);
+
+    sprintf(cmd, "¬d¸ß¨Ï¥ÎªÌ %-13s¤W¯¸¨Ó·½", acct.userid);
+    alog("¬d¸ß¨Ó·½", cmd);
+
+    if (vget(b_lines, 0, "±ý¬d¸ß³Ì«á´Xµ§¸ê®Æ(Åã¥Ü¥þ³¡½Ð«öEnterÁäÄ~Äò) ",
+      last, 4, DOECHO))
+    {
+      sprintf(tmp, "tmp/showfrom.%s", acct.userid);
+      sprintf(cmd, "cat %s | tail -%s > %s", fpath, last, tmp);
+      system(cmd);
+      more(tmp, NULL);
+      unlink(tmp);
+    }
+    else
+      more(fpath, NULL);
+  }
+  return 0;
+}
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î [37m61-231-202-81.dynamic.hinet.net[30m®ü[m

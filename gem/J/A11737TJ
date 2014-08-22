@@ -1,0 +1,32 @@
+§@ªÌ: itoc (cygreadline4.dll) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¯¸ªø°O¿ý -- ¬åªO
+®É¶¡: 2004/05/12 Wed 18:24:20                           Updated: 2005/04/29
+
+: maple.p
+
++ void add_post(char *brdname, char *fpath, char *title);
+int do_reply(XO *xo, HDR *hdr);
+
+: post.c ·s¼W¥H¤U¨ç¦¡¦b do_post() «e­±
+
+void
+add_post(brdname, fpath, title)           /* µo¤å¨ì¬ÝªO */
+  char *brdname;        /* ±ý post ªº¬ÝªO */
+  char *fpath;          /* ÀÉ®×¸ô®| */
+  char *title;          /* ¤å³¹¼ÐÃD */
+{
+  HDR hdr;
+  char folder[64];
+
+  brd_fpath(folder, brdname, fn_dir);
+  hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
+  strcpy(hdr.owner, cuser.userid);
+  strcpy(hdr.nick, cuser.username);
+  strcpy(hdr.title, title);
+  rec_bot(folder, &hdr, sizeof(HDR));
+
+  btime_update(brd_bno(brdname));
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

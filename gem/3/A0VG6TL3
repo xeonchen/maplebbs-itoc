@@ -1,0 +1,382 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] ¤@¥x¥D¾÷¤W¬[¤G­Ó BBS ¯¸
+®É¶¡: Thu Jul  3 08:17:36 2003
+
+                       [32m¡¹ ¤@¥x¥D¾÷¬[¤G­Ó BBS ¯¸ ¡¹[m
+
+  ¤@¡B¦w¸Ë§@·~¨t²Î
+  ¤G¡B¤U¸ü BBS µ{¦¡
+  ¤T¡B«Ø¥ß BBS ±b¸¹
+  ¥|¡B¦w¸Ë BBS
+  ¤­¡B³]©w BBS Àô¹Ò -- ¡]¢Ï¡^¦pªG¦³ inetd¡iFreeBSD¡j
+  ¤­¡B³]©w BBS Àô¹Ò -- ¡]¢Ð¡^¦pªG¦³ xinetd¡iLinux¡j
+  ¤­¡B³]©w BBS Àô¹Ò -- ¡]¢Ñ¡^¦pªG¨S¦³ inetd/xinetd
+  ¤»¡B¨ä¥L³]©w
+  ¤C¡B¨É¥Î±z¦Û¤vªº BBS
+
+
+    ¥»¤å¥ó¬O¼gµ¹­n¦w¸Ë itoc ©ÒºûÅ@ªº bbs µ{¦¡ª©¥»©Ò¨Ï¥Îªº¡A¨Ã¤£¾A¥Î
+  ¨ä¥L bbs ª©¥»¡C
+
+
+  [1;33m¤@¡B¦w¸Ë§@·~¨t²Î[m
+
+    §Ú·Q³o¨BÆJ¡A±zÀ³¸Ó¤w¸g§¹¦¨¤F¡C
+
+
+  [1;33m¤G¡B¤U¸ü BBS µ{¦¡[m
+
+    ¦b http://processor.tfcis.org/~itoc ¥i¥H§ä¨ì³Ì·sªºµ{¦¡ª©¥»¡AÀ³
+  ¸Óªø±o¹³ MapleBBS-3.10-20yymmdd-PACK.tgz ³o¼ËªºÀÉ¦W¡C
+
+
+  [1;33m¤T¡B«Ø¥ß BBS ±b¸¹[m
+
+    ¥H root ¨­¤Àµn¤J¡C
+
+  -root- # [1;36mvipw[m
+           ¦pªG±z¬O FreeBSD ªº¸Ü¡A¦b³Ì«á¤@¦æ¥[¤W
+           bbs2:*:9998:98::0:0:BBS2 Administrator:/home/bbs2:/bin/tcsh
+           ¦pªG±z¬O Linux ªº¸Ü¡A¦b³Ì«á¤@¦æ¥[¤W
+           bbs2:x:9998:998:BBS2 Administrator:/home/bbs2:/bin/tcsh
+           (·íµM±z¤]¥i¥H¥Î pw ©Î useradd ªº«ü¥O¨Ó§¹¦¨¬Û¦Pªº°Ê§@)
+
+  -root- # [1;36mjoe /etc/group[m
+           (°²³]½s¿è¾¹¬O joe¡A¦pªG¤£¬Oªº¸Ü¡A½Ð¦Û¦æ§ïÅÜ)
+           ¦pªG±z¬O FreeBSD ªº¸Ü¡A¦b³Ì«á¤@¦æ¥[¤W
+           bbs2:*:998:bbs2
+           ¦pªG±z¬O Linux ªº¸Ü¡A¦b³Ì«á¤@¦æ¥[¤W
+           bbs2:*:998:bbs2
+           (·íµM±z¤]¥i¥H¥Î pw ©Î groupadd ªº«ü¥O¨Ó§¹¦¨¬Û¦Pªº°Ê§@)
+
+  -root- # [1;36mpasswd bbs2[m
+           ¿é¤J bbs2 ªº±K½X
+
+  -root- # [1;36mtar xvfz /tmp/MapleBBS-3.10-20yymmdd-PACK.tgz -C /tmp/[m
+           [1;36mmv -f /tmp/bbs /home/bbs2[m
+           °²³]±z§â BBS µ{¦¡ÀÉ®×©ñ¦b /tmp/
+
+  -root- # [1;36mchown -R bbs2:bbs2 /home/bbs2[m
+
+
+  [1;33m¥|¡B¦w¸Ë BBS[m
+
+    ¥H bbs2 ¨­¤Àµn¤J¡C
+
+  -bbs2- % [1;35mjoe /home/bbs2/src/include/config.h[m
+
+           (A) ­×§ï HOST_ALIASES¡A§â±z©Ò¦³ªº fqdn ³£¥[¶i¥h
+
+#define HOST_ALIASES    {MYHOSTNAME, MYIPADDR, \
+                         "wolf.twbbs.org", "wolf.twbbs.org.tw", \
+                         NULL}
+
+           (B) ¦pªG±z¬O FreeBSD ªº¸Ü¡A§ï BBSGID ¬° 98
+               ¦pªG±z¬O Linux ªº¸Ü¡A§ï BBSGID ¬° 998
+
+#define BBSGID          98                      /* Linux ½Ð³]¬° 998 */
+
+           (C) ­×§ï BBSHOME ¤Î BAKPATH
+
+#define BBSHOME         "/home/bbs2"            /* BBS ªº®a */
+#define BAKPATH         "/home/bbs2/bak"        /* ³Æ¥÷ÀÉªº¸ô®| */
+
+           (D) ­×§ï port ¤Î shm/sem key¡A¼Æ¦r¤£­n©M¤w¦³ªºªA°È¬Û½Ä
+
+#define MAX_BBSDPORT    1       /* bbsd ­n¶}´X­Ó port¡AÀH BBSD_PORT ¦ÓÅÜ */
+#define BBSD_PORT       {3023}  /* bbsd   ©Ò¥Îªº port (bbsd.c) */
+#define BMTA_PORT       3025    /* SMTP   ©Ò¥Îªº port (bmtad.c) */
+#define GEMD_PORT       3070    /* Gopher ©Ò¥Îªº port (gemd.c) */
+#define FINGER_PORT     3079    /* Finger ©Ò¥Îªº port (bguard.c) */
+#define POP3_PORT       3110    /* POP3   ©Ò¥Îªº port (bpop3d.c) */
+#define BNNTP_PORT      3119    /* NNTP   ©Ò¥Îªº port (bnntp.c) */
+#define CHAT_PORT       6838    /* ²á¤Ñ«Ç ©Ò¥Îªº port (chat.c xchatd.c) */
+#define INNBBS_PORT    10777    /* Âà«H   ©Ò¥Îªº port (channel.c) */
+
+#define BRDSHM_KEY     12997    /* ¬ÝªO */
+#define UTMPSHM_KEY    11998    /* ¨Ï¥ÎªÌ */
+#define FILMSHM_KEY    12999    /* °ÊºA¬ÝªO */
+#define PIPSHM_KEY     14998    /* ¹q¤lÂû¹ï¾Ô */
+
+#define BSEM_KEY       12000    /* semaphore key */
+
+  -bbs- % [1;35mjoe /home/bbs2/src/include/dns.h[m
+          ¦pªG±z¨S¦³ relay server ¥iÀ°±zªº BBS ±H«Hªº¸Ü¡A¨º»ò½Ð¸õ¹L³o¤@¨B¡A
+          ¦ý±z±N¥i¯àµLªk¹ï¥~±H«H¨ì¬Y¨Ç¯¸¥x¡C
+
+          ¦pªG±z¦³ relay server ¥iÀ°±zªº BBS ±H«Hªº¸Ü¡A½Ð±N HAVE_RELAY_SERVER
+          ªº #undef §ï¦¨ #define¡A¨Ã§ï RELAY_SERVER ªº©w¸q­È¡C
+
+#define HAVE_RELAY_SERVER       /* ±Ä¥Î relay server ¨Ó¥~±H«H¥ó */
+
+#ifdef HAVE_RELAY_SERVER
+#define RELAY_SERVER    "mail.tnfsh.tn.edu.tw"  /* outbound mail server */
+#endif
+
+          ¨Ò¦p¦b¥æ³q¤j¾Çªº¯¸¥i¥H¨Ï¥Î "smtp.nctu.edu.tw"¡A¦Ó¨Ï¥Î HiNet ADSL ªº
+          ¯¸¥i¥H¨Ï¥Î "msa.hinet.net"¡C
+
+  -bbs2- % [1;35mjoe /home/bbs2/bin/install.sh[m
+           ­×§ï schoolname bbsname ... msg_bmw µ¥¼Æ¶µ¡A¨Ò¦p§ï¦¨¥H¤U³o¼Ë
+           (½Ðª`·N¤£­n¦³ªÅ¥Õ©Î¬O[]²Å¸¹)
+
+schoolname="¤Ó¶§¬P¨t"
+bbsname="¤õ¬P¼Ö¶é"
+bbsname2="Solar.Mars.BBS"
+sysopnick="¾Ô¯«°¨´µ"
+tag_valid="MarsBBS"
+myipaddr="200.100.50.25"
+myhostname="solarmars.twbbs.org"
+bbs_token="Mars"
+msg_bmw="¤õ²y"
+
+          ¦pªG±z¬O¨Ï¥Î Linux ªº¸Ü¡AÁÙ­n§ï
+
+ostype="linux"
+
+  -bbs2- % [1;35m/home/bbs2/bin/install.sh[m
+           ±z»Ý­nµ¥«Ý¤@¬q®É¶¡¨Ó§¹¦¨½sÄ¶
+
+  -bbs2- % [1;35mrm -f /home/bbs2/bin/install.sh[m
+           sed ¥Î¹L¤@¦¸¥H«á´N¨S¥Î¤F¡A¨º´N¸ò¥¦»¡Án¦A¨£§a
+
+  -bbs2- % [1;35mcrontab /home/bbs2/doc/crontab[m
+           §â doc/crontab ªº¤º®e¥[¤J crontab
+
+
+    [1;33m¤­¡B³]©w BBS Àô¹Ò -- ¡]¢Ï¡^¦pªG¦³ inetd[m
+
+    ¦pªG¨S¦³ /etc/inetd.conf ³oÀÉ®×¡A½Ð¸õ¨ì¤­¡]¢Ð¡^¡A³q±` FreeBSD À³¸Ó¦³
+  inetd ¤~¹ï¡C
+
+    ¥H root ¨­¤Àµn¤J¡C
+
+  -root- # [1;36mjoe /etc/inetd.conf[m
+           ¥[¤J¥H¤U¼Æ¦æ
+#
+# MapleBBS2
+#
+telnet2 stream  tcp     wait    bbs2    /home/bbs2/bin/bbsd     bbsd -i
+smtp2   stream  tcp     wait    bbs2    /home/bbs2/bin/bmtad    bmtad -i
+gopher2 stream  tcp     wait    bbs2    /home/bbs2/bin/gemd     gemd -i
+finger2 stream  tcp     wait    bbs2    /home/bbs2/bin/bguard   bguard -i
+pop32   stream  tcp     wait    bbs2    /home/bbs2/bin/bpop3d   bpop3d -i
+nntp2   stream  tcp     wait    bbs2    /home/bbs2/bin/bnntpd   bnntpd -i
+http2   stream  tcp     wait    bbs2    /home/bbs2/bin/bhttpd   bhttpd -i
+xchat2  stream  tcp     wait    bbs2    /home/bbs2/bin/xchatd   xchatd -i
+bbsnntp2 stream tcp     wait    bbs2    /home/bbs2/innd/innbbsd innbbsd -i
+
+  -root- # [1;36mjoe /etc/rc.d/rc.local[m
+           ¥[¤J¥H¤U¼Æ¦æ
+
+#
+# MapleBBS2
+#
+su bbs2 -c '/home/bbs2/bin/camera'
+su bbs2 -c '/home/bbs2/bin/account'
+
+
+    [1;33m¤­¡B³]©w BBS Àô¹Ò -- ¡]¢Ð¡^¦pªG¦³ xinetd[m
+
+    ¦pªG¨S¦³ /etc/xinetd.d/ ³o¥Ø¿ý¡A½Ð¸õ¨ì¤­¡]¢Ñ¡^¡A³q±` Linux À³¸Ó¦³
+  xinetd ¤~¹ï¡C
+
+    ¥H root ¨­¤Àµn¤J¡C
+
+  -root- # [1;36mjoe /etc/xinetd.d/telnet2[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service telnet2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bbsd
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/xinetd.d/smtp2[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service smtp2
+{
+        disable         = no
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bmtad
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/xinetd.d/gopher2[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service gopher2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/gemd
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/xinetd.d/finger2[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service finger2
+{
+        disable         = no
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bguard
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/xinetd.d/pop32[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service pop32
+{
+        disable         = no
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bpop3d
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/xinetd.d/nntp2[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service nntp2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bnntpd
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/xinetd.d/http2[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service http2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/bhttpd
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/xinetd.d/xchat2[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service xchat2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/bin/xchatd
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/xinetd.d/bbsnntp2[m
+           ±N³oÀÉ®×§ï¦¨¦¹¤º®e (³oÀÉ®×¦³¥i¯à­ì¥»¬O¨S¦³¥ô¦ó¤å¦rªº¶}·sÀÉ®×)
+
+service bbsnntp2
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs2
+        server          = /home/bbs2/innd/innbbsd
+        server_args     = -i
+}
+
+  -root- # [1;36mjoe /etc/rc.local[m
+           ¥[¤J¥H¤U¼Æ¦æ
+
+#
+# MapleBBS2
+#
+su bbs2 -c '/home/bbs2/bin/camera'
+su bbs2 -c '/home/bbs2/bin/account'
+
+
+    [1;33m¤­¡B³]©w BBS Àô¹Ò -- ¡]¢Ñ¡^¦pªG¨S¦³ inetd/xinetd[m
+
+    ¨S inetd ¤]¨S xinetd¡A§ï¥Î standalone ±Ò°Ê
+
+    ¥H root ¨­¤Àµn¤J¡C
+
+  -root- # [1;36mjoe /etc/rc.local[m
+           ¥[¤J¥H¤U¼Æ¦æ
+
+#
+# MapleBBS2
+#
+/home/bbs2/bin/bbsd
+/home/bbs2/bin/bmtad
+/home/bbs2/bin/gemd
+/home/bbs2/bin/bguard
+/home/bbs2/bin/bpop3d
+/home/bbs2/bin/bnntpd
+/home/bbs2/bin/xchatd
+/home/bbs2/innd/innbbsd
+
+su bbs2 -c '/home/bbs2/bin/camera'
+su bbs2 -c '/home/bbs2/bin/account'
+
+
+    [1;33m¤»¡B¨ä¥L³]©w[m
+
+  ¥H root ¨­¤Àµn¤J¡C
+
+  -root- # [1;36mjoe /etc/services[m
+           ¥[¤J¥H¤U¼Æ¦æ
+
+# ²Ä¤G­ÓBBS
+telnet2        3023/tcp
+telnet2        3023/udp
+smtp           3025/tcp    mail         #Simple Mail Transfer
+smtp           3025/udp    mail         #Simple Mail Transfer
+gopher         3070/tcp
+gopher         3070/udp
+finger         3079/tcp
+finger         3079/udp
+pop3           3110/tcp    #Post Office Protocol - Version 3
+pop3           3110/udp    #Post Office Protocol - Version 3
+nntp           3119/tcp    usenet       #Network News Transfer Protocol
+nntp           3119/udp    usenet       #Network News Transfer Protocol
+xchat          6838/tcp
+xchat          6838/udp
+bbsnntp       10777/tcp    usenet       #Network News Transfer Protocol
+bbsnntp       10777/udp    usenet       #Network News Transfer Protocol
+xchat2         6838/tcp
+xchat2         6838/udp
+bbsnntp2      10777/tcp    usenet
+bbsnntp2      10777/udp    usenet
+
+  -root- # [1;36mreboot[m
+           ­«¶}¾÷§a
+
+
+    [1;33m¤C¡B¨É¥Î±z¦Û¤vªº BBS[m
+
+    ±zªº BBS2 À³¸Ó¤w¸g¬[¦n¤F¡A¸ÕµÛ telnet ¬Ý¬Ý¡A¨º´N³o¼Ë¦n¦n¨É¥Î§a¡C
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,50 @@
+µo«H¤H: waynesan.bbs@csdc.twbbs.org (csc241.twbbs.org) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] menu.c ¨t²ÎºÞ²z¿ï³æÁôÂÃ
+µo«H¯¸: ¦Ëµ«¤p¯¸ (2004/03/26 Fri 13:07:25)                Updated: 2004/07/23
+
+: menu.c
+
+static MENU menu_main[] =
+{
+
+[1;33m+[m #if 0   /* waynesan.040325:ÁôÂÃ¿ï³æªº¨t²ÎºûÅ@°Ï */
+  menu_admin, PERM_ALLADMIN, M_AMENU,
+  "0Admin    £X ¨t²ÎºûÅ@°Ï £X",
+[1;33m+[m #endif
+
+  Gem, 0, M_GEM,
+  "Announce  £i ºëµØ¤½§GÄæ £i",
+
+: menu.c:menu()
+
+...
+    /* itoc.010911: Select everywhere¡A¤£¦A­­¨î¬O¦b M_0MENU */
+    case 's':
+    case Ctrl('S'):
+      utmp_mode(M_BOARD);
+      Select();
+      goto every_key;
+
++   /* waynesan.040325: ¥D¿ï³æ«ö'0'¶i¤J¨t²ÎºÞ²z¿ï³æ */
++   case '0':
++     if (bbsmode == M_0MENU)
++     {
++       if (HAS_PERM(PERM_ALLADMIN))
++       {
++         utmp_mode(M_AMENU);
++         menu->level = PERM_MENU + table[cc]->desc[0];
++         menu = (MENU *) menu_admin;
++         mode = MENU_LOAD | MENU_DRAW;
++         depth++;
++         continue;
++       }
++       goto every_key;
++     }
++     goto default_key; /* ­Y¤£¦b M_0MENU ¤¤«ö r ªº¸Ü¡A­nµø¬°¤@¯ë«öÁä */
+
+--
+[m[1m¢¨[m¢i¢­[1m    [m¢¬[1m¢i[30m¢© [33m ·s¦Ë°ª¤¤ [37m³nÅé¬ã¨sªÀ [36m¤§ [37m¢Ð¢Ð¢á[33m [;32;40m¢E[1;37m¢E [33m¦Ëµ«¤p¯¸ [;32;40m¢E[1;37m¢E [m  [1;33m¢¨[;33;40m¢©[m
+[1m¢ª¢¨¢i¢i¢i¢i¢©¢«¡´ ¡´ [;33;40m¡@¡@¡@¡@  ¡@   ¡@¡@¡@¡@¡@¡@¡@¡@¡@¡@¡@¡@¡@ ¡@ [1;37m¢¨[33;43m¢ª¢«[40m¢©[m
+[1m  ¢i[m¡«[1m¢i¢i[m¡¬[1m¢i ¢¨¢i[m¢©[1m¡´([32mOrigin[37m)ºµ[30m¿ß[37mµo[30m·½[37m¡Gcsdc.twbbs.org [30m¦Ë[37mµ«[30m¤p[37m¯¸   [33m¢ª[43m¢¨¢©[40m¢«[m
+[1m  ¢i¢i¢©¢¨¢i¢i [m¢i[1;47m¡´[m¢i  [1m([33mAuthor[37m)[30mºµ[37m¿ß[30m«~[37mºØ¡G[30mby[37m  waynesan    [m            [33m¢ª[1m¢«[m
+[1m  ¢ª¢i¢i¢i¢i¢« [m¢ª¢i[1;30m¢«[37m  ([32mAdress[37m)ºµ[30m¿ß[37m²£[30m¦a[37m¡G61.221.30.148 [m[m

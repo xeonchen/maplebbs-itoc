@@ -1,0 +1,41 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý°Î¦Wª©PO¤å³¹¨C­Ó¤H³£¥i¥H¦³£|¥N¸¹£v
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/03/15 Mon 12:03:18)                Updated: 2005/11/16
+
+¡° ¤Þ­z¡mganiao.bbs@wretch.twbbs.org (ªì¾ÇªÌ)¡n¤§»Ê¨¥¡G
+> °Î¦W¤å³¹µoªíÁöµM°Î¦W¦ý¥i¥H¹³PPT¯¸¶Ü??¡A¨C­Ó¤H«ö¤jQ´N¥i¬d¸ßPO¤å³¹ªÌ¥Î¤á½s¸¹¡A
+> ¦ý¥L­Ì¥uª¾¹D½s¸¹«o¤£ª¾¹D¥»¤H¡A¥H¨¾¤î¤¬¬Ûðã½|²q§Ò¡C
+
+  §â½s¸¹¼g¦b¼ÊºÙ¤¤
+
+: post.c:do_post()
+
+static int
+do_post(xo, title)
+  XO *xo;
+  char *title;
+{
+  /* Thor.981105: ¶i¤J«e»Ý³]¦n curredit */
+  HDR hdr, buf;
++#ifdef HAVE_ANONYMOUS
++ char anony[49];
++#endif
+
+  ...
+  ...
+
+    rcpt = anonymousid; /* itoc.010717: ¦Û©w°Î¦W ID */
+-   nick = STR_ANONYMOUS;
++   sprintf(nick = anony, "§Ú¬O½s¸¹ %d", cuser.userno);
+
+: edit.c:ve_header()
+
+-     fprintf(fp, "%s %s (%s) %s %s\n",
+-       str_author1, anonymousid, STR_ANONYMOUS,
++     fprintf(fp, "%s %s (§Ú¬O½s¸¹ %d) %s %s\n",
++       str_author1, anonymousid, cuser.userno,
+        curredit & EDIT_OUTGO ? str_post1 : str_post2, currboard);
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

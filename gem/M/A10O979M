@@ -1,0 +1,138 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (ºñ¥¨¤H¦n«È¡H) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¥\¯à]¯à¦Û­q¬ÝªO¤ÀÃþÃC¦â¶Ü
+µo«H¯¸: XEON (Tue, 15 Jul 2003 01:55:47 +0800 (CST))      Updated: 2007/04/29
+
+: board.c:class_item()
+
+- prints("%6d%c%s%-13s\033[1;3%dm%-5s\033[m%s ",
++ prints("%6d%c%s%-13s\033[%sm%-4s\033[m %s ",
+    num, token, str1, brd->brdname,
+-   brd->class[3] & 7, brd->class, str2);
++   class_color(brd->class), brd->class, str2);
+
+: board.c:class_body()
+
+        short *chx;
+        char *img, *str;
++       char class[BCLEN + 1];
+
+        img = class_img;
+        chx = (short *) img + (CH_END - chn);
+        str = img + *chx;
++       str_ncpy(class, str + BNLEN + 1, BCLEN + 1);
+-       prints("%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s\n",
++       prints("%6d%c  %-13.13s\033[%sm%-5.5s\033[m%s\n",
+          cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
+-         str, str[BNLEN + 4] & 7, str + BNLEN + 1, ...);
++         str, class_color(class), str + BNLEN + 1, ...);
+
+: board.c:class_color() ¥[¦b class_item() «e­±
+
+static char *       /* ¦^¶ÇÃC¦â */
+class_color(class)
+  char *class;
+{
+  int i;
+  char *str;
+  extern FCACHE *fshm;
+
+  for (i = 0; *(str = fshm->classtable[i]); i++)
+  {
+    if (!strcmp(class, str))
+      break;
+  }
+  return fshm->colortable[i];
+}
+
+: cache.c
+
+- static FCACHE *fshm;
++ FCACHE *fshm;
+
+: global.h
+
+#define FN_ETC_LOVELETTER "etc/loveletter"      /* ±¡®Ñ²£¥Í¾¹¤å®w */
++ #define FN_ETC_CLASS    "etc/class"           /* ¬ÝªO¤ÀÃþÃC¦â */
+
+: admutil.c:a_xfile()
+
+#ifdef HAVE_LOVELETTER
+    "±¡®Ñ²£¥Í¾¹¤å®w",
+#endif
++   "¬ÝªO¤ÀÃþÃC¦â",
+
+  ...
+  ...
+
+#ifdef HAVE_LOVELETTER
+    FN_ETC_LOVELETTER,
+#endif
++   FN_ETC_CLASS,
+
+: struct.h:FCACHE
+
+typedef struct
+{
+  int shot[MOVIE_MAX];          /* Thor.980805: ¦X²z½d³ò¬° 0..MOVIE_MAX - 1 */
+  char film[MOVIE_SIZE];
++ char classtable[100][BCLEN + 1];
++ char colortable[100][20];
+} FCACHE;
+
+: camera.c:do_color() ¥[¤J main() «e­±
+
+static void
+do_color(fshm)
+  FCACHE *fshm;
+{
+  int i;
+  char msg[STRLEN], *str;
+  FILE *fp;
+
+  i = 0;
+
+  if (fp = fopen(FN_ETC_CLASS, "r"))
+  {
+    for (; i < 99; i++)
+    {
+      if (!fgets(msg, STRLEN, fp))
+        break;
+      if (*msg == '#' || *msg == '\n')
+        continue;
+      if (str = strchr(msg, '\n'))
+        *str = '\0';
+      msg[BCLEN] = '\0';
+      strcpy(fshm->classtable[i], msg);
+      strcpy(fshm->colortable[i], msg + BCLEN + 1);
+    }
+
+    fclose(fp);
+  }
+
+  fshm->classtable[i][0] = '\0';
+  strcpy(fshm->colortable[i], "1;37"); /* ¦b list ¸Ì­±§ä¤£¨ì®Éªº¹w³]ÃC¦â */
+}
+
+: camera.c:main()
+
++ do_color(fshm);
+
+  exit(0);
+}
+
+: etc/class ·s¼W¦¹ÀÉ®×
+: ©Î¬O±q BBS ¯¸¤W 0Admin->Xfile ¸Ì­±§ï
+
+# ¤«¦r¶}ÀYªº¬Oµù¸Ñ
+# ®æ¦¡¬O¡G   ¤ÀÃþ+¤@­ÓªÅ®æ+ÃC¦â±±¨î½X
+¤H¤å 1;35
+¤å¾Ç 1;35
+¯¸°È 1;34;41
+­Ó¤H 1;32
+­µ¼Ö 1;31
+ÃÀ¤H 1;31
+¹q¼v 1;31
+
+--
+[1;31m|[33m Origin [31m| [0;45m MapleBBS-itoc °Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+[1;31m|[35m Author [31m| [36mitoc.dorm11.nctu.edu.tw[m

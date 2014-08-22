@@ -1,0 +1,24 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: 20041002 ªºª©¥» (¨Ï¥ÎªÌ¦W³æ)
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/03 Sun 00:14:00)                Updated: 2004/10/03
+
+¡° ¤Þ­z¡mitoc (®Ö¤ß°Ê¤O)¡n¤§»Ê¨¥¡G
+>   ¬°¤Fµ{¦¡¤è«K¡A§ï¤F¥H¤U feature¡G
+>   6. ¦Û¤v±Æ§Ç¦b³Ì«e­±
+
+  ±N ¦Û¤v©M¤¬³]¦n¤Í ²VÂø¦b¤@°_±Æ§Ç
+
+: ulist.c:ulist_cmp_userid()
+: ulist.c:ulist_cmp_host()
+: ulist.c:ulist_cmp_mode()
+
+- int k = ulist_ftype[(*i) - ushm->uslot] - ulist_ftype[(*j) - ushm->uslot];
++ /* ¦Û¤v ¤Î ¤¬³]¦n¤Í ¤£¤À¶}±Æ§Ç */
++ int ftypeI = ulist_ftype[(*i) - ushm->uslot];
++ int ftypeJ = ulist_ftype[(*j) - ushm->uslot];
++ int k = ((ftypeI|ftypeJ) == (FTYPE_SELF|FTYPE_BOTHGOOD)) ? 0 : ftypeI-ftypeJ;
+  return k ? k : ... ;
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;43m¢¢[46mùñ[m [1mMo[30mdi[mfy: [1;35m2004/10/03 Sun 00:14:00[m

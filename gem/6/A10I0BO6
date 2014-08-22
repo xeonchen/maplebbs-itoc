@@ -1,0 +1,90 @@
+§@ªÌ: itoc (©_©Çªº¼ÊºÙ) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¶i¤ÀÃþµe­±
+®É¶¡: 2004/08/16 Mon 11:27:14                           Updated: 2004/08/16
+
+¡° ¤Þ­z¡mchwaian.bbs@processor.tfcis.org (µL¨¥)¡n¤§»Ê¨¥¡G
+> ¶i¤J¤ÀÃþ®É¦Û°Êshow¥XÃþ¦ü¶iªOµe­±ªº¥\¯à
+
+  ¶}¤@­Ó¥Ø¿ý¥s gem/brdnote
+
+  ¶i¤J¸Ó¤ÀÃþ«á¡A¯¸ªø«ö B §Y¥i½s¿è¸Ó¤ÀÃþªº¡u¶i¤ÀÃþµe­±¡v
+
+: board.c:XoClass()
+
+  xo.key = chn;
+  xo.xyz = NULL;
+  if (!class_load(&xo))
+  {
+    if (xo.xyz)
+      free(xo.xyz);
+    return 0;
+  }
+
++ /* ¶i¤ÀÃþµe­± */
++ if (!(class_bits[-chn] & BRD_V_BIT) || (cuser.ufo & UFO_BRDNOTE))
++ {
++   short *chx;
++   char *img, *str, *ptr, fpath[64];
+
++   img = class_img;
++   chx = (short *) img + (CH_END - chn);
++   str = img + *chx;
+
++   if (ptr = strchr(str, '/'))
++   {
++     sprintf(fpath, "gem/brdnote/%.*s.note", ptr - str, str);
++     more(fpath, NULL);
++   }
++   class_bits[-chn] ^= BRD_V_BIT;
++ }
+
+  xt = xz[XZ_CLASS - XO_ZONE].xo;
+  xz[XZ_CLASS - XO_ZONE].xo = &xo;
+
+: board.c:class_memo_edit() ¥[¦b class_help() «e­±
+
+static int
+class_memo_edit(xo)
+  XO *xo;
+{
+  int mode;
+  short *chx;
+  char *img, *str, *ptr, fpath[64];
+
+  if (xo->key >= CH_END || !HAS_PERM(PERM_ALLBOARD))
+    return XO_NONE;
+
+  img = class_img;
+  chx = (short *) img + (CH_END - xo->key);
+  str = img + *chx;
+
+  if (!(ptr = strchr(str, '/')))
+    return XO_NONE;
+
+  mode = vans("¶iªOµe­± (D)§R°£ (E)­×§ï (Q)¨ú®ø¡H[E] ");
+
+  if (mode != 'q')
+  {
+    sprintf(fpath, "gem/brdnote/%.*s.note", ptr - str, str);
+
+    if (mode == 'd')
+    {
+      unlink(fpath);
+      return XO_FOOT;
+    }
+
+    if (vedit(fpath, 0))       /* Thor.981020: ª`·N³Qtalkªº°ÝÃD */
+      vmsg(msg_cancel);
+    return class_head(xo);
+  }
+  return XO_FOOT;
+}
+
+: board.c:class_cb[]
+
++ 'B', class_memo_edit,
+
+  'h', class_help
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

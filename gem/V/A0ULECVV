@@ -1,0 +1,59 @@
+§@ªÌ: itoc (¯uªº«Ü¥i·R°Ú :D) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] BBS §ó·sµ{¦¡¤â¥U
+®É¶¡: Mon Aug 12 12:01:19 2002
+
+                       [32m¡¹ §ó·sµ{¦¡¤â¥U ¡¹[m
+
+  ¤@¡B¤U¸ü·sª© BBS µ{¦¡
+  ¤G¡B§ó·sµ{¦¡
+  ¤T¡B¦Û©w²ÕºA
+
+
+    ¥»¤å¥ó¬O¼gµ¹­n¦w¸Ë itoc ©ÒºûÅ@ªº bbs µ{¦¡ª©¥»©Ò¨Ï¥Îªº¡A¨Ã¤£¾A¥Î
+  ¨ä¥L bbs ª©¥»¡C
+
+    ¥»¤å¥óªº¥Øªº¬OÅý MapleBBS-3.10-20yymmdd-PACK ¤É¯Å¨ì³Ì·s¤é´Áµ{¦¡
+  ¥Îªº¡C
+
+
+  [1;33m¤@¡B¤U¸ü·sª© BBS µ{¦¡[m
+
+    ¦b http://processor.tfcis.org/~itoc ¥i¥H§ä¨ì³Ì·sªºµ{¦¡ª©¥»¡AÀ³
+  ¸Óªø±o¹³ MapleBBS-3.10-20yymmdd-PACK.tgz ³o¼ËªºÀÉ¦W¡C
+
+
+  [1;33m¤G¡B§ó·sµ{¦¡[m
+
+    ¥H bbs ¨­¤Àµn¤J¡A¨Ã§â MapleBBS-3.10-20yymmdd-PACK.tgz ©ñ¦b /tmp¡C
+
+  -bbs- % [1;36mtar xvfz MapleBBS-3.10-20yymmdd-PACK.tgz -C /tmp/[m
+
+  -bbs- % [1;36mrm -rf /home/bbs/src[m
+
+  -bbs- % [1;36mmv -f /tmp/bbs/src /home/bbs/[m
+
+    ¬Ý·sª©ªº src/maple/CHANGE¡AµM«á±q±zªºª©¥»¤é´Á¶}©l¬Ý¨ì³Ì«á¤@¦æ¡A
+  ¦pªG¥u¦³ *.h *.c ¨º»ò±z¥u­n´« src/ §Y¥i¡C¦³®É­Ô¥i¯à¦³¤@¨Ç gem/@/*.hlp
+  etc/* ³o¨Ç¤£¦b src/ ¸Ì­±ªº§â¨º­ÓÀÉ®×¤]­n´«·s¡A±q·sª©½Æ»s¹L¨Ó§Y¥i¡C
+  ½d¨Ò¦p¤U¤G¦æ¡G
+
+  -bbs- % [1;36mmv -f /tmp/bbs/etc/webx.conf.cwb /home/bbs/etc/[m
+
+  -bbs- % [1;36mmv -f /tmp/bbs/gem/@/@cosign.hlp /home/bbs/gem/@/[m
+
+    ³Ì«á§â /tmp ¤ºªº¼È¦sÀÉ®×§R°£¡C
+
+  -bbs- % [1;36mrm -rf /tmp/bbs[m
+
+  -bbs- % [1;36mrm -f /tmp/MapleBBS-3.10-20yymmdd-PACK.tgz[m
+
+
+  [1;33m¤T¡B¦Û©w²ÕºA[m
+
+    ¨ì¦¹¡A±z¤w¸g§¹¦¨ code ªº´À´«¤F¡A±µ¤U¨Ó±z­n½s¿è¥H¤UÀÉ®×¡G
+
+  src/include/config.h     ¸Ì­±ªº SCHOOLNAME ¨ì HOST_ALIASES¡C
+                           ¦pªG±z¬O LINUX ªº¨Ï¥ÎªÌ¡AÁÙ­n§ï BBSGID ¬° 999¡C
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

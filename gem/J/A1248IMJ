@@ -1,0 +1,65 @@
+§@ªÌ: itoc (http://cpu.twbbs.org) ¬ÝªO: itoc
+¼ÐÃD: Re: °Ý¤@¨Ç¤p°ÝÃD..
+®É¶¡: Fri Jun 20 21:40:46 2003                          Updated: 2005/10/30
+
+¡° ¤Þ­z¡malexabc.bbs@aurora.twbbs.org (­¯¥Í¤H)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¦³¿ìªk¹³WD¤@¼Ë°µ¤@­Óall_postªO¶Ü?
+
+: post.c:do_allpost() ·s¼W¦b do_post() «e­±
+
+static void
+do_allpost(fpath, owner, nick, mode)
+  char *fpath;
+  char *owner;
+  char *nick;
+  int mode;
+{
+  HDR hdr;
+  char folder[64];
+  char *brdname = "All_Post";       [1;44m// ªO¦W¦Û©w [m
+
+  brd_fpath(folder, brdname, fn_dir);
+  hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
+
+  hdr.xmode = mode & ~POST_OUTGO;  /* ®³±¼ POST_OUTGO */
+  strcpy(hdr.owner, owner);
+  strcpy(hdr.nick, nick);
+  strcpy(hdr.title, ve_title);
+
+  rec_bot(folder, &hdr, sizeof(HDR));
+
+  btime_update(brd_bno(brdname));
+}
+
+: post.c:do_post()
+
+static int
+do_post(title)
+  char *title;
+{
+  /* Thor.981105: ¶i¤J«e»Ý³]¦n curredit */
+  HDR hdr, buf;
+  char fpath[64], *folder, *nick, *rcpt;
+  int mode;
+  time_t spendtime, prev, chrono;
++ BRD *brd;
+
+  .....
+  .....
+
+  title = ve_title;
+  mode = (curredit & EDIT_OUTGO) ? POST_OUTGO : 0;
+
+#ifdef HAVE_REFUSEMARK
+  if (curredit & EDIT_RESTRICT)
+    mode |= POST_RESTRICT;
+#endif
+
++ /* qazq.031025: ¤½¶}ªO¤~°µ all_post */
++ brd = bshm->bcache + currbno;
++ if ((brd->readlevel | brd->postlevel) < (PERM_VALID << 1))
++   do_allpost(fpath, rcpt, nick, mode);
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m     [31m°[1mÊ¤[0;31mO®[1mÖ¤[0;31mß [1mprocessor.tfcis.org    [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[ [1m     itoc.Dorm-GD2.NCTU.edu.tw      [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

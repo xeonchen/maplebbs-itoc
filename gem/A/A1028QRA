@@ -1,0 +1,86 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¬Ý¨£Áô§Î¦W³æ
+®É¶¡: Thu Jul 10 08:49:28 2003                          Updated: 2004/10/02
+
+  ­n¥ý°µ "pal.c ³Â¦NÃþ«¬" ³o½g patch
+
+  ¬Ý¨£Áô§Î¦W³æ¡G·í§Ú¤@¯ëÁô§Î®É¡A³Â¦NÁÙ¬O¥i¥H¬Ý¨ì§Ú
+
+: maple.p
+
++ int is_mymate(int userno);
+int is_mygood(int userno);
+int is_mybad(int userno);
++ int is_omate(UTMP *up);
+int is_ogood(UTMP *up);
+int is_obad(UTMP *up);
+int is_bgood(int bno);
+
+: pal.c:is_mymate() ¥[¦b is_mygood() «e­±
+
+int
+is_mymate(userno)                /*  1: §Ú³]¹ï¤è¬°³Â¦N */
+  int userno;
+{
+  return belong_pal(pal_pool, pal_max, userno | MATE_MASK);
+}
+
+: pal.c:is_mygood()
+
+- return belong_pal(pal_pool, pal_max, userno);
++ return belong_pal(pal_pool, pal_max, userno) || is_mymate(userno);
+
+: pal.c:is_omate() ¥[¦b is_ogood() «e­±
+
+int
+is_omate(up)                     /*  1: ¹ï¤è³]§Ú¬°³Â¦N */
+  UTMP *up;
+{
+  return belong_pal(up->pal_spool, up->pal_max, cuser.userno | MATE_MASK);
+}
+
+: pal.c:is_ogood()
+
+- return belong_pal(up->pal_spool, up->pal_max, cuser.userno);
++ return belong_pal(up->pal_spool, up->pal_max, cuser.userno) || is_omate(up);
+
+: bmw.c:can_see()
+
+int                     /* 1:¥i¬Ý¨£ 0:¤£¥i¬Ý¨£ */
+can_see(my, up)
+  UTMP *my;
+  UTMP *up;
+{
+  usint mylevel, myufo, urufo;
+
++ if (my == cutmp)      /* ÀË¬d§Ú¬O¤£¬O¹ï¤èªº³Â¦N */
++ {
++   if (is_omate(up))
++     return 1;
++ }
++ else                  /* ÀË¬d¹ï¤è¬O¤£¬O§Úªº³Â¦N */
++ {
++   if (is_mymate(my->userno))
++     return 1;
++ }
+
+: bmw.c:can_override(up)
+
+  else
+  {
+    /* itoc.020321: ¹ï¤è­YÁô§Î¶Ç§Ú¤ô²y¡A§Ú¤]¥i¥H³Q°Ê¦^ */
+    BMW *bmw;
+
+    for (ufo = bmw_locus - 1; ufo >= 0; ufo--)
+    {
+      bmw = &bmw_lslot[ufo];
+      if (bmw->sender == up->userno)
+        return 1;
+    }
+
++   if (is_omate(up))
++     return 1;
+  }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

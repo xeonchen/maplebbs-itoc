@@ -1,0 +1,38 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¬Ýª©Á`ºÞ«Ø¥ß·s¬Ýª©ªº®É­Ô¥ß§Y³]©w¬Ýª©¤å³¹¤W­­???
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/12/03 Fri 01:10:34)                Updated: 2004/12/03
+
+¡° ¤Þ­z¡mcomfan (Ãø¹L  ¶Ë¤ß)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¬O§_¥i¥HÅý¬Ýª©Á`ºÞ¶}ª©ªº®É­Ô´N¶¶«K³]©w·s¦¨¥ßªº¬Ýª©¤å³¹Á`¼Æ¤W­­???
+
+: acct.c:brd_new()
+
+  brh_save();
+  board_main();
+
++ if (vans("¬O§_³]©w¬ÝªO¤å³¹¤W­­(Y/N)¡H[N] ") == 'y')
++ {
++   int days = 365, max = 3000, min = 150;      /* ¹w³]­È */
++
++   if (vget(b_lines, 0, "«O¯d¤Ñ¼Æ¡G", fpath, 6, DOECHO) &&
++     (bno = atoi(fpath)) > 0)
++     days = bno;
++   if (vget(b_lines, 0, "³Ì¤j½g¼Æ¡G", fpath, 6, DOECHO) &&
++     (bno = atoi(fpath)) > 0)
++     max = bno;
++   if (vget(b_lines, 0, "³Ì¤p½g¼Æ¡G", fpath, 6, DOECHO) &&
++     (bno = atoi(fpath)) > 0)
++     min = bno;
++
++   sprintf(fpath, "%s\t%d\t%d\t%d\n", brd->brdname, days, max, min);
++   f_cat(FN_ETC_EXPIRE, fpath);
++ }
+
+  return 0;
+}
+
+  ¤@¯ë¬ÝªO¨Ì expire.c ªº¹w³]­È¤£´N¦n¤F¡A¦ó¥²¦A¥t¥~³]©w©O
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;45m¢c[42m¢i[m [1mMo[30mdi[mfy: [1;35m2004/12/03 Fri 01:13:07[m

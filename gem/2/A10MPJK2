@@ -1,0 +1,39 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°Ý] Ãö©óguest
+®É¶¡: 2004/03/01 Mon 00:37:50                           Updated: 2004/02/29
+
+¡° ¤Þ­z¡mcentric (centric)¡n¤§»Ê¨¥¡G
+> ¡° ¤Þ­z¡mchance.bbs@chance.twbbs.org (°j­·¦B¶­)¡n¤§»Ê¨¥¡G
+> > ­n«ç»ò¼Ë¤~¯à©Þ±¼ guest, Åý³o­Ó¯¸¨S¦³guest,¤]¤£¯àµù¥Uguest©O?
+> °®¯Ü³]©w¸T¤î¤W¯¸´N¦n¤F©ã..
+
+: bbsd.c:login_user()
+
+  move(b_lines, 0);
+- outs("   ¡° °ÑÆ[±b¸¹¡G\033[1;32m" STR_GUEST "\033[m"
+-   "  ¥Ó½Ð·s±b¸¹¡G\033[1;31m" STR_NEW "\033[m");
++ outs("   ¡° ¥»¯¸¤£¶}©ñ \033[1;32m" STR_GUEST "\033[m °ÑÆ["
++   "  ¥Ó½Ð·s±b¸¹¡G\033[1;31m" STR_NEW "\033[m");
+
+  ...
+  ...
+
+    else
+    {                           /* guest */
+-     if (acct_load(&cuser, uid) < 0)
+-     {
+-       vmsg(err_uid);
+-       continue;
+-     }
+-     logattempt(' ', content);
+-     cuser.userlevel = 0; /* Thor.981207: ©È¤H¶Ãª±, ±j¨î¼g¦^cuser.userlevel */
+
+-     cuser.ufo = UFO_DEFAULT_GUEST;
+-     break;    /* Thor.980917: µù¸Ñ: cuser ok! */
++     vmsg("©êºp¡A¥»¯¸¤£¶}©ñ " STR_GUEST " °ÑÆ[");
++     continue;
+    }
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

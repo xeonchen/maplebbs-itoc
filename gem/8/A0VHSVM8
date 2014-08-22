@@ -1,0 +1,45 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] talk.c ¨Ï¥ÎªÌ¿ï³æª½±µ¬d¸ß<¤µ¤é¹B¶Õ>(2)
+µo«H¯¸: ¤¤¿³¸ê¬ì (Wed, 23 Jul 2003 18:36:00 +0800 (CST))  Updated: 2003/07/23
+
+: src/maple/talk.c:do_query()
+
+static void
+do_query(acct)
+  ACCT *acct;
+{
+  UTMP *up;
+[1;32m![m int userno[1;32m, ch[m;
+  char *userid;
+
+  .....
+  .....
+
+  prints(" [°]²£] %s", fortune[userno]);    /* ­É¥Î userno */
+
+  showplans(userid);
+[1;31m- vmsg(NULL);[m
+
+[1;33m+ outz("\033[1;46m               ¡¹ ½Ð«ö (Space/Return) Ä~Äò ¡¹               \033[31;47m    [v]¤µ¤é¹B¶Õ   \033[m");[m
+                                        //µe­±¦Û¤vµe....bbs¶K·|Â_¦æ.....>"<
+
+[1;33m+ ch = vkey();
+[1;33m+ if (ch == 'v')[m     //«öÁä¦Û­q
+[1;33m+ {
+[1;33m+   void (*p)();
+[1;33m+   if (p = DL_get("bin/sinastar.so:query_star"))/*qazq.030723: ¬d¸ß¤µ¤é¹B¶Õ*/
+[1;33m+     (*p)(acct);
+[1;33m+ }[m
+
+
+==============================================================================
+
+    ¥»¨ÓÁÙ·Q­n¾Ç ¢ó¢ó¢ë¢ñ¢ü£B «ö¡ô¡õ¥i¥Hª½±µ¬d¸ß¤W¤@­Ó¡B¤U¤@­Ó¨Ï¥ÎªÌ...
+
+    ¥i¬O....¥¢±Ñ¤F.... :p
+
+    ÁÙ¬O­n ¡ö¡õ¡÷ ¤~¯à¬d¸ß¤U¤@­Ó.... ^^a
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-139-67.HINET-IP.hinet.net[m

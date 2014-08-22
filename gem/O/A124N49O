@@ -1,0 +1,54 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] ¯¸°È¶i¤J«H½c¬ö¿ý­ì¦]
+µo«H¯¸: µL¦W¤p¯¸ (2006/04/22 Sat 00:21:58)                Updated: 2006/04/22
+
+¤p­×§ï: ¬d¬Ý¥L¤HÁô¨p¸ê®Æ ±o»¡©ú­ì¦] :)
+
+[32m:/src/maple/mail.c:mbox_sysop()[m
+
++   char buf[128], msg[80];  /* ¶i¤J«H½c»¡©ú­ì¦] 060421 by guessi */
+
+..
+..
+
+-     if (acct_get(msg_uid, &acct) > 0)
++     if (acct_get(msg_uid, &acct) > 0 &&
++       vget(b_lines, 0, "½Ð¿é¤J­ì¦]¡G", msg, 60, DOECHO))
+      {
++       sprintf(buf, "¬d¬Ý %s «H½c ­ì¦]: %s", acct.userid, msg);
+-       alog("¶i¤J«H½c", acct.userid);
++       alog("¶i¤J«H½c", buf);
+
+-     sprintf(fpath, "¶i¤J (1)%s (2)%s ªº«H½c¡H[1] ", str_sysop, STR_GUEST);
++     sprintf(fpath, "¶i¤J (1)%s (2)%s ªº«H½c¡H[Q] ", str_sysop, STR_GUEST);
+
+-     userid = (vans(fpath) == '2') ? STR_GUEST : str_sysop;
++     switch (vans(fpath))
++     {
++     case '1':
++       userid = str_sysop;
++       break;
++     case '2':
++       userid = STR_GUEST;
++       break;
++     default:
++       return XO_FOOT;
++     }
+
++     if (!vget(b_lines, 0, "­ì¦]: ", msg, 65, GCARRY))
++     {
++       zmsg("¨ú®ø");
++       return XO_FOOT;
++     } /* ¶i¤J«H½c »¡©ú­ì¦] 060421 by guessi */
++     sprintf (buf, "¬d¬Ý %s «H¥ó ­ì¦]: %s", userid, msg);
+
+-     alog("¶i¤J«H½c", userid);
++     alog("¶i¤J«H½c", buf);
+
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î [37m61-231-192-79.dynamic.hinet.net[30m®ü[m

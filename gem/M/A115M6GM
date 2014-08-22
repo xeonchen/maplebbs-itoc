@@ -1,0 +1,118 @@
+µo«H¤H: TKyo.bbs@cpu.tfcis.org (·t¶Â¶Q¤½¤l) ¬ÝªO: plan
+¼Ð  ÃD: [·s¼W] window.c pans() pmsg() ¤ä´© ANSI ¦r¤¸½X
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/11 Mon 18:00:23)                Updated: 2005/04/11
+
+/* ¥»µ{¦¡½X»Ý¥ý§ó·s¹L windows.c pans/pmsg ¸m¤¤µ{¦¡½X */
+
+: maple/window.c
+#include "bbs.h"
+
+/* ·s¼W¨ç¦¡ : ­ç°£ ANSI ¦r¤¸½X¤Î¶Ç¦^¯u¥¿¦r¦êªø«× */
+static int
+chk_ansi(char *str)
+{
+  int i = 0, ch;
+  int is_ansi = 0;
+
+  while (ch = *str)
+  {
+    if (is_ansi)
+    {
+      if (ch == 'm')
+        is_ansi = 0;
+    }
+    else
+    {
+      if (ch == KEY_ESC)
+        is_ansi = 1;
+      else
+        i++;
+    }
+    str++;
+  }
+
+  return i;
+}
+
+: maple/window.c : pans()
+int             /* ¶Ç¦^¤p¼g¦r¥À©Î¼Æ¦r */
+pans(x, y, title, desc)
+  int x, y;
+  char *title;
+  char *desc[];
+{
+- int cur, old_cur, max, ch;
++ int cur, old_cur, max, ch, i; /* ·s¼WÅÜ¼Æ i, ¥[³t¥Î */
+  char hotkey;
+
+   /* §ä¥X title ¤Î desc ¤¤³Ìªøªºªø«× */
+  char buf[512];        /* tsaikd.041005 title ¥i¯à¦³¦n´X¦æ */
+  strcpy(buf, title);
+- desc_maxlen = strlen(strtok(buf, "\n"));
++ desc_maxlen = chk_ansi(strtok(buf, "\n"));
+  char *tmp;
+- while ( (tmp = strtok(NULL, "\n")) !=NULL )
+-   desc_maxlen = (desc_maxlen > strlen(tmp)) ? desc_maxlen : strlen(tmp);
++ while ((tmp = strtok(NULL, "\n")) != NULL)
++   desc_maxlen = ((i = chk_ansi(tmp)) > desc_maxlen) ? i : desc_maxlen;
+
+- for( ch=1 ; desc[ch] ; ch++ )
+-   desc_maxlen = (desc_maxlen > strlen(desc[ch])) ?
+-\       desc_maxlen : strlen(desc[ch]);
++ for (ch = 1; desc[ch]; ch++)
++   desc_maxlen = ((i = chk_ansi(desc[ch])) > desc_maxlen) ? i : desc_maxlen;
+  .
+  .
+  .
+}
+
+: maple/window.c : draw_item()
+{
+  .
+  .
+  .
+- sprintf(buf, " ¢x%s%c %c%c%c%-25s  \033[m¢x ",
++ sprintf(buf, " ¢x%s%c %c%c%c%-s%*c\033[m¢x ",
+  .
+  .
+  .
+- (hotkey == *desc) ? ']' : ')', desc + 1);
++ (hotkey == *desc) ? ']' : ')', desc + 1,
++ (desc_maxlen - chk_ansi(desc + 1)), ' ');
+  .
+  .
+  .
+}
+
+: maple/window.c : draw_menu()
+{
+  .
+  .
+  .
+  /* tsaikd.041005 ­É¥Î meet */
+- meet = strlen(ptitle[i]) + (strlen(ptitle[i]) % 2);
++ meet = chk_ansi(ptitle[i]) + (chk_ansi(ptitle[i]) % 2);
+  .
+  .
+  .
+}
+
+: maple/window.c : pmsg()
+- int len, x, y, i;
++ int len, x, y, i, j; /* ·s¼WÅÜ¼Æ j, ¥[³t¥Î */
+
+- len = strlen(strtok(buf, "\n"));
+- for( i=1 ; (pbuf = strtok(NULL, "\n")) != NULL ; i++ )
+-   len = len<strlen(pbuf) ? strlen(pbuf) : len;
+
++ len = chk_ansi(strtok(buf, "\n"));
++ for (i = 1; (pbuf = strtok(NULL, "\n")); i++)
++   len = ((j = chk_ansi(pbuf)) > len) ? j : len;
+  .
+  .
+  .
+}
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mTKyo [30m±q [31mcszone.twbbs.org [30mµoªí[m

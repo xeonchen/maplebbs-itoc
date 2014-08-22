@@ -1,0 +1,44 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: §R¤å°ÝÃD..
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/03/06 Sat 23:22:52)                Updated: 2004/10/01
+
+¡° ¤Þ­z¡mcentric (centric)¡n¤§»Ê¨¥¡G
+> ¦n¤Í/¯µ±Kª©..
+> ¦Û¤v¢ì±¼ªº¤å³¹·|¶]¨ìjunkª©¥h..
+> ½Ð°Ý­n­×§ï­þ Åý¥L¤£·|¦b¶]¥hjunk©O??
+
+: post.c:move_post()
+
+  hdr_fpath(fpath, folder, hdr);
+
++ if ((bshm->bcache + currbno)->readlevel != PERM_SYSOP &&
++   (bshm->bcache + currbno)->readlevel != PERM_BOARD)
++ {
+    brd_fpath(fnew, board, fn_dir);
+    hdr_stamp(fnew, HDR_LINK | 'A', &post, fpath);
+
+    /* ª½±µ½Æ»s trailing data */
+
+    memcpy(post.owner, hdr->owner, TTLEN + 140);
+
+    if (by_bm)
+      sprintf(post.title, "%-13s%.59s", cuser.userid, hdr->title);
+    else if (!stat(fpath, &st))
+      by_bm = st.st_size;
+
+    rec_add(fnew, &post, sizeof(HDR));
+    btime_update(brd_bno(board));
++ }
++ else
++ {
++   if (!stat(fpath, &st))
++     by_bm = st.st_size;
++ }
+
+  unlink(fpath);
+  btime_update(currbno);
+  cancel_post(hdr);
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;45m¢¢[42m¢¡[m [1mMo[30mdi[mfy: [1;36m2004/03/06 Sat 23:22:52[m

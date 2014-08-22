@@ -1,0 +1,119 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ½Ð°Ý"¦b¨Ï¥ÎªÌ¦Cªí«ö->Áä¦³¿ï³æ"
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/29 Fri 01:35:29)                Updated: 2004/10/29
+
+¡° ¤Þ­z¡mvividcat46.bbs@bbs.wretch.cc (¯¦±K¼w£»³Í¯S)¡n¤§»Ê¨¥¡G
+> §Ú·Q¦b¯¸¤ºªº¨Ï¥Î³o¦Cªí ¤@«ö->Áä´N¦³Ãþ¦ü¤U¦Cªº¿ï³æ¥X²{
+> ¥i¥H¤è«K¤H®a²á¤Ñ©Î¥á¤ô²y.q§O¤H
+> ­n©M¥L(¦o) (T)½Í¤Ñ(F)¤U¤­¤l´Ñ(P)°«Ãdª«(C)¤U¶H´Ñ(D)¤U·t´Ñ(N)¨S¨Æ§ä¿ù¤H¤F?[N]
+
+  ¨Ï¥ÎªÌ¦W³æ«ö Enter ¥X²{
+  ±z·Q Q)¬d¸ß T)½Í¤Ñ 1)¶Â¥Õ´Ñ 2)¤­¤l´Ñ 3)³ò´Ñ 4)­x´Ñ 5)·t´Ñ¡H
+  ­Y¬O¿ï 1~5 «hª½±µ¶i¤J¤U´Ñ¡A¤£¦A»Ý­n«ö ^O
+
+: ulist.c:ulist_talk()
+
+- return XO_NONE;
++ return XO_FOOT;
+
+: ulist.c:ulist_hello() ·s¼W¦b ulist_help() «e­±
+
+int talk_state = 0;
+/* -1:Â÷¶}Talk 0:¤@¯ëTalk '1':¤­¤l´Ñ '2':¤­¤l´Ñ '3':³ò´Ñ '4':­x´Ñ '5':·t´Ñ */
+
+static int
+ulist_hello(xo)
+  XO *xo;
+{
+  int ch;
+  UTMP *up;
+
+  if (HAS_PERM(PERM_PAGE))
+    ch = vans("±z·Q©M¥L Q)¬d¸ß T)½Í¤Ñ 1)¶Â¥Õ´Ñ 2)¤­¤l´Ñ "
+      "3)³ò´Ñ 4)­x´Ñ 5)·t´Ñ¡H[Q] ");
+  else
+    ch = 'q';
+
+  if (ch == 't')
+    return ulist_talk(xo);
+
+  if (ch < '1' || ch > '5')
+    return ulist_query(xo);
+
+  /* ¤U´Ñ */
+  up = ulist_pool[xo->pos];
+  if (can_override(up))
+  {
+    talk_state = ch;
+    ch = talk_page(up);
+    talk_state = 0;
+  }
+  return ch ? ulist_head(xo) : XO_FOOT;
+}
+
+: ulist.c:ulist_cb[]
+
+- 'r', ulist_query,
++ 'r', ulist_hello,
+
+: talk.c:talk_speak()
+
++ extern int talk_state;
+
+static void
+talk_speak(fd)
+  int fd;
+{
+  ...
+
+  for (;;)
+  {
+-   ch = vkey();
++   ch = (!talk_state) ? vkey() : (talk_state > 0) ? Ctrl('O') : Ctrl('C');
+
+: talk.c:talk_page()
+
+- if (vans("½T©w­n©M¥L/¦o½Í¤Ñ¶Ü(Y/N)¡H[N] ") != 'y')
++ if (vans("½T©w­n©M¥L/¦o½Í¤Ñ/¤U´Ñ¶Ü(Y/N)¡H[N] ") != 'y')
+    return 0;
+
+  ...
+
+- if (ans == 'y')
++ if (!talk_state && ans == 'y')
+    talk_save();        /* lkchu.981201: talk °O¿ý³B²z */
+
+: bwboard.c:main_board()
+
++ extern int talk_state;
+
+static int
+main_board(sock, later)
+  int sock, later;
+{
+  ...
+
+  if (!later)
+  {
++   if (!talk_state)
+      c = vans("·Q¤U­þºØ´Ñ (1)¶Â¥Õ´Ñ ... (5)·t´Ñ (Q)¨ú®ø¡H [Q] ");
++   else
++   {
++     c = talk_state;
++     talk_state = -1;
++   }
+
+
+----------------------
+
+  «ÜÅ¼ªº§@ªk
+
+  ¨Ã¥B¦³¤@­Ó known problem ¬O¡G
+
+  ­Y³QÁÜ½Ð¤U´Ñªº¨º­Ó¤H¨S¦³ UFO_NTLOG
+  ¨º»ò³QÁÜ½Ð¤U´Ñªº¨º­Ó¤H¦bµ²§ô¤U´Ñ®É¡A¨t²Î·|´M°Ý¬O§_Àx¦s²á¤Ñ°O¿ý
+  (¦ý¬O¨S¦³¤º®e¥i¨Ñ°O¿ý)
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

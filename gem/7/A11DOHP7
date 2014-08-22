@@ -1,0 +1,42 @@
+µo«H¤H: tandrian.bbs@ntcb.twbbs.org.tw (¤Û°ìÅ]«°«á¯ª), ¬İªO: itoc
+¼Ğ  ÃD: Re: [°İÃD] µù¥U·s±b¸¹®É¡A¦p¦óÅı¨Ï¥ÎªÌª½±µ¶ñ¥Í¤é¡Kµ¥µ¥
+µo«H¯¸: ¤Û±sÅ]«° (Wed Jul 10 11:47:58 2002)               Updated: 2004/03/05
+
+³o¬O¤§«eitoc¤j¤jpo¥X¨Óªº....¤§«e¦³ªº´N°İ§Ú§a~ ^^
+
+: bbsd.c acct_apply()[37m
+
+  do
+  {
+    vget(21, 0, "¯u¹ê©m¦W¡G", cuser.realname, RNLEN + 1, DOECHO);
+  } while (strlen(cuser.realname) < 4);
+
++ do
++ {
++   if (vget(22, 0, "¥X¥Í¦~¥÷¡]¥Á°ê¡^¡G", buf, 3, DOECHO))
++     cuser.year = atoi(buf);
++ } while (cuser.year < 1 || cuser.year > 99);
+
++ do
++ {
++   if (vget(22, 0, "¥X¥Í¤ë¥÷¡G", buf, 3, DOECHO))
++     cuser.month = atoi(buf);
++ } while (cuser.month < 1 || cuser.month > 12);
+
++ do
++ {
++   if (vget(22, 0, "¥X¥Í¤é´Á¡G", buf, 3, DOECHO))
++     cuser.day = atoi(buf);
++ } while (cuser.day < 1 || cuser.day > 31);
+
++ do
++ {
++   if (vget(22, 0, "©Ê§O (0)¤¤©Ê (1)¨k©Ê (2)¤k©Ê [0]¡G", buf, 3, DOECHO))
++     cuser.sex = buf[0] - '0';
++ } while (cuser.sex < 0 || cuser.sex > 2);
+
+--
+[0m[30;1mùİ[0m                           [30;1mùß[0m
+[0m  [44mùŞùùùß ùáùùùù ùİùùùù ùàùùùß[40m  [32;1m¡¼ Origin: [33m¤Û°ìÅ]«° [37mntcb.twbbs.org[0m
+[0m  [46;1mùå  ùã ùãùùùù ùãùùùù ùãùùùå[0m  [31;1m¡¼ From:[0m[36m140.131.114.191[m
+[0m[30;1mùã                           ùå[0m

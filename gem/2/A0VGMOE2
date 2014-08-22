@@ -1,0 +1,77 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: itoc
+¼Ð  ÃD: [¤å¥ó] ºëµØ°Ïªº½g¼Æ¤W­­©M®e¶q¤W­­
+µo«H¯¸: Àº¤Ñ±^ (Sun, 06 Jul 2003 15:21:41 +0800 (CST))    Updated: 2003/07/15
+
+  (4) ¬ÝªOºëµØ°Ï¤W­­³]©w
+
+: include/battr.h
+
+#define BRD_NOVOTE      0x10    /* ¤£¤½§G§ë²¼µ²ªG©ó [record] ªO */
+#define BRD_ANONYMOUS   0x20    /* °Î¦W¬ÝªO */
++ #define BRD_NOGEMCHECK  0x40    /* ¤£ÀË¬dºëµØ°Ï¤j¤p */
+
+: include/battr.h
+
+- #define NUMBATTRS       6
++ #define NUMBATTRS       7
+
+- #define STR_BATTR       "zTcsvA"
++ #define STR_BATTR       "zTcsvAG"
+
+: include/battr.h:battr_tbl[]
+
+- "°Î¦W¬ÝªO"                    /* BRD_ANONYMOUS */
++ "°Î¦W¬ÝªO",                   /* BRD_ANONYMOUS */
++ "¤£ÀË¬dºëµØ°Ï¤j¤p"            /* BRD_NOGEMCHECK *
+
+: maple/acct.c
+
+/* ----------------------------------------------------- */
+/* ¬ÝªOºÞ²z                                              */
+/* ----------------------------------------------------- */
+
++ #define DEF_GEMN        10000          /* ¬ÝªOºëµØ°Ï¹w³]¤W­­ 10000 ½g */
++ #define DEF_GEMK        (1000 << 10)   /* ¬ÝªOºëµØ°Ï¹w³]¤W­­ 1000 KB */
+
+: maple/acct.c:m_setbrd()
+
+  default:      /* ¹w³]¤£ÅÜ°Ê */
+    break;
+  }
+
++ if (vget(++i, 0, "³]©wºëµØ°Ï¤W­­(Y/N)¡H[N] ", data, 3, LCECHO) == 'y')
++ {
++   sprintf(data, "%d", brd->gemsize_n);
++   if (vget(++i, 0, "½g¼Æ¤W­­", data, 6, GCARRY))
++   {
++     int gemsize = atoi(buf);
++     if (gemsize > 0)
++       brd->gemsize_n = gemsize;
++   }
++   sprintf(data, "%d", brd->gemsize_k >> 10);
++   if (vget(i, 16, "®e¶q¤W­­(KB)", data, 12, GCARRY))
++   {
++     int gemsize = atoi(buf);
++     if (gemsize > 0)
++       brd->gemsize_k = gemsize << 10;
++   }
++ }
+
+: maple/acct.c:m_newbrd()
+
+  /* itoc.010211: ·s¬ÝªO¹w³] postlevel = PERM_POST; battr = ¤£Âà«H */
+  newboard.postlevel = PERM_POST;
+  newboard.battr = BRD_NOTRAN;
++ newboard.gemsize_n = DEF_GEMN;
++ newboard.gemsize_k = DEF_GEMK;
+
+: maple/acct.c:brd_edit()
+
+  prints("¬ÝªO¦WºÙ¡G%s\n¬ÝªO»¡©ú¡G[%s] %s\nªO¥D¦W³æ¡G%s\n",
+    newbh.brdname, newbh.class, newbh.title, newbh.BM);
++ prints("ºëµØ°Ï½g¼Æ¤W­­¡G%d   ®e¶q¤W­­¡G%dKB\n",
++   newbh.gemsize_n, newbh.gemsize_k >> 10);
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [35;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m218-163-206-115.HINET-IP.hinet.net[m

@@ -1,0 +1,30 @@
+§@ªÌ: itoc (¯uªº«Ü¥i·R°Ú :D) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ¯¦±K/¦n¤Íª© ¯¸ªø¤]¤£¯àÅª
+®É¶¡: Fri Aug 16 10:34:37 2002                          Updated: 2006/02/16
+
+¡° ¤Þ­z¡mguessi.bbs@bbs.wretch.cc¡n¤§»Ê¨¥¡G
+> §Æ±æ§ï¦¨¬ÝªOÁ`ºÞ¥H¤Î©Ò¦³¯¸ªø ¥i¬Ý¨£ªºÁôÂÃ¬ÝªO°£¤F¨t²Î¬ÝªO¤§¥~
+> ¨ä¾l¥u¥i¦C¥X¦Ó¤£¥i¶i¤J
+
+  ¬ÝªOÁ`ºÞµLªk¶i¯µ±KªO
+
+: board.c:Ben_Perm()
+: bhttpd.c:Ben_Perm()
+
+  /* itoc.030515: ¬ÝªOÁ`ºÞ­«·s§PÂ_ */
+  else if (ulevel & PERM_ALLBOARD)
+-   bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT;
++ {
++#ifdef HAVE_MODERATED_BOARD
++   if (readlevel == PERM_SYSOP || readlevel == PERM_BOARD)
++   {
++     if (!bits)
++       bits = BRD_L_BIT;
++   }
++   else
++#endif
++     bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT;
++ }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

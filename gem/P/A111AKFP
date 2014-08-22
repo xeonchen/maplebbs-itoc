@@ -1,0 +1,31 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]Ãö©ó¬ÝªOÄÝ©Ê...
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/02/18 Fri 09:42:21)                Updated: 2006/02/13
+
+¡° ¤Þ­z¡mdavidliu.bbs@bbs.dlit.edu.tw (David)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¤@¤U¬O§_¦³¿ìªk³]©w¬Y¬ÝªO¬°"§R¤å«á¤å³¹¤£¶ideleted/junkªO"?
+> ¦Ó¤£¬O¥u¦³¯¦±KªO¤~¥i³]©w¦¹¥\¯à¡C
+
+: battr.h
+
+  #define BRD_NOSCORE     0x40    /* ¤£µû¤À¬ÝªO */
++ #define BRD_NOGODELETE  0x80    /* §R¤å«á¤å³¹¤£¶i deleted/junk ªO */
+
+- #define NUMBATTRS       7
+- #define STR_BATTR       "zTcsvA%"
++ #define NUMBATTRS       8
++ #define STR_BATTR       "zTcsvA%d"
+
+: battr.h:battr_tbl[]
+
+  "¤£µû¤À¬ÝªO",                 /* BRD_NOSCORE */
++ "§R¤å¤£¶i [deleted]",         /* BRD_NOGODELETED */
+
+: post.c:move_post()
+
+- if (!(xmode & POST_BOTTOM))   /* ¸m©³¤å³Q¬å¤£¥Î move_post */
++ if (!(xmode & POST_BOTTOM) && !(currbattr & BRD_NOGODELETE))
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

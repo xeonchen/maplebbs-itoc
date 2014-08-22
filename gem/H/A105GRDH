@@ -1,0 +1,30 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ­è¸ÕµÛ±N¬ÝªO«ü¦V¨ìµ{¦¡®É¡A¦³ÂI¤p°ÝÃD
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/03/17 Wed 22:45:01)                Updated: 2004/03/17
+
+  ¶i¤J newboard ªO (¥]¬A±q Class/Board/Select/Favor ¶i¤J)
+  ´Nª½±µ¶i¤J³s¸p¾÷
+
+: xover.c:xover()
+
+void
+xover(cmd)
+  int cmd;
+{
+  int pos, num, zone, sysmode;
+  XO *xo;
+  KeyFunc *xcmd, *cb;
+
++ if (cmd == XZ_POST && !strcmp(currboard, "newboard"))
++ {
++   DL_func("bin/newbrd.so:XoNewBoard");
++   return;
++ }
+
+  for (;;)
+  {
+    while (cmd != XO_NONE)
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;45m¢¢[42m¢¡[m [1mMo[30mdi[mfy: [1;36m2004/03/17 Wed 22:45:01[m

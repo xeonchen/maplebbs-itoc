@@ -1,0 +1,118 @@
+µo«H¤H: guessi.bbs@bbs.wretch.cc (¨S) ¬ÝªO: plan
+¼Ð  ÃD: [­×¥¿] ¤å³¹¤£¶i All_Post ¬ÝªO
+µo«H¯¸: µL¦W¤p¯¸ (2006/11/07 Tue 20:42:57)                Updated: 2006/11/07
+
+¡° ¤Þ­z¡mid9455.bbs@csc241.twbbs.org (= =)¡n¤§»Ê¨¥¡G
+> ¨º½Ð°Ý¤@¤U  ¦pªG»¡§Ú·Q­n§ï¦¨
+> ¦b³]©wÄÝ©Êªº®É­Ô  ¯à°÷³]©w»¡­n¤£­nÅý³o­ÓªOªº¤å³¹¶i All_PostªOªº¸Ü
+> ¤S¸Ó«ç»ò°µ©O  ÁÂÁÂ±z :)
+
+[32m:/src/include/battr.h[m
+
+#define BRD_ANONYMOUS   0x20    /* °Î¦W¬ÝªO */
++ #define BRD_NOALLPOST 0x40    /* ¤£°µAll_Post */
+
+  ...
+  ...
+
+- #define NUMBATTRS       6
++ #define NUMBATTRS       7
+
+- #define STR_BATTR       "zTcsvA"
++ #define STR_BATTR       "zTcsvAP"
+
+[32m:/src/include/battr.h:battr_tbl[][m
+
+  "°Î¦W¬ÝªO",                   /* BRD_ANONYMOUS */
++ "¤£¶i All_Post ¬ÝªO"          /* BRD_NOALLPOST */
+
+
+[32m:/src/so/manage.c[m
+
+§â¥H¤U³o¬q¥[¦b post_battr_noscore() «á­±
+
+static int
+post_battr_noallpost(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("µoªí¤å³¹ 1)¶iAll_Post 2)¤£¶iAll_Post [Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_NOALLPOST;
+    break;
+  case '2':
+    newbrd.battr |= BRD_NOALLPOST;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+[32m:src/so/manage.c:post_manage()[m
+
+#  ifdef HAVE_SCORE
+    "Score   ³]©w¥i§_µû¤À",
+#  endif
++   "AllPost All_Post³]©w",
+
+  ...
+  ...
+
+#  ifdef HAVE_SCORE
+    " (S)µû¤À"
+#  endif
++   " (A)AlPo"
+
+  ...
+  ...
+
+#ifdef HAVE_SCORE
+  case 's':
+    return post_battr_noscore(xo);
+#endif
+
++ case 'a':
++   return post_battr_noallpost(xo);
+
+[32m:/src/maple/post.c:do_post()[m
+
+  char fpath[64], *folder, *nick, *rcpt;
+  int mode;
+  time_t spendtime, prev, chrono;
+- BRD *brd;
+
+  .....
+  .....
+
+  title = ve_title;
+  mode = (curredit & EDIT_OUTGO) ? POST_OUTGO : 0;
+
+#ifdef HAVE_REFUSEMARK
+  if (curredit & EDIT_RESTRICT)
+    mode |= POST_RESTRICT;
+#endif
+
+- brd = bshm->bcache + currbno;
+- if ((brd->readlevel | brd->postlevel) < (PERM_VALID << 1))
++ if (!(currbattr & BRD_NOALLPOST))
++   do_allpost(fpath, rcpt, nick, mode);
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37m[30m¦Ó¥Î¤§«ï²H¬°¤W³Ó¦Ó¤£¬ü¦Ó¬ü¤§ªÌ¬O¼Ö±þ¤H¤Ò¼Ö±þ¤HªÌ«h¤£¥i±o§Ó©ó¤Ñ¤U
+[m[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H¤£[37m134-208-34-179.ndhu.edu.tw[30m®ü[m

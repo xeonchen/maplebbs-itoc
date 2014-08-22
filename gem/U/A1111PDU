@@ -1,0 +1,554 @@
+µo«H¤H: TKyo.bbs@cpu.tfcis.org (·t¶Â¶Q¤½¤l) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]¤å³¹Ãþ§O
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/01/25 Tue 16:54:09)                Updated: 2006/04/17
+
+¡° ¤Þ­z¡mwim888.bbs@wim888.twbbs.org (888)¡n¤§»Ê¨¥¡G
+> ¦bPOST¤å³¹®É·|¥ý°Ý­n¤£­n¥[¤W¤å³¹Ãþ§O
+> ¥Ø«e¬O­n´N¥þ¯¸³£¥Î­n¤£µM´N¬O³£¤£¥Î
+> ¯à¤£¯à§ï¦¨Åý¨C­Óª©¤À¶}¥h¨M©w
+> ¨C­Óª©¥i¥H³]©w¦Û¤vªº¤å³¹¦³­þ¨ÇÃþ§O
+
+¨þ, ­è¦n§Ú¯¸¤W¦³³o¥\¯à, ¼g¦n¤@­ÓÂ§«ô¦h¤F, ´N Post ¥X¨Óµ¹¤j®a°Ñ¦Ò§a :)
+
+------------------------------------------------------------------------------
+: src/include/modes.h : °²³] XO_ZONE ³Ì«á¬°ºëµØ°Ï, »Ý¸ò xz[] ¦P¨B
+
+  #define XZ_GEM          (XO_ZONE + 13)          /* ºëµØ°Ï */
++ #define XZ_PREFIX       (XO_ZONE + 14)          /* ¤å³¹Ãþ§O©w¸qÀÉ */
+
+: src/include/battr.h : °²³]¬ÝªOÄÝ©Ê³Ì«á¬O BRD_NOSCORE
+
+  #define BRD_NOSCORE   0x40    /* ¤£µû¤À¬ÝªO */
++ #define BRD_PREFIX    0x80    /* ¨Ï¥Î¤å³¹Ãþ§O */
+
+- #define NUMBATTRS 7
++ #define NUMBATTRS 8
+
+- #define STR_BATTR "zTcsvA%"         /* itoc: ·s¼WºX¼Ðªº®É­Ô§O§Ñ¤F§ï³o¸Ì°Ú */
++ #define STR_BATTR "zTcsvA%p"        /* itoc: ·s¼WºX¼Ðªº®É­Ô§O§Ñ¤F§ï³o¸Ì°Ú */
+
+#ifdef _ADMIN_C_
+  static char *battr_tbl[NUMBATTRS] =
+  {
+    .
+    .
+    .
+  "¤£µû¤À¬ÝªO",         /* BRD_NOSCORE */
++ "¨Ï¥Î¤å³¹Ãþ§O"        /* BRD_PREFIX */
+};
+#endif
+
+: src/include/struct.h : ¾A·í¦ì¸m¥[¤J
+
++ #define FN_PREFIX       "prefix.dat"            /* ¤å³¹Ãþ§O©w¸qÀÉ */
++ typedef struct
++ {
++   time_t stamp;                 /* ½s¸¹ */
++   usint xmode;                  /* ¤å³¹Ãþ§O¼Ò¦¡ */
++   char title[11];               /* ¤å³¹Ãþ§O¼ÐÃD */
++ }       PREFIX;
+
+: src/include/theme.h : ¾A·í¦ì¸m¥[¤J
+
+#define NECKER_PREFIX  "[¡ö]Â÷¶} [T]­×§ïÃþ§O [E]­×§ï [m]²¾°Ê [t]¼ÐÅÒ [d/D]§R°£ [^D]¼ÐÅÒ§R°£ [h]»¡©ú\n" \
+COLOR3 "  ½s¸¹   ¤å³¹Ãþ§O    ÄÝ©Ê%*s                                                     \033[m"
+
+#define FEETER_PREFIX   \
+COLOR1 " Ãþ§OºÞ²z " COLOR2 " (ENTER)¤Á´«ÄÝ©Ê (a)·s¼W (E)­×§ï (¡ô/¡õ)¤W¤U (PgUp/PgDn)¤W¤U­¶      "
+
+: src/maple/xover.c : xz[]
+
+- {NULL, NULL, M_GEM, FEETER_GEM}               /* XZ_GEM */
++ {NULL, NULL, M_GEM, FEETER_GEM},              /* XZ_GEM */
++ {NULL, NULL, M_XMODE, FEETER_PREFIX}          /* XZ_PREFIX */
+
+: src/so/manage.c : post_manage()
+
+  char *menu[] =
+  {
+    .
+    .
+    .
++   "Prefix  ½s¿è¤å³¹Ãþ§O"
+     NULL
+  };
+
+  case 'o':
+    ret = XoBM(xo);
+    break;
+#endif
+
+  case 'p':
++   {
++     void *p;
++     int (*func) ();
+
++     p = DL_get("bin/prefix.so:XoPrefix");
+
++     if (p)
++     {
++       func = p;
++       ret = (*(func)) (xo);
++     }
++     else
++       ret = XO_FOOT;
+
++      break;
++   }
+
+
+: src/maple/post.c
+
+/* ¾A·í¦ì¸m¥[¤J¤@ function post_prefix() */
+
+static char *
+post_prefix()
+{
+  char *menu[13], fpath[64];
+  PREFIX prefix;
+  static char buf[10][14];
+  char buf_title[50];
+  int ch, i, j, num, page, page_max, page_size;
+
+  if (currbattr & BRD_PREFIX)
+  {
+    brd_fpath(fpath, currboard, FN_PREFIX);
+    if ((num = rec_num(fpath, sizeof(PREFIX))) > 0)
+    {
+      page_size = 9;
+      page_max = ((num - 1) / page_size) + 1;
+      page = 0;
+      menu[0] = "QP";
+
+      for (;;)
+      {
+        i = page * page_size;
+        for (j = 0; j <= page_size; i++, j++)
+        {
+          if (!(rec_get(fpath, &prefix, sizeof(PREFIX), i)))
+          {
+            if (prefix.xmode && (!(bbstate & STAT_BOARD)))
+              strcpy(buf[j], "#  ªO¥D±s¥Î");
+            else
+              sprintf(buf[j], "%d  %s", (j + 1), prefix.title);
+
+            menu[j + 1] = buf[j];
+          }
+          else
+          {
+            j++;
+            break;
+          }
+        }
+
+        menu[j] = "Q  ¨ú®ø";
+        menu[j + 1] = NULL;
+
+        sprintf(buf_title, "¿ï¾Ü¤å³¹Ãþ§O  (¡ö) ´«­¶ùø%cùø", page + '1');
+        ch = pans(-1, -1, buf_title, menu);
+        if (ch == 'q')
+          break;
+        else if (ch == 'p')
+        {
+          page++;
+          if (page == page_max)
+            page = 0;
+        }
+        else if (ch == '#')
+          vmsg("µLªk¨Ï¥Î¦¹¤å³¹Ãþ§O\n¦]¬°±z¤£¬O¸ÓªOªO¥D¡A½Ð­«·s¿ï¾Ü¤å³¹Ãþ§O¡I");
+        else
+          return buf[ch - '1'] + 3;
+      }
+    }
+  }
+  return NULL;
+}
+
+: src/maple/post.c : do_post()
+
+  prints("µoªí¤å³¹©ó¡i %s ¡j¬ÝªO", currboard);
+
+#ifdef POST_PREFIX
+  .
+  .
+  .
+#else
+- if (!ve_subject(21, title, NULL))
++ if (!ve_subject(22, title, ((title) ? NULL : post_prefix())))
+#endif
+    return XO_HEAD;
+
+: src/so/prefix.c ·s¼W³o°¦µ{¦¡
+
+/*-------------------------------------------------------*/
+/* prefix.c         ( NTHU CS MapleBBS Ver 3.10 )        */
+/*-------------------------------------------------------*/
+/* target : Post Refix ºÞ²z¤¶­±µ{¦¡                      */
+/* author : kyo.bbs@cszone.org                           */
+/* create : 05/01/17                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+extern XZ xz[];
+extern char xo_pool[];
+
+#define PREFIX_MANAGER  0x01
+
+#define C_PREFIX_MANAGER        "\033[1;31m"
+#define C_PREFIX_USER           "\033[1;37m"
+
+static int
+prefix_edit(prefix, echo)
+  PREFIX *prefix;
+  int echo;
+{
+  char buf_command[3] = {0};
+  char *menu[] = {buf_command,
+      "1  ¤@¯ë¨Ï¥ÎªÌ",
+      "2  ªO¥D±M¥Î", NULL};
+
+  strcpy(buf_command, "11");
+
+  if (echo == GCARRY)
+  {
+    if (prefix->xmode & PREFIX_MANAGER)
+      strcpy(buf_command, "22");
+  }
+
+  switch(pans(-1, -1, "Ãþ§O¨Ï¥ÎÅv­­", menu))
+  {
+    case '1':
+      prefix->xmode = 0;
+      break;
+    case '2':
+      prefix->xmode = PREFIX_MANAGER;
+      break;
+  }
+
+  if (!(vget(b_lines, 0, "¤å³¹Ãþ§O¡G", prefix->title, 11, echo)))
+    return 0;
+
+  return 1;
+}
+
+static int
+prefix_add(xo)
+  XO *xo;
+{
+  PREFIX prefix;
+
+  memset(&prefix, 0, sizeof(PREFIX));
+
+  if (prefix_edit(&prefix, DOECHO))
+  {
+    char fpath[64];
+
+    time(&prefix.stamp);
+    brd_fpath(fpath, currboard, FN_PREFIX);
+    rec_add(fpath, &prefix, sizeof(PREFIX));
+  }
+
+  return XO_INIT;
+}
+
+static int
+prefix_change(xo)
+  XO *xo;
+{
+  PREFIX *prefix, old_prefix;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  prefix = (PREFIX *) xo_pool + cur;
+
+  old_prefix = *prefix;
+
+  if (prefix_edit(&old_prefix, GCARRY))
+  {
+    if (memcmp(prefix, &old_prefix, sizeof(PREFIX)))
+    {
+      if (vans("½T©w­n­×§ï¶Ü¡H[N] ") == 'y')
+      {
+        char fpath[64];
+
+        brd_fpath(fpath, currboard, FN_PREFIX);
+        rec_put(fpath, &old_prefix, sizeof(PREFIX), pos, NULL);
+        return XO_INIT;
+      }
+    }
+  }
+
+  return XO_HEAD;
+}
+
+static int
+prefix_title(xo)
+  XO *xo;
+{
+  PREFIX *prefix, old_prefix;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  prefix = (PREFIX *) xo_pool + cur;
+
+  old_prefix = *prefix;
+
+  if (vget(b_lines, 0, "¤å³¹Ãþ§O¡G", prefix->title, 11, GCARRY))
+  {
+    if (memcmp(prefix, &old_prefix, sizeof(PREFIX)))
+    {
+      char fpath[64];
+
+      brd_fpath(fpath, currboard, FN_PREFIX);
+      rec_put(fpath, prefix, sizeof(PREFIX), pos, NULL);
+      return XO_LOAD;
+    }
+  }
+
+  return XO_FOOT;
+}
+
+prefix_delete(xo)
+  XO *xo;
+{
+  if (vans(msg_del_ny) == 'y')
+  {
+    if (!rec_del(xo->dir, sizeof(PREFIX), xo->pos, NULL))
+    {
+      PREFIX *prefix;
+      prefix = (PREFIX *) xo_pool + (xo->pos - xo->top);
+      return XO_LOAD;
+    }
+  }
+  return XO_FOOT;
+}
+
+static int
+prefix_rangedel(xo)
+  XO *xo;
+{
+  return xo_rangedel(xo, sizeof(PREFIX), NULL, NULL);
+}
+
+static int
+vfyprefix(prefix, pos)
+  PREFIX *prefix;
+  int pos;
+{
+  return Tagger(prefix->stamp, pos, TAG_NIN);
+}
+
+static int
+prefix_prune(xo)
+  XO *xo;
+{
+  return xo_prune(xo, sizeof(PREFIX), vfyprefix, NULL);
+}
+
+static void
+prefix_item(num, prefix)
+  int num;
+  PREFIX *prefix;
+{
+  prints("%6d  %c%-10s  %s%s\033[m\n",
+    num, tag_char(prefix->stamp),
+    prefix->title,
+    (prefix->xmode & PREFIX_MANAGER) ? C_PREFIX_MANAGER : C_PREFIX_USER,
+    (prefix->xmode & PREFIX_MANAGER) ? "ªO¥D±M¥Î" : "¤@¯ë¨Ï¥ÎªÌ");
+}
+
+static int
+prefix_query(xo)
+  XO *xo;
+{
+  PREFIX *prefix;
+  int pos, cur;
+  char fpath[64];
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  prefix = (PREFIX *) xo_pool + cur;
+
+  prefix->xmode ^= PREFIX_MANAGER;
+  brd_fpath(fpath, currboard, FN_PREFIX);
+  rec_put(fpath, prefix, sizeof(PREFIX), pos, NULL);
+
+  move(3 + cur, 0);
+  prefix_item(++pos, prefix);
+
+  return XO_NONE;
+}
+
+static int
+prefix_body(xo)
+  XO *xo;
+{
+  PREFIX *prefix;
+  int max, num, tail;
+
+  max = xo->max;
+  if (max <= 0)
+  {
+    if (vans("·s¼W¤å³¹Ãþ§O¸ê®Æ¡H[N] ") == 'y')
+      return prefix_add(xo);
+
+    return XO_QUIT;
+  }
+
+  prefix = (PREFIX *) xo_pool;
+  num = xo->top;
+  tail = num + XO_TALL;
+  if (max > tail)
+    max = tail;
+
+  move(3, 0);
+  do
+  {
+    prefix_item(++num, prefix++);
+  } while (num < max);
+  clrtobot();
+
+  return XO_FOOT;       /* itoc.010403: §â b_lines ¶ñ¤W feeter */
+}
+
+static int
+prefix_head(xo)
+  XO *xo;
+{
+  vs_head("Ãþ§OºÞ²z", str_site);
+  prints(NECKER_PREFIX, d_cols, "");
+
+  return prefix_body(xo);
+}
+
+static int
+prefix_load(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(PREFIX));
+  return prefix_body(xo);
+}
+
+static int
+prefix_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(PREFIX));
+  return prefix_head(xo);
+}
+
+static int
+prefix_tag(xo)
+  XO *xo;
+{
+  PREFIX *prefix;
+  int tag, pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  prefix = (PREFIX *) xo_pool + cur;
+
+  if (tag = Tagger(prefix->stamp, pos, TAG_TOGGLE))
+  {
+    move(3 + cur, 0);
+    prefix_item(++pos, prefix);
+  }
+
+  return xo->pos + 1 + XO_MOVE; /* lkchu.981201: ¸õ¦Ü¤U¤@¶µ */
+}
+
+
+static int
+prefix_move(xo)
+  XO *xo;
+{
+  PREFIX *prefix;
+  int pos, cur, i;
+  char buf[40], ans[5];
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  prefix = (PREFIX *) xo_pool + cur;
+
+  sprintf(buf, "½Ð¿é¤J²Ä %d ¿ï¶µªº·s¦ì¸m¡G", pos + 1);
+  if (vget(b_lines, 0, buf, ans, 5, DOECHO))
+  {
+    i = atoi(ans) - 1;
+    if (i < 0)
+      i = 0;
+    else if (i >= xo->max)
+      i = xo->max - 1;
+
+    if (i != pos)
+    {
+      if (!rec_del(xo->dir, sizeof(PREFIX), pos, NULL))
+      {
+        rec_ins(xo->dir, prefix, sizeof(PREFIX), i, 1);
+        xo->pos = i;
+        return prefix_load(xo);
+      }
+    }
+  }
+  return XO_FOOT;
+}
+
+static int
+prefix_help(xo)
+  XO *xo;
+{
+  xo_help("prefix");
+  return XO_HEAD;
+}
+
+
+static KeyFunc prefix_cb[] =
+{
+  XO_INIT, prefix_init,
+  XO_LOAD, prefix_load,
+  XO_HEAD, prefix_head,
+  XO_BODY, prefix_body,
+
+  'r', prefix_query,
+  'a', prefix_add,
+  'E', prefix_change,
+  'T', prefix_title,
+  Ctrl('D'), prefix_prune,
+  'd', prefix_delete,
+  'D', prefix_rangedel,
+  't', prefix_tag,
+  'm', prefix_move,
+  'h', prefix_help
+};
+
+
+int
+XoPrefix(xo)
+  XO *xo;
+{
+
+  if (bbstate & STAT_BM)
+  {
+    char fpath[64];
+
+    brd_fpath(fpath, currboard, FN_PREFIX);
+    xz[XZ_PREFIX - XO_ZONE].xo = xo = xo_new(fpath);
+    xz[XZ_PREFIX - XO_ZONE].cb = prefix_cb;
+    xover(XZ_PREFIX);
+    free(xo);
+
+    return XO_INIT;
+  }
+
+  return XO_NONE;
+}
+------------------------------------------------------------------------------
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mTKyo [30m±q [31mcszone.twbbs.org [30mµoªí[m

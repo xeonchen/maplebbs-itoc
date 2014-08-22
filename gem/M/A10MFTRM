@@ -1,0 +1,62 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: ¦p¦ó§ä¨ì¬Y¥\¯à©Ò¹ïÀ³ªº¨ç¦¡
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/09 Sat 21:53:46)
+
+¡° ¤Þ­z¡mcomfan (Ãø¹L  ¶Ë¤ß)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý¸òrpg¨¤¦â§êºt¹CÀ¸¦³Ãöªºµ{¦¡ÀÉ®×¬O­þ¨Ç©O???????
+> ¤£¦n·N«ä  ¦]¬°«Ü·Qª¾¹D­þ¨Çµ{¦¡ÀÉ®×¬O©Mrpg¦³Ãöªº  ©Ò¥H´N¦b³o¸Ìµo°Ý¤F
+
+  ­n§ä¨ì¬Y¥\¯à©Ò¹ïÀ³ªº¨ç¦¡¡A³o­n¾a¥\¤O¡A³ÌÂ²³æªº§Þ¥©¦³¡G
+
+  ¢Ï. grep ¤jªk
+
+    ½d¨Ò¡G·Q±oª¾µoªí¤å³¹ªº¨ç¦¡¬°¦ó
+
+    ¤wª¾µoªí¤å³¹§¹¦¨®É·|¦³¡u³o¬O±zªº²Ä 99 ½g¤å³¹¡A±o 123 »È¡C¡v¦r¼Ë
+    % grep "³o¬O±zªº" ~/src/*/*.c
+    ¥i¥H§ä¨ì¦b post.c¡A½s¿è post.c ®É¡A·j´M¡u³o¬O±zªº²Ä¡v¡A´N¥i¥H§ä¨ì³o¬q
+
+    mode = BMIN(wordsnum, spendtime) / 10;    /* ¨C¤Q¦r/¬í ¤@¤¸ */
+    prints("³o¬O±zªº²Ä %d ½g¤å³¹¡A±o %d »È¡C", ++cuser.numposts, mode);
+    addmoney(mode);
+
+  ¢Ð. «öÁä¬d *_cb[]
+
+    ½d¨Ò¡G·Q±oª¾¨Ï¥ÎªÌ¦W³æ¥á¤ô²yªº¨ç¦¡¬°¦ó
+
+    ¤wª¾ (1) ¨Ï¥ÎªÌ¦W³æµ{¦¡¬O¦b ulist.c  (³o¥i¥H±qºëµØ°Ï¨÷©v¤ÀÃþª¾¹D)
+                                         (©ÎªÌ¤wª¾¨Ï¥ÎªÌ¦W³æ¦³¡u±Æ¦C¤è¦¡¡v¦r¼Ë
+                                          ¥Î grep ¤jªk¤]¥i§ä¨ì¬O ulist.c)
+         (2) ¦b¨Ï¥ÎªÌ¦W³æ¥á¤ô²yªº«ü¥O¬O w
+
+    ½s¿è ulist.c¡A·j´M¡u_cb[]¡v¡A¥i¥H§ä¨ì ulist_cb[]
+    ¸Ì­±ªº 'w' ´N¬O¹ïÀ³ªÌ ulist_write
+    ¦Ó ulist.c:ulist_write() ´N¬O¨Ï¥ÎªÌ¦W³æ¥á¤ô²yªº¨ç¦¡
+
+  ¢Ñ. ¬Ý help
+
+    ½d¨Ò¡G·Q±oª¾ªB¤Í¦W³æ§R°£ªB¤Íªº¨ç¦¡¬°¦ó
+
+    ¦bªB¤Í¦W³æ¤º«ö h¡A§ä¨ì§R°£ªB¤Í³o½g help¡A¶i¥h¤@¬Ý
+
+    ¢z¢w¢w¢w¢s¢w¢w¢w¢w¢w¢w¢s¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢{
+    ¢x«ö  Áä¢x ¨ç      ¦¡ ¢x  ±Ô                                        ­z  ¢x
+    ¢u¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢q¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t
+    ¢xd     ¢xpal_delete  ¢x§R°£ªB¤Í                                        ¢x
+    ¢|¢w¢w¢w¢r¢w¢w¢w¢w¢w¢w¢r¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}
+
+    µM«á¥Î grep ¤jªk·j´M¡upal_delete¡v¡A§Y¥i±oª¾
+    pal.c:pal_delete() ´N¬OªB¤Í¦W³æ§R°£ªB¤Íªº¨ç¦¡
+
+  ¢Ò. ¬dºëµØ°Ï
+
+    ºëµØ°Ï¦³³\¦h½d¨Ò¡A§ä¤@§ä¤]³\¦³
+
+  ¢Ó. ¦b¬ÝªO¤W°Ý
+
+    ¦pªGÁÙ¤£ª¾¹D¡A´N°Ý¤H§a
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

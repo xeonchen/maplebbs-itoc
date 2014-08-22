@@ -1,0 +1,40 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]ºëµØ°Ï¼ÐÃD¦Y±±¨î½X
+®É¶¡: Fri Nov 14 14:17:06 2003                          Updated: 2003/11/14
+
+¡° ¤Þ­z¡mchwaian (µL¨¥)¡n¤§»Ê¨¥¡G
+> ¼ÐÃD¦Y±±¨î½X¥i¦æ¶Ü¡H
+
+  ¦b vget «ö Ctrl+U §Y¥i§Yªí¥Ü KEY_ESC
+
+: visio.c:vget()
+
+    ch = vkey();
+    if (ch == '\n')
+    {
+      ...
+      ...
+    }
+
++   if (ch == Ctrl('U'))
++     ch = KEY_ESC;
+
+-   if (isprint2(ch))
++   if (isprint2(ch)|| ch == KEY_ESC)
+    {
+      ...
+      ...
+
+      for (;;)
+      {
+-       outc(echo ? ch : '*');
++       outc((echo && ch != KEY_ESC) ? ch : '*');
+        next = *prompt;
+        *prompt++ = ch;
+
+--
+  ¤£¹L±o¤p¤ß³QÀÝ¥Î :p
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

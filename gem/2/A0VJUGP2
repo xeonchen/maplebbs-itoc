@@ -1,0 +1,127 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¥P¯ó¤p¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¥\¯à]¶i¶¥¼ÐÃD¤W¦â
+µo«H¯¸: ¤ë¤U©]·Q (Sat, 26 Apr 2003 21:17:07 +0800 (CST))  Updated: 2003/04/28
+
+  °w¹ï¦³¤H·R¥Î¡i¡j¡m¡n³oªF¦è¶q¨­¥´³y......(®ö¶O¨t²Î¸ê·½ªºªF¦è)
+
+  ¥Ñ©ó¡i¡j¡m¡n³oªF¦è¤£¬O¦r¤¸±`¼Æ³B²z¤è¦¡¦³ÂI¤p´Æ¤â¡C
+
+  ¨ä¥L¹³¡q¡r³oÃþ¤]¬O¥þ§Î¬A©·¤]¥i¥H¥é·Ó¤U­±³B²z¡C
+
+> config.h
+
+#ifdef HAVE_DECLARE
+#define HAVE_ADVANCE_DECLARE    /* amaki.030424: ¶i¶¥ªº¼ÐÃD¤W¦â */
+#endif
+
+> post.c
+
+  [33m­×§ïhdr_outs[m
+
+  /* ¦^ÂÐ/Âà¿ý/­ì³Ð/¾\Åª¤¤ªº¦P¥DÃD¦^ÂÐ/¾\Åª¤¤ªº¦P¥DÃDÂà¿ý/¾\Åª¤¤ªº¦P¥DÃD­ì³Ð*/
+  static char *type[6] =
+    {"Re", "Fw", "¡º", "\033[1;33m=>", "\033[1;33m=>", "\033[1;32m¡»"};
+  uschar *title, *mark;
+  int ch, len;
++#ifdef HAVE_ADVANCE_DECLARE
++ int i;
++ char *ptr, *ptr_title, *ptr_a1, *ptr_a2, *ptr_b1, *ptr_b2;
++#endif
+  ......(²¤)
+
+
++#ifdef HAVE_ADVANCE_DECLARE
++ i = 0;
++#endif
+
+  square = 0;  /* 0:µL¤è¬A  1:²Ä¤@¦r¬°¤è¬A"["¥¼out
+                  2:¤wout"["¥¼out"]" 3:§¡out, ¤£¦A³B²z */
+  if (ch < 2)
+  {
++#ifdef HAVE_ADVANCE_DECLARE
++    ptr = &title[0];
++    ptr_a1 = strstr(title, "¡m");
++    ptr_a2 = strstr(title, "¡n");
++    ptr_b1 = strstr(title, "¡i");
++    ptr_b2 = strstr(title, "¡j");
+
++   if (*title == '[' ||
++     ((ptr_a1 - ptr == 0 && ptr_a1 < ptr_a2) ||
++      (ptr_b1 - ptr == 0 && ptr_b1 < ptr_b2)))
++#else
+    if (*title == '[')
++#endif
+      square = 1;
+  }
+#endif
+
+  ......(²¤)
+
+        {
+          outs("\033[1;37m[");
+          square = 2;
+          continue;
+        }
++#ifdef HAVE_ADVANCE_DECLARE
++        else if (ptr_a1 - ptr == 0 && ptr_a1 < ptr_a2)
++        {
++          outc(' '); /* amaki.030424: title[0]¤£·|¦L¥X¨Ó¡A¥u¦n¸É¤@­ÓªÅ¥Õ */
++          outs("\033[1;37m m\033[m");
++          i = i+2;
++          cc = title[i];
++          square = 4;
++          continue;
++        }
++        else if (ptr_b1 - ptr == 0 && ptr_b1 < ptr_b2)
++        {
++          outc(' ');
++          outs("\033[1;37m¡i\033[m");
++          i = i+2;
++          cc = title[i];
++          square = 5;
++          continue;
++        }
++      case 4:
++        ptr_title = &title[i];
++        if (ptr_title - ptr_a2 == 0)
++        {
++          outc(title[i-1]); /* amaki.030424: À³¸Ó¬O¨Ï¥Îdo-while°j°é½t¬G¡A³o¸Ì
++                             ¤]­n¸É¤@­Ó¡A¤£µM·|º|±¼¤@­ÓÅÜ¶Ã½X */
++          outs("\033[1;37m¡n\033[m");
++          i = i+2;
++          cc = title[i];
++          square = 3;
++          continue;
++        }
++      case 5:
++        ptr_title = &title[i];
++        if (ptr_title - ptr_b2 == 0)
++        {
++          outc(title[i-1]);
++          outs("\033[1;37m¡j\033[m");
++          i = i+2;
++          cc = title[i];
++          square = 3;
++          continue;
++        }
++# endif /* HAVE_ADVANCE_DECLARE */
+      case 2:
+        if (cc == ']')
+        {
+          outs("]\033[m");
+          square = 3;
+          continue;
+        }
+      }
+    }
+#endif
+
+    outc(cc);
++#ifdef HAVE_ADVANCE_DECLARE
++ } while ((cc = title[i++]) && (title < mark));
++#else
+  } while ((cc = *title++) && (title < mark));
++#endif
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

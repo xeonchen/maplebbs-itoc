@@ -1,0 +1,57 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] §Úªº³Ì·R³Æ¥÷/ÁÙ­ì
+µo«H¯¸: °Ê¤O®Ö¤ß (2007/04/11 Wed 21:40:53)                Updated: 2006/04/11
+
+¡° ¤Þ­z¡momatic (........)¡n¤§»Ê¨¥¡G
+> ¦]¬°§Ú­Ì¦³¥[§Úªº³Ì·R­«·s±Æ§Ç¥\¯à
+> ¦ý¤]¨Ç¤H·|¤£¤p¤ß«ö¨ì
+> ©Ò¥H·s¼W "³Æ¥÷/ÁÙ­ì"¥\¯à
+
+: favor.c:mf_backup() ·s¼W¦¹¨ç¦¡¦b mf_help() «e­±
+
+static int
+mf_backup(xo)
+  XO *xo;
+{
+  char srcfile[64], tmpfile[64];
+
+  /* ¥u³B²z§Úªº³Ì·R¤§­º­¶ */
+
+  switch (vans("1)³Æ¥÷§Úªº³Ì·R 2)ÁÙ­ì§Úªº³Ì·R¡H[Q] "))
+  {
+  case '1':
+    mf_fpath(srcfile, cuser.userid, FN_MF);
+    mf_fpath(tmpfile, cuser.userid, FN_MF".bak");
+    if (dashf(tmpfile))
+      unlink(tmpfile);
+    f_cp(srcfile, tmpfile, O_TRUNC);
+    vmsg("³Æ¥÷§¹¦¨");
+    break;
+
+  case '2':
+    mf_fpath(srcfile, cuser.userid, FN_MF".bak");
+    if (!dashf(srcfile))
+    {
+      vmsg("±z¨S¦³¥ô¦ó³Æ¥÷");
+    }
+    else
+    {
+      mf_fpath(tmpfile, cuser.userid, FN_MF);
+      f_cp(srcfile, tmpfile, O_TRUNC);
+      vmsg("ÁÙ­ì§¹¦¨");
+      return XO_LOAD;
+    }
+  }
+
+  return XO_FOOT;
+}
+
+: favor.c:mf_cb[]
+
++ 'B', mf_backup,
+  'h', mf_help
+
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m218-168-176-148.dynamic.hi[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

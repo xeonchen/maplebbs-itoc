@@ -1,0 +1,55 @@
+µo«H¤H: itoc.bbs@xeon.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: Ãö©óªO¥D
+µo«H¯¸: °Ê¤O®Ö¤ß (2003/12/16 Tue 11:02:43)                Updated: 2004/03/17
+
+¡° ¤Þ­z¡mjoue (¤p¤l)¡n¤§»Ê¨¥¡G
+> ¥i¥H³]¦h­Ó¤Ï°Î¦Wª©¶Ü?
+
+  ¥i¥H¡A¤£¦Pªº°Î¦WªO©ñ¦b¤£¦Pªº¤Ï°Î¦WªO
+
+: config.h
+
+- #undef  HAVE_UNANONYMOUS_BOARD
++ #define HAVE_UNANONYMOUS_BOARD
+
+: post.c:do_unanonymous()
+
+static void
+do_unanonymous(fpath)
+  char *fpath;
+{
+  HDR post;
+  char folder[64];
++ char *brdname;
+
+  [1;44m// ¤U¦C¤½¦¡¦U¯¸¦Û©w[m
++ if (!strcmp(currboard, "Fuck"))       /* Fuck ªº¤Ï°Î¦WªO¬O UnFuck */
++   brdname = "UnFuck";
++ else if (!strcmp(currboard, "Sex"))   /* Sex ªº¤Ï°Î¦WªO¬O UnSex */
++   brdname = "UnSex";
++ else                                  /* ¨ä¥L°Î¦WªO«h¬O³£¥á¨ì UnAnonymous */
++   brdname = BN_UNANONYMOUS;
+
+- brd_fpath(folder, BN_UNANONYMOUS, fn_dir);
++ brd_fpath(folder, brdname, fn_dir);
+  hdr_stamp(folder, HDR_LINK | 'A', &post, fpath);
+
+  post.xmode = 0;
+  strcpy(post.owner, cuser.userid);
+  strcpy(post.title, ve_title);
+
+  rec_add(folder, &post, sizeof(HDR));
+
+- btime_update(brd_bno(BN_UNANONYMOUS));
++ btime_update(brd_bno(brdname));
+}
+
+  ·s¶}¯µ±KªO UnFuck¡BUnSex¡BUnAnonymous
+
+  ¦pªGÁÙ·QÅýªO¥D¬Ý¨ì¤Ï°Î¦Wªº¤º®e
+  ´N§â Fuck ªO¥D¥[¤J UnFuck ªO¤Í¦W³æ
+    §â Sex  ªO¥D¥[¤J UnSex  ªO¤Í¦W³æ
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

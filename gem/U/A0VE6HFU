@@ -1,0 +1,438 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¥P¯ó¤p¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¾ã²z]ºëµØ°Ï¥i¨£¦W³æ
+µo«H¯¸: ¤ë¤U©]·Q (Sun, 13 Apr 2003 06:10:16 +0800 (CST)   Updated: 2005/10/07
+
+  ¾ã²z¤F³o¬q®É¶¡½Ñ¦h°ª¤â»Pitocªº­×§ï¡A§â§¹¾ãª©©ñ¤W¨Ó¡C
+
+  ³o¸Ì¹w³]ªº¥i¨£¦W³æÀÉ®×¬O©ñ¦b gem/brd/ªO¦W/gempal_DIR/ ¤U¡C
+
+  ºëµØ°Ï¥i¨£¦W³æ:
+
+  ²Ä¤@¦¸«ö¤po®É·|¸ß°Ý¡A²Ä¤G¦¸«ö¤po®É·|¸ß°Ý¬O§_­n¸Ñ°£¥[±K¡A¸Ñ°£«á·|
+  ¬å±¼©Ò¦³¥i¨£¦W³æ¡C
+
+  ¥[±K«á¡A¤é«á­Y¬O¦³»Ý­n¦A¥[¤J·sªº¥i¨£¦W³æ¡A½Ð«ö¤jOÁä¡C
+
+: src/lib/dao.p
+
+/* f_path.c */
++ void mak_fpath(char *str, char *key, char *name);
+void brd_fpath(char *fpath, char *board, char *fname);
+void gem_fpath(char *fpath, char *board, char *fname);
+void usr_fpath(char *fpath, char *user, char *fname);
+
+: src/lib/f_path.c:mak_fpath()
+
+- static void
++ void
+mak_fpath(str, key, name)
+
+: gem.c  ·s¼W¤»¤ä¨ç¦¡¡A§Û¦bgem_item()«e­±¡C
+
+#ifdef HAVE_GEMPAL
+static void
+gempal_fpath(fpath, board, mode, hdr)
+  char *fpath;
+  char *board;
+  char mode;       /* 'C':Cansee  'G':Gemimage */
+  HDR *hdr;
+{
+  char gboard[80], fname[32];
+
+  *fpath++ = 'g';
+  *fpath++ = 'e';
+  *fpath++ = 'm';
+
+  sprintf(gboard, "brd/%s/gempal_DIR", board);
+  sprintf(fname, "%s_%s", mode == 'C' ? "Cansee" : "Gemimage", hdr->xname);
+  mak_fpath(fpath, gboard, fname);
+}
+
+
+static void
+gembrdname_get(brdname, dir)
+  char *brdname;
+  char *dir;
+{
+  char xboard[80], *str;
+
+  strcpy(xboard, dir + 8);  /* skip "gem/brd/" */
+  if (str = strchr(xboard, '/'))
+    *str = '\0';
+
+  strcpy(brdname, xboard);
+}
+
+
+static void
+kill_gempal(board, hdr)   /* amaki.030322: ¥Î¨Ó¬å¦W³æ¤pÀÉ */
+  char *board;
+  HDR *hdr;
+{
+  char fpath[64];
+
+  gempal_fpath(fpath, board, 'C', hdr);
+  unlink(fpath);
+  gempal_fpath(fpath, board, 'G', hdr);
+  unlink(fpath);
+}
+
+
+static int
+gempal_belong(board, hdr)
+  char *board;
+  HDR *hdr;
+{
+  int fsize, count, result;
+  char fpath[64];
+
+  gempal_fpath(fpath, board, 'G', hdr);
+  board = f_img(fpath, &fsize);
+
+  result = 0;
+
+  if (board != NULL)
+  {
+    count = fsize / sizeof(int);
+    if (count > 0)
+    {
+      int userno, *up;
+      int datum, mid;
+
+      userno = cuser.userno;
+      up = (int *) board;
+
+      while (count > 0)
+      {
+        datum = up[mid = count >> 1];
+        if (userno == datum)
+        {
+          result = 1;
+          break;
+        }
+        if (userno > datum)
+        {
+          up += (++mid);
+          count -= mid;
+        }
+        else
+        {
+          count = mid;
+        }
+      }
+    }
+    free(board);
+  }
+  return result;
+}
+
+
+static int
+int_cmp(a, b)
+  int *a;
+  int *b;
+{
+  return *a - *b;
+}
+
+
+static void
+bm_image_gempal(hdr, board)
+  HDR *hdr;
+  char *board;
+{
+  int fd;
+  char fpath[64];
+
+  gempal_fpath(fpath, board, 'C', hdr);
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    struct stat st;
+    PAL *pal, *up;
+    int count;
+
+    fstat(fd, &st);
+    if (pal = (PAL *) malloc(count = st.st_size))
+    {
+      count = read(fd, pal, count) / sizeof(PAL);
+      if (count > 0)
+      {
+        int *userno;
+        int c = count;
+
+        userno = (int *) up = pal;
+        do
+        {
+          *userno++ = up->userno;
+          up++;
+        } while (--c);
+
+        if (count > 1)          /* Thor: ¦h±Æ§Ç¦³¯q¨­Åé°·±d... */
+          qsort(pal, count, sizeof(int), int_cmp);
+
+        gempal_fpath(fpath, board, 'G', hdr);
+        if ((count = open(fpath, O_WRONLY | O_CREAT | O_TRUNC, 0600)) >= 0)
+        {
+          write(count, pal, (char *) userno - (char *) pal);
+          close(count);
+        }
+      }
+      else  /* Thor.980811: lkchu patch: »P friend ¦P¨B */
+      {
+        kill_gempal(board, hdr);
+      }
+      free(pal);
+    }
+    close(fd);
+  }
+}
+
+
+extern KeyFunc pal_cb[];
+static HDR * gem_check();
+
+static int gem_init();
+
+static int
+XoBM_gempal(xo)
+  XO *xo;
+{
+  HDR *hdr;
+  XO *xt;
+  char fpath[64], xboard[BNLEN + 1];
+
+  if (!(xo->key & GEM_M_BIT) || !(hdr = gem_check(xo, NULL, 0)))
+    return XO_NONE;
+
+  /* itoc.030323: ­Ó¤HºëµØ°Ï¤£»Ý¥i¨£¦W³æ */
+  if (!(hdr->xmode & GEM_RESTRICT) || *xo->dir == 'u')
+    return XO_NONE;
+
+  gembrdname_get(xboard, xo->dir);
+  sprintf(fpath, "gem/brd/%s/gempal_DIR", xboard);
+  if (!dashd(fpath))
+    mkdir(fpath, 0755);
+
+  gempal_fpath(fpath, xboard, 'C', hdr);
+  /* itoc.010412: t_pal() §ï¦¨¨C¦¸°h¥X¦n¤Í¦W³æ´N free¡A¦Ó¤£¦b
+     talk_main() ¤¤¡A©Ò¥H­n­«³] pal_cb */
+  xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
+  xz[XZ_PAL - XO_ZONE].cb = pal_cb;
+  xover(XZ_PAL);              /* Thor: ¶ixover«e, pal_xo ¤@©w­n ready */
+
+  /* build userno image to speed up, maybe upgreade to shm */
+
+  bm_image_gempal(hdr, xboard);
+
+  free(xt);
+
+  return gem_init(xo);
+}
+#endif   /* GEM_PAL */
+
+
+: gem.c:gem_item()  ­×§ïgem_item()
+
+static void
+- gem_item(num, hdr, level)
++ gem_item(xo, num, hdr, level)
++  XO *xo;
+  int num;
+  HDR *hdr;
+  int level;
+{
+  int xmode, gtype;
+
++#ifdef HAVE_GEMPAL
++ char xboard[BNLEN + 1];
++ gembrdname_get(xboard, xo->dir);
++#endif
+
+  /* ¡·¡¸¡¹¡º¡»¡¼¡½¡¾¡¿ : A1B7 ... */
+
+  xmode = hdr->xmode;
+  gtype = (char) 0xba;
+
+  ......(²¤)
+
+  gtype = gem_way;
+
++#ifdef HAVE_GEMPAL
++ if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT) &&
++   !gempal_belong(xboard, hdr))
++#else
+  if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT))
++#endif
+    outs(MSG_DATA_CLOAK);             /* itoc.000319: ­­¨î¯Å¤å³¹«O±K */
+
+: gem.c ©Ò¦³¥Î¨ì gem_item() ªº¦a¤è³£­n§ï
+
+ :: gem_body
+  do
+  {
+-   gem_item(++num, hdr++, tail);
++   gem_item(xo, ++num, hdr++, tail);
+  } while (num < max);
+
+ :: gem_title
+    move(num - xo->top + 2, 0);
+-   gem_item(++pos, fhdr, xo->key);
++   gem_item(xo, ++pos, fhdr, xo->key);
+
+ :: gem_refuse
+    move(num - xo->top + 2, 0);
+-   gem_item(num, hdr, xo->key);
++   gem_item(xo, num, hdr, xo->key);
+
+: gem.c:gem_check()  ­×§ïgem_check
+
+  HDR *hdr;
+  int gtype;
+  char *folder;
++#ifdef HAVE_GEMPAL
++ char xboard[BNLEN + 1];
++ gembrdname_get(xboard, xo->dir);
++#endif
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+  gtype = hdr->xmode;
+
++#ifdef HAVE_GEMPAL
++ if ((gtype & GEM_RESTRICT) && !(xo->key & GEM_M_BIT) &&
++   !gempal_belong(xboard, hdr))
++#else
+  if ((gtype & GEM_RESTRICT) && !(xo->key & GEM_M_BIT))
++#endif
+    return NULL;
+
+  if ((op & GEM_PLAIN) && (gtype & GEM_FOLDER))
+    return NULL;
+
+: gem.c:gem_refuse()  ­×§ïgem_refuse
+
+static int
+gem_refuse(xo)
+  XO *xo;
+{
+  HDR *ghdr;
+  int num;
+
+  if ((xo->key & GEM_M_BIT) && (hdr = gem_check(xo, NULL, 0)))
+  {
++#ifdef HAVE_GEMPAL
++   if (hdr->xmode & GEM_RESTRICT)
++   {
++     if (vans("±z½T©w­n¸Ñ°£¤å³¹«O±K¶Ü¡H¥i¨£¦W³æ±N·|¥þ³¡¬å°£³á¡I[N] ") == 'y')
++     {
++       char xboard[BNLEN + 1];
++
++       hdr->xmode ^= GEM_RESTRICT;
++       rec_put(xo->dir, hdr, sizeof(HDR), xo->pos, NULL);
++
++       gembrdname_get(xboard, xo->dir);
++       kill_gempal(xboard, hdr);
++
++       return gem_load(xo);
++     }
++     return XO_FOOT;
++   }
++#endif
+
+    hdr->xmode ^= GEM_RESTRICT;
+    num = xo->pos;
+    rec_put(xo->dir, hdr, sizeof(HDR), num, NULL);
+
++#ifdef HAVE_GEMPAL
++   if (*xo->dir == 'g')   /* amaki.030411: «D¬ÝªOºëµØ°Ï¤£³]¥i¨£¦W³æ */
++     return XoBM_gempal(xo);
++#endif
+
+    num++;
+    move(num - xo->top + 2, 0);
+    gem_item(num, hdr, xo->key);
+  }
+
+  return XO_NONE;
+}
+
+
+: gem.c:delgem() ­×§ïdelgem
+
+    if (hdr->xname[0] != '@')
+    {
+      hdr_fpath(fpath, xo->dir, hdr);
+      unlink(fpath);
+    }
+  }
+
++#ifdef HAVE_GEMPAL
++ if (!(hdr->xmode & GEM_BOARD) && (hdr->xmode & GEM_RESTRICT))
++ {
++   char xboard[BNLEN + 1];
++
++   gembrdname_get(xboard, xo->dir);
++   kill_gempal(xboard, hdr);
++ }
++#endif
+}
+
+: gem.c:gem_cb[]  ­×§ïgem_cb
+
++#ifdef HAVE_GEMPAL
++  'O', XoBM_gempal,
++#endif
+
+
+: pal.c:pal_body()  ­×§ïpal_body
+
++extern BCACHE *bshm;
+
+static int
+pal_body(xo)
+  XO *xo;
+{
+  PAL *pal;
++ BRD *brd;
+  int num, max, tail;
+
++#ifdef HAVE_GEMPAL
++ char *dir;
++ dir = xo->dir;
++#endif
+
+  move(3, 0);
+  clrtobot();
+  max = xo->max;
+  if (max <= 0)
+  {
++#ifdef HAVE_GEMPAL
++   if (*dir == 'b')
++   {
++     brd = bshm->bcache + brd_bno(currboard);
++     if ((brd->readlevel == PERM_SYSOP) || (brd->readlevel == PERM_BOARD))
++     {
++       if (vans("­n³]¬ÝªO¥i¨£¦W³æ¶Ü(Y/N)¡H[N] ") == 'y')
++         return pal_add(xo);
++     }
++#ifdef HAVE_BUCKET
++     else
++     {
++       if (vans("­n³]¬ÝªO¤ô±í¦W³æ¶Ü(Y/N)¡H[N] ") == 'y')
++         return pal_add(xo);
++     }
++#endif
++   }
++   else if (*dir == 'g')
++   {
++     if (vans("­n³]ºëµØ°Ï¥i¨£¦W³æ¶Ü(Y/N)¡H[N] ") == 'y')
++       return pal_add(xo);
++   }
++   else
++#endif
+      if (vans("­n¥æ·sªB¤Í¶Ü(Y/N)¡H[N] ") == 'y')
+        return pal_add(xo);
+    return XO_QUIT;
+  }
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

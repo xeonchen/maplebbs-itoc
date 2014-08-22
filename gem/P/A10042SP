@@ -1,0 +1,88 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¦^¤å¦Û°Ê²¾°Ê´å¼Ð¨ì³Ì¤U­±
+®É¶¡: 2004/01/12 Mon 10:49:08                           Updated: 2004/06/10
+
+¡° ¤Þ­z¡mqazq.bbs@bbs.cs.nchu.edu.tw (¢Û¢é¢ø¢ô¢í¡Ð¢ñ¢ü¢÷¢ë)¡n¤§»Ê¨¥¡G
+>     ¦^¤å¦Û°Ê²¾°Ê´å¼Ð¨ì³Ì¤U­±
+>     ¤£ª¾¹D­n«ç»ò¼g¤~¥i¥H°Ç¡H
+
+: edit.c:ve_quote()
+
+- static void
++ static int
+ve_quote(this)
+  textline *this;
+{
+  int fd, op;
++ int quote_lines = 0;
+  FILE *fp;
+
+  ...
+  ...
+
+        if (op == 'a')
+        {
+          while (fgets(str, ANSILINELEN - 2, fp))       /* ¯dªÅ¶¡µ¹ "> " */
++         {
+            this = ve_line(this, buf);
++           quote_lines++;
++         }
+        }
+        else
+        {
+          while (fgets(str, ANSILINELEN - 2, fp))       /* ¯dªÅ¶¡µ¹ "> " */
+          {
+            if (is_quoted(str)) /* "--\n" */
+              break;
+            if (quote_line(str, op))
++           {
+              this = ve_line(this, buf);
++             quote_lines++;
++           }
+          }
+        }
+  ...
+  ...
+
+  this->next = next;
+  if (next)
+    next->prev = this;
+
++ return quote_lines;
+}
+
+: edit.c:vedit()
+
+  textline *vln, *tmp;
+  int cc, col, mode, margin, pos;
++ int quote_lines = 0;
+
+  ...
+  ...
+
+  if (ve_op > 0)        /* itoc.010301: ·s¼W ve_op = -1 ®É¤£¯àÀx¦s */
+  {
+-   ve_quote(vln);
++   quote_lines = ve_quote(vln);
+  }
+
+  ...
+  ...
+
+ve_key:
+
++   if (quote_lines)
++   {
++     quote_lines--;
++     cc = KEY_DOWN;
++   }
++   else
+      cc = vkey();
+
+    if (isprint2(cc))
+
+--
+  ·íµM¡A§A¥i¥H·s¼W­Ó UFO_XXXX ¨ÓÅý¨Ï¥ÎªÌ¿ï¾Ü­n¤£­n³o¥\¯à
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

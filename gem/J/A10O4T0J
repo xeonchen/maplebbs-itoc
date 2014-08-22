@@ -1,0 +1,28 @@
+µo«H¤H: simple.bbs@bbs.wfc.edu.tw (¾i§L¤d¤é ¥Î¦b¤@®É) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¼Ö³z±m-¤j¼Ö³z(­×§ïª©)
+µo«H¯¸: ¥d¥¬©_¿Õ (2004/10/27 Wed 00:39:26)                Updated: 2005/11/14
+
+: struct.h ·s¼W³o­Ó struct ¦b MODELOG «á­±
+
+/* ----------------------------------------------------- */
+/* lottery.c ¤¤¹B¥Îªº¸ê®Æµ²ºc                            */
+/* ----------------------------------------------------- */
+
+typedef struct
+{
+  char userid[IDLEN + 1];       /* ÁÊ¶RªÌ */
+  int num[6];                   /* ©ÒÁÊ¶Rªº±m¨é6­Ó¸¹½X */
+  int prize;                    /* ¤¤¤°»ò¼ú¶µ */
+}      BUY_LOTTERY;
+
+
+: global.h
+
++ #define FN_RUN_LOTTERY        "run/lottery"       /* ¥»¦¸¼Ö³z¥þ¯¸ÁÊ¶R¦W³æ */
++ #define LAST_KEEP_MONEY   "run/lottery.lastmoney"  /* °O¿ý¤W´Á¥¼µoªº¼úª÷ */
+
+#define BMTA_LOGFILE    "run/bmta.log"  /* ¦¬¥~³¡«Hªº°O¿ý */
+
+--
+[m[1;32m¡° Origin: [33m§d»ñ§Þ³N¾Ç°|¹qºâ¤¤¤ß ¥d¥¬©_¿Õ [37m<bbs.wfc.edu.tw>[m
+[1;31m¡» From: [36mbbs.wfc.edu.tw[m

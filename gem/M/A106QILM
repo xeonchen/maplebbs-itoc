@@ -1,0 +1,1294 @@
+µo«H¤H: Efen.bbs@bbs.med.ncku.edu.tw (^^) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]POP3¶l¥ó¦øªA¾¹
+µo«H¯¸: °j­·¨¦ (2004/04/02 Fri 13:22:41)                  Updated: 2004/04/03
+
+±qWindtop¨ºÃäÂà´Ó¹L¨Óªº¡C
+
+: modes.h
+
+#define XZ_GEM          (XO_ZONE + 13)  /* ºëµØ°Ï */
++ #define XZ_MIME       (XO_ZONE + 14)  /* MIME ¦¬«H */
+
+: ufo.h
+
+#define UFO_LOGINCLOAK  BFLAG(21)       /* ¤W¯¸ª½±µÁô¨­ */
++ #define UFO_MIME      BFLAG(22)       /* MIME ¸Ñ½X */
+
+  "Áô¨­¤W¯¸        (Áô¨­/²{¨­)",        /* UFO_LOGINCLOAK */
++ "MIME½s½X        (¶}±Ò/Ãö³¬)",        /* UFO_MIME */
+
+: global.h
+
++ #define FN_MAILSERVICE_LOG  "run/mailservice.log"   /* MailSevice ¨Ï¥Î¬ö¿ý */
++ #define FN_ETC_MAILSERVICE  "etc/mailservice"       /* ¹q¤l¶l¥óªA°È */
+
+: theme.h
+
++ #define FEETER_POP3     \
+COLOR1 " POP3ªA°È " COLOR2 " (y)¦^«H (F/x)Âà±H (d)§R°£ (D)°Ï¬q§R°£ (m)¼Ð°O
+ \033[m"
+
+: maple.p
+
++/* socket.c */
++int Get_Socket(char *site,int *sock);
+
+: admutil.c
+
+    "¦¬«H¥Õ¦W³æ",
+    "¦¬«H¶Â¦W³æ",
+
+#ifdef HAVE_LOGIN_DENIED
+    "©Úµ´³s½u¦W³æ",
+#endif
++   "POP3ªA°È»¡©ú",
+
+
+    MAIL_ACLFILE,
+    UNMAIL_ACLFILE,
+
+#ifdef HAVE_LOGIN_DENIED
+    BBS_ACLFILE,
+#endif
++   FN_ETC_MAILSERVICE,
+
+: menu.c
+
+§ä¦a¤è¥[¤W
+  "bin/pop3mail.so:Pop3mail", PERM_BASIC, -M_XMODE,
+  "Pop3       ¢u POP3 ¶l¥ó¢t",
+
+: so/Makefile
+
+¥[¤W pop3mail.so
+
+: ~/mailservice
+
+»Ý­n¦b/home/bbs¤§¤U¡A
+mkdir mailservice
+
+: so/pop3mail.c
+
+¥[¤W¤U­±³o¬qµ{¦¡
+..³o³¡¤ÀÁÙ¦³°ÝÃD¡AÂà«H/±H«H/¦^«Hªº°Ê§@³£¥i¥H¤F¡A
+¥u¬O§R¤åªº³¡¤ÀÁÙ¨S§ï¦n¡K
+­ì¨Óªº§R¤å¬O¥Î¤jD¼Ð¦n¡AµM«áÂ÷¶}®É°Ý§A­n¤£­n§R°£(WindTop³£³o¼Ë???)
+³Ì«áÂ÷¶}¦øªA¾¹®É¦A§R±¼
+
+²{¦b§Ú§ï¤F«e¥b¡AÅý¥Lª½±µ§R±¼¡K
+µM«á«á¥bÁÙ¨S·Q¨ì«ç»ò§ï¡K
+so...^^;;ÅÜ¦¨¨S¿ìªk¦³®Äªº§R¥ó¡A¥u¬O¦Û¤vÂsÄý®É¡A§R¦nª±ªº¡A
+»·ºÝªºmail server¤£·|¨ü¨ì¼vÅT¡I@.@
+
+
+/*-------------------------------------------------------*/
+/* pop3mail.c       ( YZU WindTop BBS )                  */
+/*-------------------------------------------------------*/
+/* author : statue.bbs@bbs.yzu.edu.tw                    */
+/* author : visor.bbs@bbs.yzu.edu.tw                     */
+/* target : pop3 mail client in mime transfer            */
+/* create : 2000/06/22                                   */
+/* update : 2000/07/11                                   */
+/* rfc    : 1734, 1939, 2449, 1225                       */
+/*-------------------------------------------------------*/
+
+#include "bbs.h"
+
+#define MIME_BASE64     0x10000000
+#define MIME_QP         0x20000000
+#define MIME_MIME       0x40000000
+
+static int is_mime; /* ¤Á´« MIME ¥ÎªººX¼Ð */
+static int is_base64;
+static int is_qp;
+static int is_bbsmail;
+static char boundary[128];
+
+extern XZ xz[];
+extern char xo_pool[];
+
+static FILE *fsock; /* ³s½u¥Îªº FILE */
+
+static int del_num; /* ¥Î¨Ó UnDelete ¥Î , ¤w§R°£¤å³¹¼Æ*/
+
+extern int TagNum;
+static int server_login();
+static char *pop3_mime_transfer(unsigned char *);
+
+
+static void
+logitfile(file, key, msg)
+  char *file;
+  char *key;
+  char *msg;
+{
+  time_t now;
+  struct tm *p;
+  char buf[100];
+
+  time(&now);
+  p = localtime(&now);
+  sprintf(buf, "%02d/%02d/%02d %02d:%02d:%02d %s %-14s %s\n",
+    p->tm_year % 100, p->tm_mon + 1, p->tm_mday,
+    p->tm_hour, p->tm_min, p->tm_sec, key, cuser.userid, msg ? msg : "");
+  f_cat(file, buf);
+}
+
+
+/* ----------------------------------------------------- */
+/* QP code : "0123456789ABCDEF"                          */
+/* QP ¬O¤@ºØ¸Ñ½X¤è¦¡ quoted-printable                    */
+/* ¤@½g¤å³¹¤¤ªº '=' ¦³¨S¦³¶W¹L¤@©w¼Æ¥Ø.                  */
+/* ----------------------------------------------------- */
+
+static int
+qp_code(x)
+  register int x;
+{
+  if (x >= '0' && x <= '9')
+    return x - '0';
+  if (x >= 'a' && x <= 'f')
+    return x - 'a' + 10;
+  if (x >= 'A' && x <= 'F')
+    return x - 'A' + 10;
+  return -1;
+}
+
+/* ------------------------------------------------------------------ */
+/* BASE64 :                                                           */
+/* "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" */
+/* Base64µLªk§PÂ_, °£«D§Ú­Ì¦³header                                   */
+/* ------------------------------------------------------------------ */
+
+static int
+base64_code(x)
+  register int x;
+{
+  if (x >= 'A' && x <= 'Z')
+    return x - 'A';
+  if (x >= 'a' && x <= 'z')
+    return x - 'a' + 26;
+  if (x >= '0' && x <= '9')
+    return x - '0' + 52;
+  if (x == '+')
+    return 62;
+  if (x == '/')
+    return 63;
+  return -1;
+}
+
+/* ----------------------------------------------------- */
+/* judge & decode QP / BASE64                            */
+/* ----------------------------------------------------- */
+
+/* ¥h°£¤£¥²­nªº¼ÐÀY */
+static int
+pop3_mime_cut(unsigned char* src,HDR *hdr, FILE *fp,FILE *sock)
+{
+  char *ptr;
+
+  /* ­Y¨S¦³¶}±Ò MIME ¸Ñ½X¿ï¶µ«h¤£¤©¸Ñ½X */
+  if(!is_mime)
+    return 1;
+
+  if(*boundary != 0 && !strncmp(src+2,boundary,strlen(boundary)-2))
+  {
+    fprintf(fp, "> ------------------------------------------------------------
+----------- <\n"
+);
+    return -1;
+  }
+  if(str_str(src,"<pre>"))
+    return -1;
+
+  if(str_str(src,"</pre>"))
+  {
+    hdr->xmode |= MIME_MIME;
+    return 0;
+  }
+
+  if(!strncmp(src, "----", strlen("----"))||
+     !strncmp(src, "\tboundary", strlen("\tboundary")))
+    return 0; /* ¸õ¹L¦¹³¡¥÷¸Ñ½X */
+
+#if 1
+  if(!strncmp(src, "Content-Type: ", strlen("Content-Type: ")))
+  {
+    ptr = src + strlen("Content-Type: ");
+    if(!str_ncmp(ptr, "text/html",strlen("text/html")))
+    {
+      hdr->xmode |= MIME_MIME;
+      fprintf(fp, "html ¦³ºô­¶®æ¦¡\n");
+      return 0;
+    }
+    if(!str_ncmp(ptr, "image",strlen("image")))
+    {
+      hdr->xmode |= MIME_MIME;
+      fprintf(fp, "image ¦³ªþ¥ó : ¹Ï¤ùÀÉ\n");
+      return 0;
+    }
+    if(!str_ncmp(ptr, "audio",strlen("audio")))
+    {
+      hdr->xmode |= MIME_MIME;
+      fprintf(fp, "audio ¦³ªþ¥ó : ­µ®ÄÀÉ\n");
+      return 0;
+    }
+    if(!str_ncmp(ptr, "video",strlen("video")))
+    {
+      hdr->xmode |= MIME_MIME;
+      fprintf(fp, "video ¦³ªþ¥ó : ¼v­µÀÉ\n");
+      return 0;
+    }
+    if(!str_ncmp(ptr, "application",strlen("application")))
+    {
+      hdr->xmode |= MIME_MIME;
+      fprintf(fp, "application ¦³ªþ¥ó : ¤£©ú®æ¦¡\n");
+      return 0;
+    }
+    hdr->xmode &= (MIME_QP|MIME_BASE64);
+
+    /* ¹J¨ì text or image µ²§ô¸Ñ½X°Ê§@ */
+    fgets(src, 256, sock);
+    if(*src == '\t') /* Contect-Type «á¦³ boundary & charset,«e·|¦³ tab */
+    {
+      return 0;
+    }
+  }
+#endif
+  if(!str_ncmp(src, "\tname", strlen("\tname")))
+  {
+    char *end;
+    ptr = strstr(src,"name");
+    ptr = strchr(ptr,'"');
+    end = strchr(ptr+1,'"');
+    *end = 0;
+    fprintf(fp, "\tªþ¥ó¦WºÙ : %s\n",pop3_mime_transfer((char *)ptr+1));
+    return 0;
+  }
+  if(!strncmp(src, "Content-Transfer-Encoding: ", strlen("Content-Transfer-Enco
+ding: ")))
+  { /* ¸Ñ rfc1522 body code */
+    ptr = src + strlen("Content-Transfer-Encoding: ");
+    if(!strncmp(ptr, "base64", strlen("base64")))
+    {
+      hdr->xmode |= MIME_BASE64;
+      hdr->xmode &= ~MIME_QP;
+    }
+    if(!strncmp(ptr, "quoted-printable", strlen("quoted-printable")))
+    {
+      hdr->xmode |= MIME_QP;
+      hdr->xmode &= ~MIME_BASE64;
+    }
+    return 0;
+  }
+  if(hdr->xmode & MIME_MIME)
+    return 0;
+
+  return 1; /* ¶i¦æ¸Ñ½X°Ê§@ */
+}
+
+/* ¸Ñ½X , ¸ò bmtad.c ªº multipart() «Ü¹³*/
+static char*
+pop3_mime_transfer(unsigned char* src)
+{
+  unsigned char* dst = src;
+  char *ans;
+  register int is_done;
+  register int c1, c2, c3, c4;
+
+  /* ­Y¨S¦³¶}±Ò MIME ¸Ñ½X¿ï¶µ«h¤£¤©¸Ñ½X */
+  if(!is_mime)
+    return src;
+
+  ans = src;
+
+   /* §PÂ_«e 10 ­Ó¦r¤¸¬O§_³£¦bbase64 ¤¤ */
+  for (c1 = 0; c1 < 10 ; c1++)
+     if (base64_code(src[c1]) == -1)
+     {
+        is_base64 = 0;
+        break;
+     }
+  for (is_done = 0; c1 = *src; src++) /* §â¶Ç¶i¨Óªº­È§@¸Ñ½X */
+  {
+    if (c1 == '?' && src[1] == '=') /* qb code ªº To: From: */
+    {
+      if(src[2] == ' ') /* ³q±` qb code ©Î base64 ªº²Ä¤T­Ó¤£·|¬OªÅ¥Õ */
+      {
+        src++;
+        is_qp = is_base64 = 0;
+      }
+      continue;
+    }
+    else if ((c1 == '=') && (src[1] == '?'))
+    {
+      /* c2 : qmarks, c3 : code_kind */
+
+      c2 = c3 = 0;
+
+      for (;;)
+      {
+        c1 = *++src;
+        if (c1 != '?')
+        {
+          if (c2 == 2)
+            c3 = c1 | 0x20;
+        }
+        else
+        {
+          if (++c2 >= 3)
+            break;
+        }
+      }
+
+      if (c3 == 'q') /* =?q */
+        is_qp = MIME_QP;
+      else if (c3 == 'b') /* =?big5? */
+        is_base64 = MIME_BASE64;
+    }
+    else if (c1 == '\n')        /* chuan: multi line encoding */
+    {
+      if (!is_base64)
+         *dst++ = c1;
+      is_done = is_qp = is_base64 = 0;
+      continue;
+    }
+    else if (is_qp && c1 == '=')
+    {
+      c1 = *++src;
+      if (!*src)
+         break;
+      c2 = *++src;
+      if (!*src)
+         break;
+      *dst++ = (qp_code(c1) << 4) | qp_code(c2);
+      if (dst[-1] == (unsigned char)-1)
+         --dst;
+    }
+    else if (is_base64 && !is_done)
+    {
+      while (isspace(c1))
+      {
+        c1 = *++src;
+      }
+      if (!c1)
+        break;
+      do
+      {
+        c2 = *++src;
+      } while (isspace(c2));
+      if (!c2)
+        break;
+      do
+      {
+        c3 = *++src;
+      } while (isspace(c3));
+      if (!c3)
+        break;
+      do
+      {
+        c4 = *++src;
+      } while (isspace(c4));
+      if (!c4)
+        break;
+      if (c1 == '=' || c2 == '=')
+      {
+        is_done = 1;
+        continue;
+      }
+      c2 = base64_code(c2);
+      *dst++ = (base64_code(c1) << 2) | ((c2 & 0x30) >> 4);
+      if (c3 == '=')
+        is_done = 1;
+      else
+      {
+        c3 = base64_code(c3);
+        *dst++ = ((c2 & 0xF) << 4) | ((c3 & 0x3c) >> 2);
+        if (c4 == '=')
+          is_done = 1;
+        else
+        {
+          *dst++ = ((c3 & 0x03) << 6) | base64_code(c4);
+        }
+      }
+    }
+    else
+      *dst++ = c1;
+  }
+  if (!is_base64 && dst[-1] == '=')
+     dst[-1] = '\n';
+  *dst = '\0';
+  return ans;
+}
+
+static int
+int_len(num)
+  int num;
+{
+  int i;
+  i = 1;
+  while((num/10) > 0)
+  {
+    num/=10;
+    i++;
+  }
+  return i;
+}
+
+/* §â¨Ó·½¨ú¥X»Ý­nªº³¡¤À */
+static char *
+parse_owner(token)
+  char *token;
+{
+  char *ptr;
+
+  /* =?big5?B?qHSyzrresnqt+w==?= <postmaster@mail86.yzu.edu.tw> */
+
+  ptr = strchr(token,'>'); /* > */
+  if(ptr) /* ¬Ý³Ì«á¤@­Ó¦r¤¸¬O§_¬° > */
+  {
+    *ptr = 0; /*  */
+    ptr = strchr(token, '<'); /* <postmaster@mail86.yzu.edu.tw */
+    if(ptr[-1] == ' ')
+      ptr[-1] = 0; /* <postmaster@mail86.yzu.edu.tw */
+    *ptr++ = 0; /* postmaster@mail86.yzu.edu.tw */
+    pop3_mime_transfer(ptr);
+  }
+  else /* statue.bbs@cnpa-6.admin.yzu.edu.tw */
+    ptr = token;
+
+  return ptr;
+}
+
+static char *
+parse_nick(token)
+  char *token;
+{
+  char *ptr;
+
+  /* =?big5?B?qHSyzrresnqt+w==?= <postmaster@mail86.yzu.edu.tw> */
+
+  ptr = token;
+  if(*ptr == '=')
+  {
+    ptr = strchr(token, '<'); /* <postmaster@mail86.yzu.edu.tw> */
+    if(ptr[-1] == ' ');
+      ptr[-1] = 0; /* <postmaster@mail86.yzu.edu.tw> */
+  }
+  return token; /* =?big5?B?qHSyzrresnqt+w==?= */
+}
+
+/* ±q header ¨ú¥X»Ý­nªº³¡¤À */
+static void
+parse_header(hdr, count)
+  HDR *hdr;
+  int count;
+{
+  char *ptr, *token, buf[256];
+  int lines;
+  struct tm tmdate;
+
+  lines = -1;
+  fprintf(fsock, "TOP %d 0\r\n", count);
+
+  fgets(buf, 256, fsock);
+
+  while(strncmp(buf, ".", 1))
+  {
+    /* §@ªÌ */
+    if(!strncmp(buf, "From: ", strlen("From: ")))
+    {
+      char tmp[256];
+      token = ptr = buf + strlen("From: ");
+      strcpy(tmp,token);
+      buf[strlen(buf)-2] = 0;
+      tmp[strlen(tmp)-2] = 0;
+
+      /* ­n¤£­n is_base64 | is_qb */
+      snprintf(hdr->nick, 48, "%s", pop3_mime_transfer(parse_nick(token)));
+      /* ¨Ó·½»Ý¨ú¥X¥u»Ý­nªº³¡¤À <s874070@mail.yzu.edu.tw> */
+      hdr->nick[48] = 0;
+
+      snprintf(hdr->owner, 78, "%s", pop3_mime_transfer(parse_owner(tmp)));
+      hdr->owner[78] = 0;
+    }
+
+    /* ¤é´Á */
+    /* Date: Sun, 26 Dec 1999 02:07:46 -0800 */
+    /* Date: 04 Jul 2000 07:18:54 GMT */
+    if(!strncmp(buf, "Date: ", strlen("Date: ")))
+    {
+      token = ptr = buf + strlen("Date: ");
+      buf[strlen(buf)-2] = 0;
+
+      if(!strstr(token, "GMT"))
+        token += 5;
+      strptime(token, "%d %b %Y", &tmdate);
+//      strptime(token, "%a, %d %b %Y", &tmdate);
+      snprintf(hdr->date, 9, "%02d/%02d/%02d",
+               (tmdate.tm_year)%100, tmdate.tm_mon+1, tmdate.tm_mday);
+    }
+
+    /* ¼ÐÃD */
+    /* Subject: xxxxxx */
+    if(!strncmp(buf, "Subject: ", strlen("Subject: ")))
+    {
+      token = ptr = buf + strlen("Subject: ");
+      buf[strlen(buf)-2] = 0;
+      pop3_mime_transfer(ptr);
+      strncpy(hdr->title, ptr, 72);
+      hdr->title[72] = 0;
+    }
+
+    fgets(buf, 256, fsock);
+    lines++;
+  }
+  hdr->xid = lines;
+}
+
+static int
+pop3_load_dir()
+{
+  char buf[256],tmp[80];
+  int total = 0, step = 0, begin = 1, count;
+  HDR hdr;
+/*  int totalsize;*/
+
+  fprintf(fsock, "STAT\r\n");
+  fgets(buf, 256, fsock); /* +OK 14 63665 */
+  if(!strncmp(buf, "+OK", 3))
+  {
+        total = atoi(buf+4);
+/*        count = int_len(total);
+        totalsize = atoi(buf+4+count);
+        sprintf(tmp,"«H¥ó¡G%d «Ê¡A¦@ %d bytes", total, totalsize);
+        vmsg(tmp);*/
+        if(total == 0)
+        {
+          vmsg("±zªº¹q¤l¶l¥ó«H½c¨S¦³«H¥ó¡C");
+          return 1;
+        }
+        else
+          begin = 1;
+  }
+  else
+    return 1;
+
+  sprintf(tmp, "mailservice/%s.DIR", cuser.userid); /* DIRECTORY/MBOX */
+  unlink(tmp);
+  if((step = open(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)
+    return 1;
+  for(count = begin; count <= total; count++)
+  {
+    hdr.xmode = MAIL_READ;
+    hdr.chrono = count;
+    snprintf(hdr.xname, 32, "%s.mail", cuser.userid);
+    parse_header(&hdr, count); // ¸ÑÄ¶ header
+    write(step, &hdr, sizeof(HDR)); /* hdr to file */
+  }
+  close(step);
+  return 0;
+}
+
+
+static int
+chkpop3(hdr)
+  HDR *hdr;
+{
+  return (hdr->xmode & MAIL_MARKED);
+}
+
+
+static int
+vfypop3(hdr, pos)
+  HDR *hdr;
+  int pos;
+{
+  return (Tagger(hdr->chrono, pos, TAG_NIN) || chkpop3(hdr));
+}
+
+
+static void
+delpop3(xo, hdr)
+  XO *xo;
+  HDR *hdr;
+{
+  char fpath[64];
+
+  hdr_fpath(fpath, xo->dir, hdr);
+  unlink(fpath);
+}
+
+
+static int
+pop3_rangedel(xo)
+  XO *xo;
+{
+  return xo_rangedel(xo, sizeof(HDR), chkpop3, delpop3);
+}
+
+static int
+pop3_delete(xo)
+  XO *xo;
+{
+  int pos;
+  HDR *hdr;
+  char fpath[64], *dir;
+
+  pos = xo->pos;
+  hdr = (HDR *) xo_pool + (pos - xo->top);
+
+  if (hdr->xmode & MAIL_MARKED)
+    return XO_NONE;
+
+  if (vans(msg_del_ny) == 'y')
+  {
+    dir = xo->dir;
+    currchrono = hdr->chrono;
+    if (!rec_del(dir, sizeof(HDR), pos, cmpchrono))
+    {
+      hdr_fpath(fpath, dir, hdr);
+      unlink(fpath);
+      return XO_LOAD;
+    }
+  }
+  return XO_FOOT;
+}
+
+
+static int
+pop3_get(fpath,hdr)
+  char *fpath;
+  HDR *hdr;
+{
+  char mail[80], buf[256] , *ptr ,*end;
+  int start, totalsize,count,ck,page;
+  int check_size;
+  FILE *fp;
+  snprintf(hdr->xname, 32, "%s.mail", cuser.userid);
+  sprintf(mail, "mailservice/%s.mail", cuser.userid);
+
+  fp = fopen(mail, "w");
+
+  /* GET SIZE*/
+  fprintf(fsock, "LIST %d\r\n", (int)hdr->chrono);
+  fgets(buf, 256, fsock);
+  totalsize = atoi(buf+5+int_len(hdr->chrono));
+
+  if(totalsize > 10485760)
+  {
+    fprintf(fp, "\n«H¥ó®e¶q¤Ó¤j¡AµLªk¦¬¨ú¡C\n");
+    fclose(fp);
+    return 0;
+  }
+  count = hdr->xid;
+
+  if(!is_bbsmail)
+  {
+    fprintf(fp, "§@ªÌ: %s\n", hdr->owner); /* §â From §ï¦¨ §@ªÌ */
+    fprintf(fp, "¼ÐÃD: %s\n", hdr->title);
+    fprintf(fp, "®É¶¡: %s\n\n", hdr->date);
+  }
+
+  /* GET BODY */
+
+  fprintf(fsock, "RETR %d\r\n", (int)hdr->chrono);
+  fgets(buf, 256, fsock);
+
+  start = is_bbsmail ? -1 : 1;
+
+  page = 0;
+  is_qp = hdr->xmode & MIME_QP;
+  is_base64 = hdr->xmode & MIME_BASE64;
+
+  fgets(buf, 256, fsock);
+  totalsize = 0;
+  boundary[0] = 0;
+  page = 1;
+  check_size = 0;
+  do
+  {
+    start++;
+    ck = pop3_mime_cut(buf, hdr, fp,fsock);
+    if(start < count && *boundary == 0 && (ptr = strstr(buf,"boundary")))
+    {
+      ptr = strchr(buf,'"');
+      end = strchr(ptr+1,'"');
+      *end = 0;
+      strcpy(boundary,ptr+1);
+    }
+    }
+    if(ck == -1)
+    {
+      page = 1;
+      hdr->xmode &= ~MIME_MIME;
+    }
+
+    is_qp = hdr->xmode & MIME_QP;
+    is_base64 = hdr->xmode & MIME_BASE64;
+    if(start >= count && page == 1 && ck == 1 && !check_size)
+    {
+      pop3_mime_transfer(buf);
+      fprintf(fp, "%s", buf);
+      totalsize += strlen(buf);
+      if(totalsize > 10485760)
+      {
+        fprintf(fp, "\n«H¥ó®e¶q¤Ó¤j¡AµLªk¦¬¨ú¡C\n");
+        check_size = 1;
+      }
+    }
+    ptr = fgets(buf, 256, fsock);
+  } while(strcmp(buf, ".\r\n") && ptr);
+  if((hdr->xmode & (MIME_BASE64|MIME_QP)) && is_mime)
+  {
+    fprintf(fp, "\n**³o¬O¤@«Ê¸g¹L MIME ¸Ñ½Xªº¤å¥ó¡A¦p¦³°ÝÃD½Ð³qª¾¨t²ÎºÞ²zªÌ¡C**
+\n");
+  }
+  fclose(fp);
+  return 1;
+}
+
+static int
+pop3_browse(xo)
+  XO *xo;
+{
+  char  file[32];
+  HDR *hdr;
+
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+  sprintf(file, "mailservice/%s.mail", cuser.userid);
+
+
+  if(!pop3_get(file, hdr))
+    return XO_NONE;
+
+  strncpy(currtitle, hdr->title, 40); /* title ¥u¨ú¥Î«e 40 ­Ó ? */
+
+  more(file, NULL);
+  hdr->xmode |= MAIL_READ;
+
+  return XO_HEAD;
+}
+
+static inline int
+mbox_attr(type)
+  int type;
+{
+  if (type & MAIL_DELETE)
+    return 'D';
+
+  if (type & MAIL_REPLIED)
+    return (type & MAIL_MARKED) ? 'R' : 'r';
+
+  return "+ Mm"[type & 3];
+}
+
+static int
+pop3_tag(xo)
+  XO *xo;
+{
+  HDR *hdr;
+  int tag, pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
+  if (tag = Tagger(hdr->chrono, pos, TAG_TOGGLE))
+  {
+    move(3 + cur, 7);
+    outc(tag > 0 ? '*' : ' ');
+  }
+  return xo->pos + 1 + XO_MOVE;
+}
+
+static int
+pop3_prune(xo)
+  XO *xo;
+{
+  return xo_prune(xo, sizeof(HDR), vfypop3, delpop3);
+}
+
+static int
+pop3_mime_change()
+{
+  is_mime ^= 1;
+  return XO_HEAD;
+}
+
+static int
+pop3_mark(xo)
+  XO *xo;
+{
+  HDR *mhdr;
+  int cur, pos;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  mhdr = (HDR *) xo_pool + cur;
+  move(3 + cur, 6);
+  outc(mbox_attr(mhdr->xmode ^= MAIL_MARKED));
+  rec_put(xo->dir, mhdr, sizeof(HDR), pos, NULL);
+  return XO_NONE;
+}
+
+static void
+pop3_item(pos, hdr)
+  int pos;
+  HDR *hdr;
+{
+#ifdef OVERDUE_MAILDEL
+  int xmode;
+
+  xmode = hdr->xmode;
+  prints(xmode & MAIL_DELETE ? "%6d%c\033[1;5;37;41m%c\033[m " : "%6d%c%c ",
+    pos, tag_char(hdr->chrono), mbox_attr(xmode));
+#else
+  prints("%6d%c%c ", pos, tag_char(hdr->chrono), mbox_attr(hdr->xmode));
+#endif
+
+  hdr_outs(hdr, 47);
+}
+
+
+#ifdef HAVE_LIGHTBAR
+static int
+pop3_item_bar(xo, mode)
+  XO *xo;                       /* sequence number */
+  int mode;
+{
+  HDR *hdr;
+
+  hdr = (HDR *) xo_pool + xo->pos - xo->top;
+
+#ifdef OVERDUE_MAILDEL
+  int xmode;
+
+  xmode = hdr->xmode;
+  prints(xmode & MAIL_DELETE ? mode ?
+    "\033[1;44m%6d%c\033[5;37;41m%c\033[0;1;44m " : "%6d%c\033[1;5;37;41m%c\033
+[m " : mode ? "\
+033[1;44m%6d%c%c " : "%6d%c%c ", xo->pos + 1, tag_char(hdr->chrono), mbox_attr(
+xmode));
+
+#else
+  prints("%s%6d%c%c ", mode ? "\033[1;44m" : "", xo->pos + 1,
+         tag_char(hdr->chrono), mbox_attr(hdr->xmode));
+#endif
+
+  if (mode)
+    hdr_outs_bar(hdr, 47);
+  else
+    hdr_outs(hdr, 47);
+
+  return XO_NONE;
+}
+#endif
+
+
+static int
+pop3_body(xo)
+  XO *xo;
+{
+  HDR *pop3;
+  int num, max, tail;
+
+  max = xo->max;
+
+  if (max <= 0)
+  {
+    vmsg("±zªº¹q¤l¶l¥ó«H½c¨S¦³«H¥ó¡C");
+    return XO_QUIT;
+  }
+
+  pop3 = (HDR *) xo_pool;
+  num = xo->top;
+  tail = num + XO_TALL;
+  if (max > tail)
+    max = tail;
+
+  move(3, 0);
+  do
+  {
+    pop3_item(++num, pop3++);
+  } while (num < max);
+  clrtobot();
+
+  return XO_FOOT;
+}
+
+static int
+pop3_head(xo)
+  XO *xo;
+{
+  vs_head("Pop3ªA°È", str_site);
+  outs("[¡ö]Â÷¶} [¡÷,r]Åª«H [d]§R°£/±Ï¦^ [S]­«Åª [R]¦^«H [x]Âà¹F [h]»¡©ú");
+  if(is_mime)
+    outs(" [MIME ¸Ñ½X]");
+  else
+    outs(" [ µL  ¸Ñ½X]");
+  outs("\n\033[44m\
+  ½s¸¹   ¤é ´Á §@ ªÌ        «H  ¥ó  ¼Ð  ÃD                                  \03
+3[m");
+
+  return pop3_body(xo);
+}
+
+static int
+pop3_load(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(HDR));
+  return pop3_body(xo);
+}
+
+static int
+pop3_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(HDR));
+  return pop3_head(xo);
+}
+
+static int
+pop3_help(xo)
+  XO *xo;
+{
+  vmsg("Ãi±o¼g :p");
+  return XO_FOOT;
+}
+
+static int
+pop3_send(xo)
+  XO *xo;
+{
+  m_send();
+  return pop3_head(xo);
+}
+
+static int
+pop3_reply(xo)
+  XO *xo;
+{
+  HDR *hdr;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+  sprintf(quote_file,"mailservice/%s.mail",cuser.userid);
+  if(!pop3_get(quote_file,hdr))
+    return XO_NONE;
+
+  do_mreply(hdr);
+  return XO_HEAD;
+}
+
+static int
+pop3_forward(xo)
+  XO *xo;
+{
+  HDR *hdr,mhdr;
+  char fpath[80],rcpt[64],folder[128];
+  int userno;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+  strcpy(rcpt,cuser.email);
+  sprintf(fpath,"mailservice/%s.mail",cuser.userid);
+  if(!pop3_get(fpath,hdr))
+    return XO_NONE;
+  if (!vget(b_lines, 0, "¥Øªº¦a¡G", rcpt, sizeof(rcpt), GCARRY))
+    return XO_FOOT;
+
+  if (mail_external(rcpt))
+    bsmtp(fpath, hdr->title, rcpt, 0);
+  else
+  {
+     if ((userno = acct_userno(rcpt)) <= 0)
+        return -1;
+     usr_fpath(folder, rcpt, fn_dir);
+     hdr_stamp(folder, HDR_LINK, &mhdr, fpath);
+     strcpy(mhdr.owner, cuser.userid);
+     strcpy(mhdr.nick, cuser.username);
+     strcpy(mhdr.title, hdr->title);
+     rec_add(folder, &mhdr, sizeof(mhdr));
+     m_biff(userno);
+  }
+  return XO_HEAD;
+
+}
+
+static int
+pop3_reload_dir(xo)
+  XO *xo;
+{
+  char buf[128];
+  fprintf(fsock,"RSET\r\n");
+
+  do
+  {
+    fgets(buf,128,fsock);
+  } while (strncmp(buf,"+OK",3));
+
+  if(pop3_load_dir())
+  {
+    fclose(fsock);
+    vmsg("­«Åª¥¢±Ñ");
+    return XO_QUIT;
+  }
+  del_num = 0; /* ­«³]¤w§R°£¤å³¹¬° 1 */
+  return XO_INIT;
+}
+
+static int
+pop3_mailsize(xo)
+  XO *xo;
+{
+  char buf[128],msg[128],*str;
+  HDR *hdr;
+  int total,totalsize;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+  fprintf(fsock,"LIST %d\r\n",xo->pos+1);
+
+  do
+  {
+    str = fgets(buf,128,fsock);
+  } while (strncmp(buf,"+OK",3) && str);
+
+  if(str)
+  {
+    str = strchr(buf,' ');
+    total = atoi(str);
+    str = strchr(str+1,' ');
+    totalsize = atoi(str);
+    sprintf(msg,"«H¥ó¡G²Ä %d «Ê¡A¦@ %d bytes", total, totalsize);
+    vmsg(msg);
+  }
+  else
+    return XO_HEAD;
+
+  return XO_INIT;
+}
+
+static int
+pop3_stat(xo)
+  XO *xo;
+{
+  char buf[128],msg[128],*str;
+  int total,totalsize;
+  fprintf(fsock,"STAT\r\n");
+
+  do
+  {
+    str = fgets(buf,128,fsock);
+  } while (strncmp(buf,"+OK",3) && str);
+
+  if(str)
+  {
+    str = strchr(buf,' ');
+    total = atoi(str);
+    str = strchr(str+1,' ');
+    totalsize = atoi(str);
+    sprintf(msg,"«H¥ó¡G%d «Ê¡A¦@ %d bytes", total, totalsize);
+    vmsg(msg);
+  }
+  else
+    return XO_HEAD;
+
+  return XO_INIT;
+}
+
+KeyFunc pop3_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, pop3_item_bar,
+#endif
+  XO_INIT, pop3_init,
+  XO_LOAD, pop3_load,
+  XO_HEAD, pop3_head,
+  XO_BODY, pop3_body,
+  'r', pop3_browse,
+  'd', pop3_delete,
+  'R', pop3_reply,
+  'y', pop3_reply,
+  's', pop3_send,
+  'C', pop3_stat,
+  'c', pop3_mailsize,
+  't', pop3_tag,
+  'S', pop3_reload_dir,
+  'x', pop3_forward,
+  'm', pop3_mark,
+  'M', pop3_mime_change,
+  Ctrl('D'), pop3_prune,
+  'D', pop3_rangedel,
+  'h', pop3_help
+};
+
+static int
+server_login(inputemail)
+  char *inputemail;
+{
+  char buf[256], user[60], email[60], pass[20], *host;
+  int sock = 110; /* pop3 port */
+
+  more(FN_ETC_MAILSERVICE, (char *)-1);
+
+  if(inputemail)
+    strcpy(email,inputemail);
+  else
+    strcpy(email,cuser.email); /* ¦Û°ÊÀ° user ¥[¤W±b¸¹¦W */
+
+  pass[0] = 0;
+  if(!vget(21, 0, "±b¸¹¡G", email, 60, GCARRY) ||
+     !vget(22, 0, "±K½X¡G", pass, 20, NOECHO))
+  {                                             /* ¦³¤@¶µ¨S¿é¤J«h©ñ±ó */
+    return -1;
+  }
+
+  if(!strchr(email, '@'))
+  {
+    vmsg("¿é¤J±b¸¹¦³»~");
+    return 1;
+  }
+
+  strcpy(user, email);
+  *(strchr(user,'@')) = 0;
+  host = strchr(email, '@')+1;
+
+  if(Get_Socket(host, &sock))
+  {
+    vmsg("¥D¾÷µLªk³s½u");
+    return 1;
+  }
+
+  fsock = fdopen(sock, "r+");
+  fgets(buf, 256, fsock);               /* Welcome */
+  fprintf(fsock, "USER %s\r\n", user);  /* USER NAME */
+  fgets(buf, 256, fsock);
+
+  if(!strncmp(buf, "+OK", 3))
+  {
+    is_bbsmail = strstr(buf,".bbs@") ? 1 : 0;
+    fprintf(fsock,"PASS %s\r\n", pass);   /* PASSWORD */
+    fgets(buf, 256, fsock);
+    if(strncmp(buf, "+OK", 3))
+    {
+      logitfile(FN_MAILSERVICE_LOG, "-pop3  NO-", email);       /* µn¤J¥¢±Ñ°O¿ý
+ */
+      vmsg("µn¤J¥¢±Ñ, ±K½X¿ù»~.");
+      fclose(fsock);
+      return 1;
+    }
+    else
+    {
+      logitfile(FN_MAILSERVICE_LOG, "-pop3  OK-", email);       /* µn¤J¦¨¥\°O¿ý
+ */
+    }
+  }
+  else
+  {
+    logitfile(FN_MAILSERVICE_LOG, "-pop3  NO-", email);       /* µn¤J¥¢±Ñ°O¿ý *
+/
+    vmsg("µn¤J¥¢±Ñ, µL¦¹±b¸¹.");
+    fclose(fsock);
+    return 1;
+  }
+
+  if(pop3_load_dir())
+  {
+    fclose(fsock);
+    return 1;
+  }
+  return 0;
+}
+
+static int
+server_logout(xo)
+  XO *xo;
+{
+  if (del_num && vans(msg_del_ny) == 'y')
+  {
+    int fd;
+    HDR hdr;
+    char buf[200];
+
+    if ((fd = open(xo->dir, O_RDONLY)) >= 0)
+    {
+      while (read(fd, &hdr, sizeof(hdr)) == sizeof(HDR))
+      {
+        if (hdr.xmode & POST_DELETE)
+        {
+          fprintf(fsock, "DELE %d\r\n", hdr.chrono);
+          while (1)
+          {
+            if (!strncmp(fgets(buf, 200, fsock), "+OK", 3))/* purge messages */
+              break;
+          }
+        }
+      }
+      close(fd);
+    }
+  }
+  fprintf(fsock, "QUIT\r\n");
+  fclose(fsock);
+  return 0;
+}
+
+int
+Pop3mail()
+{
+  XO *xo;
+  char currsmaildir[30];
+
+  del_num = is_base64 = is_qp = 0; /* ¹w³]¤w§R°£¤å³¹¼Æ¬° 0, µL¸Ñ½X¤è¦¡ */
+
+  is_mime = (cuser.ufo & UFO_MIME) ? 1 : 0; /* ­YµL UFO_MIME «h±N³o¦æ¨ú®ø */
+
+  sprintf(currsmaildir, "mailservice/%s.DIR", cuser.userid); /*DIRECTORY/MBOX*/
+
+  /* by statue */
+  if (server_login(NULL))
+    return 0;
+
+  xz[XZ_MIME - XO_ZONE].xo = xo = xo_new(currsmaildir); /* ³]¨ú .DIR ¸ô®| */
+  xz[XZ_MIME - XO_ZONE].cb = pop3_cb;
+  xover(XZ_MIME);
+
+  server_logout(xo);
+
+  free(xo);
+  return 0;
+}
+
+int
+Pop3Contact(email)
+  char *email;
+{
+  XO *xo;
+  char currsmaildir[30];
+
+  del_num = is_base64 = is_qp = 0; /* ¹w³]¤w§R°£¤å³¹¼Æ¬° 0, µL¸Ñ½X¤è¦¡ */
+
+  is_mime = (cuser.ufo & UFO_MIME) ? 1 : 0; /* ­YµL UFO_MIME «h±N³o¦æ¨ú®ø */
+
+  sprintf(currsmaildir, "mailservice/%s.DIR", cuser.userid); /*DIRECTORY/MBOX*/
+
+
+  if (server_login(email))
+    return 0;
+
+  xz[XZ_MIME - XO_ZONE].xo = xo = xo_new(currsmaildir); /* ³]¨ú .DIR ¸ô®| */
+  xz[XZ_MIME - XO_ZONE].cb = pop3_cb;
+  xover(XZ_MIME);
+
+  server_logout(xo);
+
+  free(xo);
+  return 0;
+}
+
+
+--
+[0m[1;31;44m ¡y¢~¢£[33m¦¨¤jÂå¾Ç[31m¢~¢£ [32m¢ª[35m¢¨      [37m¡Ë  ¡¸ [35m¢[32mi[33m¢[36mi [32mbbs.med.ncku.edu.tw [36m¢[33mi[32m¢[35mi [37m¡¸  ¡Ê     [0m
+[0m[1;31;42m ¢~¢£[33m°j ­· ¨¦[31m¢~¢£¡z [31m¢«[34m¢© [37m¡÷From¡G[36mbackwind.g1.dorm.ncku.edu.tw               [37m¡ö[0m

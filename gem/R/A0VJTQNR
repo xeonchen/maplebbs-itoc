@@ -1,0 +1,144 @@
+µo«H¤H: fuse.bbs@bbs.hightman.net («OÀIµ·) ¬ÝªO: plan
+¼Ð  ÃD: [¸Õ¸Õ] ¤ä«ù¹«¼Ðªºbbs
+µo«H¯¸: ©ú¤ë¤ô°aBBS (Sun, 18 May 2003 12:53:53 +0800 CST) Updated: 2003/08/24
+
+    ¦U¦ì¬[bbsªº¤j¤jÀ³¸Ó¦³¥Î¹Lxwindow¤Wªºxterm§a¡C
+
+    ¦³¨S¦³¦bxterm¨½­±¹B¦æmc¡A´N¬Omidnight command¡C
+
+    ¦bxterm¤¤¹B¦æmc®É¡A¥i¥H¥Î¹«¼ÐÂIªF¦è¡AÂIµæ³æ¡Amc¨½­±ªºeditÁÙ¥i¥H
+    ¿ï¾Ü°Ï¶ô¡C
+
+    §Ú·Q§Ú­Ìªºbbs¦pªG¯à¥Î¹«¼ÐÂI¿ï¡A·|¦³¦n¦h¦nª±ªºªF¦è§@¥X¨Ó¡C
+
+    §Ú¸ÕµÛ§@¤F¤@¤U¡G
+
+: global.h
+
+#define I_TIMEOUT       -31
+#define I_OTHERDATA     -32
+
++ /* fuse.030517: xterm-mouse tracking */
++ #define KEY_XTERM       0x8000
+
+: visio.c:vkey()
+
++ /* fuse.030517: xterm-mouse tracking */
++ int xterm_btn;
++ int xterm_posx;
++ int xterm_posy;
+
+
+int
+vkey()
+{
+  ...
+  ...
+    else if (mode == 2)             /* Cursor key */
+    {
+      if (ch >= 'A' && ch <= 'D')
+        return KEY_UP - (ch - 'A');
+      else if (ch >= '1' && ch <= '6')
+        mode = 3;
++     else if (ch == 'M')   /* fuse.030517: xterm-mouse tracking */
++       mode = 4;
+      else
+        return ch;
+    }
+    else if (mode == 3)             /* Ins Del Home End PgUp PgDn */
+    {
+      if (ch == '~')
+        return KEY_HOME - (last - '1');
+      else
+        return ch;
+    }
++   else if (mode == 4)
++   {
++     /* fuse.030517: xterm-mouse tracking */
++     xterm_btn = ch - ' ';
++     mode = 5;
++   }
++   else if (mode == 5)
++   {
++     xterm_posy = ch - ' ' - 1;
++     mode = 6;
++   }
++   else if (mode == 6)
++   {
++     xterm_posx = ch - ' ' - 1;
++     return KEY_XTERM;
++   }
+    last = ch;
+  }
+}
+
+¤W­±ªº¥N½X¬O¦b¹«¼ÐÂIÀ»®É®·Àòxterm mouse tracking §Ç¦C¡C
+§Y*[M<mb><y><x>
+¦s¦bxterm_btn, xterm_posx, xterm_posy³o¤T­ÓÅÜ¶q¨½­±¡C
+
+µM¦Z´N¥i¥H¦b»Ý­nªº¦a¤è¥Î¤F¡A§Ú¦bxover.c¨½­±¬O³o¼Ë¥Îªº¡G
+
+: xover.c:xover()
+
+void
+xover(cmd)
+  int cmd;
+{
+  int pos, num, zone, sysmode;
+  XO *xo;
+  KeyFunc *xcmd, *cb;
++ extern int xterm_btn;
++ extern int xterm_posx;
++ extern int xterm_posy;
+
++ send(0, "\033[?1000h", 8, 0);
+
+  ...
+  ...
+
+    else if (cmd >= '1' && cmd <= '9')
+    {
+      cmd = xo_jump(cmd, zone);
+    }
++   else if (cmd == KEY_XTERM)  /* fuse.030517: xterm-mouse tracking */
++   {
++     if (xterm_btn == 0)
++     {
++       if (xterm_posy < 7)                     /* Left */
++       {
++         return;
++       }
++       else if (xterm_posy <= 60)              /* Move */
++       {
++         cmd = xo->top + (xterm_posx - 3) + XO_MOVE;
++       }
++       else
++       {
++         if (xterm_posx > (b_lines >> 1))      /* PgDn */
++           cmd = pos + XO_TALL + XO_MOVE;
++         else                                  /* PgUp */
++           cmd = pos - XO_TALL + XO_MOVE;
++       }
++     }
++     else
++     {
++       cmd = XO_NONE;
++     }
++   }
+    else
+
+    ¥H¤W¥N½X¬O»¡¡G¦b¦Cªí¿ï¾Ü(ª©­±¡AºëµØ°Ï¡A¤å³¹¦Cªí¡A¥Î¤á¦Cªí)®É
+    ¦pªG¹«¼ÐÂI¦b10¦C¥H¥ª¡A´N¬O¡§¥ªÁä¡¨¥X¥h
+    ¦pªG¹«¼ÐÂI¦b10-60¦C¡Aªí¥Ü²¾°Ê¨ì¬ÛÀ³¦æ
+    ¦pªG¹«¼ÐÂI¦b60¦C¥H¥k¡A¦b¥b«Ì¥H¤WÂI´N¬O¦V¤WÂ½¡A¥b«Ì¥H¤UÂI´N¬O¦V¤UÂ½
+
+--
+    ¶¶«K¼s§i¤@¤U§Úªºfterm:
+    fterm¥D­¶¡Ghttp://fterm.zj001.net
+    fterm-bigª©¤U¸ü¡Ghttp://210.83.130.82/~fuse/fterm-big5.zip
+    ¬É­±ºt¥Ü¡Ghttp://210.83.130.82/~fuse/ftermbig.gif
+              http://210.83.130.82/~fuse/mcbig.gif
+
+--
+[1;32m¡° Origin: [33m©ú¤ë¤ô°a [37m<bbs.hightman.net> [m
+[1;31m¡» From: [36m10.11.26.15[m

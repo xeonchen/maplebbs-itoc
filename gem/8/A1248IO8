@@ -1,0 +1,72 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] §@ªÌ§R°£¤å³¹®É¡A¸ó¶K­p¼Æ¸òµÛ´î¤Ö
+®É¶¡: 2005/11/05 Sat 09:12:03                           Updated: 2005/11/05
+
+  ¦pªG¦³°µºëµØ°Ï "µoªí¤å³¹¤]§ì Cross-Post" ªº¸Ü
+  ¨º»ò±`¦³¤H·|©ê«è¥L©ú©ú§â¤å³¹§R°£¤F¡A¬°¤°»òÁÙºâ cross-post¡H
+
+  ­Y¬O§@ªÌ¦Û¤v§R°£¤å³¹®É¡Across-post °»´ú­p¼Æ´N´î¤@
+
+: post.c:checksum_find()
+
+- static int                      /* 1:¬Ocross-post 0:¤£¬Ocross-post */
+- checksum_find(fpath)
++ static int                      /* return checksum */
++ checksum_count(fpath)
+  char *fpath;
+{
+  ...
+
+
+- return checksum_put(sum);
++ return sum;
+}
+
+: post.c:check_crosspost()
+
++ int sum;
+  char *blist, folder[64];
+  ACCT acct;
+  HDR hdr;
+
+  ...
+
+- if (checksum_find(fpath))
++ sum = checksum_count(fpath);
++ if (checksum_put(sum))
+
+: post.c:post_delete()
+
+      if (!by_BM && !(currbattr & BRD_NOCOUNT))
+      {
++#ifdef HAVE_DETECT_CROSSPOST
++       int sum;
++       hdr_fpath(buf, xo->dir, hdr);
++       sum = checksum_count(buf);
++       checksum_rmv(sum);
++#endif
+
+: post.c:checksum_rmv() ·s¼W¦¹¨ç¦¡©ó checksum_put() «á­±
+
+static inline void
+checksum_rmv(sum)
+  int sum;
+{
+  int i;
+
+  if (sum)
+  {
+    for (i = 0; i < MAX_CHECKSUM_POST; i++)
+    {
+      if (checksum[i].sum == sum)
+      {
+        if (checksum[i].total > 0)
+          checksum[i].total--;
+        break;
+      }
+    }
+  }
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

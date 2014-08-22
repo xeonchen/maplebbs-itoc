@@ -1,0 +1,86 @@
+§@ªÌ: itoc (League) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] ¦^¤ô²yªº¦ì¸m§ï¦^­Ë¼Æ²Ä¤G¦æ
+®É¶¡: 2004/03/12 Fri 10:02:16                           Updated: 2004/03/12
+
+¡° ¤Þ­z¡mjal.bbs@bbs3.au.edu.tw (¯¸¤Wªº¤u¤Í§Ì§Ì)¡n¤§»Ê¨¥¡G
+> ¦]¬°¯¸¤Wuser²ßºD¦^°T®§¦b¤U¤è¦C¡A©Ò¥H·Q§ï¦^¨ì¤U­±¡A
+
+  §â¦^¤ô²y±q (0, 0) §ï¦^ (b_lines - 1, 0)¡A­n§ïªº³¡¤À¦³
+  1) vget(line, col, ...) ¤¤ªº line
+  2) ¥Ñ©ó save_foot() ¥u·|¦³¤G¦æ¨ü¨ìÅÜ°Ê¡A©Ò¥H¤£»Ý slp[3]¡A¥u»Ý slp[2]
+
+: bmw.c:bmw_edit()
+
+  int recver;
+- screenline slp[3];
++ screenline slp[2];
+  char *userid, fpath[64];
+  FILE *fp;
+
+  ...
+  ...
+
+  for (;;)
+  {
+    int ch;
+    BMW *benz;
+
+-   ch = vget(0, 0, hint, bmw->msg, 62, GCARRY);
++   ch = vget(b_lines - 1, 0, hint, bmw->msg, 62, GCARRY);
+
+: bmw.c:bmw_reply()
+
+  int max, display, tmpmode;
+  char buf[128];
+  UTMP *up;
+  BMW bmw;
+- screenline slp[3];
++ screenline slp[2];
+#ifdef BMW_DISPLAY
+  screenline slt[t_lines];
+#endif
+
+: visio.c:save_foot()
+
+void
+save_foot(slp)
+  screenline *slp;
+{
+  int i;
+- int lines[3] = {0, b_lines - 1, b_lines};     /* Àx¦s³o¤T¦æ */
++ int lines[2] = {b_lines - 1, b_lines};        /* Àx¦s³o¤G¦æ */
+
+- for (i = 0; i < 3; i++)
++ for (i = 0; i < 2; i++)
+  {
+    move(lines[i], 0);
+    memcpy(slp + i, cur_slp, sizeof(screenline));
+    slp[i].smod = 0;
+    slp[i].emod = ANSILINELEN;/* Thor.990125:¤£½×³Ì«á¤@¦¸§ï¨ì­þ, ¥þ³¡­nÃ¸¤W */
+    slp[i].oldlen = ANSILINELEN;
+    slp[i].mode |= SL_MODIFIED;
+  }
+}
+
+: visio.c:restore_foot()
+
+void
+restore_foot(slp)
+  screenline *slp;
+{
+  int i;
+- int lines[3] = {0, b_lines - 1, b_lines};     /* «ì´_³o¤T¦æ */
++ int lines[2] = {b_lines - 1, b_lines};        /* «ì´_³o¤G¦æ */
+
+- for (i = 0; i < 3; i++)
++ for (i = 0; i < 2; i++)
+  {
+    move(lines[i], 0);
+    memcpy(cur_slp, slp + i, sizeof(screenline));
+  }
+
+  refresh(); /* Thor.981222: ¬°¨¾¾ãscreen­«Ã¸, ±Ä¥Î refresh */
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

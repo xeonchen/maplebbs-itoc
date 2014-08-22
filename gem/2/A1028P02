@@ -1,0 +1,47 @@
+§@ªÌ: itoc (¡@) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] ¨D®É¶¡ time_t
+®É¶¡: Sun Jan 20 00:52:36 2002
+
+#if 0
+  int tm_sec;                   /* seconds (0 - 60) */
+  int tm_min;                   /* minutes (0 - 59) */
+  int tm_hour;                  /* hours (0 - 23) */
+  int tm_mday;                  /* day of month (1 - 31) */
+  int tm_mon;                   /* month of year (0 - 11) */
+  int tm_year;                  /* year - 1900 */
+  int tm_wday;                  /* day of week (Sunday = 0) */
+  int tm_yday;                  /* day of year (0 - 365) */
+  int tm_isdst;                 /* is summer time in effect? */
+  char *tm_zone;                /* abbreviation of timezone name */
+  long tm_gmtoff;               /* offset from UTC in seconds */
+#endif
+
+
+#include <time.h>
+
+
+int
+main()
+{
+  struct tm ptime;
+
+  /* 2001 ¦~ 5 ¤ë 6 ¤é */
+  ptime.tm_sec = 0;
+  ptime.tm_min = 0;
+  ptime.tm_hour = 0;
+  ptime.tm_mday = 6;
+  ptime.tm_mon = 5 - 1;
+  ptime.tm_year = 2001 - 100;
+  ptime.tm_isdst = 0;
+  ptime.tm_zone = "GMT";
+  ptime.tm_gmtoff = 0;
+
+  printf("%d\n", mktime(&ptime));
+}
+
+  time_t ¬O±q 1970 ¦~ °_ºâªº¬í¼Æ¡Aªø 4-byte(32-bit)
+  ³Ì¦h¥i¹F 2^31-1
+  ¬G·|©ó 2038 ¦~ 1 ¤ë 19 ¤é¬P´Á¤G¦­¤W 11 ÂI 14 ¤À 07 ¬í¨ì¹F¤W­­
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

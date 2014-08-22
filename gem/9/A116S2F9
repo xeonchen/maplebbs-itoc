@@ -1,0 +1,1312 @@
+µo«H¤H: TKyo.bbs@cpu.tfcis.org (·t¶Â¶Q¤½¤l) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]·s°O±b¤â¥¾
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/26 Tue 17:04:56)                Updated: 2006/04/17
+
+/*
+1.¥»¦¸·s°O±b¤â¥¾¤§·s¼W¥\¯à, ¬O¥H­ì "°O±b¤â¥¾" ¥\¯à¹ê»Ú¹B¦æ¤@¦~¥b«á
+  ¨Ì¾Ú "¤Ñ¤Ñ¨Ï¥Îªººô¤Í" ©Ò´£¥X¤§»Ý¨D¤Î¬°¤F¤¶­± xover() ¤Æ¦Ó­«·s¼¶¼gªºª©¥»
+
+2.¥B¾ã¦X "­ì°O±b¤â¥¾¸ê®ÆÀÉÂàÀÉµ{¦¡" ©ó·s°O±b¤â¥¾¤¤
+  ±ý´«·sª©¥»ªººô¤Í¥i¥H¤£¥Î¾á¤ß
+
+3.©³¤Uµ{¦¡½X, ¦³³\¦h¦a¤è¦]¬°ÅU¼{¨ì telnet Åã¥Üµe­±¦Ó¦³©ÒÂ_¦æ
+
+*/
+
+: src/include/struct.h  /* ¾A·í¦ì¸m¥[¤J */
+
+#ifdef HAVE_CREDIT
+typedef struct
+{
+  time_t stamp;         /* ¸ê®Æ«Ø¥ß¤é´Á®É¶¡ */
+  int type;             /* ¸ê®ÆÃþ§O */
+  time_t chrono;        /* ¨Ï¥ÎªÌ¦Û­q¤§¸ê®Æ¤é´Á®É¶¡ */
+  char flag;            /* ¤ä¥X/¦¬¤J */
+  int money;            /* ª÷ÃB */
+  char useway;          /* ¤ÀÃþ(­¹¦ç¦í¦æ¨|¼Ö) */
+  char desc[75];        /* »¡©ú */
+  char desc_way[5];     /* ¤ÀÃþ¦Û­q */
+}      CREDIT;
+
+#define CREDIT_FOLDER   0x01    /* ¸ê®Æ§¨ */
+#define CREDIT_DATA     0x02    /* ¤@¯ë¸ê®Æ */
+
+#define CREDIT_OUT      0x1     /* ¤ä¥X */
+#define CREDIT_IN       0x2     /* ¦¬¤J */
+
+#define CREDIT_OTHER    0       /* ¨ä¥L */
+#define CREDIT_EAT      1       /* ­¹ */
+#define CREDIT_WEAR     2       /* ¦ç */
+#define CREDIT_LIVE     3       /* ¦í */
+#define CREDIT_MOVE     4       /* ¦æ */
+#define CREDIT_EDU      5       /* ¨| */
+#define CREDIT_PLAY     6       /* ¼Ö */
+#define CREDIT_CUSTOM   7       /* ¦Û­q */
+#endif
+
+: src/include/theme.h   /* ¾A·í¦ì¸m¥[¤J */
+
+/* ----------------------------------------------------- */
+/* °O±b¤â¥¾ÃC¦â                                          */
+/* ----------------------------------------------------- */
+
+#ifdef HAVE_CREDIT
+#define C_CREDIT_IN "\033[1;31m"
+#define C_CREDIT_OUT    "\033[1;32m"
+#define C_CREDIT_N      "\033[1;37m"
+#define C_CREDIT_OTHER  "\033[1;33m"
+#define C_CREDIT_TITLE  "\033[1;35m"
+#endif
+
+
+- #define NECKER_CREDIT "[¡ö]Â÷¶} [C]´«­¶ [1]·s¼W [2]§R°£ [3]¥þ§R [4]Á`­p\n" \
+- COLOR3 "  ½s¸¹   ¤é  ´Á   ¦¬¤ä  ª÷  ÃB  ¤ÀÃþ     »¡  ©ú%*s                               \033[m"
+
++ #define NECKER_CREDIT   \
++ "[¡ö]Â÷¶} [T]­×§ï¸ê®Æ»¡©ú [t]¼ÐÅÒ [d/D/^D]§R°£ [m]²¾°Ê [^G]®üÁã¥\\¯à
+ [h]»¡©ú\n" \
++ COLOR3 "  ½s¸¹  ¤é      ´Á  ¦¬¤ä ª÷    ÃB  ¥Î³~
+ »¡              ©ú%*s                    \033[m"
+
+
++ #define FEETER_CREDIT   \
++ COLOR1 " °O±b¤â¥¾ "
+  COLOR2 " (a/f)·s¼W¸ê®Æ/¸ê®Æ§¨ (E)­×§ï (s)²Î­p (S)±Æ§Ç (g)¦¬¿ý¸ê®Æ (¡ö)Â÷¶}  "
+
+: src/include/modes.h
+
+#define XZ_GEM      (XO_ZONE + 13)  /* ºëµØ°Ï */
++ #define XZ_CREDIT       (XO_ZONE + 14)  /* °O±b¤â¥¾ */
+
+: src/maple/menu.c : menu_other[]
+
+#ifdef HAVE_CREDIT
+- "bin/credit.so:main_credit", PERM_BASIC, - M_XMODE,
++ "bin/new_credit.so:credit_main", PERM_BASIC, - M_XMODE,
+  "MoneyNote  ¡ñ °O±b¤â¥¾ ¡ð",
+#endif
+
+: src/maple/xover.c : xz[]
+
+- {NULL, NULL, M_GEM, FEETER_GEM}               /* XZ_GEM */
++ {NULL, NULL, M_GEM, FEETER_GEM},              /* XZ_GEM */
++ {NULL, NULL, M_XMODE, FEETER_CREDIT}          /* XZ_CREDIT */
+
+: src/so/new_credit.c   /* ·s¼W¦¹µ{¦¡ */
+
+/*-------------------------------------------------------*/
+/* new_credit.c     ( NTHU CS MapleBBS Ver 3.10 )        */
+/*-------------------------------------------------------*/
+/* target : ·s°O±b¤â¥¾                                   */
+/* author : kyo.bbs@cszone.org                           */
+/* create : 05/01/03                                     */
+/* update :   /  /                                       */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+#ifdef HAVE_CREDIT
+
+extern XZ xz[];
+extern char xo_pool[];
+extern int TagNum;
+extern TagItem TagList[];
+
+static char CreditAnchor[64], CreditSailor[TTLEN + 1];
+
+static int credit_anchor(XO *xo);
+void XoCredit(char *folder, char *title);
+static void credit_do_delete();
+
+typedef struct
+{
+  int year;                     /* ¦~ */
+  char month;                   /* ¤ë */
+  char day;                     /* ¤é */
+
+  char flag;                    /* ¤ä¥X/¦¬¤J */
+  int money;                    /* ª÷ÃB */
+  char useway;                  /* Ãþ§O(­¹¦ç¦í¦æ¨|¼Ö) */
+  char desc[112];               /* »¡©ú */
+}      CREDIT_OLD;
+
+static time_t
+make_time(year, month, day)
+  int year, month, day;
+{
+  struct tm ptime;
+
+  ptime.tm_sec = 0;
+  ptime.tm_min = 0;
+  ptime.tm_hour = 0;
+  ptime.tm_mday = day;
+  ptime.tm_mon = month - 1;
+  ptime.tm_year = year - 1900;
+  ptime.tm_isdst = 0;
+#ifndef CYGWIN
+  ptime.tm_zone = "GMT";
+  ptime.tm_gmtoff = 0;
+#endif
+
+  return mktime(&ptime);
+}
+
+static char datemsg[40];
+
+char *
+BAtime(clock)
+  time_t *clock;
+{
+  struct tm *t = localtime(clock);
+  sprintf(datemsg, "%04d/%02d/%02d %02d:%02d:%02d",
+  t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+  t->tm_hour, t->tm_min, t->tm_sec);
+  return (datemsg);
+}
+
+void
+credit_fpath(fpath, userid, fname)
+  char *fpath;
+  char *userid;
+  char *fname;
+{
+  char buf[IDLEN + 1];
+
+  str_lower(buf, userid);
+
+  if (fname)
+    sprintf(fpath, "usr/%c/%s/CREDIT/%s", buf[0], buf, fname);
+  else
+    sprintf(fpath, "usr/%c/%s/CREDIT", buf[0], buf);
+}
+
+void
+credit_stampfpath(fpath, stamp)
+  char *fpath;
+  time_t stamp;
+{
+  char xname[32];
+
+  xname[0] = 'F';
+  archiv32(stamp, xname + 1);
+  credit_fpath(fpath, cuser.userid, xname);
+}
+
+int
+credit_edit(credit, echo)
+  CREDIT *credit;
+  int echo;
+{
+  char buf_command[3] = {0}, buf[80], month, day;
+  char *menu[] = {buf_command,
+      "1  ¤ä¥X",
+      "2  ¦¬¤J",
+      "Q  ¨ú®ø", NULL};
+  char *menu2[] = {buf_command,
+      "1  ¨ä¥L",
+      "2  [­¹]",
+      "3  [¦ç]",
+      "4  [¦í]",
+      "5  [¦æ]",
+      "6  [¨|]",
+      "7  [¼Ö]",
+      "8  ¦Û­q", NULL};
+  int i, year, mmday[12] = {31, 28, 31, 30, 31, 30,
+                            31, 31, 30, 31, 30, 31}; /* ¨C­Ó¤ëªº¤Ñ¼Æ */
+  time_t now;
+  struct tm *ptime;
+
+  i = 3;
+  move(i, 0);
+  clrtobot();
+
+  if (echo == GCARRY)
+  {
+    if (credit->flag == CREDIT_OUT)
+      strcpy(buf_command, "1Q");
+    else
+      strcpy(buf_command, "2Q");
+    ptime = localtime(&credit->chrono);
+  }
+  else
+  {
+    memset(credit, 0, sizeof(CREDIT));
+    credit->flag = CREDIT_OUT;
+    strcpy(buf_command, "1Q");
+    now = time(NULL);
+    ptime = localtime(&now);
+  }
+
+  credit->flag = pans(-1, -1, "¿ï¶µ", menu);
+
+  if (credit->flag == 'q')
+    return 0;
+
+  if (credit->flag == '1')
+    credit->flag = CREDIT_OUT;
+  else
+    credit->flag = CREDIT_IN;
+
+  move(++i, 0);
+  prints("¦¬¤ä¡G%s%s\033[m",
+    (credit->flag == CREDIT_OUT) ? C_CREDIT_OUT : C_CREDIT_IN,
+    menu[credit->flag] + 3);
+
+  sprintf(buf, "%04d", ptime->tm_year + 1900);
+  do
+  {
+    if (vget(++i, 0, "¤é´Á(¦~)¡G", buf, 5, GCARRY))
+      year = atoi(buf);
+    else
+      return 0;
+  } while (year < 1);
+
+  sprintf(buf, "%02d", ptime->tm_mon + 1);
+  do
+  {
+    if (vget(++i, 0, "¤é´Á(¤ë)¡G", buf, 3, GCARRY))
+      month = atoi(buf);
+    else
+      return 0;
+  } while (month < 1 || month > 12);
+
+  /* ¥­¶|¦~ªº§P§O */
+  if ((year % 400 == 0) ||
+     (year % 100 != 0 && year % 4 == 0))
+  mmday[1] = 29;
+
+  sprintf(buf, "%02d", ptime->tm_mday);
+  do
+  {
+    if (vget(++i, 0, "¤é´Á(¤é)¡G", buf, 3, GCARRY))
+      day = atoi(buf);
+    else
+      return 0;
+  } while (day < 1 || day > mmday[month - 1]);
+
+  credit->chrono = make_time(year, month, day);
+
+  if (echo == GCARRY)
+    sprintf(buf, "%d", credit->money);
+  do
+  {
+    if (vget(++i, 0,
+      (credit->flag == CREDIT_OUT) ? "¤ä¥Xª÷ÃB(¤¸)¡G" : "¦¬¤Jª÷ÃB(¤¸)¡G",
+      buf, 9, echo))
+    {
+      credit->money = atoi(buf);
+    }
+    else
+      return 0;
+  } while (credit->money < 1);
+
+  if (credit->flag == CREDIT_OUT)        /* ¤ä¥X¤~¦³°O¿ý¥Î³~ */
+  {
+    if (echo == GCARRY)
+      sprintf(buf_command, "%c%c",
+        (credit->useway + '1'), (credit->useway + '1'));
+    else
+      strcpy(buf_command, "11");
+
+    if ((credit->useway = (pans(-1, -1, "¥Î³~", menu2) - '1')) == 7)
+    {
+      if (!(vget(++i, 0, "¥Î³~¡G", credit->desc_way, BCLEN, echo)))
+        return 0;
+    }
+    else
+    {
+      move(++i, 0);
+      prints("¥Î³~¡G" C_CREDIT_OTHER "%s\033[m",
+        menu2[credit->useway + 1] + 3);
+    }
+  }
+
+  vget(++i, 0, "»¡©ú¡G", credit->desc, TTLEN, echo);
+
+  return 1;
+}
+
+static int
+credit_stamp(credit)
+  CREDIT *credit;
+{
+  char fpath[64];
+  int fd;
+
+  credit_stampfpath(fpath, credit->stamp);
+  if ((fd = open(fpath, O_WRONLY | O_CREAT | O_EXCL, 0600)) >= 0)
+    close(fd);
+
+  return fd;
+}
+
+static int
+credit_add(xo, ctype)
+  XO *xo;
+  int ctype;
+{
+  CREDIT credit;
+  int ans;
+  char *menu[] = {"AQ",
+      "A  °O±b¸ê®Æ",
+      "F  ¸ê®Æ§¨",
+      "G  ®üÁã¥\\¯à",
+      "Q  Â÷¶}", NULL};
+
+  char *menu2[] = {"AQ",
+      "A  ¥[¨ì³Ì«á",
+      "I  ´¡¤J¥Ø«e¦ì¸m",
+      "N  ¤U¤@­Ó",
+      "Q  Â÷¶}", NULL};
+
+  if ((ans = ctype) == 0)
+    ans = pans(-1, -1, "¿ï¶µ", menu);
+
+  switch (ans)
+  {
+    case 'q':
+      return XO_NONE;
+    case 'a':
+    case 'f':
+
+      if (ans == 'f')
+      {
+        if (!(vget(b_lines, 0, "¼ÐÃD¡G", credit.desc, TTLEN, DOECHO)))
+          return XO_INIT;
+
+        time(&credit.stamp);
+        credit.type = CREDIT_FOLDER;
+        if (credit_stamp(&credit) < 0)
+          return XO_INIT;
+      }
+      else
+      {
+        if (!(credit_edit(&credit, DOECHO)))
+          return XO_INIT;
+
+        time(&credit.stamp);
+        credit.type = CREDIT_DATA;
+      }
+
+      break;
+    case 'g':
+      credit_anchor(xo);
+      return XO_NONE;
+  }
+
+  ans = pans(-1, -1, "¦s©ñ¦ì¸m", menu2);
+
+  switch (ans)
+  {
+  case 'q':
+    break;
+
+  case 'i':
+  case 'n':
+
+    rec_ins(xo->dir, &credit, sizeof(CREDIT), xo->pos + (ans == 'n'), 1);
+    break;
+
+  case 'a':
+  default:
+
+    rec_add(xo->dir, &credit, sizeof(CREDIT));
+    break;
+  }
+
+  return XO_INIT;
+}
+
+static int
+credit_add_data(xo)     /* itoc.010419: §Ö³tÁä */
+  XO *xo;
+{
+  return credit_add(xo, 'a');
+}
+
+
+static int
+credit_add_folder(xo)       /* itoc.010419: §Ö³tÁä */
+  XO *xo;
+{
+  return credit_add(xo, 'f');
+}
+
+static int
+credit_change(xo)
+  XO *xo;
+{
+  CREDIT *credit, old_credit;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  credit = (CREDIT *) xo_pool + cur;
+
+  if (credit->type & CREDIT_DATA)
+  {
+    old_credit = *credit;
+
+    if (credit_edit(&old_credit, GCARRY))
+    {
+      if (memcmp(credit, &old_credit, sizeof(CREDIT)))
+      {
+        if (vans("½T©w­n­×§ï¶Ü¡H[N] ") == 'y')
+        {
+          rec_put(xo->dir, &old_credit, sizeof(CREDIT), pos, NULL);
+          return XO_LOAD;
+        }
+      }
+    }
+  }
+
+  return XO_BODY;
+}
+
+static int
+credit_title(xo)
+  XO *xo;
+{
+  CREDIT *credit, old_credit;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  credit = (CREDIT *) xo_pool + cur;
+
+  old_credit = *credit;
+  if (old_credit.type & CREDIT_FOLDER)
+  {
+    if (!(vget(b_lines, 0, "¼ÐÃD¡G", old_credit.desc, TTLEN, GCARRY)))
+      return XO_FOOT;
+  }
+  else if (old_credit.type & CREDIT_DATA)
+    vget(b_lines, 0, "»¡©ú¡G", old_credit.desc, TTLEN, GCARRY);
+
+  if (memcmp(credit, &old_credit, sizeof(CREDIT)))
+    rec_put(xo->dir, &old_credit, sizeof(CREDIT), pos, NULL);
+
+  return XO_LOAD;
+}
+
+static int
+credit_sum(xo)
+  XO *xo;
+{
+  CREDIT *credit;
+  struct stat st;
+  int fd, ch, i;
+  int qyear, qafter, stop_sum;
+  time_t qtime_src, qtime_desc;
+  struct tm *ptime;
+  char *menu[] = {"QQ",
+      "1  ¥þ³¡²Î­p",
+      "2  ¨Ì¦~¥÷²Î­p",
+      "3  ¨Ì¦~¤ë²Î­p",
+      "4  ¨Ì¦~¤ë¤é´Á¶¡¹j²Î­p",
+      "Q  ¨ú®ø", NULL};
+  char qmonth, qday, buf[100];
+  usint way[8], moneyin, moneyout;
+  int mmday[12] = {31, 28, 31, 30, 31, 30,
+                   31, 31, 30, 31, 30, 31}; /* ¨C­Ó¤ëªº¤Ñ¼Æ */
+
+  ch = pans(-1, -1, "²Î­p¤è¦¡", menu);
+
+  switch (ch)
+  {
+    case 'q':
+      return XO_NONE;
+    case '2':
+    case '3':
+    case '4':
+
+      i = 3;
+      move(i++, 0);
+      clrtobot();
+
+      move(i++, 0);
+      prints("²Î­p¤è¦¡¡G" C_CREDIT_TITLE "%s\033[m", menu[ch - '0'] + 3);
+
+      credit = (CREDIT *) xo_pool + xo->pos - xo->top;
+
+      if (credit->type & CREDIT_FOLDER)
+        ptime = localtime(&credit->stamp);
+      else
+        ptime = localtime(&credit->chrono);
+
+      sprintf(buf, "%04d", ptime->tm_year + 1900);
+      do
+      {
+        if (vget(++i, 0, "[¿z¿ï±ø¥ó] ¦~¥÷¡G", buf, 5, GCARRY))
+          qyear = atoi(buf);
+        else
+          return XO_FOOT;
+      } while (qyear < 1);
+
+      if (ch == '2')
+        break;
+
+      sprintf(buf, "%02d", ptime->tm_mon + 1);
+      do
+      {
+        if (vget(++i, 0, "[¿z¿ï±ø¥ó] ¤ë¥÷¡G", buf, 3, GCARRY))
+          qmonth = atoi(buf);
+        else
+          return XO_FOOT;
+      } while (qmonth < 1 || qmonth > 12);
+
+      if (ch == '3')
+        break;
+
+      /* ¥­¶|¦~ªº§P§O */
+      if (((qyear + 1911) % 400 == 0) ||
+        ((qyear + 1911) % 100 != 0 && (qyear + 1911) % 4 == 0))
+      mmday[1] = 29;
+
+      sprintf(buf, "%02d", ptime->tm_mday);
+      do
+      {
+        if (vget(++i, 0, "[¿z¿ï±ø¥ó] ¤é´Á¡G", buf, 3, GCARRY))
+          qday = atoi(buf);
+        else
+          return XO_FOOT;
+      } while (qday < 1 || qday > mmday[qmonth - 1]);
+
+      qtime_src = make_time(qyear, qmonth, qday);
+
+      qafter = 7;
+      sprintf(buf, "%d", qafter);
+      do
+      {
+        if (vget(++i, 0, "[¿z¿ï±ø¥ó] ¤é´Á¶¡¹j¤Ñ¼Æ¡G", buf, 3, GCARRY))
+          qafter = atoi(buf);
+        else
+          qafter = 0;
+      } while (qafter < 0 || qday > 100);
+
+      qtime_desc = qtime_src + qafter * 86400;
+  }
+
+  if ((fd = open(xo->dir, O_RDONLY)) >= 0 && !fstat(fd, &st) && st.st_size > 0)
+  {
+    memset(way, 0, sizeof(way));
+    moneyin = 0;
+    moneyout = 0;
+
+    mgets(-1);
+    while (credit = mread(fd, sizeof(CREDIT)))
+    {
+      stop_sum = 0;
+
+      if (credit->type & CREDIT_FOLDER)
+        continue;
+
+      ptime = localtime(&credit->chrono);
+
+      switch (ch)
+      {
+        case '3':
+          stop_sum = ((stop_sum == 0) &&
+                     ((ptime->tm_mon + 1) == qmonth)) ? 0 : 1;
+        case '2':
+          stop_sum = ((stop_sum == 0) &&
+                     ((ptime->tm_year + 1900) == qyear)) ? 0 : 1;
+          break;
+        case '4':
+          stop_sum = ((stop_sum == 0) && ((credit->chrono >= qtime_src) &&
+                     (credit->chrono <= qtime_desc))) ? 0 : 1;
+          break;
+      }
+
+      if (stop_sum == 0)
+      {
+        if (credit->flag == CREDIT_OUT)
+          way[credit->useway] += credit->money;
+        else
+          moneyin += credit->money;
+      }
+    }
+  }
+  close(fd);
+
+  for (i = 0; i <= 7; i++)
+    moneyout += way[i];
+
+  i = 3;
+
+  move(i, 0);
+  clrtobot();
+  move(++i, 0);
+
+  switch (ch)
+  {
+    case '1':
+      strcpy(buf, C_CREDIT_TITLE "¥þ³¡²Î­pµ²ªG");
+      break;
+    case '2':
+      sprintf(buf, C_CREDIT_N " %d " C_CREDIT_TITLE "¦~²Î­pµ²ªG", qyear);
+      break;
+    case '3':
+      sprintf(buf, C_CREDIT_N " %d " C_CREDIT_TITLE "¦~"
+                   C_CREDIT_N " %d " C_CREDIT_TITLE "¤ë¥÷²Î­pµ²ªG",
+        qyear, qmonth);
+      break;
+    case '4':
+      {
+        struct tm *ptime;
+
+        ptime = localtime(&qtime_src);
+        prints(C_CREDIT_N " %d " C_CREDIT_TITLE "¦~"
+               C_CREDIT_N " %d " C_CREDIT_TITLE "¤ë"
+               C_CREDIT_N " %d " C_CREDIT_TITLE "¤é¡ã",
+          ptime->tm_year + 1900, ptime->tm_mon + 1, ptime->tm_mday);
+
+        ptime = localtime(&qtime_desc);
+        sprintf(buf, C_CREDIT_N " %d " C_CREDIT_TITLE "¦~"
+                     C_CREDIT_N " %d " C_CREDIT_TITLE "¤ë"
+                     C_CREDIT_N " %d " C_CREDIT_TITLE "¤é´Á¶¡¹j²Î­pµ²ªG",
+          ptime->tm_year + 1900, ptime->tm_mon + 1, ptime->tm_mday);
+
+        break;
+      }
+  }
+  prints("%s\033[m\n" BCOLOR "%s\033[m\n", buf, msg_seperator);
+  prints(C_CREDIT_IN "Á`¦¬¤J  %12u\033[m ¤¸\n", moneyin);
+  prints(C_CREDIT_OUT "Á`¤ä¥X  %12u\033[m ¤¸\n", moneyout);
+
+  if (moneyin > moneyout)
+    prints(BCOLOR "%s\033[m\n" C_CREDIT_IN "  µ²¾l  %12u\033[m ¤¸\n\n",
+      msg_seperator, moneyin - moneyout);
+  else if (moneyin < moneyout)
+    prints(BCOLOR "%s\033[m\n" C_CREDIT_OUT "  ³z¤ä  %12u\033[m ¤¸\n\n",
+      msg_seperator, moneyout - moneyin);
+  else
+    prints(BCOLOR "%s\033[m\n" C_CREDIT_N "  ¥´¥­  %12u\033[m ¤¸\n\n",
+      msg_seperator, 0);
+
+  prints(C_CREDIT_TITLE "%s\033[m\n" BCOLOR "%s\033[m\n", "¤ä¥XÃþ§O©ú²Ó",
+    msg_seperator);
+  prints(C_CREDIT_OTHER " [­¹]   " C_CREDIT_OUT "%12u\033[m ¤¸"
+     C_CREDIT_OTHER "     [¦ç]   " C_CREDIT_OUT "%12u\033[m ¤¸\n",
+     way[CREDIT_EAT], way[CREDIT_WEAR]);
+  prints(C_CREDIT_OTHER " [¦í]   " C_CREDIT_OUT "%12u\033[m ¤¸"
+     C_CREDIT_OTHER "     [¦æ]   " C_CREDIT_OUT "%12u\033[m ¤¸\n",
+     way[CREDIT_LIVE], way[CREDIT_MOVE]);
+  prints(C_CREDIT_OTHER " [¨|]   " C_CREDIT_OUT "%12u\033[m ¤¸"
+     C_CREDIT_OTHER "     [¼Ö]   " C_CREDIT_OUT "%12u\033[m ¤¸\n",
+     way[CREDIT_EDU], way[CREDIT_PLAY]);
+  prints(C_CREDIT_OTHER " ¨ä¥L   " C_CREDIT_OUT "%12u\033[m ¤¸"
+     C_CREDIT_OTHER "     ¦Û­q   " C_CREDIT_OUT "%12u\033[m ¤¸\n",
+     way[CREDIT_OTHER], way[CREDIT_CUSTOM]);
+  prints(BCOLOR "%s\033[m\n", msg_seperator);
+
+  vmsg(NULL);
+
+  return XO_BODY;
+}
+
+static int
+credit_query(xo)
+  XO *xo;
+{
+  CREDIT *credit;
+  int pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  credit = (CREDIT *) xo_pool + cur;
+
+  if (credit->type & CREDIT_FOLDER)
+  {
+    char fpath[64];
+    char title[TTLEN + 1];
+
+    str_ncpy(title, credit->desc, sizeof(title));
+    credit_stampfpath(fpath, credit->stamp);
+    XoCredit(fpath, title);
+    return XO_INIT;
+  }
+  else if (credit->type & CREDIT_DATA)
+  {
+    char *menu[] = {"QQ",
+        "A  ·s¼W°O±b¸ê®Æ",
+        "F  ·s¼W¸ê®Æ§¨",
+        "T  ­×§ï°O±b¸ê®Æ»¡©ú",
+        "E  ­×§ï°O±b¸ê®Æ",
+        "S  °O±b¸ê®Æ²Î­p",
+        "Q  ¨ú®ø", NULL};
+
+    switch (pans(-1, -1, "¥\\¯à¿ï³æ", menu))
+    {
+      case 'a':
+        return credit_add_data(xo);
+      case 'f':
+        return credit_add_folder(xo);
+      case 't':
+        return credit_title(xo);
+      case 'e':
+        return credit_change(xo);
+      case 's':
+        return credit_sum(xo);
+      default:
+        return XO_NONE;
+    }
+  }
+}
+
+static void
+delcredit(xo, credit)
+  XO *xo;
+  CREDIT *credit;
+{
+  if (credit->type & CREDIT_FOLDER)
+  {
+    char fpath[64];
+
+    credit_stampfpath(fpath, credit->stamp);
+    if (str_ncmp(CreditAnchor, fpath, sizeof(CreditAnchor)) == 0)
+      CreditAnchor[0] = '\0';
+    credit_do_delete(xo, fpath);
+  }
+}
+
+static void
+credit_do_delete(xo, folder)
+  XO *xo;
+  char *folder;
+{
+  CREDIT credit;
+  FILE *fp;
+
+  if (!(fp = fopen(folder, "r")))
+    return;
+
+  while (fread(&credit, sizeof(CREDIT), 1, fp) == 1)
+    delcredit(xo, &credit);
+
+  fclose(fp);
+  unlink(folder);
+}
+
+static int
+credit_delete(xo)
+  XO *xo;
+{
+  if (vans(msg_del_ny) == 'y')
+  {
+    CREDIT *credit;
+
+    credit = (CREDIT *) xo_pool + (xo->pos - xo->top);
+    delcredit(xo, credit);
+
+    if (!rec_del(xo->dir, sizeof(CREDIT), xo->pos, NULL))
+      return XO_LOAD;
+  }
+  return XO_FOOT;
+}
+
+static int
+credit_rangedel(xo)
+  XO *xo;
+{
+  return xo_rangedel(xo, sizeof(CREDIT), NULL, delcredit);
+}
+
+
+static int
+vfycredit(credit, pos)
+  CREDIT *credit;
+  int pos;
+{
+  return Tagger(credit->stamp, pos, TAG_NIN);
+}
+
+
+static int
+credit_prune(xo)
+  XO *xo;
+{
+  return xo_prune(xo, sizeof(CREDIT), vfycredit, delcredit);
+}
+
+static void
+credit_item(num, credit)
+  int num;
+  CREDIT *credit;
+{
+  char *credit_way[] =
+      {"¨ä¥L", "[­¹]", "[¦ç]", "[¦í]", "[¦æ]", "[¨|]", "[¼Ö]", NULL};
+
+  if (credit->type & CREDIT_FOLDER)
+    prints("%6d %c" COLOR_ANN_F CHAR_ON "%-*.*s\033[m",
+      num, tag_char(credit->stamp), d_cols + 68, d_cols + 68,
+      credit->desc);
+  else if (credit->type & CREDIT_DATA)
+  {
+    credit_way[7] = credit->desc_way;
+    prints("%6d %c%-10.10s  %s %8d  " C_CREDIT_OTHER "%4s %-*.*s\033[m",
+      num, tag_char(credit->stamp),
+      BAtime(&credit->chrono),
+      (credit->flag == CREDIT_OUT) ? C_CREDIT_OUT "¤ä¥X" : C_CREDIT_IN "¦¬¤J",
+      credit->money,
+      (credit->flag == CREDIT_OUT) ? credit_way[credit->useway] : "",
+      d_cols + 38, d_cols + 38,
+      credit->desc);
+  }
+}
+
+static int
+credit_body(xo)
+  XO *xo;
+{
+  CREDIT *credit;
+  int max, num, tail;
+
+  move(3, 0);
+  clrtobot();
+  max = xo->max;
+  if (max <= 0)
+  {
+    if ((max = credit_add(xo, 0)) != XO_NONE)
+      return max;
+
+    return XO_QUIT;
+  }
+
+  credit = (CREDIT *) xo_pool;
+  num = xo->top;
+  tail = num + XO_TALL;
+  if (max > tail)
+    max = tail;
+
+  do
+  {
+    move(3 + num - xo->top, 0);
+    credit_item(++num, credit++);
+  } while (num < max);
+
+  return XO_FOOT;   /* itoc.010403: §â b_lines ¶ñ¤W feeter */
+}
+
+
+static int
+credit_head(xo)
+  XO *xo;
+{
+  vs_head("°O±b¤â¥¾", xo->xyz);
+  prints(NECKER_CREDIT, d_cols, "");
+
+  return credit_body(xo);
+}
+
+
+static int
+credit_load(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(CREDIT));
+  return credit_body(xo);
+}
+
+
+static int
+credit_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(CREDIT));
+  return credit_head(xo);
+}
+
+static int
+credit_tag(xo)
+  XO *xo;
+{
+  CREDIT *credit;
+  int tag, pos, cur;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  credit = (CREDIT *) xo_pool + cur;
+
+  if (tag = Tagger(credit->stamp, pos, TAG_TOGGLE))
+  {
+    move(3 + cur, 0);
+    credit_item(++pos, credit);
+  }
+
+  return xo->pos + 1 + XO_MOVE; /* lkchu.981201: ¸õ¦Ü¤U¤@¶µ */
+}
+
+static int
+credit_cmp(a, b)
+  CREDIT *a, *b;
+{
+  int iSeq, jSeq;
+  int i, j;
+
+  iSeq = (a->type & CREDIT_FOLDER) ? 1 : 0;
+  jSeq = (b->type & CREDIT_FOLDER) ? 1 : 0;
+
+  i = j = 0;
+
+  if (!iSeq)
+    i = a->chrono;
+
+  if (!jSeq)
+    j = b->chrono;
+
+  if (!iSeq && !jSeq)
+    return (i == j) ? str_cmp(a->desc, b->desc) : (i - j);
+  else if (!jSeq)
+    return -1;
+  else if (!iSeq)
+    return 1;
+  else
+    return str_cmp(a->desc, b->desc);
+}
+
+static int
+credit_sort(xo)
+  XO *xo;
+{
+  if (vans("°õ¦æ¸ê®Æ±Æ§Ç¶Ü¡H[N] ") == 'y')
+  {
+    rec_sync(xo->dir, sizeof(CREDIT), credit_cmp, NULL);
+    return credit_load(xo);
+  }
+  else
+    return XO_NONE;
+}
+
+
+static int
+credit_move(xo)
+  XO *xo;
+{
+  CREDIT *credit;
+  int pos, cur, i;
+  char buf[40], ans[5];
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  credit = (CREDIT *) xo_pool + cur;
+
+  sprintf(buf, "½Ð¿é¤J²Ä %d ¿ï¶µªº·s¦ì¸m¡G", pos + 1);
+  if (vget(b_lines, 0, buf, ans, 5, DOECHO))
+  {
+    i = atoi(ans) - 1;
+    if (i < 0)
+      i = 0;
+    else if (i >= xo->max)
+      i = xo->max - 1;
+
+    if (i != pos)
+    {
+      if (!rec_del(xo->dir, sizeof(CREDIT), pos, NULL))
+      {
+        rec_ins(xo->dir, credit, sizeof(CREDIT), i, 1);
+        xo->pos = i;
+        return credit_load(xo);
+      }
+    }
+  }
+  return XO_FOOT;
+}
+
+static int
+Ask_creditTag(msg)
+  char *msg;
+/* ----------------------------------------------------- */
+/* return value :                                        */
+/* -1   : ¨ú®ø                                           */
+/* 0    : single article                                 */
+/* o.w. : whole tag list                                 */
+/* ----------------------------------------------------- */
+{
+  int num;
+  char buf_command[3] = {0};
+  char *menu[] = {buf_command,
+      "A  ¦¹¶µ°O±b¸ê®Æ",
+      "T  ¤w¼ÐÅÒ°O±b¸ê®Æ",
+      "Q  Â÷¶}", NULL};
+
+
+  if (num = TagNum)
+    strcpy(buf_command, "TQ");
+  else
+    strcpy(buf_command, "AQ");
+
+  if (num)      /* itoc.020130: ¦³ TagNum ¤~°Ý */
+  {
+    switch (pans(-1, -1, msg, menu))
+    {
+    case 'q':
+      return -1;
+
+    case 'a':
+      return 0;
+    }
+  }
+  return num;
+}
+
+
+int
+credit_gather(xo)
+  XO *xo;
+{
+  CREDIT *credit, xcredit;
+  int tag, locus;
+  char *dir, *folder;
+  time_t now;
+
+  folder = CreditAnchor;
+
+  if (!*folder)
+  {
+    zmsg("½Ð¥ý©wÁã¥H«á¦Aª½±µ¦¬¿ý¦Ü©wÁã°Ï");
+    return XO_NONE;
+  }
+
+  if (str_ncmp(folder, xo->dir, sizeof(CreditAnchor)) == 0)
+  {
+    zmsg("µLªk¦¬¿ý°O±b¸ê®Æ¡I\n¥Ø«e¸ê®Æ§¨¬°°O±b¤â¥¾©wÁã°Ï¡i£Z¡j¡C");
+    return XO_NONE;
+  }
+
+  tag = Ask_creditTag("¦¬¿ý¦Ü°O±b¤â¥¾©wÁã°Ï¡i£Z¡j");
+
+  if (tag < 0)
+    return XO_NONE;
+
+  dir = xo->dir;
+  credit = tag ? &xcredit : (CREDIT *) xo_pool + xo->pos - xo->top;
+
+  locus = 0;
+  now = time(0);
+
+  do
+  {
+    if (tag)
+      EnumTag(credit, dir, locus, sizeof(CREDIT));
+
+    if (credit->type & CREDIT_DATA)
+    {
+      credit->stamp = now + locus;
+      rec_add(folder, credit, sizeof(CREDIT));
+    }
+  } while (++locus < tag);
+
+  zmsg("°O±b¸ê®Æ¦¬¿ý§¹¦¨¡A¦ý¬O¸ê®Æ§¨¤£·|³Q¦¬¿ý¡C");
+
+  return XO_NONE;
+}
+
+static int
+credit_anchor(xo)
+  XO *xo;
+{
+  char *folder;
+  char *menu[] = {"QQ",
+      "A  ©wÁã",
+      "D  ©ÞÁã",
+      "J  ´N¦ì",
+      "Q  ¨ú®ø", NULL};
+
+
+  folder = CreditAnchor;
+
+  switch (pans(-1, -1, (*folder) ? "°O±b¤â¥¾¡i£Z¡j" : "°O±b¤â¥¾", menu))
+  {
+  case 'a':
+    strcpy(folder, xo->dir);
+    str_ncpy(CreditSailor, xo->xyz, sizeof(CreditSailor));
+    zmsg("°O±b¤â¥¾¤w©wÁã¡i£Z¡j");
+    break;
+  case 'd':
+    *folder = '\0';
+    zmsg("°O±b¤â¥¾¤w©ÞÁã");
+    break;
+  case 'j':
+    if (!*folder)                     /* ¨S¦³©wÁã´N¶i¤J¸ê·½¦^¦¬µ© */
+    {
+      zmsg("°O±b¤â¥¾©|¥¼©wÁã¡I");
+      return XO_NONE;
+    }
+
+    if (str_ncmp(folder, xo->dir, sizeof(CreditAnchor)) == 0)
+      return XO_NONE;
+
+    XoCredit(folder, CreditSailor);
+    return XO_INIT;
+    break;
+  }
+
+  /* return XO_NONE; */
+  return XO_NONE;   /* itoc.010726: §â b_lines ¶ñ¤W feeter */
+}
+
+static int
+credit_help(xo)
+  XO *xo;
+{
+  xo_help("credit");
+  return XO_HEAD;
+}
+
+
+static KeyFunc credit_cb[] =
+{
+  XO_INIT, credit_init,
+  XO_LOAD, credit_load,
+  XO_HEAD, credit_head,
+  XO_BODY, credit_body,
+
+  'r', credit_query,
+  'a', credit_add_data,
+  'f', credit_add_folder,
+  Ctrl('D'), credit_prune,
+  Ctrl('G'), credit_anchor,
+  'E', credit_change,
+  'T', credit_title,
+  's', credit_sum,
+  'd', credit_delete,
+  'D', credit_rangedel,
+  't', credit_tag,
+  'g', credit_gather,
+  'm', credit_move,
+  'S', credit_sort,
+  'h', credit_help
+};
+
+int
+f_exists(fpath)
+  char *fpath;
+{
+  int fd, fsize, ret;
+  struct stat st;
+
+  ret = 0;
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    if (fstat(fd, &st) || (fsize = st.st_size) > 0)
+      ret = 1;
+
+    close(fd);
+  }
+
+  return ret;
+}
+
+static int
+check_old_credit(void)
+{
+  int i;
+  char fpath[64], f_desc[64];
+  char buf[80];
+  CREDIT_OLD credit_old;
+  CREDIT credit;
+
+  usr_fpath(fpath, cuser.userid, FN_CREDIT);
+  if (!(f_exists(fpath)))
+    return 1;
+
+  if (vans("¨Ï¥Î«e¥²¶·¥ýÂà´«ÂÂª©°O±b¤â¥¾¸ê®Æ¡AÂàÀÉ¶Ü¡H[N] ") == 'y')
+  {
+    time_t now;
+
+    credit_fpath(f_desc, cuser.userid, FN_CREDIT);
+    i = 0;
+
+    now = time(0);
+    while (!(rec_get(fpath, &credit_old, sizeof(CREDIT_OLD), i)))
+    {
+        memset(&credit, 0, sizeof(CREDIT));
+        credit.stamp = now + i;
+        credit.type = CREDIT_DATA;
+        credit.chrono = make_time(credit_old.year,
+                                 credit_old.month,
+                                 credit_old.day);
+        credit.flag = credit_old.flag;
+        credit.money = credit_old.money;
+        credit.useway = credit_old.useway;
+        str_ncpy(credit.desc, credit_old.desc, sizeof(credit.desc));
+        rec_add(f_desc, &credit, sizeof(CREDIT));
+        i++;
+    }
+
+    sprintf(buf, "rm %s", fpath);
+    system(buf);
+    return 1;
+  }
+  return 0;
+}
+
+void
+XoCredit(folder, title)
+  char *folder;
+  char *title;
+{
+  XO *xo, *last;
+
+  last = xz[XZ_CREDIT - XO_ZONE].xo;    /* record */
+
+  xz[XZ_CREDIT - XO_ZONE].xo = xo = xo_new(folder);
+  xz[XZ_CREDIT - XO_ZONE].cb = credit_cb;
+  xo->xyz = title;
+
+  xover(XZ_CREDIT);
+  free(xo);
+
+  xz[XZ_CREDIT - XO_ZONE].xo = last;    /* restore */
+}
+
+int
+credit_main()
+{
+  char fpath[64];
+
+  credit_fpath(fpath, cuser.userid, NULL);
+  if (mkdir(fpath, 0700) != 0 && errno != EEXIST)
+  {
+    vmsg("«Ø¥ß°O±b¤â¥¾¥Ø¿ý®Éµo¥Í¿ù»~¡A½Ð¦V¯¸ªø´£¥X");
+    return XREDRAW;
+  }
+
+  if (check_old_credit())
+  {
+    credit_fpath(fpath, cuser.userid, FN_CREDIT);
+    XoCredit(fpath, "¥D­¶");
+  }
+
+  return 0;
+}
+
+#endif              /* HAVE_CREDIT */
+
+/* °O±b¤â¥¾ Help
+
+                          ¡¸¡i°O±b¤â¥¾¾Þ§@»¡©ú¡j¡¸
+   ¡i°ò¥»«ü¥O¡j¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+    (Enter/r/¡÷) °O±b¤â¥¾¥\¯à¿ï³æ
+    (a)          ·s¼W°O±b¸ê®Æ
+    (f)          ·s¼W¸ê®Æ§¨
+    (m)          ²¾°Ê¸ê®Æ¦ì¸m
+    (S)          ¸ê®Æ±Æ§Ç
+    (T)          ­×§ï°O±b¸ê®Æ»¡©ú
+    (E)          ­×§ï°O±b¸ê®Æ
+    (s)          ²Î­p°O±b¸ê®Æ
+    (^D/D)       ¼ÐÅÒ/½d³ò§R°£
+    (d)          §R°£¸ê®Æ
+    (t)          ¤Á´«¼ÐÅÒ
+    (^G)         °O±b¤â¥¾®üÁã
+    (g)          ¦¬¿ý°O±b¸ê®Æ(¤ä´©¼ÐÅÒ¥\¯à)
+    (h)          »¡©ú
+
+*/
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mTKyo [30m±q [31mcszone.twbbs.org [30mµoªí[m

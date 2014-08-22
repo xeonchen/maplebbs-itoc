@@ -1,0 +1,111 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¥Î¤ä²¼µoµ¹¥þ¯¸¼úª÷
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/18 Mon 08:40:31)                Updated: 2005/04/22
+
+¡° ¤Þ­z¡mjcw (©]ªÅ¤Uªº³Ç¦è)¡n¤§»Ê¨¥¡G
+> ª¦¤å¦³§ä¨ì¥H transacct ª½±µ¥[¿úªº¤èªk
+> ¥i¬O·Q»¡¬JµM¤w¸g¦³¤ä²¼³o»ò¤è«KªºªF¦è
+> ´N¹³¥þ¯¸³q§i¤@¼ËªºÂ²«K¤èªk
+> ¯à¥Î¤ä²¼µo¿úµ¹¥þ¯¸¨Ï¥ÎªÌ¶Ü¡H
+
+: util/Makefile
+
+EXE =   ... give_paycheck
+
+: util/give_paycheck.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* util/give_paycheck.c ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : µoµ¹¥þ¯¸¨Ï¥ÎªÌ¤ä²¼                           */
+/* create : 05/04/18                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#if 0
+
+  µ¹ itoc ¤@±i 100 »È 200 ª÷ ªº¤ä²¼
+  % ~/bin/give_paycheck 100 200 itoc
+
+  µ¹ sysop ¤@±i 100 »È 0 ª÷ ªº¤ä²¼
+  % ~/bin/give_paycheck 100 0 sysop
+
+  µ¹¥þ¯¸¨Ï¥ÎªÌ¦U¤@±i 50 »È 30 ª÷ ªº¤ä²¼
+  % ~/bin/give_paycheck 50 30
+
+  µ¹¥þ¯¸¨Ï¥ÎªÌ¤ä²¼­n°õ¦æ¤@¬q®É¶¡¡A½Ð­@¤ßµ¥­Ô
+
+#endif
+
+
+#include "bbs.h"
+
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  int money, gold;
+  char c, *str, buf[64];
+  struct dirent *de;
+  DIR *dirp;
+  PAYCHECK paycheck;
+
+  if (argc == 3 || argc == 4)
+  {
+    money = atoi(argv[1]);
+    gold = atoi(argv[2]);
+    if (money < 0 || gold < 0)
+      printf("money and gold should not be negative.\n");
+  }
+  else
+  {
+    printf("Usage: %s money gold [userid]\n", argv[0]);
+    return -1;
+  }
+
+  memset(&paycheck, 0, sizeof(PAYCHECK));
+  time(&paycheck.tissue);
+  paycheck.money = money;
+  paycheck.gold = gold;
+  strcpy(paycheck.reason, "[µo¿ú] ¯¸ªø");
+
+  if (argc == 4)
+  {
+    chdir(BBSHOME);
+    usr_fpath(buf, argv[3], FN_PAYCHECK);
+    rec_add(buf, &paycheck, sizeof(PAYCHECK));
+    return 0;
+  }
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    sprintf(buf, BBSHOME "/usr/%c", c);
+    chdir(buf);
+
+    if (!(dirp = opendir(".")))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      str = de->d_name;
+      if (*str <= ' ' || *str == '.')
+        continue;
+
+      sprintf(buf, "%s/" FN_PAYCHECK, str);
+      rec_add(buf, &paycheck, sizeof(PAYCHECK));
+    }
+
+    closedir(dirp);
+  }
+
+  return 0;
+}
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;45m¢c[42m¢i[m [1mMo[30mdi[mfy: [1;35m2005/04/18 Mon 08:41:30[m

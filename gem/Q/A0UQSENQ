@@ -1,0 +1,253 @@
+µo«H¤H: itoc.bbs@kulu.twbbs.org (¦Ñ¤Ò¤lªºÀY?!), ¬ÝªO: itoc
+¼Ð  ÃD: [¥\¯à] ¨Ï¥ÎªÌ¦Û©w¾×«H
+µo«H¯¸: ©BÂP©BÂP¤õÁç¯¸ (Sun Jun  2 17:19:08 2002)         Updated: 2003/06/26
+
+  ­ì¥»­n¼gÅý¨Ï¥ÎªÌ¦Û©w¾×«H¦Cªíªº
+  ¥i¬O«á¨Óµo²{¤j³¡¤Àªº user ³£Ãi±o½s :p
+  ©Ò¥H§ï¦¨¿ï¶µ¦¡ªº
+
+: struct.h
+
+typedef struct
+{
+  ...
+  ...
++ usint ncm;                    /* ©Ú¦¬¶l¥ó */
+}      ACCT;
+
+  ¥[Äæ¦ì·íµM­nÂà´« .ACCT
+
+
+: maple.p
+
++int u_reject(void);
+
+: acct.c ·s¼W¦¹¨ç¦¡
+
+int
+u_reject()
+{
+  cuser.ncm = bitset(cuser.ncm, 32, 32,
+    "½Ð¦Û¦æ½Õ¾ã¾×«H¦Cªí¡]¡½¬°¾×«H¡A¡¼¬°¤£¾×¡^¡G", reject_tbl);
+  vmsg("­n­«·s¤W¯¸¤~·|¶}©l¥Í®Ä");
+  return 0;
+}
+
+: menu.c ¥[¤J¿ï¶µ
+
++ u_reject, PERM_BASIC, M_UFILES,
++ "NoCeM      ¢u ¾×«H³]©w ¢t",
+
+: ufo.h ¥[¤J³o¬q
+
+#ifdef _ADMIN_C_
+static char *reject_tbl[] =
+{
+  "©Ú¦¬¥þ³¡ Internet ªº«H¥ó",
+  "©Ú¦¬¨Ó¦Û *.com.* ªº«H¥ó",
+  "©Ú¦¬¨Ó¦Û *.net.* ªº«H¥ó",
+  "©Ú¦¬¨Ó¦Û *.org.* ªº«H¥ó",
+  "0x00000010 «O¯d",
+  "0x00000020 «O¯d",
+  "0x00000040 «O¯d",
+  "0x00000080 «O¯d",
+  "0x00000100 «O¯d",
+  "0x00000200 «O¯d",
+  "0x00000400 «O¯d",
+  "0x00000800 «O¯d",
+  "0x00001000 «O¯d",
+  "0x00002000 «O¯d",
+  "0x00004000 «O¯d",
+  "0x00008000 «O¯d",
+  "©Ú¦¬¨Ó¦Û ¥xÆW(tw) ªº«H¥ó",
+  "©Ú¦¬¨Ó¦Û ¤¤°ê(cn) ªº«H¥ó",
+  "0x00040000 «O¯d",
+  "0x00080000 «O¯d",
+  "0x00100000 «O¯d",
+  "0x00200000 «O¯d",
+  "0x00400000 «O¯d",
+  "0x00800000 «O¯d",
+  "0x01000000 «O¯d",
+  "0x02000000 «O¯d",
+  "0x04000000 «O¯d",
+  "0x08000000 «O¯d",
+  "0x10000000 «O¯d",
+  "0x20000000 «O¯d",
+  "0x40000000 «O¯d",
+  "0x80000000 «O¯d",
+};
+#endif
+
+: bmtad.c bbs_mail()
+
+  /* Thor.990617: get file stat */
+  if (!stat(folder, &st) && st.st_size > MAX_BBSMAIL * sizeof(HDR))
+  {
+    fprintf(fp, "MAIL-\t[%d] <%s> over-spammed\n", sno, userid);
+    return -1;
+  }
+
++  /* user reject */
++ if (user_reject(ap->addr, userid))
++ {
++   fprintf(fp, "MAIL-\t[%d] <%s> user reject\n", sno, userid);
++   return -3;
++ }
+
+  /* allocate a file for the new mail */
+
+: bbsmail.c mail2bbs()
+
+  if (st.st_size > MAX_BBSMAIL * sizeof(HDR))
+  {
+    close(fx);
+    sprintf(buf, "BBS user <%s> over-spammed", userid);
+    mailog(buf);
+    puts(buf);
+    return EX_NOUSER;
+  }
+
++  /* user reject */
++ if (user_reject(sender, userid))
++ {
++   close(fx);
++   sprintf(buf, "BBS user <%s> rejected", userid);
++   mailog(buf);
++   puts(buf);
++   return EX_NOUSER;
++ }
+
+: bmtad.c bbs_mail() «e­±¥[¤J³o¨Ç¨ç¦¡
+: bbsmail.c mail2bbs() «e­±¥[¤J³o¨Ç¨ç¦¡
+
+static int
+str_area(from, domain)
+  char *from;
+  char *domain;         /* .tw .cn ¤§Ãþªº */
+{
+  int len1, len2;
+  char *str;
+
+  len1 = strlen(from) - 1;
+  len2 = strlen(domain) - 1;
+
+  if (len1 < len2)
+    return 0;
+
+  str = from + len1;
+  for (; len2 >= 0; len2--)
+  {
+    if (domain[len2] != *str)
+      return 0;
+    str--;
+  }
+
+  return 1;
+}
+
+
+static int
+str_last(from, domain)
+  char *from;
+  char *domain;         /* .com.* .org.* .net.* ¤§Ãþªº */
+{
+  int len1, len2;
+  char *str;
+
+  if (str_area(from, domain))   /* from ªºµ²§À¤w match domain */
+    return 1;
+
+  len1 = strlen(from) - 4;      /* §â .tw °£¥h¦A¤ñ¸û¤@¦¸ */
+  len2 = strlen(domain) - 1;
+
+  if (len1 < len2)
+    return 0;
+
+  str = from + len1;
+  for (; len2 >= 0; len2--)
+  {
+    if (domain[len2] != *str)
+      return 0;
+    str--;
+  }
+
+  return 1;
+}
+
+
+static inline int         /* 1: reject */
+user_reject(addr, userid) /* itoc.020602: ¨Ï¥ÎªÌ¦Û­q¾×«H¦Cªí */
+  char *addr;
+  char *userid;
+{
+  ACCT cuser;
+  int ncm;
+  char author[80], *from;
+
+  sprintf(author, "usr/%c/%s/.ACCT", *userid, userid);  /* ­É¥Î author ncm */
+  if ((ncm = open(author, O_RDONLY)) < 0)
+  {
+    return 0;
+  }
+  if (read(ncm, &cuser, sizeof(ACCT)) != sizeof(ACCT))
+  {
+    close(ncm);
+    return 0;
+  }
+  close(ncm);
+  ncm = cuser.ncm;
+
+  strcpy(author, addr);
+  from = strchr(author, '@');
+  *from = '\0';
+  from++;
+
+  /* §ï¥H¤Uµ{¦¡½Ð¶¶«K§ï ufo.h ¤¤ªº reject_tbl[] */
+
+  if ((ncm & 0x000001) ||                             /* ©Ú¦¬¨Ó¦Û Internet */
+
+    (ncm & 0x00000002 && str_last(from, ".com")) ||   /* ©Ú¦¬¨Ó¦Û *.com.* */
+    (ncm & 0x00000004 && str_last(from, ".net")) ||   /* ©Ú¦¬¨Ó¦Û *.net.* */
+    (ncm & 0x00000008 && str_last(from, ".org")) ||   /* ©Ú¦¬¨Ó¦Û *.org.* */
+
+    (ncm & 0x00010000 && str_area(from, ".tw")) ||    /* ©Ú¦¬¨Ó¦Û ¥xÆW(tw) */
+    (ncm & 0x00020000 && str_area(from, ".cn")))      /* ©Ú¦¬¨Ó¦Û ¤¤°ê(cn) */
+  {
+    return 1;
+  }
+
+  return 0;
+}
+
+> ------------------- §¹¦¨ ------------------------ <
+
+¦pªG¥H«á­nÂX¥R¡A´N§ï bmtad.c user_reject() ¤Î ufo.h reject_tbl[]
+
+<<½d¨Ò¤@>>
+
+: reject_tbl[]
+  "0x00000010 «O¯d", §ï¬° "©Ú¦¬¨Ó¦Û *.gov.* ªº«H¥ó",
+
+: user_reject()
++   (ncm & 0x00000010 && str_last(from, ".gov")) ||   /* ©Ú¦¬¨Ó¦Û *.gov.* */
+
+
+<<½d¨Ò¤G>>
+
+: reject_tbl[]
+  "0x00040000 «O¯d", §ï¬° "©Ú¦¬¨Ó¦Û ¤é¥»(jp) ªº«H¥ó",
+
+: user_reject()
++   (ncm & 0x00040000 && str_area(from, ".jp")) ||    /* ©Ú¦¬¨Ó¦Û ¤é¥»(jp) */
+
+
+<<½d¨Ò¤T>> ·íµM§A¤]¥i¥H¦Û©w³W«h
+
+: reject_tbl[]
+  "0x00000400 «O¯d", §ï¬° "©Ú¦¬§@ªÌ§t¦³ fuck ¦r²´",
+
+: user_reject()
++   (ncm & 0x00000400 && strstr(author, "fuck")) ||    /* ©Ú¦¬§@ªÌ fuck */
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

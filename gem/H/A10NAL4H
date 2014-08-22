@@ -1,0 +1,47 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¯à¤£¯à¹³µL¦WªºÂIºq­p¶O¤è¦¡ ?
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/20 Wed 00:48:55)                Updated: 2004/10/20
+
+¡° ¤Þ­z¡mallean.bbs@micro.bio.ncue.edu.tw (allean)¡n¤§»Ê¨¥¡G
+>     ÂI¤@­ººq 100 ¶ô °Î¦W°u¦¬¤@¤d
+>     ÂI¦h­ººq®É ²Ä¤@­º 1000 ¶ô
+>                ²Ä i­º 10+1000(i-1)¶ô
+
+: song.c:song_order()
+
+- if (count_ktv() >= 3)         /* ­­¨îÂI¤T­º */
+- {
+-   vmsg("¹L¥h¤G¤Q¥|¤p®É¤º±z¤wÂI¿ï¹L¦hºq¦±");
+-   return XO_FOOT;
+- }
+
+- if (cuser.money < 1000)
+- {
+-   vmsg("­n 1000 »È¹ô¤~¯àÂIºq¨ì¬ÝªO³á");
+-   return XO_FOOT;
+- }
+
+  ...
+  ...
+
+  annoy = vans("·Q­n°Î¦W¶Ü(Y/N)¡H[N] ") == 'y';
+
++ fd = count_ktv() * 1000 + 100; /* ÂI²Äi­º­nªá 100+1000*i ¤¸ */
++ if (annoy)
++   fd += 500;                  /* °Î¦W¦A¥[ 500 */
++ if (cuser.money < fd)
++ {
++   sprintf(buf, "­n %d »È¹ô¤~¯àÂIºq¨ì¬ÝªO³á", fd);
++   vmsg(buf);
++   return XO_FOOT;
++ }
+
+  ...
+  ...
+
+- cuser.money -= 1000;
++ cuser.monery -= fd;
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

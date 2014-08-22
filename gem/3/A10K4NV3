@@ -1,0 +1,36 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]Ãö©óªO¤Í²M³æ
+®É¶¡: 2004/09/07 Tue 11:27:49                           Updated: 2005/01/05
+
+¡° ¤Þ­z¡mScottYu.bbs@scottyu.twbbs.org (©]¥úªü¯S -¤j®a±ß¦w)¡n¤§»Ê¨¥¡G
+> ¦b±q¯µ±K¡B¦n¤Í¬ÝªO¤Á´«¦¨¤@¯ë¬ÝªO®É¡A
+> ©Î¬O±q¤@¯ë¬ÝªO¤Á´«¦¨¯µ±K¡B¦n¤Í¬ÝªO®É¡A
+> ªO¤Í´NÅÜ¤ô±í¡A©Î¤ô±í´NÅÜ¦¨ªO¤Í¡A
+> ¦pªG¦W³æ¤@¦h²¾°£­«¥[¨Ã¤£¤è«K¡C
+> §Æ±æ¯à¤Á´«¬ÝªOÄÝ©Ê«á¯à¸ß°Ý¬O§_ª½±µ²M±¼¦W³æ¡C
+
+: manage.c:post_brdlevel()
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
++   if (vans("¬O§_²M°£¦n¤Í/¤ô±í¦W³æ(Y/N)¡H[N] ") == 'y')
++   {
++     if ((oldbrd->readlevel == 0 &&
++       (newbrd.readlevel == PERM_BOARD || newbrd.readlevel == PERM_SYSOP)) ||
++       (newbrd.readlevel == 0 &&
++       (oldbrd->readlevel == PERM_BOARD || oldbrd->readlevel == PERM_SYSOP)))
++     {
++       static void bpal_cache();
++       char fpath[64];
++       brd_fpath(fpath, currboard, fn_pal);
++       unlink(fpath);
++       bpal_cache();
++     }
++   }
+  }
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mpc512-2.ee.nctu.edu.tw [30mµoªí[m

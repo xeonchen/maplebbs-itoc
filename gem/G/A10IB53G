@@ -1,0 +1,27 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¼W¥[Äæ¦ì»¡©ú
+®É¶¡: Sun Aug 17 16:08:35 2003                          Updated: 2007/04/12
+
+  ­Y¦³ÅÜ°Ê struct ACCT ³£»Ý­nÂà´« .ACCT
+  Âà´«ªº¤è¦¡¦p¤U¡G
+
+  1. Ãö¯¸ (°õ¦æ src/sh/killbbs.sh)
+          (­Y¬O Cygwin «h¬O°õ¦æ killbbs.bat)
+
+  2. °õ¦æ bin/backupacct ¨Ó³Æ¥÷¥þ¯¸ªº .ACCT  (­Y¦³«H¤ß¤£·|¥X¿ù¡A¦¹¨BÆJ¥i¸õ¹L)
+
+  3. ±N src/include/struct.h:struct ACCT ·Ó§Û¥h
+     src/util/tran/transacct.c:struct OLD
+
+  4. ·Ó patch ¸Ì­±©Ò¼gªº¡A¹ïµ{¦¡°µ­×§ï
+     ¨Ã¦b src/include/struct.h:struct ACCT ¥[·sÄæ¦ì
+
+  5. ±N²§°Ê¹L«áªº src/include/struct.h:struct ACCT ·Ó§Û¥h
+     src/util/tran/transacct.c:struct NEW
+
+  6. ­«·s½sÄ¶µ{¦¡¡A¨Ã°õ¦æ bin/transacct
+
+  7. ¶}¯¸ (­«·s¶}¾÷)
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

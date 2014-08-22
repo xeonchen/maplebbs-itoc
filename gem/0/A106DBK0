@@ -1,0 +1,114 @@
+µo«H¤H: hession.bbs@ccudream.twbbs.org (Be myself-§@¦Û¤v-) ¬ÝªO: plan
+¼Ð  ÃD: Re: ³]©w¬ÝªOÄÝ©Ê-> Åý¨Ï¥ÎªÌ¶K¤å«á¤£±o§R°£
+µo«H¯¸: ¤¤¥¿¿v¹Ú¶é (2004/03/27 Sat 12:14:14)              Updated: 2006/08/25
+
+¦]¬° ¦³¨Ç¬ÝªO¤£·QÅý¨Ï¥ÎªÌ§R¤å
+©Ò¥H§Ú¸ÕµÛ¥h§ï
+¦ý¬O ¤£¼ô±xª©¥DªºÅv­­ªº¶}©ñ«ç»ò§@
+
+[1;33;40m§Ú§Æ±æ¸Ó¬Ýª©¦b¸g¹L³]©w«á
+°£¤F ¸Óª©ª©¥D¤Î¯¸ªø¦³Åv §R¤å ©Î­×§ï¤å³¹¤§¥~
+¨ä¾l«D¸Óª©ªºª©¥D ¤£±o§R¤å[m
+
+¥H¤U¬O§Ú¸ÕµÛ§@ªº­×§ï
+§Æ¾¬¦U¦ìªº«ü¾É
+=============================================
+
+: battr.h
+
+#define BRD_ANONYMOUS   0x20    /* °Î¦W¬ÝªO */
++ #define BRD_NODEL       0x40    /* hession.040313: ¤£±o§R¤å¬ÝªO */
+
+  ...
+  ...
+
+- #define NUMBATTRS       6
++ #define NUMBATTRS       7
+
+- #define STR_BATTR       "zTcsvA"
++ #define STR_BATTR       "zTcsvAD"
+
+: battr.h:battr_tbl[]
+
+  "°Î¦W¬ÝªO",                   /* BRD_ANONYMOUS */
++ "¤£±o§R¤å¬ÝªO"                /* hession.040310: BRD_NODEL */
+
+: post.c:post_delete()
+
+  if (!cuser.userlevel ||
+    !strcmp(currboard, BN_DELETED) ||
+    !strcmp(currboard, BN_JUNK))
+    return XO_NONE;
+
++ if ((currbattr & BRD_NODEL) && !(bbstate & STAT_BOARD))
++   return XO_NONE;  /* hession.040310: ¨Ï¬ÝªO¶K¤åªÌµLªk§R¤å */
+
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ¦pªG§Æ±æ¶}©ñµ¹ªO¥D¦Û¦æ³]©w
+
+: manage.c §â¥H¤U³o¬q¥[¦b post_battr_noscore() «á­±
+
+static int
+post_battr_nodel(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("1)§@ªÌ¥i¥H§R°£¤å³¹ 2)§@ªÌ¤£¥i§R°£¤å³¹ [Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_NODEL;
+    break;
+  case '2':
+    newbrd.battr |= BRD_NODEL;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+#  ifdef HAVE_SCORE
+    "Score   ³]©w¥i§_µû¤À",
+#  endif
++   "Delete  §R°£¤å³¹³]©w",
+
+  ...
+  ...
+
+#  ifdef HAVE_SCORE
+    " (S)µû¤À"
+#  endif
++   " (D)§R°£"
+
+  ...
+  ...
+
+#ifdef HAVE_SCORE
+  case 's':
+    return post_battr_noscore(xo);
+#endif
+
++ case 'd':
++   return post_battr_nodel(xo);
+
+--
+[m[1;33m¡´[36m     [37m£»[36m    [37m£»[36m ¢¨¢h¢© ¢¨¢h¢© ¢h  ¢h ¢i¢h¢© ¢i¢h¢© ¢i¢h¢© ¢¨¢h¢© ¢i¢h¢p   [33m¡þ[m
+  [1m£»[m [1;33m¢­[37m         ¢i     ¢i     ¢i  ¢i ¢i  ¢p ¢i  ¢p ¢i¢g   ¢i¢g¢p ¢p¢p¢p [33m¡¹[m
+[32m¢¨[37;42m     [1;33m¡¹[37m£»     [33m¢ª¢i¢« ¢ª¢i¢« ¢ª¢i¢« ¢i¢i¢« ¢i¢ª¢g ¢i¢g¢« ¢i  ¢p ¢p¢p¢p[37m£»[;37;42m  [32;40m¢©[m
+[32;42m  [1;37m¢Ñ¢Ò¢Ð¢Ð¢á  [32m¤¤¥¿[35m¿v¹Ú¶é[36mBBS¯¸ [31mÅwªï»YÁ{°ÑÆ[[32m cd.twbbs.org  (140.123.20.230)[36m [;37;42m   [m
+[1;32m http://cd.twbbs.org[;32;40m¢ª[30;42m [1;33m [37m¡¯[32m [37mAuthor:[;30;42m hession     [1;37m¡¹ From:[;30;42m 218.165.154.245 [1;32m  [33m [;32;40m¢«[m

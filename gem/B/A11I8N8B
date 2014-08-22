@@ -1,0 +1,88 @@
+µo«H¤H: tsaikd.bbs@bbs.tsaikd.org (¤d¤H±Ù) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] Ãö©ó­º­¶
+µo«H¯¸: ¦a¤U´cÅ]«° (2005/09/11 Sun 12:39:12)
+
+¡° ¤Þ­z¡mFish.bbs@cpu.tfcis.org (³½²Â³½Äø§b§b³½)¡n¤§»Ê¨¥¡G
+>     ¦]¬°¦³°õ¦æ bhttpd
+>     ©Ò¥H²{¦b¾÷¾¹ªº­º­¶¬O bhttpd ªº­º­¶
+>     ¨º§Ú¦pªG§Æ±æ¤@¶i¤J¾÷¾¹ªº­º­¶¬O¨ä¥L­º­¶
+>     ¦ì§}­n¬O http://MyAddress/bbs ¤~¶i¤J bhttpd ªº­º­¶
+
+  ­º¥ý¡A±N bhttpd §ï port
+
+: config.h
+
+- #define BHTTP_PORT      80
++ #define BHTTP_PORT      8000
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ­Y¬O FreeBSD¡A«h³o¼Ë°µ
+
+: /etc/service ¥[¤J
+
+bhttp           8000/tcp    www www-http         #Web BBS
+bhttp           8000/udp    www www-http         #Web BBS
+
+: /etc/inetd.conf ¥[¤J
+
+bhttp   stream  tcp     wait    bbs     /home/bbs/bin/bhttpd    bhttpd -i
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ­Y¬O Linux¡A«h³o¼Ë°µ
+
+: /etc/xinetd.d/http §ï¦^ apache ªº
+
+service http
+{
+        disable         = no
+        socket_type     = stream
+        protocol        = tcp
+        wait            = no
+        user            = nobody
+        server          = /home/apache/bin/httpd
+        nice            = 5
+        log_on_sucess   -= HOST PID
+}
+
+: /etc/xinetd.d/bhttp ·s¼W¦¹ÀÉ®×
+
+service bhttp
+{
+        disable         = no
+        flags           = REUSE
+        socket_type     = stream
+        wait            = yes
+        user            = bbs
+        server          = /home/bbs/bin/bhttpd
+        port            = 8000
+        server_args     = -i
+}
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ±µµÛ apache ¥Î vhost¡A¥[¤J³o­Ó³]©w
+
+<VirtualHost bbs.tsaikd.org:80>
+    DocumentRoot "/var/www/localhost/htdocs"
+    ServerName "bbs.tsaikd.org"
+    Redirect "/" "http://bbs.tsaikd.org:8000/"
+</VirtualHost>
+
+¶i¨ì http://bbs.tsaikd.org/ ´N·|Âà¦¨ http://bbs.tsaikd.org:8000/
+
+Redirect ´N¬OÂà§}ªº°Ê§@
+
+¬ÛÃöªº³]©w§ä google ·|¤ñ¸û¸Ô²Ó...^_^
+
+--
+ [7;30;41m¤d        ¤H         ±Ù    KD !![m [1;31m¦a¤U´cÅ]«° [32mtelnet://bbs.tsaikd.org[m
+ [1;37;44mK[m [1;37;44mD[melete         ±þ±þ±þ [31m±þ¨ì§A²æ¿Ç¤l "©ñ§¾" !![m
+ i    ~~ [1;31m¡´[m     [1;5;33m¢e¢d¢c¢b[m       ¡s¡·    ¡s¡·    ¡s¡· §Ö°k°Ú!!
+ l    ~~ ¢«¡Ã¡Ã                  ¢«¡t    ¢«¡t    ¢«¡t
+ o   ~ ¡þ¡ý                  ..¡t¡r....¡t¡r....¡t¡r[m
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m ¦¨¤j¸ê°T£»¦a¤U´cÅ]«° [36;47m bbs.tsaikd.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mtsaikd [30m±q [31m140.116.103.204 [30mµoªí[m

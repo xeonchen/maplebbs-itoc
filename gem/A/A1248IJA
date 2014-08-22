@@ -1,0 +1,45 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: Re: ∏m©≥•\Ø‡¶p¶Û≠≠®ÓΩgº∆ ?
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2006/04/13 Thu 09:46:22)                Updated: 2006/04/17
+
+°∞ §ﬁ≠z°mguessi.bbs@bbs.wretch.cc°n§ßª ®•°G
+> ∑Q±N∏m©≥º∆∂q≠≠®Ó¶b§≠Ωg ∏”¶p¶Û∞µ©O ?
+
+: post.c:post_bottom()
+
+  if (bbstate & STAT_BOARD)
+  {
+    HDR *hdr, post;
+    char fpath[64];
++   int fd, fsize;
++   struct stat st;
+
++   if ((fd = open(xo->dir, O_RDONLY)) >= 0)
++   {
++     if (!fstat(fd, &st))
++     {
++       fsize = st.st_size;
++       while ((fsize -= sizeof(HDR)) >= 0)
++       {
++         lseek(fd, fsize, SEEK_SET);
++         read(fd, &post, sizeof(HDR));
++         if (!(post.xmode & POST_BOTTOM))
++           break;
++       }
++     }
++     close(fd);
++     if ((st.st_size - fsize) / sizeof(HDR) > 5)
++     {
++       vmsg("∏m©≥§Â§£Ø‡∂WπL§≠Ωg");
++       return XO_FOOT;
++     }
++   }
+
+    hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+    hdr_fpath(fpath, xo->dir, hdr);
+    hdr_stamp(xo->dir, HDR_LINK | 'A', &post, fpath);
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m itoc.Dorm11.NCTU.edu.tw  [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

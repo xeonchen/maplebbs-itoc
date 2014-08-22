@@ -1,0 +1,46 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]¦³Á|¿ì§ë²¼or½ä½L¦P®É¦bªO¤Wpo¤å
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/06/09 Thu 03:13:06)                Updated: 2005/06/09
+
+¡° ¤Þ­z¡mdreambird.bbs@bbs.wretch.cc (bird)¡n¤§»Ê¨¥¡G
+> ¦³Á|¿ì§ë²¼or½ä½L¦P®É¦bªO¤Wpo¤å
+
+  ¥ý°µºëµØ°Ï
+  [¥\¯à] post.c µo¤å¨ì¬ÝªO
+
+: vote.c:vote_add()
+
+static int
+vote_add(xo)
+  XO *xo;
+{
++ FILE *fp;
+
+  ...
+  ...
+
+  rec_add(dir, &vch, sizeof(vch));
+
++ sprintf(fpath, "tmp/vote.%s", cuser.userid);
++ if (fp = fopen(fpath, "w"))
++ {
++   sprintf(title, "¥»ªO¶}©l%s", vch.vgamble == '$' ? "½ä½L" : "§ë²¼");
++
++   /* ¤å³¹ÀÉÀY */
++   fprintf(fp, "%s %s (%s)\n", str_author1, cuser.userid, cuser.username);
++   fprintf(fp, "¼ÐÃD: %s\n®É¶¡: %s\n\n", title, Now());
++
++   /* ¤å³¹¤º®e */
++   fprintf(fp, "%s\n%s\n", title, vch.title);
++   fclose(fp);
++
++   add_post(currboard, fpath, title);
++   unlink(fpath);
++ }
+
+  vmsg("¶}©l§ë²¼¤F¡I");
+  return vote_init(xo);
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

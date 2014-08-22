@@ -1,0 +1,39 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]Ãö©ó¯d¨¥ª©
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/11/16 Tue 17:19:21)                Updated: 2005/04/12
+
+¡° ¤Þ­z¡mimd.bbs@bbs.wretch.cc (ºN¯Á¤¤)¡n¤§»Ê¨¥¡G
+> ¦³¿ìªk­­¨î¨Ï¥ÎªÌ¦b¦h¤[®É¶¡¤º(¨Ò¦p¥b¤p®É©Î¤@¤p®É)
+> µLªk¦b¯d¨¥ª©¯d¨¥©O
+
+: menu.c:pad_draw()
+
+  static char pcolors[6] = {31, 32, 33, 34, 35, 36};
++ struct stat st;
++ char fpath[64];
+
++ usr_fpath(fpath, cuser.userid, "pad_draw");
++ if (!stat(fpath, &st))
++ {
++   if (st.st_mtime > time(0) - 30 * 60)   /* 30 ¤ÀÄÁ¤~¯à¯d¨¥¤@¦¸ */
++   {
++     vmsg("¨C¤T¤Q¤ÀÄÁ¥u¯à¯d¨¥¤@¦¸");
++     return XEASY;
++   }
++ }
+
+  ...
+  ...
+
+  } while (cc == 'e');
+
+  time(&(pad.tpad));
++ if ((cc = open(fpath, O_WRONLY | O_CREAT)) >= 0)
++ {
++   write(cc, fpath, 1);
++   close(cc);
++ }
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mpc512-2.EE.NCTU.edu.tw [30mµoªí[m

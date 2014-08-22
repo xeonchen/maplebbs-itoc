@@ -1,0 +1,106 @@
+µo«H¤H: itoc.bbs@wretch.twbbs.org (Midlife Crisis) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] ¬ÝªOÄÝ©Ê
+µo«H¯¸: µL¦W¤p¯¸ (2004/01/28 Wed 18:09:28)                Updated: 2004/03/24
+
+¡° ¤Þ­z¡mcco.bbs@bbs.c-co.net (Micro-BOY!)¡n¤§»Ê¨¥¡G
+> §Ú·QÅý ¯S©w¬ÝªO ¨Ò¦p KTV ªO
+> ÂIºqªº¤H¤£¯à¥h¸ÓªO¦Û¦æ§âºq§R°£±¼
+> §ó¸Ô²Ó¤@ÂI»¡´N¬O¨î©w¬ÝªO§R°£Åv­­
+> ³]©w¬Y¬ÝªO§R°£Åv­­Âk ¦ó¤H©Ò¦³
+
+  §ï struct BRD¡A­nÂà´« .BRD
+
+: global.h
+
+#define MSG_READPERM    "¾\\ÅªÅv­­¡G"
+#define MSG_POSTPERM    "µoªíÅv­­¡G"
++ #define MSG_DELPERM    "§R°£Åv­­¡G"
+
+: struct.h:struct BRD
+
+  usint readlevel;              /* ¾\Åª¤å³¹ªºÅv­­ */
+  usint postlevel;              /* µoªí¤å³¹ªºÅv­­ */
++ usint dellevel;               /* §R°£¤å³¹ªºÅv­­ */
+
+: acct.c:brd_set()
+
+  case 'c':
+    brd->readlevel = PERM_SYSOP;        /* ¯µ±K¬ÝªO */
+    brd->postlevel = 0;
++   brd->dellevel = 0;
+    brd->battr |= (BRD_NOSTAT | BRD_NOVOTE);
+    break;
+
+  case 'd':
+    brd->readlevel = PERM_BOARD;        /* ¦n¤Í¬ÝªO */
+    brd->postlevel = 0;
++   brd->dellevel = 0;
+    brd->battr |= (BRD_NOSTAT | BRD_NOVOTE);
+    break;
+
+  case 'a':
+    brd->readlevel = 0;
+    brd->postlevel = PERM_POST;
++   brd->dellevel = 0;
+    brd->battr &= ~(BRD_NOSTAT | BRD_NOVOTE);
+    break;
+
+  case 'b':
+    if (vget(++i, 0, "¾\\ÅªÅv­­(Y/N)¡H[N] ", buf, 3, LCECHO) == 'y')
+    {
+      brd->readlevel = bitset(brd->readlevel, NUMPERMS, NUMPERMS,
+        MSG_READPERM, perm_tbl);
+      move(2, 0);
+      clrtobot();
+      i = 1;
+    }
+
+    if (vget(++i, 0, "µoªíÅv­­(Y/N)¡H[N] ", buf, 3, LCECHO) == 'y')
+    {
+      brd->postlevel = bitset(brd->postlevel, NUMPERMS, NUMPERMS,
+        MSG_POSTPERM, perm_tbl);
+      move(2, 0);
+      clrtobot();
+      i = 1;
+    }
+
++   if (vget(++i, 0, "§R°£Åv­­(Y/N)¡H[N] ", buf, 3, LCECHO) == 'y')
++   {
++     brd->dellevel = bitset(brd->dellevel, NUMPERMS, NUMPERMS,
++       MSG_DELPERM, perm_tbl);
++     move(2, 0);
++     clrtobot();
++     i = 1;
++   }
+    break;
+
+: post.c:post_delete()
+
+  if (!cuser.userlevel ||
+    !strcmp(currboard, BN_DELETED) ||
+    !strcmp(currboard, BN_JUNK))
+    return XO_NONE;
+
++ if (!HAS_PERM((bshm->bcache + currbno)->dellevel))
++ {
++   vmsg("±zµLªk§R°£¥»ªO¤å³¹");
++   return XO_FOOT;
++ }
+
+: post.c:post_rangedel()
+
+  if (!(bbstate & STAT_BOARD))
+    return XO_NONE;
+
++ if (!HAS_PERM((bshm->bcache + currbno)->dellevel))
++ {
++   vmsg("±zµLªk§R°£¥»ªO¤å³¹");
++   return XO_FOOT;
++ }
+
+--
+[1;30;40m¤Ò§LªÌ¤£²»¤§¾¹ª«©Î´c¤§¬G¦³¹DªÌ¤£³B§g¤l©~«h¶Q¥ª¥Î§L«h¶Q¥k§LªÌ¤£²»¤§¾¹«D§g¤l[m
+[1;30m¤§¾¹¤£±o¤w[37mBLOG http://wretch.twbbs.org/blog ¦w¦è±Ð½m §Ú·Q¼g¤é°O ¶ã¶ã[30m©ó¤Ñ¤U[m
+[1;30m¨o¦N¨Æ©|¥ª¤¿¨Æ©|¥k°¾±N­x©~¥ª¤W±N­x©~¥k¨¥¥H³àÂ§³B¤§±þ¤H¤§²³¥H«s´dª_¤§¾Ô³Ó¥H[m
+[1;30m³àÂ§³B¤§¹D±`[37mµL¦W[30m¾ëÁö¤p¤Ñ¤U²ö¯à¦Ú«J¤ý­Y¯à¦u¤§¸Uª«±N¦Û»«¤Ñ¦a¬Û¦X¥H­°¥ÌÅS¥Á²ö[m
+[1;30m¤§¥O¦Ó¦Û§¡©l¨î¦³¦W¦W¥ç¬J¦³¤Ò¥ç±Nª¾¤îª¾¤î¥i¥H [37m94.177.30.61.isp.tfn.net.tw[30m®ü[m

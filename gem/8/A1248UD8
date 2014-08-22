@@ -1,0 +1,32 @@
+µo«H¤H: kevinblue.bbs@cpu.tfcis.org (³Í¤åÂÅ) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] stardict¥»¾÷¦r¨å
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/04/18 Tue 11:22:12)                Updated: 2006/04/18
+
+¥ÎAJAX½u¤W¦r¨å + dreye.c §ïªº...
+
+¦r¨å¨Ó·½            : http://stardict.sourceforge.net/
+½u¤W¦r¨å(­ì§@ªÌºô­¶): http://gais4.cs.ccu.edu.tw/~sys89/ajaxdict.html
+Autor¡Gsyshen@gmail.com
+
+http://opensvn.csie.org/nightlessbbs/trunk/src/game/ajaxdict.c
+http://opensvn.csie.org/nightlessbbs/trunk/src/dict/query.c
+http://opensvn.csie.org/nightlessbbs/trunk/src/dict/Makefile
+
+http://opensvn.csie.org/nightlessbbs/trunk/src/dict/
+
+# src/dict
+# Makefile
+# cdict-big5.dict
+# cdict-big5.idx
+# cdict-big5.ifo
+# cdict-big5.l1idx
+# query.c
+
+¦]¬°dreye¤Ó¾÷¨®
+©Ò¥H¦Û¤v§ï¤F¤@­Óµ¹bbs¬d¸ß...
+¦³»Ý­n½Ð¦Û¤vsvn¤U¨Ó§a
+
+·PÁÂ­ì§@ªÌsyshen <(_ _)>
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1mpc142.wireless2.scu.edu.tw[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

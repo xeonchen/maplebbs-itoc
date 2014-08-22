@@ -1,0 +1,69 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [½Ð¯q] ­×§ï¤å³¹³Æ¥÷°ÝÃD
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/05/24 Tue 18:55:31)                Updated: 2007/04/26
+
+¡° ¤Þ­z¡mRagnarok (§b§bØp(¡Ù¡ó¡ó¡Ø))¡n¤§»Ê¨¥¡G
+> §Ú·Q¹³ JUNK/DELETED ¤@¼Ë³Æ¥÷³Q­×§ï¹Lªº¤å³¹(½s¿è«eªº¤º®e)¡A¦s¨ì BN_MODIFY ªO
+> §Ú·Q³Ì®e©öªº¤èªk¦n¹³¬O¦b post_edit() ¤¤¡A¦b¶i¤Jvedit()«e½Æ»s¤@¥÷¤º®e¦Ü¸ÓªO¡C
+
+: post.c:post_edit()
+
+  char fpath[64];
++ char folder[64];
+  HDR *hdr;
++ HDR xpost;
+  FILE *fp;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+  hdr_fpath(fpath, xo->dir, hdr);
++ brd_fpath(folder, BN_JUNK, fn_dir);
+
+  if (HAS_PERM(PERM_ALLBOARD))                  /* ¯¸ªø­×§ï */
+  {
+#ifdef HAVE_REFUSEMARK
+    if (!chkrestrict(hdr))
+      return XO_NONE;
+#endif
++   hdr_stamp(folder, HDR_COPY | 'A', &xpost, fpath);
++   strcpy(xpost.owner, hdr->owner);
++   strcpy(xpost.nick, hdr->nick);
++   strcpy(xpost.title, hdr->title);
+-   vedit(fpath, 0);
++   if (!vedit(fpath, 0))
++   {
++     rec_bot(folder, &xpost, sizeof(HDR));
++     btime_update(brd_bno(BN_JUNK));
++   }
++   else
++   {
++     hdr_fpath(fpath, folder, &xpost);
++     unlink(fpath);
++   }
+  }
+  else if (cuser.userlevel && !strcmp(hdr->owner, cuser.userid))
+  {
++   hdr_stamp(folder, HDR_COPY | 'A', &xpost, fpath);
++   strcpy(xpost.owner, hdr->owner);
++   strcpy(xpost.nick, hdr->nick);
++   strcpy(xpost.title, hdr->title);
+    if (!vedit(fpath, 0))       /* ­Y«D¨ú®ø«h¥[¤W­×§ï¸ê°T */
+    {
+      if (fp = fopen(fpath, "a"))
+      {
+        ve_banner(fp, 1);
+        fclose(fp);
+      }
++     rec_bot(folder, &xpost, sizeof(HDR));
++     btime_update(brd_bno(BN_JUNK));
+    }
++   else
++   {
++     hdr_fpath(fpath, folder, &xpost);
++     unlink(fpath);
++   }
+  }
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

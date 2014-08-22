@@ -1,0 +1,105 @@
+§@ªÌ: itoc (©_©Çªº¼ÊºÙ) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] Åã¥Ü«H½c¨Ï¥ÎªÅ¶¡
+®É¶¡: 2004/09/10 Fri 10:32:16                           Updated: 2005/04/20
+
+¡° ¤Þ­z¡mallean.bbs@micro.bio.ncue.edu.tw (allean)¡n¤§»Ê¨¥¡G
+>      ¥i§_¦b¤W­±ªº¼ÐÃD,·s¼W¨Ï¥ÎªÌ«H½c¨Ï¥Î¶qªº¸ê°T©O ?
+
+: theme.h §R°£ [s]¡B[x]¡B[X] ¨Ã¼W¥[ %s
+
+- #define NECKER_MBOX "[¡ö]Â÷¶} ... [s]±H«H [x]Âà¿ý [X]Âà¹F [h]»¡©ú\n" \
++ #define NECKER_MBOX "[¡ö]Â÷¶} ... [h]»¡©ú (%d ½g¡B%d KB)\n" \
+
+: mail.c:mbox_head()
+
++ static int MboxKB;       /* ¨Ï¥Î®e¶q */
+
+static int
+mbox_head(xo)
+  XO *xo;
+{
+  if (HAS_STATUS(STATUS_BIFF))  /* ¤@¶i¤J«H½c´N®³±¼ STATUS_BIFF */
+    cutmp->status ^= STATUS_BIFF;
+
+  vs_head("¶l¥ó¿ï³æ", str_site);
+- prints(NECKER_MBOX, d_cols, "");
++ prints(NECKER_MBOX, xo->max, MboxKB, d_cols, "");
+  return mbox_body(xo);
+}
+
+: mail.c:mbox_init()
+
+static int
+mbox_init(xo)
+  XO *xo;
+{
+  xo_load(xo, sizeof(HDR));
++ MboxKB = mbox_totalsize(xo->dir) >> 10;       /* ´«¦¨ KB */
+  return mbox_head(xo);
+}
+
+: mail.c:mbox_totalsize() ·s¼W©ó mbox_init() ¤§«e
+
+static int
+mbox_totalsize(folder)
+  char *folder;
+{
+  int total_k;
+  char *ptr, *str, fpath[64];
+  struct stat st;
+  struct dirent *de;
+  DIR *dirp;
+
+  strcpy(fpath, folder);
+  ptr = (char *) strchr(fpath, '.');
+  *ptr = '@';
+  *(ptr + 1) = '\0';
+
+  total_k = 0;
+  if (dirp = opendir(fpath))
+  {
+    *(ptr + 1) = '/';
+    while (de = readdir(dirp))
+    {
+      str = de->d_name;
+
+      if (*str <= ' ' || *str == '.')
+        continue;
+
+      strcpy(ptr + 2, str);
+
+      if (!stat(fpath, &st))
+        total_k += st.st_size;
+    }
+    closedir(dirp);
+  }
+
+  return total_k;
+}
+
+
+------------------------------------
+
+  ¦pªG¦³°µ [¥\¯à] mail.c ­­¨î­Ó¤H«H½c®e¶q
+  ¨º»ò±µµÛÁÙ¥i¥H³o¼Ë§ï¡A§â¤W­­Åã¥Ü¥X¨Ó
+
+: theme.h §R°£«ü¥O»¡©ú
+
+- #define NECKER_MBOX "[¡ö]Â÷¶} ... [h]»¡©ú (%d ½g¡B%d KB)\n" \
++ #define NECKER_MBOX "[h]»¡©ú (%d/%d ½g¡B%d/%d KB)\n" \
+
+: mail.c:mbox_head()
+
+- prints(NECKER_MBOX, xo->max, MboxKB, d_cols, "");
++ prints(NECKER_MBOX,
++   xo->max,
++   HAS_PERM(PERM_ALLADMIN | PERM_MBOX) ? MAX_BBSMAIL :
++   HAS_PERM(PERM_VALID) ? MAX_VALIDMAIL : MAX_NOVALIDMAIL,
++   MboxKB,
++   HAS_PERM(PERM_ALLADMIN | PERM_MBOX) ? MAX_BBSMAILSIZE >> 10:
++   HAS_PERM(PERM_VALID) ? MAX_VALIDMAILSIZE >> 10 :
++   MAX_NOVALIDMAILSIZE >> 10,
++   d_cols, "");
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

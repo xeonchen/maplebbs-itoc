@@ -1,0 +1,598 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¤j´I¯Î
+®É¶¡: 2003/12/03 Wed 17:49:04                           Updated: 2003/12/22
+
+  ³o­Ó¤j´I¯ÎÁöµM¦a¹Ï¬O¤@¼Ëªº
+  ¤£¹L¨ä¥Lªº¦a»ù¤Î¾÷·|©R¹B³£¬O§Ú¶Ã½sªº :p
+
+: config.h
+
+#define PIPSHM_KEY      4998    /* ¹q¤lÂû¹ï¾Ô */
++ #define RICHSHM_KEY   4997    /* ¤j´I¯Î */
+
+: menu.c ¾A·í¿ï³æ¥[¤J
+
++  "bin/rich.so:main_rich", PERM_BASIC, - M_GAME,
++  "Rich       ¤j´I¯Î",
+
+: game/Makefile
+
+SO =     ..... [1;33mrich.so[m
+
+: etc/game/rich.land ·s¼W³oÀÉ®×
+: ²Ä¤@Äæ¬O¸ô¦W
+: ²Ä¤GÄæ >10 ¤¤¤@¼Ëªº¼Æ¦rªí¥Ü¦P¤@°Ïªº¡A½ò¨ì­n¦h¦¬¿ú
+: ²Ä¤TÄæ¬O»ù®æ
+
+¥Ñ¦¹¥h      -1  0
+«Ø°ê«n¸ô    11  500
+©R¹B        0   0
+«Ø°ê¥_¸ô    11  600
+¥I©Ò±oµ|    -2  0
+»O¥_¨®¯¸    1   1000
+°·±d¸ô      12  800
+¾÷·|        0   0
+¥ú©ú¸ô      12  800
+¤­ºÖ¸ô      12  1000
+§¤¨c¸ô¹L    -1  0
+¦Û¥Ñ¸ô      13  1100
+¹q¤O¤½¥q    2   1500
+¥­µ¥¸ô      13  1100
+³Õ·R¸ô      13  1200
+»O¤¤¨®¯¸    1   1000
+©µ¥­¤T¸ô    14  1400
+©R¹B        0   0
+©µ¥­¤G¸ô    14  1400
+©µ¥­¤@¸ô    14  1500
+°±¨®³õ      -1  0
+©¾§µ¸ô      15  1800
+¾÷·|        0   0
+¤¯·R¸ô      15  1800
+«H¸q¸ô      15  2000
+»O«n¨®¯¸    1   1000
+¥Á±Ú¸ô      16  2200
+¥ÁÅv¸ô      16  2200
+¦Û¨Ó¤ô¼t    2   1500
+¥Á¥Í¸ô      16  2500
+ª½±µ¶i¨c    -3  0
+¤¤¥¿¸ô      17  3000
+¤¤µØ¸ô      17  3000
+©R¹B        0   0
+¤¶¹Ø¸ô      17  3200
+°ª¶¯¨®¯¸    1   1000
+¾÷·|        0   0
+·s¥Í«n¸ô    18  3500
+¥I©Ò±oµ|    -2  0
+·s¥Í¥_¸ô    18  4000
+
+: src/game/rich.c ·s¼W³oÀÉ®×
+
+/*-------------------------------------------------------*/
+/* rich.c       ( NTHU CS MapleBBS Ver 3.10 )            */
+/*-------------------------------------------------------*/
+/* target : ¤j´I¯Î                                       */
+/* create : 02/07/01                                     */
+/* update : 03/07/14                                     */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+#ifdef HAVE_GAME
+
+#define MAX_RICHUSER    10  /* ¨Ï¥ÎªÌ¤H¼Æ¤W­­¡A³Ì¤j¥i³]¨ì 26
+                               (§_«h­^¤å¦r¥À·|¤£°÷¥Î) */
+#define MAX_LAND        40  /* ¥þ³¡¦³ 40 ¶ô¦a */
+
+
+typedef struct
+{
+  char userid[IDLEN + 1];   /* ID */
+  int lose;                 /* 1: ¿é¤F */
+  int money;                /* ¿ú */
+  int pos;                  /* ¦ì¸m (0~MAX_LAND-1 ¤À§O¥Nªí ¥Ñ¦¹¥h~·s¥Í¥_¸ô) */
+}   RICH_PLAYER;
+
+
+typedef struct
+{
+  char name[9];             /* ¤g¦a¦W */
+  int owner;                /* ¤g¦a¾Ö¦³ªÌ */
+  int district;             /* >0:¦a¬q½s¸¹(¥iÁÊ¶R) >10:¤@¯ë«Ø¦a
+                               1:¨®¯¸ 2:¹q¼t¤ô¼t 0:¾÷·|©R¹B
+                               -1:¸ô¹L -2:¥Iµ| -3:§¤¨c */
+  int cost;                 /* ¤g¦a»ù­È */
+  int floor;                /* ¼Ó¼h */
+}   RICH_LAND;
+
+
+typedef struct
+{
+  int numuser;              /* ¥»®à¥Ø«e¦³´X¤H */
+  int maxuser;              /* ¥»®à³Ì¦h®e¯Ç´X¤H */
+  int nowturn;              /* ²{¦b½ü¨ì½Ö */
+  int numlose;              /* ¦³´X­Ó¤H­Ë³¬¤F */
+
+  RICH_PLAYER player[MAX_RICHUSER];
+
+  RICH_LAND land[MAX_LAND]; /* 0~39 ³o¨Ç¦aªºª¬ºA */
+}   RICH_STRUCT;
+
+
+static RICH_STRUCT *ri;
+static int mynum;                   /* §Ú¬O²Ä´X­Óª±®a */
+static RICH_PLAYER *myrp;
+
+
+/*-------------------------------------------------------*/
+/* ­pºâ»@ª÷                                              */
+/*-------------------------------------------------------*/
+
+
+static int
+count_pay(rl)
+  RICH_LAND *rl;
+{
+  int i, pay;
+  RICH_LAND *rlp;
+
+  pay = 0;
+  for (i = 0; i < MAX_LAND; i++)
+  {
+    rlp = &ri->land[i];
+
+    /* ¦P°Ï¬q¦P¥D¤H¡A»@ª÷­n¥[¿ú */
+    if (rlp->district == rl->district && rlp->owner == rl->owner)
+      pay += rlp->cost * rlp->floor / 20;
+  }
+
+  return pay;
+}
+
+
+/*-------------------------------------------------------*/
+/* ª±®a¨ç¦¡                                              */
+/*-------------------------------------------------------*/
+
+
+static void
+rp_init()
+{
+  ri->numuser++;
+
+  /* ¨C­Ó¤H¤@¶}©lªºª¬ºA */
+  myrp = &ri->player[mynum];
+  strcpy(myrp->userid, cuser.userid);
+  myrp->lose = 0;
+  myrp->money = 10000;
+  myrp->pos = 0;
+}
+
+
+static void
+rp_exit()
+{
+  ri->numuser--;
+
+  /* «ì´_ªì©lª¬ºA */
+  myrp->userid[0] ='\0';
+}
+
+
+static int  /* 0:Ä~Äòª± -1:¿é¤F*/
+rp_play()
+{
+  int pay;
+  char msg[80];
+  RICH_PLAYER *rp;
+  RICH_LAND *rl;
+
+  myrp->pos += rnd(6) + 1;  /* ¨C¦¸¨« 1~6 ®æ */
+  myrp->pos %= MAX_LAND;
+
+  rl = &ri->land[myrp->pos];
+
+  if (rl->owner >= 0)
+  {
+    if (rl->owner != mynum) /* §O¤Hªº¦a½L */
+    {
+      rp = &ri->player[rl->owner];
+      pay = count_pay(rl);
+      rp->money += pay;
+      myrp->money -= pay;
+      sprintf(msg, "±z¨Ó¨ì¤F[%s]¡A³o¬O %s ªº¦a½L¡A±o¥I¥L %d ¤¸",
+        rl->name, rp->userid, pay);
+      vmsg(msg);
+    }
+    else            /* §Úªº¦a½L */
+    {
+      if (rl->district > 10)
+      {
+        if (myrp->money >= rl->cost)
+        {
+          if (rl->floor < 5)
+          {
+            sprintf(msg, "±z¨Ó¨ì¤F[%s]¡A³o¬O¦Û¤wªº¦a¡A­n§ë¸ê«Ø³]¶Ü(Y/N)¡H[N] ",
+              rl->name);
+            if (vans(msg) == 'y')
+            {
+              myrp->money -= rl->cost;
+              rl->floor++;
+              vmsg("±z«Ø³]¤F³o¶ô¦a");
+            }
+            else
+            {
+              vmsg("±z©ñ±ó«Ø³]³o¶ô¦a");
+            }
+          }
+          else
+          {
+            sprintf(msg, "±z¨Ó¨ì¤F[%s]¡A³o¶ô¦a¤w¸g¤­¼h¼Ó°ª¤F", rl->name);
+            vmsg(msg);
+          }
+        }
+        else
+        {
+          sprintf(msg, "¶ã¶ã¡A[%s]¬O¦Û¤vªº¦a¡A¥i¬O±z¨S¿ú«Ø³]", rl->name);
+          vmsg(msg);
+        }
+      }
+      else
+      {
+        sprintf(msg, "±z¨Ó¨ì¤F¦Û¤vªº¦a½L[%s]", rl->name);
+        vmsg(msg);
+      }
+    }
+  }
+  else
+  {
+    if (rl->district > 0)       /* ¥iÁÊ¶Rªº¦a¬q */
+    {
+      if (myrp->money >= rl->cost)
+      {
+        sprintf(msg, "±z¨Ó¨ì¤F[%s]¡A³o¬O¨S¦³¤Hªº¦a¡A­n¶R¤U¨Ó¶Ü(Y/N)¡H[N] ",
+          rl->name);
+        if (vans(msg) == 'y')
+        {
+          myrp->money -= rl->cost;
+          rl->owner = mynum;
+          vmsg("±z¶R¤U¤F³o¶ô¦a");
+        }
+        else
+        {
+          vmsg("±z©ñ±óÁÊ¶R³o¶ô¦a");
+        }
+      }
+      else
+      {
+        sprintf(msg, "¶ã¶ã¡A[%s]¬O¨S¦³¤Hªº¦a¡A¥i¬O±z¨S¿ú¶R", rl->name);
+        vmsg(msg);
+      }
+    }
+    else if (rl->district == -1)    /* ¸ô¹L */
+    {
+      sprintf(msg, "±z¨Ó¨ì¤F[%s]¡A¤°»ò¨Æ³£¨Sµo¥Í", rl->name);
+      vmsg(msg);
+    }
+    else if (rl->district == -2)    /* ¦©µ| */
+    {
+      myrp->money = myrp->money >> 1;
+      sprintf(msg, "±z¨Ó¨ì¤F[%s]¡A¨­¤Wªº¿ú³Q¯¸ªø·m¤F¤@¥b", rl->name);
+      vmsg(msg);
+    }
+    else if (rl->district == -3)    /* §¤¨c */
+    {
+      sprintf(msg, "±z¨Ó¨ì¤F[%s]¡A³Q°O¤T¤ä¤j¹L°Ç¥O°h¾Ç¡A¿é¤F", rl->name);
+      vmsg(msg);
+      return -1;
+    }
+    else                            /* ¾÷·|©R¹B */
+    {
+      sprintf(msg, "±z¨Ó¨ì¤F[%s]¡A¸Õ¸Õ¦Û¤vªº¤â®ð", rl->name);
+      vmsg(msg);
+
+      /* ÀH«K¼gªº :p */
+      switch (rnd(3))
+      {
+      case 0:
+        myrp->money += 100;
+        vmsg("¦Ò¸Õ¦Ò 100 ¤À¡A±o¨ì¼ú¾Çª÷ 100 ¤¸ (¾Ç®Õ«Ü½a)");
+        break;
+
+      case 1:
+        myrp->money -= 1000;
+        vmsg("¨«¸ô½ò¨ì­»¿¼¥Ö¶^­Ë¡A¥IÂåÃÄ¶O 1000 ¤¸ (Âå°|«Ü¶Â)");
+        break;
+
+      case 2:
+        myrp->money = 0;
+        vmsg("¹J¨ì±jµs¡A§â¨­¤Wªº¿ú³£·m¥ú¤F");
+        break;
+      }
+    }
+  }
+
+  if (myrp->money < 0)
+  {
+    ri->numlose++;
+    myrp->lose = 1;
+    vmsg("«z«z¡A±z¨S¿ú¤F«Å§i­Ë³¬¡A¿é¤F");
+    return -1;
+  }
+
+  return 0;
+}
+
+
+/*-------------------------------------------------------*/
+/* ¤g¦a¨ç¦¡                                              */
+/*-------------------------------------------------------*/
+
+
+static void
+rl_init()
+{
+  int i;
+  char district[10], cost[10];
+  FILE *fp;
+  RICH_LAND *rl;
+
+  if (!(fp = fopen("etc/game/rich.land", "r")))
+    return;
+
+  for (i = 0; i < MAX_LAND; i++)
+  {
+    rl = &ri->land[i];
+    fscanf(fp, "%s %s %s", rl->name, district, cost);
+    rl->owner = -1;
+    rl->district = atoi(district);
+    rl->cost = atoi(cost);
+    rl->floor = 1;
+  }
+
+  fclose(fp);
+}
+
+
+static void
+rl_clear()      /* ±N¦Û¤vªº¤g¦aÂk¤½¦³ */
+{
+  int i;
+  RICH_LAND *rl;
+
+  for (i = 0; i < MAX_LAND; i++)
+  {
+    rl = &ri->land[i];
+    if (rl->owner == mynum)
+    {
+      rl->owner = -1;
+      rl->floor = 1;
+    }
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* ¤j´I¯Î¨ç¦¡                                            */
+/*-------------------------------------------------------*/
+
+
+static int      /* -1:¥¢±Ñ  >=0:§Ú¬O²Ä´X­Óª±®a */
+rich_initshm()
+{
+  int num, max;
+  char ans[5], buf[80];
+
+  ri = shm_new(RICHSHM_KEY, sizeof(*ri));
+  if (shmget(RICHSHM_KEY, sizeof(*ri), 0) < 0)
+    ri->numuser = 0;
+
+  num = ri->numuser;
+  if (num > MAX_RICHUSER)
+  {
+    vmsg("©êºp¡A®àªø³]©w¤¤¡A½Ðµy­Ô");
+    return -1;
+  }
+
+  if (!num) /* ²Ä¤@­Ó¶i¤Jªº¤H¬O®àªø */
+  {
+    memset(ri, 0, sizeof(RICH_STRUCT));
+
+    ri->numuser = MAX_RICHUSER + 1; /* ®àªø³]©w¤¤ */
+    sprintf(buf, "´X­Ó¤H­nª±(2~%d)¡H ", MAX_RICHUSER);
+    vget(b_lines, 0, buf, ans, 3, DOECHO);
+    max = atoi(ans);
+    ri->numuser = 0;            /* ®àªø³]©w§¹¦¨ */
+    if (max < 2 || max > MAX_RICHUSER)
+      return -1;
+    ri->maxuser = max;
+  }
+  else      /* ®à¤º¤w¸g¦³¤H¡A§ä¤@­ÓªÅ¦ì */
+  {
+    max = ri->maxuser;
+    for (num = 1; num < max; num++) /* ²Ä 0 ­Ó¦ì¤l¬O®àªø */
+    {
+      if (!ri->player[num].userid[0])
+        break;
+    }
+    if (num == max) /* §ä¤£¨ìªÅ¦ì */
+    {
+      vmsg("©êºp¡A®à¤º¤wº¡¡A¤U¦¸½Ð¦­");
+
+#if 1   /* ¦pªG½T©w¥X¿ù¤F¡A¯¸ªø¥i¥H²M®à */
+      if (HAS_PERM(PERM_SYSOP) && vans("¯¸ªø­n²M®à½ð¤H(Y/N)¡H[N] ") =='y')
+        ri->numuser = 0;
+#endif
+
+      return -1;
+    }
+  }
+
+  mynum = num;
+  rp_init();
+
+  rl_init();
+}
+
+
+static int      /* 0:¤wº¡®à  -1:Â÷¶} */
+rich_wait()     /* µ¥«Ýº¡®à */
+{
+  int num, max, fd;
+  struct timeval tv = {1, 0};
+
+  num = -1;
+  max = ri->maxuser;
+  do            /* ¬d¤H¼Æ¬O§_¨¬°÷ */
+  {
+    if (num != ri->numuser) /* ¦³ÅÜ°Ê¤~ refresh */
+    {
+      move(b_lines, 0);
+      clrtoeol();
+      prints("¥Ø«e¦³ %d/%d ­Óª±®a¡Aµ¥«Ý¨ä¥Lªº¨Ï¥ÎªÌ¥[¤J¡A«ö q Â÷¶}",
+        ri->numuser, max);
+      refresh();
+      num = ri->numuser;
+    }
+
+    fd = 1;
+    if (select(1, (fd_set *) &fd, NULL, NULL, &tv) > 0)
+    {
+      if (vkey() == 'q')
+      {
+        rp_exit();
+        return -1;
+      }
+    }
+  } while (num < max);
+
+  return 0;
+}
+
+
+static void
+rich_display()
+{
+  clear();
+  move(0, 0);
+  outs("    §K¶O  ¢x©¾§µ¢x¾÷·|¢x¤¯·R¢x«H¸q¢x»O«n¢x¥Á±Ú¢x¥ÁÅv¢x¦Û¨Ó¢x¥Á¥Í¢x ª½  ±µ \n");
+  outs("   °±¨®³õ ¢x ¸ô ¢x    ¢x ¸ô ¢x ¸ô ¢x¨®¯¸¢x ¸ô ¢x ¸ô ¢x¤ô¼t¢x ¸ô ¢x ¶i  ¨c \n");
+  outs("  ¢w¢w¢w¢w¢q¢w¢w¢r¢w¢w¢r¢w¢w¢r¢w¢w¢r¢w¢w¢r¢w¢w¢r¢w¢w¢r¢w¢w¢r¢w¢w¢q¢w¢w¢w¢w\n");
+  outs("  ©µ¥­¤@¸ô¢x                                                    ¢x¤¤ ¥¿ ¸ô\n");
+  outs("  ¢w¢w¢w¢w¢t                                                    ¢u¢w¢w¢w¢w\n");
+  outs("  ©µ¥­¤G¸ô¢x                                                    ¢x¤¤ µØ ¸ô\n");
+  outs("  ¢w¢w¢w¢w¢t                                                    ¢u¢w¢w¢w¢w\n");
+  outs("  ©R    ¹B¢x                                                    ¢x©R    ¹B\n");
+  outs("  ¢w¢w¢w¢w¢t                                                    ¢u¢w¢w¢w¢w\n");
+  outs("  ©µ¥­¤T¸ô¢x                                                    ¢x¤¶ ¹Ø ¸ô\n");
+  outs("  ¢w¢w¢w¢w¢t                                                    ¢u¢w¢w¢w¢w\n");
+  outs("  »O¤¤¨®¯¸¢x  ¢w¢t¡ô©R¥O°Ï¢u¢w¢w¢t            ¢u¢w¢w¢t  ¢u¢w¢w  ¢x°ª¶¯¨®¯¸\n");
+  outs("  ¢w¢w¢w¢w¢t                                                    ¢u¢w¢w¢w¢w\n");
+  outs("  ³Õ ·R ¸ô¢x                                                    ¢x¾÷    ·|\n");
+  outs("  ¢w¢w¢w¢w¢t                                                    ¢u¢w¢w¢w¢w\n");
+  outs("  ¥­ µ¥ ¸ô¢x                                                    ¢x·s¥Í«n¸ô\n");
+  outs("  ¢w¢w¢w¢w¢t                                                    ¢u¢w¢w¢w¢w\n");
+  outs("  ¹q¤O¤½¥q¢x                                                    ¢x¥I©Ò±oµ|\n");
+  outs("  ¢w¢w¢w¢w¢t  ¡÷                                                ¢u¢w¢w¢w¢w\n");
+  outs("  ¦Û ¥Ñ ¸ô¢x                                                    ¢x·s¥Í¥_¸ô\n");
+  outs("  ¢w¢w¢w¢w¢q¢w¢w¢s¢w¢w¢s¢w¢w¢s¢w¢w¢s¢w¢w¢s¢w¢w¢s¢w¢w¢s¢w¢w¢s¢w¢w¢q¢w¢w¢w¢w\n");
+  outs("   §¤  ¨c ¢x¤­ºÖ¢x¥ú©ú¢x¾÷·|¢x°·±d¢x»O¥_¢x¥I©Ò¢x«Ø°ê¢x©R¹B¢x«Ø°ê¢x¥Ñ ¦¹ ¥h\n");
+  outs("   ¸ô  ¹L ¢x ¸ô ¢x ¸ô ¢x    ¢x ¸ô ¢x¨®¯¸¢x±oµ|¢x¥_¸ô¢x    ¢x«n¸ô¢x        \n");
+}
+
+
+static void
+rich_play()
+{
+  int nowturn, nexturn, wait, fd;
+  struct timeval tv = {1, 0};
+
+  /* ¶}©lÂ¶°é°é¤F */
+
+  srand(time(NULL) - cuser.userno); /* Åý©Ò¦³¤Hªº seed ³£¤£¦P */
+
+  for (;;)
+  {
+    /* ½ü¨ì§O¤H */
+    wait = 0;
+    nowturn = -1;
+    while (mynum != ri->nowturn)
+    {
+      if (nowturn != ri->nowturn)   /* ¦³ÅÜ°Ê¤~ refresh */
+      {
+        move(b_lines, 0);
+        clrtoeol();
+        nowturn = ri->nowturn;
+        prints("¥Ø«e½ü¨ì %c. %s", 'A' + nowturn, ri->player[nowturn].userid);
+        refresh();
+      }
+
+      fd = 1;
+      select(1, (fd_set *) &fd, NULL, NULL, &tv);
+
+      if (++wait > 300)
+      {
+        ri->numuser = 0;
+        vmsg("¦³¤H¤Ó¤[¥¼§¹¦¨¦æ°Ê¡AÀ³¸Ó¬OÂ_½u¤F¡A¹CÀ¸°±¤î¶i¦æ");
+        return;
+      }
+    }
+
+    /* ½ü¨ì¦Û¤v */
+    if (ri->numlose == ri->numuser - 1)
+    {
+      vmsg("«z«z¡A¨ä¥L¤H³£­Ë³¬¤F¡A±zÀò³Ó¤F");
+      ri->numuser = 0;
+      return;
+    }
+    outz("½Ð«ö¥ô·NÁäÂY»ë¤l\033[5m...\033[m");
+    vkey();
+
+    if ((fd = rp_play()) < 0)
+      rl_clear();
+
+    /* ´«¤U¤@­ÓÁÙ¨S¿éªº¤H */
+    for (nexturn = ri->nowturn;;)
+    {
+      nexturn = (nexturn == ri->maxuser - 1) ? 0 : nexturn + 1;
+      if (!((&ri->player[nexturn])->lose))
+        break;
+    }
+    ri->nowturn = nexturn;
+
+    if (fd < 0)     /* §Ú¿é¤F */
+      return;
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                        */
+/*-------------------------------------------------------*/
+
+
+int
+main_rich()
+{
+  if (cutmp->status & STATUS_COINLOCK)
+  {
+    vmsg(MSG_COINLOCK);
+    return XEASY;
+  }
+
+  if (rich_initshm() < 0)
+    return XEASY;
+
+  if (rich_wait() < 0)
+    return XEASY;
+
+  rich_display();
+  rich_play();
+
+  return 0;
+}
+#endif
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

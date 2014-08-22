@@ -1,0 +1,358 @@
+§@ªÌ: itoc (¯}¸Ñ¶´Åé¤~¬O¤ý¹D¡I) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¥æ³q¤j¾Ç¥\½Òªí
+®É¶¡: 2004/04/07 Wed 14:31:55                           Updated: 2004/04/07
+
+  ²Å¦X¥æ³q¤j¾Ç¤W½Ò®É¶¡ªº¥\½Òªí
+
+  ¨ú¥N classtable.c §Y¥i¨Ï¥Î
+
+/*-------------------------------------------------------*/
+/* classtable.c ( YZU WindTopBBS Ver 3.02 )              */
+/*-------------------------------------------------------*/
+/* target : ¥\½Òªí                                       */
+/* create :   /  /                                       */
+/* update : 02/07/12                                     */
+/* author :                                              */
+/* modify : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+#ifdef HAVE_CLASSTABLE
+
+/* ----------------------------------------------------- */
+/* classtable.c ¤¤¹B¥Îªº¸ê®Æµ²ºc                         */
+/* ----------------------------------------------------- */
+
+
+#define MAX_WEEKDAY     6       /* ¤@¬P´Á¦³ 6 ¤Ñ */
+#define MAX_DAYCLASS    16      /* ¤@¤Ñ¦³ 16 ¸` */
+
+
+typedef struct
+{
+  char name[9];     /* ½Ò¦W */
+  char teacher[9];  /* ±Ð®v */
+  char class[8];    /* ±Ð«Ç */
+  char nouse[4];    /* ¨S¥ÎªºÄæ¦ì */
+}   CLASS;
+
+
+typedef struct
+{
+  CLASS table[MAX_WEEKDAY][MAX_DAYCLASS];
+    /* ¤@¬P´Á MAX_WEEKDAY * MAX_DAYCLASS °ó½Ò */
+}   CLASS_TABLE;
+
+
+typedef struct
+{
+  char c_class[5];  /* ²Ä´X¸` */
+  char c_start[6];  /* ¤W½Ò®É¶¡ */
+  char c_break[6];  /* ¤U½Ò®É¶¡ */
+}  CLOCK;
+
+
+static CLOCK class_time[MAX_DAYCLASS] =     /* ½Ò°ó®É¶¡ */
+{
+  {" ¢Û ", "06:00", "06:50"},
+  {" ¢Ü ", "07:00", "07:50"},
+  {" ¢Ï ", "08:00", "08:50"},
+  {" ¢Ð ", "09:00", "09:50"},
+  {" ¢Ñ ", "10:10", "11:00"},
+  {" ¢Ò ", "11:10", "12:00"},
+  {" ¢æ ", "12:30", "13:20"},
+  {" ¢Ó ", "13:30", "14:20"},
+  {" ¢Ô ", "14:30", "15:20"},
+  {" ¢Õ ", "15:40", "16:30"},
+  {" ¢Ö ", "16:40", "17:30"},
+  {" ¢ç ", "17:40", "18:30"},
+  {" ¢× ", "18:30", "19:20"},
+  {" ¢Ø ", "19:30", "20:20"},
+  {" ¢Ù ", "20:30", "21:20"},
+  {" ¢Ú ", "21:30", "22:20"}
+};
+
+
+/* ----------------------------------------------------- */
+/* CLASS ³B²z¨ç¼Æ                                        */
+/* ----------------------------------------------------- */
+
+
+static void
+class_show(x, y, class)
+  int x, y;
+  CLASS *class;
+{
+  move(x, y);
+  prints("½Ò¦W¡G%s", class->name);
+  move(x + 1, y);
+  prints("±Ð®v¡G%s", class->teacher);
+  move(x + 2, y);
+  prints("±Ð«Ç¡G%s", class->class);
+}
+
+
+static int          /* 1:¥¿½T 0:¿ù»~ */
+class_number(day, class)    /* ¶Ç¦^¬P´Á´X²Ä´X¸` */
+  int *day;
+  int *class;
+{
+  char ans[4];
+
+  move(2, 0);
+  outs("5C ªí¥Ü¬P´Á¤­²Ä¢Ñ¸`");
+  *day = vget(3, 0, "¤W½Ò®É¶¡¡G", ans, 3, DOECHO) - '1';
+  *class = *(ans + 1);
+  if (*class >= 'A' && *class <= 'Z')
+    *class |= 0x20;     /* ´«¤p¼g */
+
+  switch (*class)
+  {
+  case 'm':
+  case 'n':
+    *class -= 'm';
+    break;
+
+  case 'a':
+  case 'b':
+  case 'c':
+  case 'd':
+    *class -= 'a' - 2;
+    break;
+
+  case 'x':
+    *class = 6;
+    break;
+
+  case 'e':
+  case 'f':
+  case 'g':
+  case 'h':
+    *class -= 'e' - 7;
+    break;
+
+  case 'y':
+    *class = 11;
+    break;
+
+  case 'i':
+  case 'j':
+  case 'k':
+  case 'l':
+    *class -= 'i' - 12;
+    break;
+
+  default:
+    return 0;
+  }
+  if (*day > MAX_WEEKDAY - 1 || *day < 0 || *class > MAX_DAYCLASS - 1 || *class < 0)
+    return 0;
+
+  return 1;
+}
+
+
+static void
+class_edit(class)
+  CLASS *class;
+{
+  int echo;
+
+  echo = *(class->name) ? GCARRY : DOECHO;
+  vget(4, 0, "½Ò¦W¡G", class->name, sizeof(class->name), echo);
+  vget(5, 0, "±Ð®v¡G", class->teacher, sizeof(class->teacher), echo);
+  vget(6, 0, "±Ð«Ç¡G", class->class, sizeof(class->class), echo);
+}
+
+
+/* ----------------------------------------------------- */
+/* CLASS_TABLE ³B²z¨ç¼Æ                                  */
+/* ----------------------------------------------------- */
+
+
+static void
+table_file(fpath, table)    /* §â table ¼g¤J FN_CLASSTBL_LOG */
+  char *fpath;
+  CLASS_TABLE *table;
+{
+  int i, j;
+  FILE *fp;
+
+  fp = fopen(fpath, "w");
+
+  fprintf(fp, "           ¬P´Á¤@    ¬P´Á¤G    ¬P´Á¤T    ¬P´Á¥|    ¬P´Á¤­    ¬P´Á¤»\n");
+  for (i = 0; i < MAX_DAYCLASS; i++)
+  {
+    fprintf(fp, "²Ä%s¸`  ", class_time[i].c_class);
+    for (j = 0; j < MAX_WEEKDAY; j++)
+      fprintf(fp, "%-8.8s  ", table->table[j][i].name);
+
+    fprintf(fp, "\n  %s   ", class_time[i].c_start);
+    for (j = 0; j < MAX_WEEKDAY; j++)
+      fprintf(fp, "%-8.8s  ", table->table[j][i].teacher);
+
+    fprintf(fp, "\n  %s   ", class_time[i].c_break);
+    for (j = 0; j < MAX_WEEKDAY; j++)
+      fprintf(fp, "%-8.8s  ", table->table[j][i].class);
+
+    fprintf(fp, "\n\n");
+  }
+  fclose(fp);
+}
+
+
+static void
+table_show(table)
+  CLASS_TABLE *table;
+{
+  char fpath[64];
+
+  usr_fpath(fpath, cuser.userid, FN_CLASSTBL_LOG);
+  table_file(fpath, table);
+  more(fpath, NULL);
+}
+
+
+static void
+table_mail(table)
+  CLASS_TABLE *table;
+{
+  char fpath[64];
+
+  usr_fpath(fpath, cuser.userid, FN_CLASSTBL_LOG);
+  table_file(fpath, table);
+  mail_self(fpath, cuser.userid, "­Ó¤H¥\\½Òªí", MAIL_READ);
+}
+
+
+static void
+table_edit(table)
+  CLASS_TABLE *table;
+{
+  int i, j;
+
+  vs_bar("½s¿è­Ó¤H¥\\½Òªí");
+
+  if (class_number(&i, &j))
+  {
+    class_edit(&(table->table[i][j]));
+    class_show(10, 0, &(table->table[i][j]));
+  }
+}
+
+
+static void
+table_del(table)
+  CLASS_TABLE *table;
+{
+  int i, j;
+
+  vs_bar("§R°£­Ó¤H¥\\½Òªí");
+
+  if (!class_number(&i, &j))
+    return;
+
+  class_show(10, 0, &(table->table[i][j]));
+
+  if (vans(msg_sure_ny) == 'y')
+    memset(&(table->table[i][j]), 0, sizeof(CLASS));
+}
+
+
+static void
+table_copy(table)
+  CLASS_TABLE *table;
+{
+  int i, j, x, y;
+
+  vs_bar("­Ó¤H¥\\½Òªí");
+
+  move(9, 0);
+  outs("¨Ó·½¡G");
+  if (!class_number(&i, &j))
+    return;
+
+  class_show(10, 0, &(table->table[i][j]));
+
+  move(9, 39);
+  outs("¥Øªº¡G");
+  if (!class_number(&x, &y))
+    return;
+
+  class_show(10, 39, &(table->table[x][y]));
+
+  if (vans(msg_sure_ny) == 'y')
+    memcpy(&(table->table[x][y]), &(table->table[i][j]), sizeof(CLASS));
+}
+
+
+int
+main_classtable()
+{
+  char fpath[64];
+  CLASS_TABLE newtable, oldtable, *ptr;
+
+  usr_fpath(fpath, cuser.userid, FN_CLASSTBL);
+  ptr = &newtable;
+
+  if (rec_get(fpath, ptr, sizeof(CLASS_TABLE), 0))
+    memset(ptr, 0, sizeof(CLASS_TABLE));
+  memcpy(&oldtable, ptr, sizeof(CLASS_TABLE));
+
+  for (;;)
+  {
+    switch (vans("½Òªí¨t²Î (E/C/D)½s¿è/½Æ»s/§R°£ P)¦L¥X K)¥þ¬å S)¦sÀÉ M)«H½c Q)Â÷¶} [Q] "))
+    {
+    case 'e':
+      table_edit(ptr);
+      break;
+    case 'd':
+      table_del(ptr);
+      break;
+    case 'c':
+      table_copy(ptr);
+      break;
+
+    case 'p':
+      table_show(ptr);
+      break;
+    case 'm':
+      table_mail(ptr);
+      break;
+
+    case 's':
+      rec_put(fpath, ptr, sizeof(CLASS_TABLE), 0, NULL);
+      memcpy(&oldtable, ptr, sizeof(CLASS_TABLE));
+      vmsg("Àx¦s§¹¦¨");
+      break;
+    case 'k':
+      if (vans(msg_sure_ny) == 'y')
+      {
+        unlink(fpath);
+        memset(ptr, 0, sizeof(CLASS_TABLE));
+        memset(&oldtable, 0, sizeof(CLASS_TABLE));
+      }
+      break;
+
+    default:
+      goto end_loop;
+    }
+  }
+
+end_loop:
+
+  /* ÀË¬d·sÂÂ¬O§_¤@¼Ë¡A­Y¤£¤@¼Ë­n°Ý¬O§_¦sÀÉ */
+  if (memcmp(&oldtable, ptr, sizeof(CLASS_TABLE)))
+  {
+    if (vans("¬O§_Àx¦s(Y/N)¡H[Y] ") != 'n')
+      rec_put(fpath, ptr, sizeof(CLASS_TABLE), 0, NULL);
+  }
+
+  return 0;
+}
+#endif  /* HAVE_CLASSTABLE */
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

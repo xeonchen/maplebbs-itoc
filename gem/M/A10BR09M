@@ -1,0 +1,42 @@
+µo«H¤H: waynesan.bbs@csc241.tcssh.tc.edu.tw («z«Yªüªê) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¦³¿ú¤H½ð¤H¥\¯à....
+µo«H¯¸: local (2004/06/02 Wed 13:44:00)                   Updated: 2004/10/07
+
+¤@¯ë¨Ï¥ÎªÌ¦b¨Ï¥ÎªÌ¦W³æ
+«ö[Ctrl]+[K]¥iªá9000ª÷¹ô½ð¤H¤U½u
+-------------------------------------------------------------------------------
+
+: talk.c:ulist_kick()
+
+static int
+ulist_kick(xo)
+  XO *xo;
+{
+- if (HAS_PERM(PERM_ALLACCT))
++ if (HAS_PERM(PERM_ALLACCT) || !HAS_STATUS(STATUS_COINLOCK))
+  {
+    UTMP *up;
+    pid_t pid;
+    char buf[80];
+
++   if (!HAS_PERM(PERM_ALLACCT))
++   {
++     if (cuser.gold < 9000)
++     {
++       vmsg("­n 9000 ª÷¹ô¤~¯à½ð¨Ï¥ÎªÌ¤U½u³á");
++       return XO_FOOT;
++     }
++     if (vans("¬O§_­nªá 9000 ª÷¹ô½ð³o¦ì¨Ï¥ÎªÌ¤U½u(Y/N)¡H[N] ") != 'y')
++       return XO_FOOT;
++     cuser.gold -= 9000;
++   }
+
+    up = ulist_pool[xo->pos];
+
+--
+    [1;31m¡Z¡Z[m
+  [1;31m¡þ  [37m¡þ[34m¢v¢v¢@  [31m°g[34m¤Û[37m°ê«×[31m Charming [34mShadow [37mCountry[m
+[1;31m¢y  [37m¡þ[31m  [37m¡þ¢@  [34m¢j[33m¤J¹Ò¦ì§} csc241.twbbs.org[m
+[1;31m¢y  [37m¢@¡þ[31m  [37m¡þ  [34m¢j[32m¦ì§}¥N½X 203.71.212.241[m
+[1;31m  ¢@¡Z¡Z[37m¡þ[31m  [34m¡þ  [36m¨Ó·½¥À°ê localhost.tcssh.tc.edu.tw[m
+[1;31m  [4m¡þ    [34m¢v¢v¢@[;1;31m  µoªí®É¶¡ 2004/06/02 Wed 13:06:05[m

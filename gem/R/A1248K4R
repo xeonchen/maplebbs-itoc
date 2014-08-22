@@ -1,0 +1,89 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (¡¯§Ú­n¬õ³z¥bÃä¤Ñ¡¯) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¸õ¨ì¤å³¹¨Ó·½¬ÝªO¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (2004/11/19 Fri 17:14:30)                Updated: 2004/11/19
+
+    All_Post ¬O¦s©ñ¯¸¤º¥þ³¡¬ÝªOªº¤å³¹¡C
+
+    ©¹©¹¦³¤H¦b All_Post ªO¬Ý¨ì¤å³¹¡A·Q­n¨ì­ì¥»ªºªO¬Ý¨ä¥Lªº©Î¬O±À¤å...
+
+    ÁÙ­n«Ü³Â·Ðªº§ä¨ì¨º­ÓªOµM«á¶i¤J....^^|||
+
+    ©Ò¥H´N¼g¤F³o­Ó¥\¯à¡A§Æ±æ¤j®aÀ°¦£¬Ý¬Ý¦³¤°»ò bug ....^^a
+
+    ©Î¬O­þ¸Ì¥i¥H­×§ï¡B³Ì¨Î¤Æªº....ÁÂÁÂ¤j®aÅo¡I^^
+
+==============================================================================
+
+: src/post.c:post_jump()    ·s¼W¾ã¤ä¨ç¦¡¦b post_browse() ¤W­±
+
+static int
+post_jump(xo)       /* qazq.041119: ¸õ¨ì¤å³¹¨Ó·½¬ÝªO */
+  XO *xo;
+{
+  int tmpbno, bno;
+  char *brdname, fpath[64], *ptr, buf[ANSILINELEN];
+  HDR *hdr;
+  FILE *fp;
+  static int p_jump = 0;  /* ¶i¤J´X¼h */
+
+  /* ³Ì¦h jump ¤@¼h */
+  if (p_jump >= 1)
+    return XO_NONE;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+  hdr_fpath(fpath, xo->dir, hdr);
+
+  if (fp = fopen(fpath, "r"))
+  {
+    ptr = fgets(buf, sizeof(buf), fp);
+    fclose(fp);
+
+    /* ¶}©l§ì¥X¬ÝªO¦WºÙ */
+    if (ptr &&
+      ((ptr = strstr(buf, str_post1)) || (ptr = strstr(buf, str_post2))) &&
+      ptr[5] == ' ' && ptr[6])
+    {
+      brdname = ptr + 6;        /* ©w¦ì¨ì¬ÝªO¦WºÙªº¦ì¸m */
+      if (ptr = strchr(brdname, '\n'))
+        *ptr = '\0';
+      bno = brd_bno(brdname);
+      if (bno >= 0 && bno != currbno)    /* ¬ÝªO¦s¦b && ­n¸õ¨ì§Oªº¬ÝªO */
+      {
+        tmpbno = currbno; /* ¬ö¿ý¤W¤@­Ó¬ÝªO */
+
+        if (!XoPost(bno))      /* ¥i¥H¶i¤J¤~ xover() */
+        {
+          p_jump++;
+          xover(XZ_POST);
+#ifndef ENHANCED_VISIT
+          time(&brd_visit[currbno]);
+#endif
+          p_jump--;
+
+          XoPost(tmpbno);        /* ¸õ¦^­ì¨Óªº¬ÝªO */
+          return XZ_POST;
+        }
+      }
+    }
+  }
+  return XO_NONE;
+}
+
+: post.c:post_cb[]
+
++ 'J', post_jump,     /* qazq.041119: ¬ÝªO¸õÅD(¥D­nµ¹All_PostªO¥Î) */
+
+: post.c:post_browse()
+
++   case 'J':       /* qazq.041119: ¸õ¤å³¹¨ì¨Ó·½¬ÝªO */
++     post_jump(xo);
++     break;
+
+    case 'h':
+      xo_help("post");
+      break;
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m218-163-149-207.dynamic.hinet.net [30mµoªí[m

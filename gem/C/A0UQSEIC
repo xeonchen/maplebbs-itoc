@@ -1,0 +1,21 @@
+µo«H¤H: itoc.bbs@kulu.twbbs.org (¬@±Ï¤@­ÓÆF»î), ¬ÝªO: itoc
+¼Ð  ÃD: [¥\¯à] °ÊºA¬ÝªO¦æ¼Æ¶W¹L 10 ¦æ
+µo«H¯¸: ©BÂP©BÂP¤õÁç¯¸ (Tue Jun 11 19:55:50 2002)         Updated: 2004/09/01
+
+  ¥H°ÊºA¬ÝªO¬° 12 ¦æ¬°¨Ò¤l
+
+: theme.h §ï MENU_XNOTE ¤Î MOVIE_LINES
+
+/* itoc.µù¸Ñ: ª`·N MENU_XPOS ­n >= MENU_XNOTE + MOVIE_LINES */
+
+#define MENU_XNOTE      [1;32m1[m       /* °ÊºA¬ÝªO¥Ñ (1, 0) ¶}©l */
+#define MOVIE_LINES     [1;32m12[m      /* °Êµe³Ì¦h¦³ 12 ¦C */
+
+#define MENU_XPOS       13      /* ¿ï³æ¶}©lªº (x, y) ®y¼Ð */
+#define MENU_YPOS       ((d_cols >> 1) + 18)
+
+  µM«á­«·s make maple/ ¤Î util/
+  ¦A°õ¦æ bin/camera §Y¥i
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

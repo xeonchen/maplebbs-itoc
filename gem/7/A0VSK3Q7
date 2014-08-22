@@ -1,0 +1,316 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw («ö¡ã·Ð¦º¤F.....) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ·í¤é¤å³¹¼Æ¾Ú²Î­p¡C
+µo«H¯¸: ¤¤¿³¸ê¬ì (Fri, 28 Nov 2003 11:23:15 +0800 (CST))  Updated: 2003/11/30
+
+    ¢°. ²Î­p·í¤éµoªí¤å³¹ªºÁ`®É¶¡(¬í)¡B¦r¤¸¼Æ¡BÀò±o¿ú¹ô¡C
+
+    ¢±. ²Î­p·í¤éªº¤å³¹Äé¤ô¤ý¡C
+
+    ¢². ¨C¤Ñ 0:00 ¦Û°Ê²£¥Í¦b record ªO¡C
+
+    ¢³. ¦b ºëµØ¤½§GÄæ ¤]¥i¥Hª½±µ¾\Åª¡C
+
+==============================================================================
+
+: src/include/global.h
+
+#define FN_RUN_POST "run/post"  /* ¤å³¹½g¼Æ²Î­p */
+#define FN_RUN_POST_LOG "run/post.log"  /* ¤å³¹½g¼Æ²Î­p */
+[1;33m+#define FN_TOTAL_POST_GOLD  "run/var/post_gold.log" /* ·í¤é¤å³¹¦U¶µ¼Æ¾Ú */
+[1;33m+#define FN_RUN_POSTNUMS_TOP "run/postnums_top.log"  /* ·í¤éÄé¤ô¤ý */[m
+
+
+
+: src/include/struct.h      ¥[¤J¤U­±ªºµ²ºc
+
+typedef struct
+{
+  time_t spendtime;
+  int wordsnum;
+  int gold;
+} POSTGOLD;     /* ²Î­p¥þ¯¸·í¤éªº¤å³¹»ù­È */
+
+
+: src/maple/post.c:do_post()        //¨Cµoªí¤@½g´N°O¿ý¤@¦¸¸Ó½g¤å³¹ªº¼Æ¾Ú¡C
+
+    else
+    {
+[1;33m+     POSTGOLD PostGold;[m
+
+      mode = BMIN(wordsnum, spendtime) / 10;    /* ¨C¤Q¦r/¬í ¤@¤¸ */
+      prints("³o¬O±zªº²Ä %d ½g¤å³¹¡A±o %d »È¡C", ++cuser.numposts, mode);
+      cuser.money += mode;
+      /* itoc.010408: ¨Ì¤å³¹ªø«×/©Ò¶O®É¶¡¨Ó¨M©w­nµ¹¦h¤Ö¿ú */
+      /* itoc.µù¸Ñ: ¿ú­nÃøÁÈ¡A¹ô¨î¤~·|¦³·N¸q */
+
+[1;33m+     PostGold.spendtime = spendtime;   /* ²Î­p¥þ¯¸·í¤éªº¤å³¹»ù­È */
+[1;33m+     PostGold.wordsnum = wordsnum;
+[1;33m+     PostGold.gold = mode;
+
+[1;33m+     rec_add(FN_TOTAL_POST_GOLD, &PostGold, sizeof(POSTGOLD));[m
+    }
+
+
+
+: src/util/poststat.c
+
+[1;33m+#define MAX_NUM 5       /* ¥»¤éÄé¤ô¤ý²Î­p¦W¦¸ */[m
+
+
+: poststat.c:post_author()      //§â·í¤éµoªí½g¼Æ«e´X¦W§ì¥X¨Ó¼g¤JÀÉ®×¡C
+
+  /* report */
+
+  if (fp = fopen(FN_RUN_POST_LOG, "w"))
+  {
+[1;33m+   FILE *fp2;
+[1;33m+   int i = 1;
+
+[1;33m+   fp2 = fopen(FN_RUN_POSTNUMS_TOP, "w");[m
+
+[1;32m![m   pa_out(patop, fp[1;32m, fp2, i[m);
+    fclose(fp);
+[1;33m+   fclose(fp2);[m
+  }
+}
+
+
+: poststat.c:pa_out()
+
+static void
+[1;32m![mpa_out(top, fp[1;32m, fp2, i[m)
+  SplayNode *top;
+  FILE *fp;
+[1;33m+ FILE *fp2;
+[1;33m+ int i;[m
+{
+
+  .....
+  .....
+
+  if (top == NULL)
+    return;
+
+[1;32m![m pa_out(top->left, fp[1;32m, fp2, i[m);
+
+  .....
+  .....
+
+  fprintf(fp, "\n>%6d %s\n", pa->count, pa->author);
+
+[1;33m+ if (i <= MAX_NUM)
+[1;33m+ {
+[1;33m+   fprintf(fp2, "%d %s\n", pa->count, pa->author);
+[1;33m+   i++;
+[1;33m+ }[m
+
+  for (text = pa->text; text; text = text->ptnext)
+  {
+    fprintf(fp, "%7d %.70s\n", text->count, text->title);
+  }
+
+[1;32m![m pa_out(top->right, fp[1;32m, fp2, i[m);
+}
+
+
+: src/util/account.c:main()     ¨C¤Ñ²£¥ÍÀÉ®×¦b record ªO¡C
+
+[1;33m+   sprintf(title, "%s¤å³¹¼Æ¾Ú²Î­p", date);
+[1;33m+   keeplog("gem/@/@-poststat", NULL, title, 0);      [m
+
+    if (fp = fopen(fn_yesday, "w"))
+    {
+      f_suck(fp, fn_today);
+      fclose(fp);
+    }
+    sprintf(title, "%s¤W¯¸¤H¦¸²Î­p", date);
+    keeplog(fn_today, NULL, title, 1);
+
+
+
+: src/util/post-gold.c      ¥[¤J¤U­±¾ã¤äµ{¦¡
+                    ÀÉ®×¥i¦b³o¨ú±o¡Ghttp://140.120.13.11/~qazq/bbs/post-gold.c
+
+/*-------------------------------------------------------*/
+/* util/post-gold.c ( NTHU CS MapleBBS Ver 3.00 )        */
+/*-------------------------------------------------------*/
+/* target : ¤å³¹¼Æ¾Ú²Î­p                                 */
+/* create : 03/11/27                                     */
+/* update :   /  /                                       */
+/* modify : qazq.bbs@csNCHU.twbbs.org                    */
+/*-------------------------------------------------------*/
+
+#include "bbs.h"
+
+#define FN_TOTAL_POST_GOLD_OLD  "run/var/post_gold.old"
+#define OUTPUT_POSTSTAT     BBSHOME"/gem/@/@-poststat"
+
+#define MAX_NUM 5   /* ¥»¤éÄé¤ô¤ý²Î­p¦W¦¸ */
+
+static void
+postnum_top(OutPut_fp)
+  FILE *OutPut_fp;
+{
+  FILE *fp;
+  int i = 0;
+  int postnums[MAX_NUM] = {0};
+  char userid[MAX_NUM][13] = {0};
+
+  if (fp = fopen(FN_RUN_POSTNUMS_TOP, "r"))
+  {
+    while (i <= MAX_NUM - 1)
+    {
+      fscanf(fp, "%d%s", &postnums[i], userid[i]);
+      i++;
+    }
+    fclose(fp);
+  }
+
+  i = 0;
+
+  while (postnums[i] != 0 && i <= MAX_NUM - 1)
+  {
+    fprintf(OutPut_fp, "  \033[1;3%dm²Ä %d ¦W¡G%-13s µoªí %d ½g\033[m\n",
+      i <= 2 ? i + 1 : 7, i + 1, userid[i], postnums[i]);
+    i++;
+  }
+}
+
+int
+main()
+{
+  FILE *fp;
+  FILE *OutPut_fp;
+  POSTGOLD *PostGolds;
+  int i ,total;
+  int total_spendtime = 0, total_wordsnum = 0, total_gold = 0;
+
+  chdir(BBSHOME);
+
+  if (fp = fopen(FN_TOTAL_POST_GOLD, "r"))
+  {
+    total = rec_num(FN_TOTAL_POST_GOLD, sizeof(POSTGOLD));
+    PostGolds = malloc(total * sizeof(POSTGOLD));
+
+    for (i = 0; i <= total - 1; i++)
+      fread(&PostGolds[i], sizeof(POSTGOLD), 1, fp);
+
+    fclose(fp);
+  }
+  else
+    return 0;
+
+  for (i = 0; i <= total - 1; i++)
+  {
+    total_spendtime += PostGolds[i].spendtime;
+    total_wordsnum += PostGolds[i].wordsnum;
+    total_gold += PostGolds[i].gold;
+  }
+
+  if (OutPut_fp = fopen(OUTPUT_POSTSTAT, "w"))
+  {
+    int average_spendtime, average_wordsnum, average_gold;
+    time_t now;
+    struct tm *ptime;
+
+    average_spendtime = total_spendtime / total;
+    average_wordsnum = total_wordsnum / total;
+    average_gold = total_gold / total;
+
+    time(&now);
+    ptime = localtime(&now);
+
+    fprintf(OutPut_fp, "\n        ¢t\033[1;41m        ¥»¤é¤å³¹©Ò±o        \033[m¢u"
+      "        \033[33m²Î­p¤é´Á: \033[36m%d ¤ë %d ¤é\033[m\n\n",
+      ptime->tm_mon + 1, ptime->tm_mday);
+
+    fprintf(OutPut_fp,
+      "  ¤å³¹µoªí\033[31mÁ`½g¼Æ¡G\033[1;31m%d ½g\033[m\n\n"
+      "  µo¤å¯Ó¶O\033[36mÁ`®É¼Æ¡G\033[1;36m%d ¬í \033[0;36m(%d ®É %d ¤À %d ¬í)\033[m\n"
+      "      ¤å³¹\033[32mÁ`¦r¼Æ¡G\033[1;32m%d ­Ó¦r¤¸ \033[0;32m(%d ­¶ %d ¦æ %d ­Ó¦r¤¸)\033[m\n"
+      "      ¤å³¹\033[33mÁ`»ù­È¡G\033[1;33m%d ª÷\033[m\n\n",
+      total, total_spendtime, total_spendtime / 3600, (total_spendtime % 3600) / 60, total_spendtime % 60,
+      total_wordsnum, total_wordsnum / 1840, (total_wordsnum % 1840) / 80, total_wordsnum % 80,
+      total_gold);
+    fprintf(OutPut_fp,
+      "    ¥­§¡¯Ó¶O®É¼Æ¡G\033[1m%d ¬í (%d ¤À %d¬í)\033[m\n"
+      "    ¥­§¡Á`¦r¤¸¼Æ¡G\033[1m%d ­Ó¦r¤¸ (%d ¦æ %d ­Ó¦r¤¸)\033[m\n"
+      "    ¥­§¡¤å³¹»ù­È¡G\033[1m%d ª÷\033[m\n\n",
+      average_spendtime, average_spendtime / 60, average_spendtime % 60,
+      average_wordsnum, average_wordsnum / 80, average_wordsnum % 80,
+      average_gold);
+
+    fprintf(OutPut_fp, "\n        ¢t\033[1;41m        ¥»¤éÄé¤ô¤ý        \033[m¢u\n\n");
+
+    postnum_top(OutPut_fp);
+    fclose(OutPut_fp);
+
+    rename(FN_TOTAL_POST_GOLD, FN_TOTAL_POST_GOLD_OLD);
+    //unlink(FN_TOTAL_POST_GOLD);
+  }
+
+  free(PostGolds);
+  return 0;
+}
+
+: src/util/MakeFile
+
+[1;32m![m ..... poststat [1;32mpost-gold[m reaper ....
+
+==============================================================================
+
+    ³Ì«á¦b crontab ¥[¤J
+
+# ¨C¤Ñ 23:55 °µ·íµM¤å³¹¼Æ¾Ú²Î­p
+55 23 * * * bin/post-gold > /dev/null 2>&1
+
+
+    ¦b (A)nnounce  £i ºëµØ¤½§GÄæ £i ¥[¤J¸ê®Æ
+
+    ÀÉ¦W¬° -poststat
+
+==============================================================================
+
+    ¯u¬O¤£«ç»ò°_²´ªº¥\¯à....
+
+    ¤£¹L´N¬O®ö¶O¤@¤U¨t²Î¸ê·½....^^a
+
+    ¦Ó¥B...ÁÙ¤£«ç»ò·Ç°Ç¡ã
+
+    ¹³¬O....¤å³¹Á`¦r¤¸....´«ºâ¦¨¢æ­¶¢æ¦æ¢æ­Ó¦r¤¸.....
+
+    [1;36mÁÙ¦³¤°»ò¥i¥H¥[¦b³o­Ó²Î­p¸Ì­±ªº¶Ü¡H[m
+
+    §Ú¯à¤O¥i¤Î³£¼g¤F....¨þ¨þ¡ã
+
+    ¦n±ß¤F....©ú¤Ñ¦b¢Þ¢Ýµ{¦¡½X¦n¤F....
+
+==============================================================================
+
+
+
+        ¢t[1;37;41m        ¥»¤é¤å³¹©Ò±o        [m¢u        [33m²Î­p¤é´Á: [36m11 ¤ë 27 ¤é[37m
+
+  ¤å³¹µoªí[31mÁ`½g¼Æ¡G[1;31m65 ½g[m
+
+  µo¤å¯Ó¶O[36mÁ`®É¼Æ¡G[1;36m26270 ¬í [;36m(7 ®É 17 ¤À 50 ¬í)[37m
+      ¤å³¹[32mÁ`¦r¼Æ¡G[1;32m14317 ­Ó¦r¤¸ [;32m(7 ­¶ 17 ¦æ 77 ­Ó¦r¤¸)[37m
+      ¤å³¹[33mÁ`»ù­È¡G[1;33m2654 ª÷[m
+
+    ¥­§¡¯Ó¶O®É¼Æ¡G[1;37m404 ¬í (6 ¤À 44¬í)[m
+    ¥­§¡Á`¦r¤¸¼Æ¡G[1;37m220 ­Ó¦r¤¸ (2 ¦æ 60 ­Ó¦r¤¸)[m
+    ¥­§¡¤å³¹»ù­È¡G[1;37m40 ª÷[m
+
+
+        ¢t[1;37;41m        ¥»¤éÄé¤ô¤ý        [m¢u
+
+  [1;31m²Ä 1 ¦W¡GRamanujan     µoªí 9 ½g[m
+  [1;32m²Ä 2 ¦W¡Gbug           µoªí 6 ½g[m
+  [1;33m²Ä 3 ¦W¡Gqazq          µoªí 6 ½g[m
+  [1;37m²Ä 4 ¦W¡G[¤£§i¶D§A]    µoªí 5 ½g[m
+  [1;37m²Ä 5 ¦W¡Gjohnson       µoªí 5 ½g[m   [m
+
+
+--
+ [1m[42m¢z[41m¢q[m Au[1mth[30mor[m: [43m ¤¤¿³¸ê¬ì£»¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [33;47m csNCHU.twbbs.org [m
+ [1m[44m¢|[43m¢}[m O[1mri[30mgi[mn: [1;36mqazq [30m±q [35m61-217-232-237.HINET-IP.hinet.net [30mµoªí[m

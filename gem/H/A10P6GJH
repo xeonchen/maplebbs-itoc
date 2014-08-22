@@ -1,0 +1,28 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] ³Qµû¤À¹Lªº¤å³¹ÅÜ¥¼Åª
+®É¶¡: 2004/11/11 Thu 18:31:52                           Updated: 2006/07/20
+
+  ¥²¶·¥ý°µ³o½g
+  [¥\¯à] post.c HDR ·s¼W¤@­ÓÄæ¦ìµ¹¤wÅª¥¼Åª»²§U§PÂ_
+
+: post.c:addscore()
+
+  hdd->xmode |= POST_SCORE;
+  hdd->score += curraddscore;
++ hdd->stamp = ram->stamp;
+
+: post.c:post_score()
+
+  if (curraddscore)
+  {
+    currchrono = hdr->chrono;
++   change_stamp(xo->dir, hdr);
+    rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos,
+      cmpchrono, addscore);
++   post_history(xo, hdr);
++   btime_update(currbno);
+    return XO_LOAD;
+  }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

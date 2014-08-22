@@ -1,0 +1,85 @@
+§@ªÌ: itoc (worm.twbbs.org) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] find_title.c ·j´M©Ò¦³¤å³¹¼ÐÃD
+®É¶¡: Wed Aug 28 01:27:24 2002                          Updated: 2005/05/19
+
+  §â¥þ¯¸¬ÝªOªº¤å³¹¼ÐÃD³£·j´M¤@¹M
+
+: src/util/Makefile ¥[¤J find_title
+
+EXE =   ... [1;33mfind_title[m
+
+: src/util/find_title.c ·s¼Wµ{¦¡¦p¤U
+
+/*-------------------------------------------------------*/
+/* util/find_title.c    ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ·j´M©Ò¦³¬ÝªO¥þ³¡¤å³¹¼ÐÃD                     */
+/* create : 03/04/26                                     */
+/* update : 05/05/19                                     */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+static char *keyword;
+
+
+static void
+do_find(brdname)
+  char *brdname;
+{
+  int i, fsize;
+  char folder[64];
+  HDR *hdr;
+
+  printf("¶}©l·j´M %s ªO\n", brdname);
+
+  brd_fpath(folder, brdname, FN_DIR);
+  if (hdr = (HDR *) f_img(folder, &fsize))
+  {
+    fsize /= sizeof(HDR);
+    for (i = 0; i < fsize; i++)
+    {
+      if (strstr(hdr[i].title, keyword))
+        printf("[%s] %s\n", brdname, hdr[i].title);
+    }
+
+    free(hdr);
+  }
+}
+
+
+int
+main(argc, argv)
+  int argc;
+  char *argv[];
+{
+  int num;
+  BRD brd;
+
+  if (argc != 2)
+  {
+    printf("%s keyword\n", argv[0]);
+    return 0;
+  }
+
+  chdir(BBSHOME);
+
+  keyword = argv[1];
+
+  num = 0;
+  while (!rec_get(FN_BRD, &brd, sizeof(BRD), num))
+  {
+    if (*brd.brdname)
+      do_find(brd.brdname);
+    num++;
+  }
+  printf("§ä§¹©Ò¦³¬ÝªO\n");
+
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

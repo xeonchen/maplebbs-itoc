@@ -1,0 +1,75 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ªO¥D¦Û©w¬ÝªO ¤£¨Ï¥Îª`­µ¤å/¤£¯à±À¤å
+®É¶¡: Sun Jul 27 13:53:10 2003                          Updated: 2005/05/26
+
+  §A¥²¶·¥ý°µ¤F³o½g patch
+  [¥\¯à] edit.c ¤£¯à¨Ï¥Îª`­µ¤åªº¬ÝªO
+
+: manage.c §â¥H¤U³o¬q¥[¦b post_battr_noscore() «á­±
+
+#ifdef ANTI_PHONETIC
+static int
+post_battr_nophonetic(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("1)¥i¥H¥Îª`­µ¤å 2)¤£¥i¥Îª`­µ¤å [Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_NOPHONETIC;
+    break;
+  case '2':
+    newbrd.battr |= BRD_NOPHONETIC;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+#endif      /* ANTI_PHONETIC */
+
+: manage.c:post_manage()
+
+#  ifdef HAVE_SCORE
+    "Score   ³]©w¥i§_µû¤À",
+#  endif
++#  ifdef ANTI_PHONETIC
++   "Phoneticª`­µ¤å³]©w",
++#  endif
+
+  ...
+  ...
+
+#  ifdef HAVE_SCORE
+    " (S)µû¤À"
+#  endif
++#  ifdef ANTI_PHONETIC
++   " (P)ª`­µ"
++#  endif
+
+  ...
+  ...
+
+#ifdef HAVE_SCORE
+  case 's':
+    return post_battr_noscore(xo);
+#endif
+
++#ifdef ANTI_PHONETIC
++ case 'p':
++   return post_battr_nophonetic(xo);
++#endif
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

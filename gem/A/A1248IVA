@@ -1,0 +1,205 @@
+µo«H¤H: ForceFire.bbs@bbs.math.cycu.edu.tw (¼É¤O¤õ¥ú) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¦Û°ÊÂà¿ý¨ì¦h­Ó¬ÝªO
+µo«H¯¸: ¼Æ¾Ç¤§®a (2005/09/02 Fri 22:16:20)                Updated: 2005/09/02
+
+¦]¬°±Í¨t¨t¾Ç·|®É±`¤½§i¤@¨ÇªF¦è¡A­nÂà¿ý¤@°ï¤½§iµ¹¯ZªO®aªO
+¹ê¦b¬OÃi´k©Ò¥H§Ë¤F³o­Ó:p
+
+¥i¥HÅÜ¦¨¤@­Ó«öÁä¡A©Î¬Oª½±µ°µ¦bÂà¿ýªº¥\¯à¸Ì­±¡A´N¦h¤@­Ó¿ï¶µµM«á©I¥s¥L´N¦n¤F¡C
+
+
+¨Ï¥Î¤èªk¬Oª½±µ¥s¨Ï¥ÎªÌ¦b¤å³¹¤º®e¥[¤W¥L­nÂà¿ýªº¬ÝªO¦W³æ
+
+¥H <¬ÝªO¦W³æ¶}©l> °µ¬°¶}©l¦æ
+¥H <¬ÝªO¦W³æµ²§ô> °µ¬°µ²§ô¦æ
+¤¤¶¡¬O¬ÝªO¦Cªí¡A¤@­Ó¬ÝªO¤@¦æ
+
+¹³¬O³o¼ËªºªF¦è´¡¤J¦b¤º®e¤¤
+
+<¬ÝªO¦W³æ¶}©l>
+sysop
+junk
+deleted
+0announce
+<¬ÝªO¦W³æµ²§ô>
+
+µM«á¥H«á¯¸°È¥u­n«Ü»´ÃPªº«ö¤@­ÓÁä´N¥i¥H·d©w¡C
+¤W­±¨º¨Ç²Å¸¹¥i¥H¦Û­q¡A´N¼g¦bµ{¦¡¸Ì­±¡C
+
+¦]¬°Ãiªº¥Î¦ê¦C¡A©Ò¥H´N¥Î¤Gºû°}¦C¸Ñ¨M¡A§A¤]¥i¥H§ïÅÜ³Ì¦h¥i¥HÂà¿ý¬ÝªO¤W­­¡C
+
+³Ì«á¦]¬°¹ê¦b¬OÃiªº·Q«öÁä¡A©Ò¥H´Nª½±µ°µ¦b post_cross() ¸Ì­±¤F
+µy·L§ï¤@¤U¶¶§Ç¡A¥[´X¦æµ{¦¡´N ok ¤F
+============================================================================
+
+: ±N³o¬q¥[¦b post.c:post_cross() «e­±
+
+/*-------------------------------------------------------*/
+/* target : ±N¤å³¹Âà¿ý¨ì¦Û­qªº¬ÝªO¦Cªí¤¤                 */
+/* create : 2005/09/02                                   */
+/* author : hialan.bbs@bbs.math.cycu.edu.tw              */
+/*-------------------------------------------------------*/
+
+#define MAX_CROSSBOARD 100      /* ³Ì¦h¯à°÷Âà¿ý¬ÝªO¼Æ */
+
+#define STR_CROSSLISTSTART      "<¬ÝªO¦W³æ¶}©l>"
+#define STR_CROSSLISTEND        "<¬ÝªO¦W³æµ²§ô>"
+
+static int
+cross_loadlist(char *fpath, char boardlist[MAX_CROSSBOARD][BNLEN + 1])
+{
+  FILE *fp;
+  int num, in_list, bno;
+  char buf[ANSILINELEN], *brdname;
+  BRD *brd;
+
+  if (!(fp = fopen(fpath, "r")))
+  {
+    vmsg("µLªk¶}±ÒÀÉ®×¡I");
+    return 0;
+  }
+
+  num = in_list = 0;
+
+  while (fgets(buf, sizeof(buf), fp) && num < MAX_CROSSBOARD)
+  {
+    if (!in_list)
+    {
+      if (!strncmp(STR_CROSSLISTSTART, buf, strlen(STR_CROSSLISTSTART)))
+        in_list = 1;
+      continue;
+    }
+
+    if (!strncmp(STR_CROSSLISTEND, buf, strlen(STR_CROSSLISTEND)))
+      break;
+
+    brdname = boardlist[num];
+
+    if (sscanf(buf, " %12s", brdname) <= 0)
+      continue;
+
+    if ((bno = brd_bno(brdname)) < 0)
+    {
+      sprintf(buf, "%s ¬ÝªO¤£¦s¦b¡I", brdname);
+      vmsg(buf);
+    }
+    else
+    {
+      brd = bshm->bcache + bno;
+      strcpy(brdname, brd->brdname);       /* §ïÅÜ¤j¤p¼g */
+      num++;
+    }
+  }
+
+  fclose(fp);
+  return num;
+}
+
+
+static int
+cross_announce(xo)
+  XO *xo;
+{
+  char boardlist[MAX_CROSSBOARD][BNLEN + 1];
+  char *dir;
+  HDR *hdr, xpost;
+  int num, i;
+  char xfolder[64], fpath[64];
+
+  dir = xo->dir;
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+  hdr_fpath(fpath, dir, hdr);
+
+  if (!(num = cross_loadlist(fpath, boardlist)))
+  {
+    vmsg("¦W³æ®æ¦¡¤£¹ï©Î¬O¨S¦³¦W³æ¡I");
+    return XO_FOOT;
+  }
+
+  clear();
+  prints("¼ÐÃD¡G%s\n", hdr->title);
+  outs("±NÂà¦Ü¤U¦C¬ÝªO\n");
+
+  for (i = 0; i < num && i < (b_lines - 4) * b_cols / (BNLEN + 1); i++)
+  {
+    prints("%-13.13s", boardlist[i]);
+    if (i % (b_cols / (BNLEN + 1)) == b_cols / (BNLEN + 1) - 1)
+      outs("\n");
+  }
+
+  if (vans(msg_sure_ny) == 'y')
+  {
+    for (i = 0; i < num; i++)
+    {
+      brd_fpath(xfolder, boardlist[i], fn_dir);
+
+      /* itoc.030325: ­ì¤åÂà¿ýª½±µ copy §Y¥i */
+      hdr_stamp(xfolder, HDR_COPY | 'A', &xpost, fpath);
+
+      strcpy(xpost.owner, hdr->owner);
+      strcpy(xpost.nick, hdr->nick);
+      strcpy(xpost.date, hdr->date);    /* ­ì¤åÂà¸ü«O¯d­ì¤é´Á */
+      strcpy(xpost.title, hdr->title);
+
+      rec_bot(xfolder, &xpost, sizeof(HDR));
+    }
+  }
+  else
+    vmsg(msg_cancel);
+
+  return XO_HEAD;
+}
+
+: post.c:post_cross()
+
+  tag = AskTag("Âà¿ý");
+  if (tag < 0)
+    return XO_FOOT;
+
+  dir = xo->dir;
+
+- if (!ask_board(xboard, BRD_W_BIT, "\n\n"
+-   "\033[1;33m½Ð¬D¿ï¾A·íªº¬ÝªO¡A¤Á¤ÅÂà¿ý¶W¹L¤TªO¡C\033[m\n\n") ||
+-   (*dir == 'b' && !strcmp(xboard, currboard)))
+-   /* «H½c¡BºëµØ°Ï¤¤¥i¥HÂà¿ý¦Ücurrboard */
+-   return XO_HEAD;
+
+  hdr = tag ? &xhdr : (HDR *) xo_pool + (xo->pos - xo->top);
+
+  /* ­ì§@ªÌÂà¿ý¦Û¤v¤å³¹®É¡A¥i¥H¿ï¾Ü¡u­ì¤åÂà¸ü¡v */
+- method = (HAS_PERM(PERM_ALLBOARD) ||
+-   (!tag && !strcmp(hdr->owner, cuser.userid))) &&
+-   (vget(2, 0, "(1)­ì¤åÂà¸ü (2)Âà¿ý¤å³¹¡H[1] ", buf, 3, DOECHO) != '2') ?
+-   0 : 1;
+
++ if (!HAS_PERM(PERM_ALLBOARD) && (tag || strcmp(hdr->owner, cuser.userid)))
++   method = 1;
++ else
++ {
++   vget(1, 0, HAS_PERM(PERM_ALLBOARD) ?
++     "(1)­ì¤åÂà¸ü (2)Âà¿ý¤å³¹ (3)CrossPost¤½§i¡H[Q] " :
++     "(1)­ì¤åÂà¸ü (2)Âà¿ý¤å³¹¡H[Q] ", buf, 3, DOECHO);
++
++   method = (buf[0] == '1') ? 0 :
++            (buf[0] == '2') ? 1 :
++            (buf[0] == '3') ? 3 : -1;
++
++   if (method == 3)
++     return cross_announce(xo);
++
++   if (method < 0)
++     return XO_HEAD;
++ }
+
++ if (!ask_board(xboard, BRD_W_BIT, "\n\n"
++   "\033[1;33m½Ð¬D¿ï¾A·íªº¬ÝªO¡A¤Á¤ÅÂà¿ý¶W¹L¤TªO¡C\033[m\n\n") ||
++   (*dir == 'b' && !strcmp(xboard, currboard)))
++   /* «H½c¡BºëµØ°Ï¤¤¥i¥HÂà¿ý¦Ücurrboard */
++   return XO_HEAD;
+
+  if (!tag)     /* lkchu.981201: ¾ã§åÂà¿ý´N¤£­n¤@¤@¸ß°Ý */
+
+--
+ [1;43m¢~[46m¢q[m Origin: [41m ¤¤­ì¤j¾Ç£»¼Æ¾Ç¤§®a [32;47m bbs.math.cycu.edu.tw [m
+ [1;44m¢q[41m¢£[m Author: [1;33mForceFire [30m±q [35m203-67-154-247.adsl.dynamic.seed.net.tw[30m µoªí[m
+--

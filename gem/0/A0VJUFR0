@@ -1,0 +1,296 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¬ÝªO»¡©ú
+®É¶¡: Sun Jun  1 11:56:03 2003                          Updated: 2006/04/17
+
+  1. µ¹¤©¨C­Ó¬ÝªOÂ²³æªº»¡©úÂ²¤¶
+  2. ­Y­n§ïÅÜ¬ÝªO»¡©úªº¦æ¼Æ½Ð§ó§ï xover.c:xover()
+  3. §Ë¦¨Habit¿ï¶µ¡A¦]¬°³oªF¦è¦³¤H³ßÅw¦³°Q¹½
+  4. ¦b§Úªº³Ì·R¤¤¤]¥i¥H¥¿±`Åã¥Ü
+
+: include/config.h
+
++ #define HAVE_BRD_EXPLAIN              /* kenshieh.010114: ¬ÝªO»¡©ú */
+
+: include/global.h
+
++ #define FN_EXPLAIN     "explain"
+
++ VAR char *fn_explain     INI(FN_EXPLAIN);
+
+: include/modes.h
+
+#define XO_RSIZ         256
+
++ #ifndef HAVE_BRD_EXPLAIN
+#define XO_TALL         (b_lines - 3)
++ #endif
+
+: global.h
+
++ #ifdef HAVE_BRD_EXPLAIN
++ VAR int XO_TALL;
++ #endif
+
+: include/ufo.h
+
+#define UFO_KIMONEWS    BFLAG(18)       /* itoc.020130: ¤W¯¸¬Ý Kimo News */
++ #define UFO_BRDEXP      BFLAG(19)       /* amaki.030524: ¬ÝªO»¡©úªº¼ÐÅÒ */
+
+  ...
+  ...
+
+- #define NUMUFOS_USER    19      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 19 ­Ó ufo */
++ #define NUMUFOS_USER    20      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 20 ­Ó ufo */
+
+- #define STR_UFO         "-mpsnemPBQFANbwtSHK-----CHA"
++ #define STR_UFO         "-mpsnemPBQFANbwtSHKE----CHA"
+
+  §ï¤@¤Uufo_tbl[]¡A°O±o­n¹ï»ô¤W­±ªºSTR_UFO¦ì¸m¡C
+
++#ifdef HAVE_BRD_EXPLAIN                 /* UFO_BRDEXP */
++  "¬ÝªO»¡©ú        (Åã¥Ü/ÁôÂÃ)",
++#else
+  "«O¯d",
++#endif
+
+: bbsd.c:term_init()
+
+  else
+  {
+    b_lines = 23;
+    b_cols = 79;
+  }
+
+  d_cols = b_cols - 79;
++ #ifdef HAVE_BRD_EXPLAIN
++ /* initial XO_TALL */
++ XO_TALL = b_lines - 3;
++ #endif
+}
+
+: maple/board.c:class_body()
+
+- } while (++n < b_lines);
++ } while (++n < XO_TALL + 3);
+
+: so/manage.c:post_explain_edit() ·s¼W³o¨ç¦¡©ó post_memo_edit() «á­±
+
+/* ----------------------------------------------------- */
+/* ªO¥D¥\¯à : ­×§ï¬ÝªO»¡©ú                               */
+/* ----------------------------------------------------- */
+
+
+#ifdef HAVE_BRD_EXPLAIN
+static int
+post_explain_edit(xo)
+  XO *xo;
+{
+  int mode;
+  char fpath[64];
+
+  mode = vans("¬ÝªO»¡©ú (D)§R°£ (E)­×§ï (Q)¨ú®ø¡H[E] ");
+
+  if (mode != 'q')
+  {
+    brd_fpath(fpath, currboard, fn_explain);
+    if (mode == 'd')
+      unlink(fpath);
+    else
+    {
+      if (vedit(fpath, 0)) /* Thor.981020: ª`·N³Qtalkªº°ÝÃD */
+        vmsg(msg_cancel);
+
+      return XO_HEAD;
+    }
+  }
+
+  return XO_FOOT;
+}
+#endif
+
+: so/manage.c:post_manage()
+
+    "WMemo   ½s¿è¶iªOµe­±",
++#ifdef HAVE_BRD_EXPLAIN
++   "Explain ½s¿è¬ÝªO»¡©ú",
++#endif
+
+  ...
+  ...
+
++#ifdef HAVE_BRD_EXPLAIN
++ char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (E)»¡©ú (M)°ÆªO"
++#else
+  char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO"
++#endif
+
+  ...
+  ...
+
+  case 'w':
+    ret = post_memo_edit(xo);
+    break;
+
++ case 'e':
++   ret = post_explain_edit(xo);
++   break;
+
+: maple/xover.c:XoBoard() ·s¼W³o¨ç¦¡©ó xover() «e­±
+
+#ifdef HAVE_BRD_EXPLAIN
+static void
+XoBoard(xo, zone)           /* ¬ÝªO»¡©ú */
+  XO *xo;
+  int zone;
+{
+  int bno;
+  short *chp;
+  char buf[ANSILINELEN];
+  BRD *brd;
+  MF *mf;
+  FILE *fp;
+
+  if (!(cuser.ufo & UFO_BRDEXP))
+    return;
+
+  if (zone == XZ_CLASS)
+  {
+    chp = (short *) xo->xyz + xo->pos;
+    bno = *chp;
+  }
+  else if (zone == XZ_MF)
+  {
+    mf = (MF *) xo_pool + (xo->pos - xo->top);
+    if (mf->mftype & MF_BOARD)
+      bno = brd_bno(mf->xname);
+    else
+      return;
+  }
+  else
+  {
+    return;
+  }
+
+  move(XO_TALL + 3, 0);
+  clrtobot();
+  outs(msg_seperator);
+
+  if (bno >= 0)
+  {
+    brd = bshm->bcache + bno;
+    brd_fpath(buf, brd->brdname, "explain");
+
+    if (fp = fopen(buf, "r"))
+    {
+      for (bno = XO_TALL + 4; bno < b_lines; bno++)     /* ­É¥Î bno */
+      {
+        if (!(fgets(buf, ANSILINELEN, fp)))
+          break;
+        buf[79] = '\0';
+        move(bno, 0);
+        outx(buf);
+      }
+
+      fclose(fp);
+    }
+  }
+  outf(xz[zone].feeter);
+}
+#endif
+
+: xover.c:xover() ¶i¤J¬ÝªO¦Cªí/§Úªº³Ì·R®É¡A±N XO_TALL §ï¬° b_lines-7
+
+  int pos, num, zone, sysmode;
+  XO *xo;
+  KeyFunc *xcmd, *cb;
+
++#ifdef HAVE_BRD_EXPLAIN
++ zone = cmd;
++#endif
+
+  for (;;)
+  {
+    while (cmd != XO_NONE)
+    {
++#ifdef HAVE_BRD_EXPLAIN
++     /* ¤T¦æ¬ÝªO»¡©ú¡B¤@¦æ¤À¹j½u¡A¦@¥|¦æ */
++     /* 7 - 3 = 4¡A­Y­n§ï¬ÝªO»¡©úªº¦æ¼Æ¡A§ï 7 ³o­Ó¼Æ¦r */
++     XO_TALL = ((cuser.ufo&UFO_BRDEXP) && (zone==XZ_CLASS || zone==XZ_MF)) ?
++       b_lines - 7 : b_lines - 3;
++#endif
+
+      if (cmd == XO_FOOT)
+
+  ...
+  ...
+        xcmd = xz[cmd].cb;
+        sysmode = xz[cmd].mode;
++#ifdef HAVE_BRD_EXPLAIN
++       /* ¤T¦æ¬ÝªO»¡©ú¡B¤@¦æ¤À¹j½u¡A¦@¥|¦æ */
++       /* 7 - 3 = 4¡A­Y­n§ï¬ÝªO»¡©úªº¦æ¼Æ¡A§ï 7 ³o­Ó¼Æ¦r */
++       XO_TALL = ((cuser.ufo&UFO_BRDEXP) && (zone==XZ_CLASS || zone==XZ_MF)) ?
++         b_lines - 7 : b_lines - 3;
++#endif
+  ...
+  ...
+
+    if (xo->max > 0)            /* Thor: ­Y¬OµLªF¦è´N¤£show¤F */
+    {
+      num = 3 + pos - xo->top;
+      move(num, 0);
+      outc('>');
++#ifdef HAVE_BRD_EXPLAIN
++     XoBoard(xo, zone);
++#endif
+    }
+
+: xover.c:xover()  Â÷¶}®É¡A±N XO_TALL ÁÙ­ì
+
+          if (cmd == XO_QUIT)
++         {
++           XO_TALL = b_lines - 7;
+            return;
++         }
+
+  ...
+  ...
+
+    if (cmd == KEY_LEFT || cmd == 'e')
+    {
+      /* cmd = XO_LAST; *//* try to load the last XO in future */
++     XO_TALL = b_lines - 7;
+      return;
+    }
+
+: board.c:class_head()
+
+static int
+class_head(xo)
+  XO *xo;
+{
++#ifdef HAVE_BRD_EXPLAIN
++ /* ¤T¦æ¬ÝªO»¡©ú¡B¤@¦æ¤À¹j½u¡A¦@¥|¦æ */
++ /* 7 - 3 = 4¡A­Y­n§ï¬ÝªO»¡©úªº¦æ¼Æ¡A§ï 7 ³o­Ó¼Æ¦r */
++ XO_TALL = (cuser.ufo & UFO_BRDEXP) ? b_lines - 7 : b_lines - 3;
++#endif
+  vs_head("¬ÝªO¦Cªí", str_site);
+  return class_neck(xo);
+}
+
+: favor.c:mf_init()
+
+static int
+mf_init(xo)
+  XO *xo;
+{
++#ifdef HAVE_BRD_EXPLAIN
++ /* ¤T¦æ¬ÝªO»¡©ú¡B¤@¦æ¤À¹j½u¡A¦@¥|¦æ */
++ /* 7 - 3 = 4¡A­Y­n§ï¬ÝªO»¡©úªº¦æ¼Æ¡A§ï 7 ³o­Ó¼Æ¦r */
++ XO_TALL = (cuser.ufo & UFO_BRDEXP) ? b_lines - 7 : b_lines - 3;
++#endif
+  xo_load(xo, sizeof(MF));
+  return mf_head(xo);
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

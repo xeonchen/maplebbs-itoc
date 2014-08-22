@@ -1,0 +1,133 @@
+µo«H¤H: Titan.bbs@KH.twbbs.org (©ú¤Ñ¨£) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] bbs»PCoppermine Photo Gallery±b¸¹¦P¨B
+µo«H¯¸: ´ä³£©]¥¼¯v (2004/05/01 Sat 15:17:32)              Updated: 2004/10/31
+
+    ­n°µ³o½g¤§«e¡A¥²¶·¶}±Òbbsªºpop3d¡A°µ±K½X½T»{¥Î
+    «ØÄ³­n°µ³o­Óªº¤H¦Ü¤Ö¬Ý±oÀ´PHP»yªk¸òSQL¡A¤£µM·|°ÝÃD«Ü¦h
+    ­n°µ¤§«e«ØÄ³¥ý[33;1m³Æ¥÷¸ê®Æ®w[m
+
+    ­ì²z¤j­P¬O³o¼Ë¡A±qpop3d¥h½T»{±b¸¹±K½X¬O§_¥¿½T
+    ¦pªG¥¿½Tªº¸Ü´Nµn¤J¡A¦ý¬O¦]¬°cpg·|¦b¤§«áªº°Ê§@¤¤¥h½T»{±K½X
+    ©Ò¥H¦b·s¼W±b¸¹®É±K½X¨ºÄæÁÙ¬O­nÀH«K¶ë­ÓªF¦è¡A¶ë¤°»ò´NµL©Ò¿×
+
+    ¦pªGµn¤J¤§«á¡Aµo²{cpgªº¸ê®Æ®w¨S³o­Ó¤H¡A´N¦Û°Ê·s¼W³o­Ó±b¸¹
+    ¤]´N¬O»¡¡A¦pªG¨Sµn¹L¬ÛÃ¯ªº¤H¡A´N¤£·|¦³¥Lªº±b¸¹¦b¸ê®Æ®w¤¤
+
+    §Ú¤£¬OPHP°ª¤â¡A¬Ý§ÚªºÅÜ¼Æ¤£²nªº´N¦Û¤v¨ú§a¡ASQL«ü¥O½Ð¦Û¤v±µ°_¨Ó
+    §Ú¥u¬O¸ÕµÛ§â¥\¯à§@¥X¨Ó¡A¦pªG¦³bug©Î¬OÁÙ¥i¥H§ó¦nªº¦a¤è¡A½Ð«ü±Ð
+
+: login.php
+
+¦b$cookie_warning = '';³o¥y«á­±¥[¤W³o¬q
+
+- if (isset($HTTP_POST_VARS['submitted'])) {
+-     $results = db_query("SELECT user_id, user_name, user_password FROM
+-  {$CONFIG['TABLE_USERS']} WHERE user_name = '" . addslashes($HTTP_POST_VARS
+- ['username']) . "' AND BINARY user_password = '" . addslashes($HTTP_POST_VARS
+- ['password']) . "' AND user_active = 'YES'");
+
+function is_ok($string)  //rocet´£¨Ñ
+{
+  $flag = trim(preg_replace("/(^[+-])((.+))/", "\\1", $string));
+  if ($flag == "+")
+    return true;
+  else if ($flag == "-")
+    return false;
+}
+
+$socket = 0;  // socket ¶}±Ò§¹¦¨
+$user = 0;    // user ÀË¬d³q¹L
+$pass = 0;    // pass ÀË¬d³q¹L
+$ok = 0;      // socket/user/pass ³£¥¿½T
+
+if (isset($HTTP_POST_VARS['submitted']))
+{
+  $fp = fsockopen("localhost", 110, $errno, $errstr, 30);
+  if (!$fp)
+  {
+    echo "$errstr ($errno)<br />\n";
+  }
+  else
+  {
+    if (is_ok(fgets($fp)))
+      $socket = 1;
+    else
+      echo "socket can't open";
+
+    fputs($fp, "user " . addslashes($HTTP_POST_VARS['username']) . "\r\n");
+    if (is_ok(fgets($fp)))
+      $user = 1;
+    fputs($fp, "pass " . addslashes($HTTP_POST_VARS['password']) . "\r\n");
+    if (is_ok(fgets($fp)))
+      $pass = 1;
+    fputs($fp, "quit\r\n");
+
+    if ($socket && $user && $pass)
+      $ok = 1;
+
+    $checkdata = db_query("SELECT user_id FROM {$CONFIG['TABLE_USERS']}
+      WHERE user_name = '" . addslashes($HTTP_POST_VARS['username']) . " '");
+
+    if (!(mysql_num_rows($checkdata)) && $ok == "1")
+    {
+      $checkvalue = db_query("SELECT user_id FROM {$CONFIG['TABLE_USERS']}
+        ORDER BY `user_id` DESC");
+      $count = mysql_fetch_array($checkvalue);
+      $newcount = $count[0] + 1;
+
+      db_query("INSERT INTO {$CONFIG['TABLE_USERS']}
+        (`user_id`, `user_group`, `user_active`, `user_name`,
+         `user_password`, `user_lastvisit`, `user_regdate`,
+         `user_group_list`, `user_email`, `user_website`, `user_location`,
+         `user_interests`, `user_occupation`, `user_actkey`)
+        VALUES ('$newcount', '2', 'YES', '" .
+        addslashes($HTTP_POST_VARS['username']) . "', 'password',
+        '0000-00-00 00:00:00', NOW() , '', '','', '', '', '', '');");
+    }
+
+    $result = db_query("SELECT user_password FROM {$CONFIG['TABLE_USERS']}
+      WHERE user_name = '" . addslashes($HTTP_POST_VARS['username']) . "'
+      AND user_active ='YES'");
+
+    $value = mysql_fetch_array($result);
+
+    $HTTP_POST_VARS['password'] = $value['user_password'];
+
+    fclose($fp);
+  }
+
+  $results = db_query("SELECT user_id, user_name, user_password
+    FROM {$CONFIG['TABLE_USERS']}
+    WHERE user_name = '" . addslashes($HTTP_POST_VARS['username']) ."' AND
+    BINARY user_password = '" . addslashes($HTTP_POST_VARS['password']) . "'
+    AND user_active = 'YES'");
+
+¤W­±³o¬q¥[§¹¤§«á¡A§ï³o­Ó¦a¤è
+
+- if (mysql_num_rows($results)) {
++ if (mysql_num_rows($results) && $ok == "1") {
+
+
+: profile.php
+
+¬JµM±b¸¹¦P¨B¡A¨º´N¤£»Ý­n­×§ï±K½Xªº¿ï¶µ¤F
+
+§ä¨ì³o¤@¦æ¡A¬ù240¦æ¥ª¥k
+
+<input type="submit" name="change_pass"
+          value="{$lang_register_php['change_pass']}" class="button">
+
+ª½±µ§R°£¡A©Î¬Oµù¸Ñ°_¨Ó¡A¦p¡G
+
+<!-- <input type="submit" name="change_pass" value="{$lan
+          value="{$lang_register_php['change_pass']}" class="button"> -->
+
+
+    ³o¼Ë°µ§¹¤§«á¡A²z½×¤W´N¥i¥H±b¸¹¸ò±K½X¦P¨B¡A¦pªG¨S¦³¥Î¹L¬ÛÃ¯ªº±b¸¹
+    ²Ä¤@¦¸µn¤J¬ÛÃ¯®É·|¦Û°Ê¼W¥[±b¸¹¡A§Ú¥u¦³¦b§Ú¯¸¤W¸Õ¹L¡A¨S°µ¹L¨ä¥L´ú¸Õ
+
+
+--
+[1;37m¢~¢w[1;37m¢w°ª¶¯ £i Kaohsiung ¢w¢w¢w¢w¢w¢¡A[mu[1;37mth[mo[1;30mr¡G[37mTitan[m
+[1;37m¢x[44;30m°ª¶¯[37m¡E[30m´ä³£©]¥¼¯v [;33;44m£p [33;1mKH[0;44m.twbbs.org[0;1;37m¢xF[mr[1;37mom  [30m¡G[m218-34-82-31.cm.dynamic.apol.c[m
+[1;37m¢u¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢tT[mi[1mme[30m  ¡G2004/05/01 Sat 15:17:32[m

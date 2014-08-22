@@ -1,0 +1,1050 @@
+µo«H¤H: SnowWolf.bbs@xeon.tfcis.org (ÀR©]) ¬ÝªO: plan
+¼Ð  ÃD: [¤å¥ó] ¤j´I¯Î
+µo«H¯¸: °Ê¤O®Ö¤ß (Fri, 08 Aug 2003 22:24:43 +0800 (CST))  Updated: 2004/01/10
+
+: rich.c
+
+/************************************************/
+/*          ¤j´I¯Î_v1.00_870619                 */
+/*                                              */
+/*          Author: dsyan                       */
+/*      Create: 87/04/29                        */
+/*      Update: xx/xx/xx                        */
+/************************************************/
+
+/* ¥»µ{¦¡¶È¨Ñ¾Ç³N´ú¸Õ¤Î¨p¤H¬ã¨s¥Î³~¡AÄY¸T²¾§@¥L¥Î!! */
+/* ­Y¦³¥ô¦ó°ÝÃDÅwªï°Q½×.. u8511088@cc.nctu.edu.tw   */
+/* ¦pªG§A§â¥¦§ï±o«Ü´Îªº¸Ü, ­n°O±o mail §Ú¤@¤UËç! :) */
+
+
+#include "bbs.h"
+
+
+struct RICH_STRUCT
+{
+  char lfx, lfy, nowuser, start, maxmax;
+  char station[10], wapow[10], posi[10];
+  char land[40], name[10][15], sym[10][3];
+  char sls[6][3], msg[12][80], map[40][20], readmsg[10][12];
+  char chance[15][60], fate[15][60], landst[6][5];
+  int mapidx[40], chanceidx[15], fateidx[15], fee[40][9], current;
+  long money[10];
+};
+
+static char inp[50], inpc, card, prec, delay, msgc, msgcc, editmode;
+static char mymsg[6][80];
+static struct RICH_STRUCT *ri;
+
+
+/*-------------------------------------------------------*/
+/* ¿Ã¹õ±±¨î                                              */
+/*-------------------------------------------------------*/
+
+
+static void
+clrfromto(x, y)
+  int x, y;
+{
+  int i;
+
+  i = x;
+  while (i <= y)
+  {
+    move(i, 0);
+    clrtoeol();
+    i++;
+  }
+}
+
+
+static int          /* 1: ÀÉ®×¦b  0: ÀÉ®×¤£¦b */
+show_file(fpath, ln, lines) /* ±q²Ä ln ¦C¶}©l¦LÀÉ®× lines ¦æ */
+  char *fpath;
+  int ln, lines;
+{
+  FILE *fp;
+  char buf[ANSILINELEN];
+  int i;
+
+  if ((fp = fopen(fpath, "r")))
+  {
+    clrfromto(ln, ln + lines);
+    move(ln, 0);
+    i = lines;
+    while (fgets(buf, ANSILINELEN, fp) && i--)
+      outs(buf);
+    fclose(fp);
+    return 1;
+  }
+  return 0;
+}
+
+
+static void
+showcursor()
+{
+  char i, j, c[3];
+
+  for (i = 0; i < 40; i++)
+  {
+    c[0] = 32;
+    c[1] = 32;
+    c[2] = 0;
+    for (j = 0; j < ri->maxmax; j++)
+    {
+      if (ri->posi[j] == i)
+    strcpy(c, ri->sym[j]);
+    }
+    if (!i)
+    {
+      move(20, 64);
+      outs(c);
+    }
+    if (i > 0 && i < 10)
+    {
+      move(19, 67 - i * 6);
+      outs(c);
+    }
+    if (i == 10)
+    {
+      move(20, 10);
+      outs(c);
+    }
+    if (i > 10 && i < 20)
+    {
+      move(41 - i * 2, 12);
+      outs(c);
+    }
+    if (i == 20)
+    {
+      move(2, 10);
+      outs(c);
+    }
+    if (i > 20 && i < 30)
+    {
+      move(3, i * 6 - 113);
+      outs(c);
+    }
+    if (i == 30)
+    {
+      move(2, 64);
+      outs(c);
+    }
+    if (i > 30)
+    {
+      move(2 * i - 59, 62);
+      outs(c);
+    }
+  }
+}
+
+
+static void
+showhouse()
+{
+  int i, x;
+  for (x = 0; x < 40; x++)
+  {
+    i = ri->mapidx[x];
+    if (i < 0 || i > ri->maxmax - 1)
+      continue;
+    if (x > 0 && x < 10)
+    {
+      move(20, 66 - x * 6);
+      prints("%s%s", ri->sym[i], ri->sls[ri->land[x]]);
+    }
+    if (x > 10 && x < 20)
+    {
+      move(41 - x * 2, 0);
+      outs(ri->sls[ri->land[x]]);
+      move(41 - x * 2, 10);
+      outs(ri->sym[i]);
+    }
+    if (x > 20 && x < 30)
+    {
+      move(2, x * 6 - 114);
+      prints("%s%s", ri->sym[i], ri->sls[ri->land[x]]);
+    }
+    if (x > 30)
+    {
+      move(2 * x - 59, 74);
+      outs(ri->sls[ri->land[x]]);
+      move(2 * x - 59, 64);
+      outs(ri->sym[i]);
+    }
+  }
+}
+
+
+static void
+my_turn()
+{
+  if (prec == ri->current && editmode)
+  {
+    move(7 + ri->lfx, 13 + ri->lfy);
+    prints("%s[%s]½Ð«öªÅ¥ÕÁäÂY»ë¤l..", ri->sym[prec], ri->name[prec]);
+    move(18, 16 + inpc);
+  }
+}
+
+
+static void
+showmsg()
+{
+  char i, j, buf[80];
+
+  for (i = 0; i < 12; i++)
+  {
+    if (!ri->readmsg[prec][i])
+      continue;
+    strcpy(mymsg[msgc], ri->msg[i]);
+    msgc = (msgc + 1) % 6;
+    ri->readmsg[prec][i] = 0;
+  }
+  if (msgc != msgcc)
+  {
+    showcursor();
+    showhouse();
+    refresh();
+    strcpy(buf, "                                                   ");
+    for (i = 0; i < 6; i++)
+    {
+      move(12 + i, 14);
+      j = 48 - strlen(mymsg[(msgc + i) % 6]);
+      buf[j] = 0;
+      prints("%s%s", mymsg[(msgc + i) % 6], buf);
+      buf[j] = 32;
+    }
+    msgcc = msgc;
+  }
+  alarm(1);
+  my_turn();
+  refresh();
+}
+
+
+static void
+sendmsg2(mytxt)
+  char *mytxt;
+{
+  FILE *fp;
+  char i, j, k;
+
+  fp = fopen("etc/rich", "a+");
+  fprintf(fp, "%s\n", mytxt);
+  fclose(fp);
+
+  for (i = 0; i < ri->maxmax; i++)
+  {
+    k = -1;
+    while (k)
+    {
+      for (j = 0; j < 12; j++)
+      {
+    if (ri->readmsg[i][j])
+      continue;
+    ri->readmsg[i][j] = 1;
+    strcpy(ri->msg[j], mytxt);
+    k = 0;
+    break;
+      }
+    }
+  }
+}
+
+
+static void
+goprison()
+{
+  char richbuf[100];
+
+  move(9 + ri->lfx, 13 + ri->lfy);
+  outs("«¢«¢«¢! §A³QÃö¤F!!!");
+  sprintf(richbuf, "%s%s§¤¨c¤F...", ri->sym[prec], ri->name[prec]);
+  sendmsg2(richbuf);
+  if (card)
+  {
+    vmsg(NULL);
+    move(9 + ri->lfx, 13 + ri->lfy);
+    outs("¤°»ò?!¦³§Kº»¥d..¨ººâ¤F...");
+    sendmsg2("¤°»ò?!¦³§Kº»¥d..¨ººâ¤F...");
+    card--;
+  }
+  else
+  {
+    ri->posi[prec] = 10;
+    delay = 3;
+  }
+}
+
+
+static void
+de(mo)
+  long mo;
+{
+  ri->money[prec] -= mo;
+}
+
+
+static void
+reload()
+{
+  clear();
+  show_file("etc/game/display", 0, 24);
+  showcursor();
+  showhouse();
+}
+
+
+static void
+editmsg()
+{
+  char i, mybuf[100];
+
+  refresh();
+  move(11, 18);
+  outs("¡õ°T®§");
+
+  while (-1)
+  {
+    i = vkey();
+    switch (i)
+    {
+    case Ctrl('Q'):
+      if (!prec)
+      {
+    sendmsg2("®àªø¤w¸¨¶]¤F..½Ð«ötabÁä¸òµÛ¸¨¶]§a!!");
+    ri->current = 1000;
+    ri->start = 0;
+    ri->maxmax = 0;
+    return;
+      }
+      break;
+
+    case Ctrl('L'):
+      reload();
+      break;
+
+    case KEY_TAB:
+      refresh();
+      move(11, 18);
+      outs("¡ô©R¥O");
+      return;
+      break;
+
+    case KEY_BKSP:
+      move(18, 16 + inpc);
+      outs(" ");
+      inpc--;
+      if (inpc < 0)
+    inpc = 0;
+      move(18, 16 + inpc);
+      break;
+
+    case KEY_ENTER:
+      if (inpc)
+      {
+    inp[inpc] = 0;
+    if (!strcmp(inp, "/help"))
+    {
+      sendmsg2("®àªø¥´ /bye ¥i¸õ¥X¹CÀ¸..");
+      sendmsg2("«ö Tab Áä¥i¤Á´«°T®§¤Î©R¥O¼Ò¦¡..");
+      sendmsg2("­n¸õ¥X¥²¶·¾ã²Õ¸õ..");
+    }
+    else if (!prec && !strcmp(inp, "/bye"))
+    {
+      sendmsg2("®àªø¤w¸¨¶]¤F..");
+      sendmsg2("½Ð«ötabÁä¸òµÛ¸¨¶]§a!!");
+      ri->current = 1000;
+      ri->start = 0;
+      ri->maxmax = 0;
+      return;
+    }
+    else
+    {
+      sprintf(mybuf, "%s%s> %s", ri->sym[prec], ri->name[prec], inp);
+      sendmsg2(mybuf);
+    }
+      }
+      inpc = 0;
+      move(18, 16);
+      outs("                                        ");
+      move(18, 16);
+      break;
+
+    default:
+      inp[inpc] = i;
+      move(18, 16 + inpc);
+      outc(i);
+      inpc++;
+      move(18, 16 + inpc);
+      if (inpc > 34)
+    inpc = 34;
+      break;
+    }
+  }
+}
+
+
+static void
+log_rich(log)
+  char *log;
+{
+  FILE *fp;
+
+  if (fp = fopen("etc/game/rich.log", "a+"))
+  {
+    fprintf(fp, "%s %s\n", Now(), log);
+    fclose(fp);
+  }
+}
+
+
+int
+main_rich()
+{
+  time_t now, startime;
+  char richbuf[200], card;
+  int i, j, k = -1, dice;
+  delay = card = msgc = 0;
+  FILE *fp;
+
+  more("etc/game/rich.welcome", NULL);  /* Åwªïµe­± */
+
+  vs_bar("ºô¸ô¤j´I¯Î");
+  ri = shm_new(6665, sizeof(*ri));
+
+  srandom(time(NULL) + cuser.userno);
+
+  if (!ri->nowuser)
+  {
+    ri->nowuser = 22;
+    vget(1, 0, "´X­Ó¤H­nª±?? (2~10)", richbuf, 3, LCECHO);
+    i = atoi(richbuf);
+    ri->nowuser = 0;
+    if (i < 2 || i > 10)
+      return;
+    ri->maxmax = i;
+  }
+
+  move(19, 0);
+  if (ri->start)
+  {
+    prints("¤w¸g¦³¤@²Õ¦@ %d ­Ó¤H¦bª±¤F!..\n½Ðµ¥¤@¤U¦A¶i¨Ó..", ri->maxmax);
+    vmsg(NULL);
+    return 0;
+  }
+
+  if (!ri->maxmax && ri->nowuser)
+  {
+    outs("¤W¤@®à¥¿¦bµ²§ô¤¤!..\n½Ðµ¥¤@¤U¦A¶i¨Ó..");
+    vmsg(NULL);
+    return 0;
+  }
+
+  if (ri->nowuser == 22)
+  {
+    outs("³]©wª±®a¤H¼Æ¤¤..½Ðµy«á¦A¸Õ...");
+    vmsg(NULL);
+    return 0;
+  }
+
+  if (!ri->nowuser)
+  {
+    strcpy(ri->landst[0], "ªÅ¦a");
+    strcpy(ri->landst[1], "¥­©Ð");
+    strcpy(ri->landst[2], "¤G¼Ó");
+    strcpy(ri->landst[3], "¤T¼Ó");
+    strcpy(ri->landst[4], "¥|¼Ó");
+    strcpy(ri->landst[5], "®ÈÀ]");
+
+    strcpy(ri->sym[0], "¢°");
+    strcpy(ri->sym[1], "¢±");
+    strcpy(ri->sym[2], "¢²");
+    strcpy(ri->sym[3], "¢³");
+    strcpy(ri->sym[4], "¢´");
+    strcpy(ri->sym[5], "¢µ");
+    strcpy(ri->sym[6], "¢¶");
+    strcpy(ri->sym[7], "¢·");
+    strcpy(ri->sym[8], "¢¸");
+    strcpy(ri->sym[9], "¢¯");
+
+    strcpy(ri->sls[0], "¡³");
+    strcpy(ri->sls[1], "¢¹");
+    strcpy(ri->sls[2], "¢º");
+    strcpy(ri->sls[3], "¢»");
+    strcpy(ri->sls[4], "¢¼");
+    strcpy(ri->sls[5], "¡¹");
+
+    ri->lfx = ri->lfy = 1;
+  }
+
+  k = -1;
+  for (prec = 0; prec < ri->maxmax; prec++)
+  {
+    move(prec + 3, 10);
+    prints("%s [%s]         ", ri->sym[prec], ri->name[prec]);
+    if (!ri->name[prec][0] && k < 0)
+      k = prec;
+  }
+  prec = k;
+  ri->name[prec][0] = 1;
+  ri->nowuser++;
+
+  move(19, 0);
+  outs("½Ð¿é¤J§Aªº¤j¦W..");
+  vget(prec + 3, 12, " ", richbuf, 11, LCECHO);
+  if (!richbuf[0])
+  {
+    ri->name[prec][0] = 0;
+    ri->nowuser--;
+    return;
+  }
+  strcpy(ri->name[prec], richbuf);
+
+  if (!prec)
+  {
+    for (i = 0; i < 40; i++)
+      ri->land[i] = 0;
+
+    /* ¦a¹ÏÀÉ */
+    fp = fopen("etc/game/map", "r");
+    for (i = 0; i < 40; i++)
+      fscanf(fp, "%s %d", ri->map[i], &ri->mapidx[i]);
+    fclose(fp);
+
+    /* ©R¹B */
+    fp = fopen("etc/game/fate", "r");
+    for (i = 0; i < 15; i++)
+      fscanf(fp, "%s %d", ri->fate[i], &ri->fateidx[i]);
+    fclose(fp);
+
+    /* ¾÷·| */
+    fp = fopen("etc/game/chance", "r");
+    for (i = 0; i < 15; i++)
+      fscanf(fp, "%s %d", ri->chance[i], &ri->chanceidx[i]);
+    fclose(fp);
+
+    /* ¶O¥Î */
+    fp = fopen("etc/game/fee", "r");
+    for (i = 0; i < 40; i++)
+    {
+      fscanf(fp, "%d %d %d %d %d %d %d %d %d\n", &ri->fee[i][0], &ri->fee[i][1],
+    &ri->fee[i][2], &ri->fee[i][3], &ri->fee[i][4], &ri->fee[i][5], &ri->fee[i][6],
+    &ri->fee[i][7], &ri->fee[i][8]);
+    }
+    fclose(fp);
+
+    ri->current = 0;        /* ²M¶¶§Ç */
+    for (i = 0; i < 6; i++)
+      ri->msg[i][0] = 0;
+  }
+
+  ri->money[prec] = 20000;  /* ¦s¿ú */
+  ri->station[prec] = 0;    /* ¦s¨®¯¸ */
+  ri->wapow[prec] = 0;      /* ¬d¹q¤O¤ô¤O */
+  ri->posi[prec] = 0;       /* ¦s¦ì¸m */
+  for (i = 0; i < 6; i++)
+    mymsg[i][0] = 0;
+  for (i = 0; i < 12; i++)
+    ri->readmsg[prec][i] = 0;
+
+  if (!prec)
+  {
+    sprintf(richbuf, "\033[32;1m%s\033[m ¶}¤F¥i®e¯Ç %d ¤Hªº\033[31;1m¤j´I¯Î¹CÀ¸\033[m!..", cuser.userid, ri->maxmax);
+    log_rich(richbuf);
+    fp = fopen("etc/rich", "a+");
+    fprintf(fp, "%s %s (%s)\n", str_author1, "·¬«°¯¸", "°ª¶¯À³¥Î¬ì§Þ¤j¾Ç");
+    fprintf(fp, "¼ÐÃD: %s\n®É¶¡: %s\n\n\n", "¤j´I¯Î¹CÀ¸°O¿ý", Btime(&now));
+    fclose(fp);
+  }
+  sprintf(richbuf, "\033[32;1m%s\033[m ¥[¤J¤F! ¥N¸¹¬O \033[33;1m%s\033[m ..", cuser.userid, ri->name[prec]);
+  log_rich(richbuf);
+
+  move(19, 0);
+  outs("µ¥«Ý¨ä¥Lªº¨Ï¥ÎªÌ¥[¤J...   ");
+  strcpy(richbuf, "|/-\\");
+
+  while (-1)            /* ¬d¤H¼Æ */
+  {
+    k = -1;
+    for (i = 0; i < ri->maxmax; i++)
+    {
+      move(i + 3, 10);
+      j = ri->name[i][0];
+      if (j)
+    prints("%s [%s]         ", ri->sym[i], (j == 1) ? "µn¿ý¤¤" : ri->name[i]);
+      else
+    prints("%s [ªÅ¥Õ]         ", ri->sym[i]);
+
+      if (!ri->name[i][0] || ri->name[i][0] == 1)
+    k = i;
+    }
+    if (k < 0)
+      break;
+    move(19, 24);
+    prints("%c", richbuf[now % 4]);
+    refresh();
+    now = time(0);
+    while (time(0) - now < 1);
+  };
+
+  ri->start = 1;
+  show_file("etc/game/display", 0, 24);
+  move(11, 34);
+  prints("%s%s", ri->sym[prec], ri->name[prec]);
+
+  /* ¶i¤J°T®§ */
+  sprintf(richbuf, "%s%s (%s) ¶i¨Ó¤F", ri->sym[prec], ri->name[prec], cuser.userid);
+  sendmsg2(richbuf);
+
+  if (!prec)
+  {
+    sendmsg2("Â²©ö»¡©ú¡G");
+    sprintf(richbuf, "µ²§ôªk..%s ¦b°T®§Äæ«ö Ctrl-Q", ri->name[prec]);
+    sendmsg2(richbuf);
+    sendmsg2("Tab ¤Á´«µøµ¡¡AªÅ¥ÕÁäÂY»ë¤l");
+    sendmsg2("¦b°T®§Äæ¥´ /help ·|¦³¨D§Uµe­±¥X²{...");
+    sendmsg2("Have fun!.. :)");
+  }
+  signal(SIGALRM, showmsg);
+  alarm(1);
+
+  editmode = 1;
+  my_turn();
+  startime = time(0);
+
+  /* ¶}©lÂ¶°é°é¤F */
+  while (-1)
+  {
+    i = ri->posi[prec];
+    j = ri->mapidx[i];
+    move(3 + ri->lfx, 13 + ri->lfy);
+    prints("²{¦b¦ì¸m: [%d] %s (%s)       ",
+      i, ri->map[i], ri->landst[ri->land[i]]);
+    move(4 + ri->lfx, 13 + ri->lfy);
+    if (j < 0 || j > ri->maxmax)
+      outs("¥Ø«eÄÝ©ó: ¡¹" BBSNAME "¡¸");
+    else
+      prints("¥Ø«eÄÝ©ó: %s[%s]      ", ri->sym[j], ri->name[j]);
+    move(5 + ri->lfx, 13 + ri->lfy);
+    prints("¤j´I¯Î¹ô: %d  §Kº»¥d: %d     ", ri->money[prec], card);
+    while (ri->current != prec)
+    {
+      editmode = 1;
+      editmsg();
+      editmode = 0;
+      if (ri->current == prec)
+    break;
+      if (ri->current == 1000)
+    goto gameover;
+    }
+
+    sprintf(richbuf, " ");
+    sendmsg2(richbuf);
+    sprintf(richbuf, "½ü¨ì%s%s¤F..", ri->sym[prec], ri->name[prec]);
+    sendmsg2(richbuf);
+
+    if (delay)
+    {
+      move(7 + ri->lfx, 13 + ri->lfy);
+      outs("¶ã¶ã¶ã..§¤¨c¤¤...          ");
+      move(8 + ri->lfx, 13 + ri->lfy);
+      prints("ÁÙ­n %d ¦¸¤~½ü¨ì§A³á!!", delay);
+      sprintf(richbuf, "%s%s..¶ã¶ã¶ã..ÁÙ­n%d¦¸¤~¥Xº»..:~",
+    ri->sym[prec], ri->name[prec], delay);
+      sendmsg2(richbuf);
+      delay--;
+      goto prison;
+    }
+    my_turn();
+    while ((i = igetch()) != 32)
+      if (ri->current == 1000)
+    goto gameover;
+    dice = random() % 11 + 2;
+
+    move(7 + ri->lfx, 13 + ri->lfy);
+    prints("ÂY¥XÂI¼Æ.. %d ÂI                 ", dice);
+
+    sprintf(richbuf, "%s%s..ÂY¥X%dÂI..", ri->sym[prec], ri->name[prec], dice);
+    sendmsg2(richbuf);
+
+    ri->posi[prec] += dice;
+    move(8 + ri->lfx, 13 + ri->lfy);
+
+    if (ri->posi[prec] > 39)    /* Â¶¤F¤@°é?? */
+    {
+      outs("¸g¹L\"¥Ñ¦¹¥h\"..±o¼úª÷ 2000 ¤¸!!");
+      sprintf(richbuf, "%s%s¸g¹L\"¥Ñ¦¹¥h\"..±o2000", ri->sym[prec], ri->name[prec]);
+      sendmsg2(richbuf);
+      de(-2000);
+      ri->posi[prec] -= 40;
+      vmsg(NULL);
+      move(8 + ri->lfx, 13 + ri->lfy);
+      outs("                                                ");
+      move(8 + ri->lfx, 13 + ri->lfy);
+    }
+    prints("[%d]%s", ri->posi[i], ri->map[ri->posi[prec]]);
+    sprintf(richbuf, "%s%s¨«¨ì[%d]%s", ri->sym[prec],
+      ri->name[prec], ri->posi[prec], ri->map[ri->posi[prec]]);
+    sendmsg2(richbuf);
+    move(9 + ri->lfx, 13 + ri->lfy);
+
+checkplace:
+    if (ri->mapidx[ri->posi[prec]] < 0) /* ¯S®í¦aÂI?? */
+    {
+      switch (ri->mapidx[ri->posi[prec]])
+      {
+      case -2:          /* §K¶O°±¨®³õ */
+    outs("§K¶OªºËç..¥ð®§¤@¤U§a... :)");
+    break;
+
+      case -3:          /* ©R¹B */
+    dice = random() % 15;
+    prints("[©R¹B]%s", ri->fate[dice]);
+    sprintf(richbuf, "%s%s..[©R¹B]%s", ri->sym[prec],
+      ri->name[prec], ri->fate[dice]);
+    sendmsg2(richbuf);
+    if (dice > 4)       /* ³æ¯Â¸ò¿ú¦³Ãö?? */
+      de(-ri->fateidx[dice]);
+    else
+    {
+      switch (dice)
+      {
+      case 0:       /* ©ë²¼ */
+        goprison();
+        break;
+
+      case 1:       /* ­×²z¦Û¤v©Ò¦³©Ð«Î-2 */
+        vmsg(NULL);
+        move(9 + ri->lfx, 13 + ri->lfy);
+        j = k = 0;
+        for (i = 0; i < 40; i++)
+        {
+          if (ri->mapidx[i] == prec)
+          {
+        if (ri->land[i] > 0 && ri->land[i] < 5)
+          j++;
+        else if (ri->land[i] == 5)
+          k++;
+          }
+        }
+        prints("©Ð«Î %d ¼l..®ÈÀ] %d ¼l..¦X­p %d      ", j, k, j * 250 + k * 1000);
+        sprintf(richbuf, "%s%s..©Ð«Î%d..®ÈÀ]%d..¦X­p%d",
+          ri->sym[prec], ri->name[prec], j, k, j * 250 + k * 1000);
+        sendmsg2(richbuf);
+        de(j * 250 + k * 1000);
+        break;
+
+      case 2:       /* §Aªº¥Í¤é */
+        de(-(ri->maxmax - 1) * 100);
+        for (k = 0; k < ri->maxmax; k++)
+          if (k != prec)
+        ri->money[k] -= 100;
+        break;
+
+      case 3:       /* ¥Xº»³\¥iÃÒ */
+        card++;
+        break;
+
+      case 4:       /* ½æ¶À¤û²¼ */
+        vmsg(NULL);
+        move(9 + ri->lfx, 13 + ri->lfy);
+        outs("¨ú¾÷·|¤@±i?? (Y/n) ");
+        j = igetch();
+        if (j == 'Y' || j == 'y')
+        {
+          move(10, 47);
+          outs("Yes");
+          i = -22222;
+          ri->mapidx[ri->posi[prec]] = -5;
+          goto checkplace;
+        }
+        /* ¥ý§âindex§ï¦¨¾÷·|¡A¥Îi=-22222°µ°O¸¹¡A¨ì®É¦A§ï¦^¨Ó */
+        {
+          move(10, 47);
+          outs("No");
+          de(1000);
+          break;
+        }
+      }
+    }           /* ³æ¯Â¸ò¿ú¦³Ãö?? */
+    break;
+
+      case -4:          /* ©Ò±oµ| */
+    de(2000);
+    break;
+
+      case -5:          /* ¾÷·| */
+    if (i == -22222)
+      ri->mapidx[ri->posi[prec]] = -3;
+    dice = random() % 15;
+    move(9 + ri->lfx, 13 + ri->lfy);
+    prints("[¾÷·|]%s ", ri->chance[dice]);
+    sprintf(richbuf, "%s%s..[¾÷·|]%s", ri->sym[prec],
+      ri->name[prec], ri->chance[dice]);
+    sendmsg2(richbuf);
+    if (dice > 6)       /* ³æ¯Â¸ò¿ú¦³Ãö?? */
+      de(-ri->chanceidx[dice]);
+    else
+    {
+      switch (dice)
+      {
+      case 0:       /* ©ë²¼ */
+        goprison();
+        break;
+
+      case 1:       /* ­×²z¦Û¤v©Ò¦³©Ð«Î */
+        vmsg(NULL);
+        move(9 + ri->lfx, 13 + ri->lfy);
+        k = j = 0;
+        for (i = 0; i < 40; i++)
+          if (ri->mapidx[i] == prec)
+          {
+        if (ri->land[i] > 0 && ri->land[i] < 5)
+          i++;
+        else if (ri->land[i] == 5)
+          k++;
+          }
+        prints("©Ð«Î %d ¼l..®ÈÀ] %d ¼l..¦X­p %d      ", j, k, j * 250 + k * 1000);
+        sprintf(richbuf, "%s%s..©Ð«Î%d..®ÈÀ]%d..¦X­p%d",
+          ri->sym[prec], ri->name[prec], j, k, j * 250 + k * 1000);
+        sendmsg2(richbuf);
+        de(j * 250 + k * 1000);
+        break;
+
+      case 2:       /* ¥I¤áµ| */
+        vmsg(NULL);
+        move(9 + ri->lfx, 13 + ri->lfy);
+        k = j = 0;
+        for (i = 0; i < 40; i++)
+          if (ri->mapidx[i] == prec)
+          {
+        if (ri->land[i] > 0 && ri->land[i] < 5)
+          j++;
+        else if (ri->land[i] == 5)
+          k++;
+          }
+        prints("©Ð«Î %d ¼l..®ÈÀ] %d ¼l..¦X­p %d      ", j, k, j * 400 + k * 1150);
+        sprintf(richbuf, "%s%s..©Ð«Î%d..®ÈÀ]%d..¦X­p%d",
+          ri->sym[prec], ri->name[prec], j, k, j * 400 + k * 1150);
+        sendmsg2(richbuf);
+        de(j * 400 + k * 1150);
+        break;
+
+      case 3:       /* ¥Xº»³\¥iÃÒ */
+        card++;
+        break;
+
+      case 4:       /* «e¶i¨ì³Õ·R¸ô */
+        if (ri->posi[prec] > 14)
+          de(-2000);
+        ri->posi[prec] = 14;
+        break;
+
+      case 5:       /* «e¶i¨ì¥Á±Ú¸ô */
+        if (ri->posi[prec] > 26)
+          de(-2000);
+        ri->posi[prec] = 26;
+        break;
+
+      case 6:       /* »O¤¤¨®¯¸ */
+        if (ri->posi[prec] > 15)
+          de(-2000);
+        ri->posi[prec] = 15;
+        break;
+      }
+    }
+    break;
+
+      case -6:          /* §¤¨c/¸ô¹L */
+    outs("©I..¤£¥i¥H°µÃa¨ÆËç... :)");
+    break;
+
+      case -7:          /* ¶i¨c */
+    goprison();
+    break;
+
+      case -8:          /* °]²£µ| */
+    de(1000);
+    break;
+
+      case -9:          /* ¦U¤j¨®¯¸ */
+    if (ri->money[prec] >= 2000)
+    {
+      prints("%8s»ù­È 2000 ¤¸¡A¶R?? (Y/n)", ri->map[ri->posi[prec]]);
+      j = igetch();
+      if (j != 'N' && j != 'n') /* ¶R */
+      {
+        move(10, 47);
+        outs("Yes");
+        sprintf(richbuf, "%s%s..¶R¤U%8s", ri->sym[prec],
+          ri->name[prec], ri->map[ri->posi[prec]]);
+        sendmsg2(richbuf);
+        de(2000);
+        ri->mapidx[ri->posi[prec]] = prec;
+        ri->station[prec]++;
+      }
+      else              /* ¤£¶R */
+      {
+        move(10, 47);
+        outs("No");
+      }
+    }
+    else                /* ¶R¤£°_ */
+    {
+      outs("«Ü©êºp¡A§Aªº²{ª÷¤£°÷...");
+    }
+    break;
+
+      case -10:
+    if (ri->money[prec] >= 1500)
+    {
+      prints("%8s»ù­È 1500 ¤¸¡A¶R?? (Y/n)", ri->map[ri->posi[prec]]);
+      j = igetch();
+      if (j != 'N' && j != 'n') /* ¶R */
+      {
+        move(10, 47);
+        outs("Yes");
+        sprintf(richbuf, "%s%s..¶R¤U%8s", ri->sym[prec],
+          ri->name[prec], ri->map[ri->posi[prec]]);
+        sendmsg2(richbuf);
+        de(1500);
+        ri->mapidx[ri->posi[prec]] = prec;
+        ri->wapow[prec]++;
+      }
+      else              /* ¤£¶R */
+      {
+        move(10, 47);
+        outs("No");
+      }
+    }
+    else                /* ¶R¤£°_ */
+    {
+      outs("«Ü©êºp¡A§Aªº²{ª÷¤£°÷...");
+    }
+    break;
+      }
+    }
+
+    /* «D¯S®í¦aÂI */
+    else
+    {
+      i = ri->posi[prec];
+      if (ri->mapidx[ri->posi[prec]] < 100) /* ¤w³Q¶R¨«?? */
+      {
+    if (ri->mapidx[ri->posi[prec]] == prec) /* ¦Û¤vªº¦a */
+    {
+      if (i == 5 || i == 12 || i == 15 || i == 25 || i == 28 || i == 35)    /* ¨®¯¸¡B¤ô¼t¡B¹q¼t ..
+                                         * ¤£¯à»\©Ð¤lªº¦a */
+        outs("§A¦Û¤vªº¤g¦a..¥ð®§¤@¤U§a... :)");
+      else if (ri->land[i] == 5)    /* ®ÈÀ] */
+        outs("¤w¸g¬O[®ÈÀ]]¤F!!");
+      else if (ri->fee[i][6] <= ri->money[prec])
+      {
+        prints("»\\[%s]­n %d ¤¸..­n?? (Y/n)",
+          ri->landst[ri->land[i] + 1], ri->fee[i][6]);
+        j = igetch();
+        if (j != 'n' && j != 'N')
+        {
+          move(10, 47);
+          outs("Yes");
+          ri->land[i]++;
+          sprintf(richbuf, "%s%s..»\\%s", ri->sym[prec], ri->name[prec],
+        ri->landst[ri->land[i]]);
+          sendmsg2(richbuf);
+          de(ri->fee[i][6]);
+        }
+        else
+        {
+          move(10, 47);
+          outs("No");
+        }
+      }
+      else
+        outs("§A¨S¦³¨¬°÷ªº¿ú³á!!");
+    }
+    else                /* §O¤Hªº¦a */
+    {
+      if (i == 5 || i == 15 || i == 25 || i == 35)
+        k = ri->station[prec] * 500;    /* ¨®¯¸ */
+      else if (i == 12 || i == 28)
+        k = dice * ((ri->wapow[prec] == 1) ? 10 : 100); /* ¦Û¤ô¡B¹q¤O */
+      else
+        k = ri->fee[i][ri->land[i]];
+      prints("³o¬O%s[%s]ªº[%s]..¹L¸ô¶O %d", ri->sym[ri->mapidx[i]],
+        ri->name[ri->mapidx[i]], ri->landst[ri->mapidx[i]], k);
+      sprintf(richbuf, "%s%s¨«¨ì%s[%s]ªº¦a..¹L¸ô¶O%d", ri->sym[prec],
+        ri->name[prec], ri->sym[ri->mapidx[i]], ri->name[ri->mapidx[i]], k);
+      sendmsg2(richbuf);
+      de(k);
+      ri->money[ri->mapidx[i]] += k;
+    }
+      }
+      else      /* ¥¼³Q¶R¨« */
+      {
+    if (ri->mapidx[i] <= ri->money[prec])   /* ¶R±o° */
+    {
+      prints("³o¶ôªÅ¦a»ù­È %d ¤¸¡A¶R?? (Y/n)", ri->mapidx[i]);
+      j = igetch();
+      if (j != 'N' && j != 'n') /* ¶R */
+      {
+        move(10, 47);
+        outs("Yes");
+        sprintf(richbuf, "%s%s..¶R¤U%s", ri->sym[prec], ri->name[prec], ri->map[i]);
+        sendmsg2(richbuf);
+        de(ri->mapidx[i]);
+        ri->mapidx[i] = prec;
+      }
+      else              /* ¤£¶R */
+      {
+        move(10, 47);
+        outs("No");
+      }
+    }
+    else                /* ¶R¤£°_ */
+    {
+      outs("«Ü©êºp¡A§Aªº²{ª÷¤£°÷...");
+    }
+      }
+    }
+prison:
+    if (ri->current == 1000)
+      goto gameover;
+    ri->current = (prec + 1) % ri->maxmax;
+    vmsg(NULL);
+    for (i = 3; i < 10; i++)
+    {
+      move(i + ri->lfx, 13 + ri->lfy);
+      outs("                                                ");
+    }
+  }
+gameover:
+  if (ri->current == 1000)
+  {
+    alarm(0);
+    sprintf(richbuf, "\033[32;1m%s\033[m ¸¨¶]¤F! ..", cuser.userid, ri->name[prec]);
+    log_rich(richbuf);
+
+    clear();
+    more("etc/rich", NULL);
+    if (vans("²¾¦Ü³Æ§Ñ¿ý(Y/N)¡H[N] ") == 'y')
+    {
+      mail_self("etc/rich", cuser.userid, "[³Æ §Ñ ¿ý] ¤j´I¯Î¹CÀ¸°O¿ý", MAIL_READ);
+    }
+    if (ri->nowuser == 1)   /* ³Ì«á¤@­Ó¶]±¼ªº¤H */
+    {
+      sprintf(richbuf, "\033[35;1m¤j´I¯Î¹CÀ¸¶¶§Qµ²§ô\033[m!..");
+      log_rich(richbuf);
+      system("rm etc/rich");
+    }
+    ri->name[prec][0] = 0;
+    ri->nowuser--;
+    return 1;
+  }
+}
+
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m     [31m°[1mÊ¤[0;31mO®[1mÖ¤[0;31mß [1mprocessor.tfcis.org    [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[ [1m    218-172-173-190.hinet-ip.hinet  [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

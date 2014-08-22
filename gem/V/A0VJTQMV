@@ -1,0 +1,144 @@
+§@ªÌ: itoc (:MM:) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] reaper.c µoÁ~¤ô ¦©©Ò±oµ|
+®É¶¡: Sat Feb  8 13:51:36 2003                          Updated: 2005/05/08
+
+  µoªO¥DÁ~¤ô¡B¥þ¯¸µo¿ú
+  ³£¥i¥H¦b reaper.c ³B²z
+
+: reaper.c:reaper()
+
+  ulevel = acct.userlevel;
+  life = acct.lastlogin;        /* ¥²¤£¬° 0 */
+  login = acct.numlogins;
+
++ levy_tax(&acct, fpath);
+
+: reaper.c ·s¼W¥H¤U³o¬q©ó reaper() ¤§«e
+
+static int              /* ¬O´X­ÓªOªºªO¥D */
+how_many_bm_i_am(userid)
+  char *userid;
+{
+  BRD *bhdr, *tail;
+  char *list;
+  int count, len;
+
+  count = 0;
+  len = strlen(userid);
+  bhdr = bshm->bcache;
+  tail = bhdr + bshm->number;
+  do
+  {
+    list = bhdr->BM;
+    if (str_has(list, userid, len))
+      count++;
+  } while (++bhdr < tail);
+
+  return count;
+}
+
+
+/*-------------------------------------------------------*/
+/* µo«Hµ¹¨Ï¥ÎªÌ                                          */
+/*-------------------------------------------------------*/
+
+
+static void
+add_mail(userid, fpath, title)           /* µo¤åµ¹¨Ï¥ÎªÌ */
+  char *userid;         /* ±ý mail ªº¨Ï¥ÎªÌ */
+  char *fpath;          /* ÀÉ®×¸ô®| */
+  char *title;          /* ¤å³¹¼ÐÃD */
+{
+  HDR hdr;
+  char folder[64];
+
+  usr_fpath(folder, userid, FN_DIR);
+  hdr_stamp(folder, HDR_LINK, &hdr, fpath);
+  strcpy(hdr.owner, STR_SYSOP);
+  strcpy(hdr.nick, SYSOPNICK);
+  strcpy(hdr.title, title);
+  rec_add(folder, &hdr, sizeof(HDR));
+}
+
+
+static void
+tax_mail(acct, gold, money)
+  ACCT *acct;
+  int gold, money;
+{
+  char fpath[64];
+  FILE *fp;
+
+  sprintf(fpath, "tmp/tax_mail_%s", acct->userid);   /* ¼È¦sÀÉ */
+  if (fp = fopen(fpath, "w"))
+  {
+    fprintf(fp, "\n    \033[1;37;44m %s µoÁ~¤Î¦©µ| \033[m \n\n", acct->userid);
+    if (gold)
+      fprintf(fp, "      ª÷¹ô%sÃB¡G%d\n", gold > 0 ? "¼W" : "´î", abs(gold));
+    if (money)
+      fprintf(fp, "      »È¹ô%sÃB¡G%d\n", money > 0 ? "¼W" : "´î", abs(money));
+    fclose(fp);
+
+    add_mail(acct->userid, fpath, "[¬ö¿ý] Á~¤ô³U¡B¦©Ãº¾Ì³æ");
+    unlink(fpath);
+  }
+}
+
+
+/*-------------------------------------------------------*/
+/* µoÁ~¤ô                                                */
+/*-------------------------------------------------------*/
+
+
+static void
+levy_tax(acct, userid)
+  ACCT *acct;
+  char *userid;
+{
+  int money, gold;
+  time_t start;
+  struct tm *ptime;
+
+  time(&start);
+  ptime = localtime(&start);
+
+  [1;44m// ¥H¤U³o¾ã¬qªº¤½¦¡ÀH«K«ç»ò¼g [m
+  [1;44m// ­Y­n¥þ¯¸µo¼úª÷¡A¤]¬O§ï³o¸Ìªº¤½¦¡´N¥i¥H [m
+
+  money = gold = 0;
+
+  /* ¥þ¯¸µo¿ú¡A¨C¤H 10 ¤¸ */
+  money += 10;
+
+  /* ªO¥DµoÁ~¨CªO 200 ¤¸ */
+  if (acct->userlevel & PERM_BM)
+    money += how_many_bm_i_am(acct->userid) * 200;
+
+  /* ¯¸°ÈµoÁ~ª÷¹ô 500 ¤¸ */
+  if (acct->userlevel & PERM_ALLADMIN)
+    gold += 500;
+
+  [1;44m// ¥H¤W³o¾ã¬qªº¤½¦¡ÀH«K«ç»ò¼g [m
+
+  if (money || gold)   /* ¦³ª÷ÃBÅÜ°Ê¤~µo«H¡Bµo¤ä²¼ */
+  {
+    PAYCHECK paycheck;
+    char fpath[64];
+
+    tax_mail(acct, gold, money);
+
+    memset(&paycheck, 0, sizoef(PAYCHECK));
+    time(&paycheck.tissue);
+    paycheck.money = money;
+    paycheck.gold = gold;
+    strcpy(paycheck.reason, "¨t²Îµo¼úª÷");
+
+    usr_fpath(fpath, acct->userid, FN_PAYCHECK);
+    rec_add(fpath, &paycheck, sizeof(PAYCKECK));
+  }
+}
+
+
+--
+    [1;32m¢~¢w¢w Origin ¢¡ [33;45m °Ê¤O®Ö¤ß [37m processor.tfcis.org [32;40m ¡ã £_£`£a ¢w¢w¢q[m
+    [1;32m¢x     Modify ¢£ [31m03/02/08 13:52:09 [m

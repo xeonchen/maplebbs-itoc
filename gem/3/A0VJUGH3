@@ -1,0 +1,50 @@
+µo´H§H: itoc.bbs@xeon.tfcis.org (∫Ò•®§H¶n´»°H) ¨›™O: plan
+º–  √D: Re: [•\Ø‡] ™O•D¶€¶ÊºW≥]∞∆™O•D
+µo´HØ∏: ∞ §OÆ÷§ﬂ (Mon, 04 Aug 2003 01:32:35 +0800 (CST))  Updated: 2005/06/27
+
+°∞ §ﬁ≠z°mxeon (Xeon Chen)°n§ßª ®•°G
+> ≠≠©w∞∆™O§Hº∆
+
+: manage.c:post_changeBM()
+
+  int dirty, len;
++ int num_bm;          /* ∞∆™O•D≠”º∆(§£•]¨A•ø™O•D) */
++ char *str, *ptr;
+
+  oldbrd = bshm->bcache + currbno;
+
+  blist = oldbrd->BM;
+  if (is_bm(blist, cuser.userid) != 1)  /* •u¶≥•ø™O•D•i•H≥]©w™O•D¶W≥Ê */
+    return XO_FOOT;
+
++ num_bm = 0;
++ for (str = blist; ptr = strchr(str, '/'); str = ptr + 1)
++   num_bm++;
+
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  ...
+  ...
+
+    if (!strcmp(uid, "µL"))
+    {
+      strcpy(buf, cuser.userid);
+      dirty = strlen(buf);
++     num_bm = 0;
+    }
++   else if (num_bm >= 2)           [1;44m// ≠n≠≠®Ó¥X≠”¶b≥oßÔ [m
++   {
++     vmsg("¶‹¶h•uØ‡≥]©w§G¶Ï∞∆™O•D");
++     continue;
++   }
+    else if (acct_load(&acct, uid) >= 0 && !is_bm(buf, acct.userid))
+    {
+      ...
+      ...
+      acct_setperm(&acct, PERM_BM, 0);
++     num_bm++;
+    }
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m     [31m∞[1m §[0;31mOÆ[1m÷§[0;31mﬂ [1mprocessor.tfcis.org    [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[ [1m    itoc.dorm11.nctu.edu.tw         [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

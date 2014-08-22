@@ -1,0 +1,134 @@
+§@ªÌ: itoc (cygreadline4.dll) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ÂI¿ïºô§}»{ÃÒ
+®É¶¡: 2004/05/12 Wed 11:14:48                           Updated: 2006/08/06
+
+  ÂI¿ï»{ÃÒ«H¤¤ªººô§}´N³q¹L»{ÃÒ
+  ·íµM¡A«e´£¬O­n¦³±¾ bhttpd
+
+: mail.c:bsmtp()
+
+#ifdef EMAIL_JUSTIFY
+  char subject[80];
++ char regkey[10];
+#endif
+
+  ...
+  ...
+
+-   archiv32(str_hash(rcpt, cuser.tvalid), buf);
+-   sprintf(title, TAG_VALID " %s(%s) [VALID]", cuser.userid, buf);
++   archiv32(str_hash(rcpt, cuser.tvalid), regkey);
++   sprintf(title, TAG_VALID " %s(%s) [VALID]", cuser.userid, regkey);
+
+  ...
+  ...
+
+    if (method & MQ_JUSTIFY)    /* ¨­¤À»{ÃÒ«H¨ç */
+    {
+      fprintf(fw, " ID: %s (%s)  E-mail: %s\r\n\r\n",
+        cuser.userid, cuser.username, rcpt);
+      [1;44m// ¦pªG bhttpd ¤£¬O¶}¦b port 80¡A¨Ò¦p¬O port 8080¡A¨º»ò³o¸Ì­n§ï¦¨ [m
+      [1;44m// http://"MYHOSTNAME":8080/register/%s&%s" [m
++     fprintf(fw, " ±z¥i¥Hª½±µÂI¿ï http://"MYHOSTNAME"/register?%s&%s"
++       "¨Ó³q¹L»{ÃÒ\r\n\r\n", cuser.userid, regkey);
+    }
+
+: bhttpd.c ¤@¶}©lªºµù¸Ñ
+
+  http://my.domain/query?userid                ¬d¸ß userid
++ http://my.domain/register?userid&regkey      ½u¤W»{ÃÒ
+
+: bhttpd.c:cmd_table_get[]
+
+  cmd_query,       "query",     5,
++ cmd_register,    "register",  8,
+
+: bhttpd.c ¥[³o¤@¬q¦b cmd_query() «á­±
+
+/*-------------------------------------------------------*/
+/* »{ÃÒ                                                  */
+/*-------------------------------------------------------*/
+
+
+static void
+justify_user(userid, email)
+  char *userid, *email;
+{
+  char fpath[64];
+  HDR hdr;
+  FILE *fp;
+
+  /* ±H»{ÃÒ³q¹L«Hµ¹¨Ï¥ÎªÌ */
+  usr_fpath(fpath, userid, FN_DIR);
+  if (!hdr_stamp(fpath, HDR_LINK, &hdr, FN_ETC_JUSTIFIED))
+  {
+    strcpy(hdr.title, "±z¤w¸g³q¹L¨­¤À»{ÃÒ¤F¡I");
+    strcpy(hdr.owner, STR_SYSOP);
+    hdr.xmode = MAIL_NOREPLY;
+    rec_add(fpath, &hdr, sizeof(HDR));
+  }
+
+  /* °O¿ý¦b FN_JUSTIFY */
+  usr_fpath(fpath, userid, FN_JUSTIFY);
+  if (fp = fopen(fpath, "a"))
+  {
+    fprintf(fp, "WEB: %s\n", email);
+    fclose(fp);
+  }
+}
+
+
+static int
+cmd_register(ap)
+  Agent *ap;
+{
+  int fd;
+  ACCT acct;
+  char fpath[64], *userid, *regkey;
+  FILE *fpw = out_head(ap, "»{ÃÒ¨t²Î");
+
+  if (!arg_analyze(2, '?', ap->urlp, &userid, &regkey, NULL, NULL))
+    return HS_ERROR;
+
+  if (!allow_userid(ap, userid))
+    return HS_ERR_USER;
+
+  usr_fpath(fpath, userid, FN_ACCT);
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    read(fd, &acct, sizeof(ACCT));
+    if (acct.userlevel & PERM_VALID)
+    {
+      out_mesg(fpw, "±zªº»{ÃÒ¤w¸g§¹¦¨¡A½Ð¤Å­«½Æ»{ÃÒ");
+    }
+    else
+    {
+      archiv32(str_hash(acct.email, acct.tvalid), fpath);
+
+      if (str_ncmp(regkey, fpath, 7))
+      {
+        out_mesg(fpw, "©êºp¡A±zªº»{ÃÒ½X¿ù»~");
+      }
+      else
+      {
+        /* ´£¤ÉÅv­­ */
+        time(&(acct.tvalid));
+        acct.userlevel |= PERM_VALID;
+        lseek(fd, (off_t) 0, SEEK_SET);
+        write(fd, &acct, sizeof(ACCT));
+
+        justify_user(userid, acct.email);
+
+        out_mesg(fpw, "®¥³ß±z¤w¸g³q¹L»{ÃÒ");
+      }
+    }
+    close(fd);
+  }
+  else
+    return HS_ERR_USER;
+
+  return HS_END;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

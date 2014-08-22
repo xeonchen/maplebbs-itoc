@@ -1,0 +1,33 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [½Ð°Ý]§Úªº³Ì·R§Ö³tÁä
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/11/18 Thu 18:33:17)                Updated: 2004/11/18
+
+¡° ¤Þ­z¡mseeseeya.bbs@bala.mis.ccu.edu.tw (¤@ºØ©t±I)¡n¤§»Ê¨¥¡G
+> ¦b ¬ÝªO¦Cªí¦a¤è«ö¤U a ©M f ³£¬O±N¬ÝªO¥[¤J§Úªº³Ì·R
+> ­n«ç»ò­×§ï ¤~¯à a ¬O¥[¤J  f ¬O¶i¤J§Úªº³Ì·R?
+> ÁÙ¦³§Æ±æ ³o¼Ëªº§Ö³tÁä¦b¤ÀÃþ¬ÝªO¦Cªí¤]¦³¤@¼Ëªº¥\®Ä
+
+: board.c:class_cb[]
+
+  'a', class_addMF,
+- 'f', class_addMF,
++ 'f', class_MF,
+
+: board.c:class_MF() ¥[¦¹¨ç¦¡¦b class_help() ¤§«e
+
+static int
+class_MF(xo)
+  XO *xo;
+{
+  if (HAS_PERM(PERM_BASIC))
+  {
+    MyFavorite();
+    return class_init(xo);
+  }
+  return XO_NONE;
+}
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

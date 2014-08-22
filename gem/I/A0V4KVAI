@@ -1,0 +1,39 @@
+§@ªÌ: itoc (:MM:) ¬ÝªO: itoc
+¼ÐÃD: Re: §ï*.soªº°ÝÃD
+®É¶¡: Sun Jan 12 10:34:05 2003
+
+  1. §ï§¹ so/*.c ­n make ostype install
+  2. ­n­«·s¤W¯¸¤~¦³®Ä
+  3. ¦pªG¦b¿ï³æ«ö¤F§¹¥þ¨S¦³¤ÏÀ³¡A´N¬O§Aªºµ{¦¡¦³¼g¿ù
+     ¦ý compile ®É¨S¦³ error
+     ªí¥Ü¤£¬O»yªk¤Wªº¿ù»~¡A¦Ó¬O©I¥s¤F¤@­Ó¤£¦s¦bªº¨ç¦¡
+
+  ¨Ò:  so/apple.c  (¬õ¦â¬O¿ù»~©Ò¦b)
+
+  int
+  main_apple()
+  {
+    int num;
+    num = 5;
+    prints("%d", [1;31mN[mum);           <-- ·|¦³ error, ¥¼ª¾ªºÅÜ¼Æ Num
+  }
+
+  int
+  main_apple()
+  {
+    int num;
+    num = 5;
+    print[1;31md[m("%d", num);           <-- ¤£·|¦³ error, compile ·|¦¨¥\
+  }                                  ¦ý¨ä¹ê¨S¦³ printd ³o¨ç¦¡
+                                     ©Ò¥H¦b menu ¿ï³o¿ï¶µ®É·|¥¢±Ñ
+
+  ¨º§A­n«ç»ò§ä¥X³oÃþªº¿ù»~©O? «ÜÂ²³æ
+  §â apple.c ¥[¤J maple/ ¤U
+  µM«á§ï maple/Makefile ¥[¤J apple.c apple.o
+  ¦b maple/ ¤U make ostype
+  ´N·|¬Ý¨ì error ¤F
+  §ä¨ì error ¥H«á¡A¦A§â apple.c ©ñ¦^ so/ §Y¥i
+
+--
+    [1;32m¢~¢w¢w Origin ¢¡ [33;45m °Ê¤O®Ö¤ß [37m processor.tfcis.org [32;40m ¡ã £_£`£a ¢w¢w¢q[m
+    [1;32m¢q     Author ¢£ [36mitoc.Dorm-GD2.NCTU.edu.tw[m

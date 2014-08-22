@@ -1,0 +1,24 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (©Û³ê»ä­·ªº¦Ï) ¬ÝªO: itoc
+¼Ð  ÃD: Re: [­×¥¿]¾\Åª¤å³¹¤W­¶³Ì«á¤@¦æÀ³¬°¤U­¶²Ä¤@¦æ
+µo«H¯¸: ¤ë¤U©]·Q (Wed, 17 Sep 2003 09:18:41 +0800 (CST))  Updated: 2004/11/14
+
+  ±Æª©Å]¤H»{¬°  ¤W­¶³Ì«á¤@¦æ¤£À³¬°¤U­¶²Ä¤@¦æ
+
+  §¹¾ã¤@ÂIªº­×§ï¡A¥Ñ¯¸ºÞ¨Ì¦Û¤vªº³ß¦n¦Û¤v¨M©w:)
+
+  ¦pªG¯¸ºÞ§Æ±æ¸õ­¶®É¡A¤£ºÞÂ½¤W­¶©Î¬O¤U­¶¡A¹³Â½®Ñ¤@¼Ë¤£·|µo¥Í¦³µe­±­«½Æ¨ì
+
+  ªº±¡§Î¡A¥i¥H³o¼Ë§ï:
+
+: config.h
+
+- #define PAGE_SCROLL     (b_lines - 1)   /* «ö PgUp/PgDn ­n±²°Ê´X¦C */
++ #define PAGE_SCROLL     b_lines         /* «ö PgUp/PgDn ­n±²°Ê´X¦C */
+
+
+  ¨ä¹ê¤]¬O¥i¥H§Ë­Ó¼ÐÅÒ¨Ñuserµo¤å®É¥Î¡A­ì¨Óªºmore·PÄ±¤ñ¸û¹³¦b¬Ý³øªí(µe­±¬O¤@ª½³s
+
+  Äò)¡A¦Ó³o­Ómore·PÄ±¤ñ¸û¹³¬O¦b¬Ý®Ñ¡A¨âªÌ¦U¦³¤£¦P·PÄ±¡C
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

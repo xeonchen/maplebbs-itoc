@@ -1,0 +1,200 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: itoc
+¼Ð  ÃD: [¤å¥ó] ºëµØ°Ïªº½g¼Æ¤W­­©M®e¶q¤W­­
+µo«H¯¸: Àº¤Ñ±^ (Sun, 06 Jul 2003 15:21:41 +0800 (CST))    Updated: 2005/10/07
+
+  (5) ÀË¬dªº¥Dµ{¦¡
+
+: maple/bbsd.c:tn_login()
+
+-#ifndef LINUX   /* ¦b Linux ¤U³oÀË¬d©Ç©Çªº */
+-    /* itoc.010924: ÀË¬d­Ó¤HºëµØ°Ï¬O§_¹L¦h */
+-    usr_fpath(fpath, cuser.userid, "gem");
+-    {
+-      struct stat st;
+-
+-      if (!stat(fpath, &st) && (st.st_size >= 512 * 7))
+-      {
+-        cuser.userlevel &= ~PERM_POST;
+-        bell();
+-        more("etc/mboxgem.over", NULL);
+-      }
+-    }
+-#endif
+
+: maple/gem.c
+
+extern int TagNum;
+extern TagItem TagList[];
++ extern BCACHE *bshm;
+
+: maple/gem.c ¶}±Ò gem_bno()
+
+- #if 0
+static int      /* -1:¤£¬O¬ÝªOºëµØ°Ï  >=0:bno */
+gem_bno(xo)
+  XO *xo;
+{
+  ...
+}
+- #endif
+
+: maple/gem.c:·s¼W gem_checksize() ©ó gem_add() ¤§«e
+
+static int      /* 1:¹L¤j  0:¨S¦³¹L¤j */
+gem_checksize(xo, filenum, filesize)
+  XO *xo;
+  int *filenum, *filesize;
+{
+  int i, total_n, total_k;
+  char *ptr, *str, fpath[64];
+  struct stat st;
+  struct dirent *de;
+  DIR *dirp;
+
+  if (HAS_PERM(PERM_ALLBOARD))  /* ¯¸ªø©M¬ÝªOÁ`ºÞ¤£¨ü­­¨î */
+    return 0;
+
+  if (*xo->dir == 'g')
+  {
+    if ((i = gem_bno(xo)) < 0)      /* ¦pªG¬O (A)nnounce ªº¸Ü¡A¸õ¹L */
+      return 0;
+    if ((bshm->bcache + i)->battr & BRD_NOGEMCHECK)
+      return 0;
+    strcpy(fpath, xo->dir);
+    if (!(str = strchr(fpath + 8, '/')))
+      return 0;
+    strcpy(str + 1, fn_dir);
+  }
+  else /* if (*xo->dir == 'u') */
+  {
+    if (HAS_PERM(PERM_MYGEM))
+      return 0;
+    usr_fpath(fpath, cuser.userid, "gem/" FN_DIR);
+  }
+
+  if (!stat(fpath, &st))
+    total_n = st.st_size;
+  else
+    total_n = 0;
+  if (!total_n)     /* .DIR ¶}±Ò¥¢±Ñ©Î size=0 ªí¥Ü¨S¦³ºëµØ°Ï */
+    return 0;
+  total_k = 0;
+  ptr = (char *) strchr(fpath, '.');
+
+  /* ¬ÝªOºëµØ°Ï­nÀË¬d 32 ­Ó¤l¥Ø¿ý¡A­Ó¤HºëµØ°Ï¥u»ÝÀË¬d 1 ­Ó¤l¥Ø¿ý */
+  for (i = (*xo->dir == 'g') ? 31 : 0; i >= 0; i--)
+  {
+    *ptr = radix32[i];
+    *(ptr + 1) = '\0';
+    if (!(dirp = opendir(fpath)))
+      continue;
+
+    *(ptr + 1) = '/';
+    while (de = readdir(dirp))
+    {
+      str = de->d_name;
+
+      if (*str <= ' ' || *str == '.')
+        continue;
+
+      strcpy(ptr + 2, str);
+
+      if (!stat(fpath, &st))
+      {
+        if (*str == 'F')
+          total_n += st.st_size;
+        else if (*str == 'A')
+          total_k += st.st_size;
+      }
+    }
+    closedir(dirp);
+  }
+
+  /* ¹L¤jªºÀË¬d */
+  if (*xo->dir == 'g')
+  {
+    BRD *brd;
+    int bno;
+
+    if ((bno = gem_bno(xo)) < 0)
+      return 0;
+    brd = bshm->bcache + bno;
+    if (total_n >= brd->gemsize_n * sizeof(HDR) || total_k >= brd->gemsize_k)
+    {
+      *filenum = total_n / sizeof(HDR);
+      *filesize = total_k;
+      return 1;
+    }
+  }
+  else
+  {
+    if (total_n >= cuser.gemsize_n * sizeof(HDR) || total_k >= cuser.gemsize_k)
+    {
+      *filenum = total_n / sizeof(HDR);
+      *filesize = total_k;
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+: maple/gem.c:gem_add()
+
+  level = xo->key;
+  if (level < GEM_MANAGER)      /* [¦^¦¬µ©] ¤¤¤£¯à·s¼W */
+    return XO_NONE;
+
++ if (gem_checksize(xo, &fd, &ans))     /* ­É¥Î fd ©M ans */
++ {
++   /* §i¶D¨Ï¥ÎªÌ¬O¥Î¤F¦h¤Ö¡AÅý¥LªA®ð¨Ç */
++   sprintf(fpath, "ºëµØ°ÏÀÉ®×¼Æ¡G%d¡AÁ`¤j¤p¡G%dKB¡A½Ð§R°£¤@¨Ç¤å³¹",
++     fd, ans >> 10);
++   vmsg(fpath);
++   return XO_FOOT;
++ }
+
+: maple/gem.c:gem_paste()
+
+  if (!(xo->key & GEM_W_BIT))
+    return XO_NONE;
+
++ if (gem_checksize(xo, &num, &ans))    /* ­É¥Î num ©M ans */
++ {
++   char msg[80];
++   /* §i¶D¨Ï¥ÎªÌ¬O¥Î¤F¦h¤Ö¡AÅý¥LªA®ð¨Ç */
++   sprintf(msg, "ºëµØ°ÏÀÉ®×¼Æ¡G%d¡AÁ`¤j¤p¡G%dKB¡A½Ð§R°£¤@¨Ç¤å³¹",
++     num, ans >> 10);
++   vmsg(msg);
++   return XO_FOOT;
++ }
+
+: maple/gem.c:gem_anchor()
+
+  int ans;
+  char *folder;
++ int gemsize, filenum;
++ char msg[80];
+
+  ...
+  ...
+
+  ans = vans("ºëµØ°Ï A)©wÁã D)©ÞÁã J)´N¦ì Q)¨ú®ø [A] ");
+  if (ans != 'q')
+  {
+    folder = GemAnchor;
+
++   /* ºëµØ°Ï®e¶q¹F¨ì¤W­­´N¸T¤î©wÁã¡A¦ý¤¹³\©ÞÁã©M´N¦ì */
++   if (gem_checksize(xo, &fd, &ans) && ans != 'j' && ans != 'd')
++    if (ans != 'j' && ans != 'd' && gem_checksize(xo, &filenum, &gemsize))
++   {
++     /* §i¶D¨Ï¥ÎªÌ¬O¥Î¤F¦h¤Ö¡AÅý¥LªA®ð¨Ç */
++     sprintf(fpath, "ºëµØ°ÏÀÉ®×¼Æ¡G%d¡AÁ`¤j¤p¡G%dKB¡A½Ð§R°£¤@¨Ç¤å³¹",
++       fd, ans / 1024);
++     vmsg(fpath);
++     return XO_FOOT;
++   }
+
+--
+[1;31m|[33m Origin [31m| [;37;45m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [35;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m218-163-206-115.HINET-IP.hinet.net[m

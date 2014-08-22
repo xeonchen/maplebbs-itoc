@@ -1,0 +1,127 @@
+ß@™Ã: itoc (¨@±œ§@≠”∆FªÓ) ¨›™O: plan
+º–√D: [•\Ø‡] §ª≠”√±¶W¿…
+Æ…∂°: Sun Jun 30 18:31:29 2002                          Updated: 2005/04/10
+
+  πw≥]•u¶≥§T≠”√±¶W¿…°AßÔ¶®§ª≠”
+
+: edit.c show_sign()
+
+static void
+- show_sign()
++ show_sign(ch)         /* itoc.000319: ≈„•‹√±¶W¿…™∫§∫Æe */
++ char ch;
+{
+  int fd, len, i;
+- char fpath[64], buf[10], ch, *str;
++ char fpath[64], buf[10], *str;
+
+  ...
+  ...
+
+- for (ch = '1'; ch <= '3'; ch++)       /* §T≠”√±¶W¿… */
++ for (; ch <= '6'; ch++)               /* §ª≠”√±¶W¿… */
+  {
+    fpath[len] = ch;
+
+    fd = open(fpath, O_RDONLY);
+    if (fd >= 0)
+    {
+      mgets(-1);
+-     move((ch - '1') * (MAXSIGLINES + 1), 0);
++     move(((ch - '1') % 3) * (MAXSIGLINES + 1), 0);
+      prints("\033[1;36m°i √±¶W¿… %c °j\033[m\n", ch);
+
+      for (i = 1; i <= MAXSIGLINES; i++)
+      {
+        if (!(str = mgets(fd)))
+          break;
+        prints("%s\n", str);
+      }
+
++     if (((ch - '0') % 3) == 0)
++       break;
+    }
+  }
+
+
+: edit.c ve_quote()
+
+- static char msg[] = "øÔæ‹√±¶W¿… (1/2/3, 0=§£•[ r=∂√º∆)[0]°G";
++ static char msg[] = "øÔæ‹√±¶W¿… (1 ~ 6, 0=§£•[ r=∂√º∆ n=¥´≠∂)[0]°G";
+
+  ...
+  ...
+
+  {
++   int topsig = 1;     /* LHD.031107: •ª≠∂≥Ã§W≠±™∫√±¶W¿… */
++ show_sign:
+    if (cuser.ufo & UFO_SHOWSIGN)       /* itoc.000319: ≈„•‹√±¶W¿…™∫§∫Æe */
+-     show_sign();
++     show_sign('0' + topsig);          /* itoc.000319: ≈„•‹√±¶W¿…™∫§∫Æe */
+
+-   msg[33] = op = cuser.signature + '0';
++   msg[40] = op = cuser.signature + '0';
+    if (fd = vget(b_lines, 0, msg, buf, 3, DOECHO))
+    {
++     if (fd == 'n')    /* LHD.031107: ´ˆ n ¥`¿Ù¥´≠∂ */
++     {
++       topsig = (topsig + 3) % 6;
++       goto show_sign;
++     }
+
+-     if (op != fd && ((fd >= '0' && fd <= '3') || fd == 'r'))
++     if (op != fd && ((fd >= '0' && fd <= '6') || fd == 'r'))
+      {
+        cuser.signature = fd - '0';
+        op = fd;
+      }
+    }
+
+    if (op == 'r')
+-     op = (time(0) % 3) + '1';
++     op = (time(0) % 6) + '1';
+
+
+: acct.c u_xfile()
+
+  static char *desc[] =
+  {
+    "§WØ∏¶a¬I≥]©w¿…",
+    "¶W§˘¿…",
+    "√±¶W¿….1",
+    "√±¶W¿….2",
+    "√±¶W¿….3",
++   "√±¶W¿….4",
++   "√±¶W¿….5",
++   "√±¶W¿….6",
+    "º»¶s¿….1",
+    "º»¶s¿….2",
+    "º»¶s¿….3",
+    "º»¶s¿….4",
+    "º»¶s¿….5",
+    NULL
+  };
+
+  static char *path[] =
+  {
+    "acl",
+    "plans",
+    FN_SIGN ".1",
+    FN_SIGN ".2",
+    FN_SIGN ".3",
++   FN_SIGN ".4",
++   FN_SIGN ".5",
++   FN_SIGN ".6",
+    "buf.1",
+    "buf.2",
+    "buf.3",
+    "buf.4",
+    "buf.5"
+  };
+
+
+--
+  •ÿ´e™∫≥]≠p°A≥Ã¶h•i•HßÔ®Ï '9' ≠”√±¶W¿…
+
+--
+[1;37m°º •ª§Â≥π•— [33mitoc[37m ±q [32mkiller.Dorm3.NCTU.edu.tw[37m µo™Ì[m

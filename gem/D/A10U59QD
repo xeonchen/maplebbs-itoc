@@ -1,0 +1,102 @@
+µo«H¤H: chwaian.bbs@cpu.tfcis.org (µL¨¥) ¬ÝªO: plan
+¼Ð  ÃD: Re: ­«¾ãµù¥U³æ
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/01/10 Mon 20:52:58)                Updated: 2005/01/10
+
+À³¸Ó¥i¥H¥Î¤F ¤£¹L«Ü¯Ó¸ê·½ ¤[¤[°õ¦æ¤@¦¸§Y¥i
+
+¦³°µ [¥\¯à] ¨q¥X¨Ï¥ÎªÌµù¥U³æ©Ò¶ñ¤§¹q¸Ü/¦í§}
+
+¥Bµù¥U³æ¬ö¿ýÀÉ®×¤j¤p ¤w¸gÆZ¤jªº®É­Ô ¥i¨Ï¥Î
+
+: src/util/Makefile ¥[¤J fixrform
+
+EXE =   ... [1;33mfixrform[m
+
+: src/util/fixrform.c ·s¼Wµ{¦¡¦p¤U
+
+/*-------------------------------------------------------*/
+/* util/fixrform.c        ( NTHU CS MapleBBS Ver 3.00 )  */
+/*-------------------------------------------------------*/
+/* target : ­«¾ãµù¥U³æ                                   */
+/* create : 05/01/10                                     */
+/* update :   /  /                                       */
+/* author : chwaian.bbs@cpu.tfcis.org                    */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+static int
+find_rform(rform2, fp)
+  RFORM *rform2;
+  FILE *fp;
+{
+  RFORM rform;
+  int rc;
+
+  rc = 0;
+
+  fseek(fp, sizeof(RFORM), 0);  /* reset fread */
+
+  while (fread(&rform, sizeof(RFORM), 1, fp) == 1)
+  {
+    if (rform2->userno == rform.userno)
+    {
+      rform2->rtime = rform.rtime;
+
+      strcpy(rform2->userid, rform.userid);
+      strcpy(rform2->agent, rform.agent);
+      strcpy(rform2->realname, rform.realname);
+      strcpy(rform2->career, rform.career);
+      strcpy(rform2->address, rform.address);
+      strcpy(rform2->phone, rform.phone);
+      strcpy(rform2->reply, rform.reply);
+      rc = 1;
+    }
+  }
+
+  return rc;
+}
+
+
+/*-------------------------------------------------------*/
+/* ¥Dµ{¦¡                                                */
+/*-------------------------------------------------------*/
+
+
+int
+main()
+{
+  int numuser;          /* Á`¦@¦³´X­Óµù¥U±b¸¹ */
+  int point;
+  RFORM rform2;
+  FILE *fp;
+
+  chdir(BBSHOME);
+
+  unlink("run/rform.log.bak");
+  numuser = rec_num(FN_SCHEMA, sizeof(SCHEMA));
+
+  if (!(fp = fopen(FN_RUN_RFORM_LOG, "r")))
+    return 0;
+
+  for (point = 1; point < numuser; point++)
+  {
+    rform2.userno = point;
+    if (find_rform(&rform2, fp))
+    rec_add("run/rform.log.bak", &rform2, sizeof(RFORM));
+  }
+
+  fclose(fp);
+
+  /* f_mv("run/rform.log.bak","run/rform.log"); */
+  /* test¹L¡AÄ±±o³£¨S°ÝÃDªº¸Ü¡A¤~¥Î³o¦æ */
+
+  return 0;
+}
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mchwaian [30m±q [31m218-165-121-144.dynamic.hinet.net [30mµoªí[m

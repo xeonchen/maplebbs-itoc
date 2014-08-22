@@ -1,0 +1,73 @@
+§@ªÌ: itoc (ºñ¥¨¤H¦n«È¡H) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]¦Û°Ê¦³¶}ªO²Ä¤@PO
+®É¶¡: Fri Jul 18 14:51:27 2003                          Updated: 2005/04/27
+
+¡° ¤Þ­z¡mDinsam.bbs@whshs.cs.nccu.edu.tw («e¥@.. o.O)¡n¤§»Ê¨¥¡G
+> ¶}ªO¤§«á¦Û°Ê·|POST¤@½g¤½§i¦b·sªO
+
+: board.c:class_newbrd()
+
+static int
+class_newbrd(xo)
+  XO *xo;
+{
+  BRD newboard;
++ HDR hdr;
++ char folder[64];
+
+  ...
+
++ brd_fpath(folder, newboard.brdname, fn_dir);
++ hdr_stamp(folder, HDR_COPY | 'A', &hdr, "etc/newboard");
++ strcpy(hdr.owner, str_sysop);
++ strcpy(hdr.nick, SYSOPNICK);
++ strcpy(hdr.title, "[¤½§i] ¬ÝªO¦¨¥ß");
++ hdr.xmode = POST_MARKED;
++ rec_add(folder, &hdr, sizeof(HDR));
+
+  return class_init(xo);
+}
+
+: newbrd.c:nbrd_newbrd()
+
+int                          /* -1:¤£¯à¶}ªO  0: ©ñ±ó¶}ªO  1:¶}ªO¦¨¥\ */
+nbrd_newbrd()               /* ¶}·sªO */
+  NBRD *nbrd;
+{
+  BRD newboard;
+  ACCT acct;
++ char folder[64];
++ HDR hdr;
+
+  ...
+
+  if (brd_new(&newboard) < 0)
+    return 0;
+
++ brd_fpath(folder, newboard.brdname, fn_dir);
++ hdr_stamp(folder, HDR_COPY | 'A', &hdr, "etc/newboard");
++ strcpy(hdr.owner, str_sysop);
++ strcpy(hdr.nick, SYSOPNICK);
++ strcpy(hdr.title, "[¤½§i] ¬ÝªO¦¨¥ß");
++ hdr.xmode = POST_MARKED;
++ rec_add(folder, &hdr, sizeof(HDR));
+
+  vmsg("·sªO¦¨¥ß¡A°OµÛ¥[¤J¤ÀÃþ¸s²Õ");
+  return 1;
+}
+
+: etc/newboard  ·s¼W³o­ÓÀÉ®×¡A¤º®e¡B®æ¦¡¦Û©w
+
+§@ªÌ: SYSOP (§Ú¬O¯¸ªø) ¯¸¤º: [¨t²Î¤½§i]
+¼ÐÃD: [¤½§i] ¬ÝªO¦¨¥ß
+®É¶¡: Sun Jun 01 00:00:00 2000
+
+  ®¥³ß¶}ªO¡IªO¥D½Ð¦Ü [bm] ªO³ø¨ì
+
+--
+[1;31mAuthor: [36mmybbs.twbbs.org[m
+
+
+--
+[1;31m|[33m Origin [31m| [0;45m MapleBBS-itoc °Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+[1;31m|[35m Author [31m| [36mitoc.Dorm11.NCTU.edu.tw[m

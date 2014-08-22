@@ -1,0 +1,83 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (:MM:) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¥\¯à] post.c ¤å³¹µû¤À¥\¯à
+µo«H¯¸: XEON (Wed, 09 Apr 2003 22:26:34 +0800 (CST))      Updated: 2007/04/26
+
+¡° ¤Þ­z¡mamaki.bbs@luna.twbbs.org (¥P¯ó¤p¦Ï)¡n¤§»Ê¨¥¡G
+> Åã¥Ü¤å³¹³Q¾\Äýªº¦¸¼Æµ{¦¡§_¡H
+
+: post.c:post_browse()
+
+#ifdef HAVE_REFUSEMARK
+    if (!chkrestrict(hdr))
+      break;
+#endif
+
++   hdr->numread++;
++   currchrono = hdr->chrono;
++   rec_put(dir, hdr, sizeof(HDR), pos, cmpchrono);
+
+    hdr_fpath(fpath, dir, hdr);
+
+    /* Thor.990204: ¬°¦Ò¼{more ¶Ç¦^­È */
+    if ((key = more(fpath, FOOTER_POST)) < 0)
+      break;
+
+: hdr.h:struct HDR
+
+  char owner[80];               /* §@ªÌ (E-mail address) */
+- char nick[49];                /* ¼ÊºÙ */
++ char nick[44];                /* ¼ÊºÙ */
++ int numread;                  /* ³Q¾\Åª¹L´X¦¸ */
++ char nouse;
+  char score;                   /* ¤å³¹µû¤ñ¤À¼Æ */
+
+  char date[9];                 /* 96/12/31 */
+  char title[73];
+
+: post.c:post_item() ±Æª©¦Û©w
+
+static void
+post_item(num, hdr)
+  int num;
+  HDR *hdr;
+{
++ int numread;
+
+  ...
+  ...
+
+- prints("%6d%c%c", (hdr->xmode & POST_BOTTOM) ? -1 : num,
+-   tag_char(hdr->chrono), post_attr(hdr));
++ numread = hdr->numread / 1000;     /* ¨C¤@¤d¦¸ÂsÄýºâ¤@¤À */
++ prints("%6d%c%c%c", (hdr->xmode & POST_BOTTOM) ? -1 : num,
++   tag_char(hdr->chrono), post_attr(hdr),
++   numread ? '0' + numread : ' ');
+
+  ...
+  ...
+
+- hdr_outs(hdr, d_cols + 46);
++ hdr_outs(hdr, d_cols + 45);
+
+  ...
+  ...
+
+- prints("%6d%c%c", (hdr->xmode & POST_BOTTOM) ? -1 : num,
+-   tag_char(hdr->chrono), post_attr(hdr));
+- hdr_outs(hdr, d_cols + 47);
++ numread = hdr->numread / 1000;     /* ¨C¤@¤d¦¸ÂsÄýºâ¤@¤À */
++ prints("%6d%c%c%c", (hdr->xmode & POST_BOTTOM) ? -1 : num,
++   tag_char(hdr->chrono), post_attr(hdr),
++   numread ? '0' + numread : ' ');
++ hdr_outs(hdr, d_cols + 46);
+}
+
+--
+  ¦b web ¤¤¤j®a¨Ã¤£´`§Ç¾\Åª¡A©Ò¥HÂI¾\¦¸¼Æ¦³¤@©wªº°Ñ¦Ò»ù­È
+  µM¦Ó¦b bbs ¤W¤j®a³£¬O¤@½g¤@½g´`§Ç¾\Åª
+  ©Ò¥HÂI¾\¦¸¼ÆÅÜªº¤£«ç»ò¦³°Ñ¦Ò»ù­È
+  (¤]³\¦bºëµØ°Ï¤¤·|¦³»ù­È¡A¦ý¬O¬ÝªO¤¤¤£·|)
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mitoc.dorm-gd2.nctu.edu.tw                [m

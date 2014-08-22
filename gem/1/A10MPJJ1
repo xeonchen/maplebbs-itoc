@@ -1,0 +1,78 @@
+µo«H¤H: tandrian.bbs@ntcb.twbbs.org.tw (¤Û°ìÅ]«°), ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ­­¨îguest±b¸¹
+µo«H¯¸: ¤Û±sÅ]«° (Sat Aug 17 20:36:32 2002)               Updated: 2004/06/24
+
+¡° guest Á`¤H¼Æ­­¨î
+
+: config.h
+
++ #define MAXGUEST        (3)             /* ³Ì¦h°ÑÆ[ªÌ  */
+
+: bbsd.c:login_user()
+
+    else
+    {                           /* guest */
+      if (acct_load(&cuser, uid) < 0)
+      {
+        vmsg(err_uid);
+        continue;
+      }
++     if (utmp_count(cuser.userno, 0) >= MAXGUEST)
++       login_abort("\n" STR_GUEST " ±b¸¹¤w¸gÃzº¡¤F....¦A¨£ ...");
+      logattempt(' ', content);
+      cuser.userlevel = 0;
+      cuser.ufo = UFO_DEFAULT_GUEST;
+
+¡° ¦P ip ªº guest Á`¤H¼Æ­­¨î
+
+: config.h
+
++ #define MAXGUEST        (3)             /* ³Ì¦h°ÑÆ[ªÌ  */
+
+: bbsd.c:login_user()
+
+    else
+    {                           /* guest */
+      if (acct_load(&cuser, uid) < 0)
+      {
+        vmsg(err_uid);
+        continue;
+      }
++     if (utmp_ipcount(cuser.userno, &tn_addr) >= MAXGUEST)
++       login_abort("\n" STR_GUEST " ±b¸¹¤w¸gÃzº¡¤F....¦A¨£ ...");
+      logattempt(' ', content);
+      cuser.userlevel = 0;
+      cuser.ufo = UFO_DEFAULT_GUEST;
+
+: maple.p
+
++int utmp_ipcount(int userno, u_long *address);
+
+: cache.c ©ó utmp_count() ¤U·s¼W³o¨ç¦¡
+
+int
+utmp_ipcount(userno, address)
+  int userno;
+  u_long *address;
+{
+  UTMP *uentp, *uceil;
+  int count;
+  uschar *addr;
+  u_long in_addr;
+
+  count = 0;
+  addr = (uschar *) address;
+  in_addr = (addr[0] << 24) + (addr[1] << 16) + (addr[2] << 8) + addr[3];
+  uentp = ushm->uslot;
+  uceil = (void *) uentp + ushm->offset;
+  do
+  {
+    if (uentp->userno == userno && uentp->in_addr == in_addr)
+      count++;
+  } while (++uentp <= uceil);
+  return count;
+}
+
+--
+  [0m  [44mùÞùùùß ùáùùùù ùÝùùùù ùàùùùß[40m  [1;32m¡¼ Origin: [33m¤Û°ìÅ]«° - ntcb.twbbs.org
+  [0m  [46;1mùå  ùã ùãùùùù ùãùùùù ùãùùùå[0m  [31m¡¼ From: [36m218-32-98-sparc49.pchome.com[m

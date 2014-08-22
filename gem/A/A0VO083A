@@ -1,0 +1,26 @@
+§@ªÌ: itoc (i ma 11:20) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] µn¤J®Éªºtime out
+®É¶¡: Sun Oct  5 21:44:48 2003                          Updated: 2003/10/05
+
+¡° ¤Þ­z¡mwood.bbs@bbs.cs.nthu.edu.tw¡n¤§»Ê¨¥¡G
+>     §Ú·Q½Ð°Ý¤@¤U¡A­n¦p¦ó¼W¥["µn¤J®Éªºtime out"ªº³o­Ó¥\¯à©O¡H
+>     ´N¬O¨Ï¥ÎªÌ¹L¤[¥¼µn¤J¡A¨t²Î·|µ¹¤©Â_½u¡C
+
+: visio.c:igetch()
+
+          cc = vio_to.tv_sec;
+          if (cc < 60)          /* paging timeout : ¨C 60 ¬í§ó·s¤@¦¸ idle */
+            return I_TIMEOUT;
+
+          idle += cc / 60;
+          vio_to.tv_sec = cc + 60;
+
++         if (idle >= 3 && !cutmp)  /* µn¤J®É idle ¶W¹L 3 ¤ÀÄÁ´NÂ_½u */
++         {
++           outz("µn¤J¹O®É¡A½Ð­«·s¤W¯¸");
++           refresh();
++           abort_bbs();
++         }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

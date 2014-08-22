@@ -1,0 +1,36 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý«ç»ò§â¤å³¹¦Û°Ê¦¬¶i­Ó¤HºëµØ°Ï¡H
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/12/27 Mon 12:14:10)                Updated: 2004/12/27
+
+¡° ¤Þ­z¡mrainphiz (¡@)¡n¤§»Ê¨¥¡G
+>     ·Q§â¯¸¤W¨Ï¥ÎªÌpo¤å³¹«á¡A³£¯à¦Û°Ê¦¬¶i­Ó¤HºëµØ°Ï¸ÌÀY
+>     ex.µoªí¤å³¹¡B¦^ÂÐ¤å³¹....(µwºÐ¤Ó¤j¤Fooo)
+
+: post.c:do_mygem() ¥[¦b do_post() «e­±
+
+static void
+do_mygem(fpath)
+  char *fpath;
+{
+  HDR hdr;
+  char folder[64];
+
+  usr_fpath(folder, cuser.userid, "gem/.DIR");
+  hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
+
+  strcpy(hdr.owner, cuser.userid);
+  strcpy(hdr.title, ve_title);
+
+  rec_add(folder, &hdr, sizeof(HDR));
+}
+
+: post.c:do_post()
+
+  rec_bot(folder, &hdr, sizeof(HDR));
+  btime_update(currbno);
+
++ do_mygem(fpath);
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

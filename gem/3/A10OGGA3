@@ -1,0 +1,80 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ªO¥D±Ï¦^ deleted ªO¤å³¹
+®É¶¡: 2004/10/28 Thu 21:10:49                           Updated: 2004/10/28
+
+¡° ¤Þ­z¡mFish.bbs@fishocean.twbbs.org (³½²Â³½Äø§b§b³½)¡n¤§»Ê¨¥¡G
+>     §Ú¤@ª½¥H¬° Junk ©M Delete ªO¬O­nÁ×§K»~§R¤å³¹
+>     ¦³¿ìªk°µ¨ì¤å³¹±Ï¦^£v???
+
+  ­Y­ì¤å¼ÐÃD¹Lªø¡A¨º»ò±Ï¦^ªº¼ÐÃD·|ÅÜµu
+  (¦]¬°¦b§R°£®É move_post() ´N±N¼ÐÃD§ïµu¤F)
+
+: post.c:post_cb[]
+
++ 'i', post_undelete,       [1;44m// «öÁä¦Û©w [m
+  'h', post_help
+
+: post.c:post_undelete() ·s¼W¦b post_delete() «á­±
+
+static int
+post_undelete(xo)
+  XO *xo;
+{
+  HDR *hdr, xpost;
+  char fpath[64], userid[IDLEN + 2], buf[ANSILINELEN], *brdname, *ptr;
+  FILE *fp;
+
+  if (strcmp(currboard, BN_DELETED))
+    return XO_NONE;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+  if (!HAS_PERM(PERM_ALLBOARD))
+  {
+    sprintf(userid, "%-13s", cuser.userid);
+    if (strncmp(hdr->title, userid, IDLEN + 1))
+    {
+      vmsg("³o¤£¬O±z©Ò§R°£ªº¤å³¹¡AµLªk±Ï¦^");
+      return XO_FOOT;
+    }
+  }
+
+  brdname = NULL;
+  hdr_fpath(fpath, xo->dir, hdr);
+  if (fp = fopen(fpath, "r"))
+  {
+    if (fgets(buf, sizeof(buf), fp))
+    {
+      if ((brdname = strstr(buf, STR_POST1" ")) ||
+        (brdname = strstr(buf, STR_POST2" ")))
+      {
+        brdname += 6;
+        if (ptr = strchr(brdname, '\n'))
+          *ptr = '\0';
+      }
+    }
+    fclose(fp);
+  }
+
+  if (brdname && brd_bno(brdname) >= 0)
+  {
+    brd_fpath(buf, brdname, fn_dir);
+    hdr_stamp(buf, HDR_COPY | 'A', &xpost, fpath);
+    strcpy(xpost.owner, hdr->owner);
+    strcpy(xpost.nick, hdr->nick);
+    strcpy(xpost.date, hdr->date);      /* ­ì¤åÂà¸ü«O¯d­ì¤é´Á */
+    strcpy(xpost.title, hdr->title + IDLEN + 1);
+    rec_add(buf, &xpost, sizeof(HDR));
+
+    sprintf(fpath, "¤w¦¨¥\\¦a±N¥»¤å±Ï¦^ %s ªO", brdname);
+    vmsg(fpath);
+  }
+  else
+  {
+    vmsg("¥»¤åÀÉÀY¨S¦³°O¿ý¬ÝªO¦WºÙ¡A½Ð¨Ï¥ÎÂà¿ý¨Ó±Ï¦^");
+  }
+
+  return XO_FOOT;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,21 @@
+§@ªÌ: chwaian (µL¨¥) ¬ÝªO: itoc
+¼ÐÃD: Re: ·Q½Ð°Ý¦³°µ½ä½Lªº¯¸ªø
+®É¶¡: 2004/08/23 Mon 20:20:27                           Updated: 2005/06/08
+
+: menu.c static MENU menu_gameplay[]
+
++ "bin/bet.so:main_bet", PERM_VALID, - M_GAME,
++ "BBet       ¡ñ ºÆ¨g½ä½L ¡ð",
+
+: global.h
+
+#define BN_REQUEST      BN_CAMERA       /* ºq¥»§ë½Z³B */
++ #define BN_BET        "Bet"           /* ½ä½L°O¿ý */
+
+: ¶} BN_BET ³o­ÓªO
+
+  ¦b¯¸¤W¶}¤@­Ó Bet ªO
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mchwaian [30m±q [36m218-171-119-168.dynamic.hinet.net [30mµoªí[m

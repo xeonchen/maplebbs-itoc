@@ -1,0 +1,137 @@
+µo«H¤H: weiyu.bbs@weiyu.twbbs.org (Andy) ¬ÝªO: itoc
+¼Ð  ÃD: Re: ½Ð°Ý¤@¤UÃö©ó°ê®w¨t²Î
+µo«H¯¸: ¤ýªÌ¤§®a (2005/03/31 Thu 08:00:00)                Updated: 2005/03/31
+
+¡° ¤Þ­z¡mjal.bbs@bbs.jal.idv.tw (¤p¥Ê§b¡ã)¡n¤§»Ê¨¥¡G
+> §â¨Ï¥ÎªÌÃz±¼¦h¥X¨Óªº¿ú¡A¸òÂIºq or ª±¹CÀ¸¤§Ãþ©Ò¦©ªº¿ú
+> ·Q­Ó¿ìªk¦s¨ì¤@­Ó¦a¤è¥h¡C
+> µM«á´N·|¦³­Ó°ê®w¥X²{¤F...
+> ³Ì«á·í°ê®w = ¹s ªº®É­Ô..ª±¹CÀ¸Ä¹¤F¤]·|¨S¿úµ¹...:p
+
+: acct.c:addmoney() ©M addgold() ´«¦¨¥H¤U
+
+/*
+    µ{¦¡°²³]¡G
+        record 0 ¦s©ñ»È¹ô
+        record 1 ¦s©ñª÷¹ô
+    ¦@¥ÎÀÉ®×¡Grun/treasury
+    ­è¶}©l°ê®wªº¿ú³]¬°
+    INITIAL_MONEY
+    °ê®wªºª÷¹ô¤@¶}©l¦³
+    INITIAL_GOLD
+
+    §âaddmoney©Maddgold¨â­Ó´«¦¨¤U­±¨º¼Ë
+    ¤£¹L«e´£¬O ¦©¿ú¤]­n¥Î¨ìaddmoney¤~¦³®Ä:p
+    ¤£¥u¬O·¸¦ì ¦pªG¦©¿ú¤]¥Î³o­Ó¨ç¼Æªº¸Ü
+    ¤]·|¦s¨ì°ê®w§a:p (¨S¸Õ¹L)
+ */
+
+
+#define FN_TREASURY     "run/treasury"
+#define INITIAL_MONEY   1000000
+#define INITIAL_GOLD    1000
+
+
+void
+addmoney(addend)
+  int addend;
+{
+  int treasury;
+  int overflow;
+
+  if (rec_get(FN_TREASURY, &treasury, sizeof(int), 0))
+    treasury = INITIAL_MONEY;
+
+  if (addend < 0)
+  {
+    treasury -= addend;
+    cuser.money += addend;
+    rec_put(FN_TREASURY, &treasury, sizeof(int), 0, NULL);
+  }
+  else if (addend < (INT_MAX - cuser.money))      /* Á×§K·¸¦ì */
+  {
+    if (treasury < addend)
+    {
+      vmsg("°ê®w¨S»È¹ô¤F¡A¨S¿ìªk¤ä¥I±z");
+      return;
+    }
+    cuser.money += addend;
+  }
+  else
+  {
+    /* ±N·¸¥Xªº³¡¤À¦s¤J°ê®w */
+    overflow = INT_MAX - cuser.money;
+    overflow = addend - overflow;
+    treasury += overflow;
+    rec_put(FN_TREASURY, &treasury, sizeof(int), 0, NULL);
+    cuser.money = INT_MAX;
+  }
+}
+
+
+void
+addgold(addend)
+  int addend;
+{
+  int treasury;
+  int overflow;
+
+  if (rec_get(FN_TREASURY, &treasury, sizeof(int), 1))
+    treasury = INITIAL_GOLD;
+
+  if (addend < 0)
+  {
+    treasury -= addend;
+    cuser.money += addend;
+    rec_put(FN_TREASURY, &treasury, sizeof(int), 1, NULL);
+  }
+  else if (addend < (INT_MAX - cuser.gold))       /* Á×§K·¸¦ì */
+  {
+    if (treasury < addend)
+    {
+      vmsg("°ê®w¨Sª÷¹ô¤F¡A¨S¿ìªk¤ä¥I±z");
+      return;
+    }
+    cuser.gold += addend;
+  }
+  else
+  {
+    /* ±N·¸¥Xªº³¡¤À¦s¤J°ê®w */
+    overflow = INT_MAX - cuser.gold;
+    overflow = addend - overflow;
+    treasury += overflow;
+    rec_put(FN_TREASURY, &treasury, sizeof(int), 1, NULL);
+    cuser.gold = INT_MAX;
+  }
+}
+
+: bank.c:x_bank() ¦b»È¦æªº¦a¤èÅã¥Ü°ê®wÁÙ¦³¦h¤Ö¿ú
+
+int
+x_bank()
+{
+  char ans[3];
++ int treasury;
+
+  ...
+
+    "  ùüùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùùý\033[m");
+
++ outs("\n°ê®wÁÙ¦³");
++ if (rec_get("run/treasury_money", &treasury, sizeof(int), 0))
++   prints(" %d »È", treasury);
++ if (rec_get("run/treasury_gold", &treasury, sizeof(int), 0))
++   prints(" %d ª÷", treasury);
+
+  vget(11, 0, "½Ð¿é¤J±z»Ý­nªºªA°È¡G", ans, 3, DOECHO);
+
+
+--
+                        [1m¥Í¢c©[mR[1m¢d¦³¢b¤F¢d­W¢gµh[m
+                        [30;43m¦ó¤£§â²´·úªº¾l¥ú¯dµ¹§O¤H[m
+                            [1;34m§A·|¬Ý[32m¨ì§ó¦h[m
+
+--
+[1;34m¢~¢w¢w¢w¢w¢¡ ùá [35mweiyu.twbbs.org [34mùá [30m¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸[m
+[1;34m¢x[31m¤ý[32mªÌ[33m¤§[34m®a¢x ùá[36m weiyu  [33m¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸[m
+[1;34m¢¢¢w¢w¢w¢w¢£ ùá [37mµoªí©ó [36mweiyu.mshome.net  [30m¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸¡¸[m

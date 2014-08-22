@@ -1,0 +1,56 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¬ÝªOÄÝ©Ê¡G¤£¯à¨Ï¥Îª`­µ¤å
+®É¶¡: Fri Jul 25 22:34:52 2003                          Updated: 2003/08/14
+
+: battr.h
+
+#define BRD_NOSCORE     0x40    /* ¤£µû¤À¬ÝªO */
++ #define BRD_NOPHONETIC 0x80    /* ¤£¨Ï¥Îª`­µ¤å¬ÝªO */
+
+  ...
+  ...
+
+- #define NUMBATTRS       7
++ #define NUMBATTRS       8
+
+- #define STR_BATTR       "zTcsvA%"
++ #define STR_BATTR       "zTcsvA%p"
+
+  ...
+  ...
+
+  "¤£µû¤À¬ÝªO",                 /* BRD_NOSCORE */
++ "¤£¨Ï¥Îª`­µ¤å",               /* BRD_NOPHONETIC */
+};
+
+: edit.c:ve_filer()
+
+static int
+ve_filer(fpath, ve_op)
+  char *fpath;
+  int ve_op;    /* 1: ¦³ header  0,2: µL header  -1: ¤£¯àÀx¦s */
+{
+  int ans;
++#ifdef ANTI_PHONETIC
++ int phoneticsnum;      /* ª`­µ¤åªº¼Æ¶q */
++#endif
+
+  ...
+  ...
+
+#ifdef ANTI_PHONETIC
+-   if (words_check() > 2)
++   phoneticsnum = words_check();
++   if (!(curredit & EDIT_MAIL) && bbsmode != M_UFILES &&
++     currbattr & BRD_NOPHONETIC && phoneticsnum > 2)
+    {
+      vmsg("½Ð¤Å¨Ï¥Îª`­µ¤å");
+      return VE_FOOTER;
+    }
+#endif
+
+--
+  ·íµM¡Aconfig.h ¸Ì­±­n #define ANTI_PHONETIC¡A¤~¯à¶}±Ò³o¥\¯à
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

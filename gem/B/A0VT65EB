@@ -1,0 +1,92 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¬ÝªO: itoc
+¼ÐÃD: Re: ¬ö¿ý--Æ[¬Ý¸Ó¬ÝªO--ªº¤é´Á©MID
+®É¶¡: Sun Dec  7 19:53:38 2003                          Updated: 2005/07/09
+
+¡° ¤Þ­z¡mhessionhsiao.bbs@bala.mis.ccu.edu.tw (¼y¯¬ ¥­ÀRªº¤é¤l)¡n¤§»Ê¨¥¡G
+> ´N¬Oª©¥D¥H¤WªºÅv­­ªº¤H
+> ¥i¥HÆ[¬Ý
+> ¶i¥X¸Ó¬Ýª©ªº id©M¤é´Áµ¥¬ö¿ý
+
+: board.c:brd_usies() ·s¼W¦¹¨ç¦¡¦b XoPost() «e­±
+
+static void
+brd_usies()
+{
+  char fpath[64], buf[256];
+
+  brd_fpath(fpath, currboard, "usies");
+  sprintf(buf, "%s %s\n", Now(), cuser.userid);
+  f_cat(fpath, buf);
+}
+
+: board.c:XoPost()
+
+  brh_get(brd->bstamp, bno);
+
++ if (!(brd->battr & BRD_ANONYMOUS))
++   brd_usies();
+
+  return 0;
+}
+
+: manage.c:post_usies() ·s¼W¨ç¦¡©ó post_manage() «e­±
+
+static int
+post_usies(xo)
+  XO *xo;
+{
+  char fpath[64];
+
+  brd_fpath(fpath, currboard, "usies");
+  if (more(fpath, (char *) -1) >= 0 &&
+    vans("½Ð°Ý¬O§_§R°£³o¨Ç¬ÝªO¾\Åª°O¿ý(Y/N)¡H[N] ") == 'y')
+    unlink(fpath);
+
+  return XO_HEAD;
+}
+
+: manage.c:post_manage()
+
+    "Manager ¼W´î°ÆªO¥D",
++   "Usies   Æ[¹î¬ÝªO¾\\Åª°O¿ý",
+
+  ...
+  ...
+
+- char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO"
++ char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO (U)°O¿ý"
+
+  ...
+  ...
+
+  case 'm':
+    return post_changeBM(xo);
+
++ case 'u':
++   return post_usies(xo);
+
+: expire.c:main()
+
+  do
+  {
+    bname = brdp->brdname;
+    if (!*bname)
+      continue;
+
++   {
++     struct tm *ptime;
++     time_t now;
+
++     time(&now);
++     ptime = localtime(&now);
+
++     if (ptime->tm_wday == 0)      /* ¨C¶g¤@¬å usies */
++     {
++       sprintf(buf, "%s/%s", bname, "usies");
++       unlink(buf);
++     }
++   }
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35m140.113.191.153 [30mµoªí[m

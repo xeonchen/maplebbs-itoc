@@ -1,0 +1,124 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¤å³¹¥i¥HÅý©Ò¦³¤H½s¿è
+®É¶¡: 2007/03/21 Wed 22:23:43                           Updated: 2007/04/26
+
+¡° ¤Þ­z¡mpokky (·R§A)¡n¤§»Ê¨¥¡G
+>   ¥i¬O§Ú·Q°Ý§A¦³¨S¦³BBS ¥\¯à¥i¥H¹³ºû°ò¦Ê¬ì¨º¼Ë
+>   ´N¬O¤å³¹¥i¥HÅý©Ò¦³ªº¨Ï¥ÎªÌ§ï¨Ó§ï¥h
+>   ¤ñ¦p»¡¤£¬O±`¦³¥s¤j®arepost­n¤£­n¥h®a»E¤§Ãþªº
+>   ¦pªG»¡¥i¥H¤@½g¤å³¹Åý©Ò¦³¬Ý¨ìªº¤H³£¶i¥h½s¿è
+>   ³o¼Ëª©­±´N·|¬Ý°_¨Ó°®²b«Ü¦h¡ã
+
+: struct.h
+
+- #define POST_3          0x00000004
++ #define POST_WIKI       0x00000004
+
+: post.c:post_attr()
+
+  if (mode & POST_MARKED)
+    attr |= 'M';
++ else if (mode & POST_WIKI)
++   attr |= 'W';
+  else if (!attr)
+    attr = '+';
+
+: post.c:post_edit()
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
++#ifdef HAVE_REFUSEMARK
++   if (!chkrestrict(hdr))
++     return XO_NONE;
++#endif
+
+  hdr_fpath(fpath, xo->dir, hdr);
+
+  if (HAS_PERM(PERM_ALLBOARD))                  /* ¯¸ªø­×§ï */
+  {
+-#ifdef HAVE_REFUSEMARK
+-   if (!chkrestrict(hdr))
+-     return XO_NONE;
+-#endif
+    vedit(fpath, 0);
+  }
+- else if (cuser.userlevel && !strcmp(hdr->owner, cuser.userid))
++ else if (cuser.userlevel && (!strcmp(hdr->owner, cuser.userid) ||
++   (hdr->xmode & POST_WIKI)))
+
+: post.c:post_wiki() ·s¼W¦b post_mark() «á­±
+
+static int
+post_wiki(xo)
+  XO *xo;
+{
+  HDR *hdr;
+  int pos, cur, xmode;
+
+  if (!cuser.userlevel) /* itoc.020114: guest ¤£¯à¹ï¨ä¥L guest ªº¤å³¹ºû°ò */
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
+  if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BOARD))
+  {
+    xmode = hdr->xmode;
+
+#ifdef HAVE_LABELMARK
+    if (xmode & POST_DELETE)    /* «Ý¬åªº¤å³¹¤£¯à wiki */
+      return XO_NONE;
+#endif
+
+    hdr->xmode = xmode ^ POST_WIKI;
+    currchrono = hdr->chrono;
+    rec_put(xo->dir, hdr, sizeof(HDR), pos, cmpchrono);
+
+    move(3 + cur, 7);
+    outc(post_attr(hdr));
+  }
+  return XO_NONE;
+}
+
+: post.c:post_cb[]
+
++ Ctrl('W'), post_wiki,
+
+  'h', post_help
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ³Q½s¿è¹L´N°O¿ý°_¨Ó (³o¸Ì¿ï¾Ü°O¿ý¦b¡uºëµØ°Ï²§°Ê¡v)
+  ³o¼Ë´N¥i¥Hª¾¹D­þ½g¤å³¹³Q wiki && ³Q½Ö wiki
+
+: gem.c:gem_log()
+
+- static void
++ void
+gem_log(folder, action, hdr)
+
+: maple.p
+
+void brd2gem(BRD *brd, HDR *gem);
++ void gem_log(char *folder, char *action, HDr *hdr) ;
+
+: post.c:post_edit()
+
+  else if (cuser.userlevel && (!strcmp(hdr->owner, cuser.userid) ||
+    (hdr->xmode & POST_WIKI)))
+
+..
+..
+
++ if (hdr->xmode & POST_WIKI)
++ {
++   /* bluesway.070323: ­Éfpath ¨Ó¦sºëµØ°Ï¸ô®| */
++   gec_fpath(fpath, currboard, fn_dir);
++   gem_log(fpath, "Wiki", hdr);
++ }
+
+  post_head(xo);
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32m218-168-180-20.dynamic.hinet.net[37m µoªí[m

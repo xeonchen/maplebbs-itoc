@@ -1,0 +1,43 @@
+µo«H¤H: drewlin.bbs@bbs.ksitrc.net (¶¯¤¤¸ê¬ã93ªÀªø), ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]¦b¶i¯¸µe­±¥[¤W load ­È
+µo«H¯¸: ¸ê¬ãª¿³£ (Sun Feb  9 17:45:44 2003)               Updated: 2004/03/14
+
+ÁöµM³oªF¦è¦³ÂIµL²á@@
+¤£¹L¦³®É­ÔÁÙÆZ¦³°Ñ¦Ò»ù­Èªº:p
+°Ñ¦Ò windtopªº
+
+: bbsd.c:tn_main()
+
+static inline void
+tn_main()
+{
++ double load[3];
+
+  clear();
+
+#ifdef HAVE_LOGIN_DENIED
+  if (acl_has(BBS_ACLFILE, "", fromhost))
+    login_abort("\n¶Q¾÷¾¹©ó¤£³Q±Í¯¸±µ¨ü");
+#endif
+
++ getloadavg(load, 3);
+
+- prints(MYHOSTNAME " ¡ó " SCHOOLNAME " ¡ó " MYIPADDR "\n"
+-   "Åwªï¥úÁ{¡i\033[1;33;46m %s \033[m¡j¥Ø«e½u¤W¤H¼Æ [%d] ¤H",
+-   str_site, ushm->count);
++ prints(MYHOSTNAME " ¡ó " SCHOOLNAME " ¡ó " MYIPADDR "\n"
++   "Åwªï¥úÁ{¡i\033[1;33;46m %s \033[m¡j¥Ø«e½u¤W¤H¼Æ [%d] ¤H¡A"
++   "¨t²Î­t¸ü %.2f %.2f %.2f [%s]",
++   str_site, ushm->count, load[0], load[1], load[2],
++   load[0] > 7 ? "¹L°ª" : load[0] > 3 ? "°¾°ª" : "¥¿±`");
+
+
+ps...
+"¨t²Î­t¸ü %.2f %.2f %.2f [%s]" ³o¤@¦æ´N¬Oshow¥X¨t²Î­t¸üªº¦a¤è
+¥i¥H¦Û¤v´«¨ì¨ä¥L¦a¤è ¥u¬O­nª`·N³Ì«á¤@¦æªº¶¶§Ç
+(str_site¬O¯¸¦W,ushm->count¬O¯¸¤W¤H¼Æ,³Ì«á¤@­Ó¬O¨Ì·Ó¨t²Î­t¸ü­È§@¬°§PÂ_ªºªF¦è)
+¥Î 7 ©M 3 ¥h§@¬°§PÂ_­È ¥i¥H¦Û¤v­×§ï:p
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m¸[1mê[0;36m¬[1mã[0;36mª[1m¿[0;36m³[1m£ [1;31m bbs.ksitrc.net [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44m61-222-227-131.HINET-IP.hinet.net   [m

@@ -1,0 +1,54 @@
+§@ªÌ: itoc (®Ö¤ß°Ê¤O) ¯¸¤º: itoc
+¼ÐÃD: Re: ½Ð°Ý0916ª©¥»ªºµ{¦¡¬O§_®³±¼¤FÅwªïµe­±???
+®É¶¡: 2004/09/21 Tue 00:07:13                           Updated: 2005/05/23
+
+¡° ¤Þ­z¡mcomfan (Ãø¹L  ¶Ë¤ß)¡n¤§»Ê¨¥¡G
+> ½Ð°Ý«ç»ò±NÅwªïµe­±¥[¤J¨ìµ{¦¡¤§¤¤©O ???
+> ¦A¦¸½Ð°Ý¤U­±¨â¦æ°T®§­n¦p¦ó¥[¤J¨ìÅwªïµe­±ªº¤U¤è©O???
+> ¡¹ Åwªï±z²Ä 390 «×«ô³X¥»¯¸¡A¤W¦¸±z¨Ó¦Û pcXXX.XXX.dwu.edu.tw
+> ¡¹ §Ú°O±o¨º¤Ñ¬O 2004/09/20 Mon 18:44:23¡C
+
+  ¦b (A)nnounce ¸Ì­±·s¼W¸ê®Æ¡AÀÉ¦W¬O welcome
+
+  ¤º®e¤£­n¶W¹L¤@­¶
+
+: bbsd.c:tn_login()
+
++ more("gem/@/@welcome", (char *) -1);    /* Åwªïµe­± */
+
+  if (cuser.userlevel)          /* not guest */
+  {
++   move(b_lines - 1, 0);
++   prints("¡¹ Åwªï±z²Ä %d «×«ô³X¥»¯¸¡A¤W¦¸±z¨Ó¦Û %.35s\n¡¹ §Ú°O±o¨º¤Ñ¬O %s",
++     cuser.numlogins, cuser.lasthost, Btime(&cuser.lastlogin));
+
+    /* ------------------------------------------------- */
+    /* ®Ö¹ï user level ¨Ã±N .ACCT ¼g¦^                   */
+    /* ------------------------------------------------- */
+
+    cuser.lastlogin = ap_start;
+    str_ncpy(cuser.lasthost, fromhost, sizeof(cuser.lasthost));
+
+    login_level();
+
++   vmsg(NULL);
+
+    /* ------------------------------------------------- */
+    /* ³]©w status                                       */
+    /* ------------------------------------------------- */
+
+    login_status(multi);
+
+    /* ------------------------------------------------- */
+    /* ¨q¨Ç¸ê°T                                          */
+    /* ------------------------------------------------- */
+
+    login_other();
+  }
++ else                  /* guest */
++   vmsg(NULL);
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.dorm11.nctu.edu.tw [30mµoªí[m

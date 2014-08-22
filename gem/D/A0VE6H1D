@@ -1,0 +1,48 @@
+§@ªÌ: itoc (¨Ó¦Û¤õ¬Pªº¥~¬P¤H) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] ³Ì«á¤@½g¤å³¹«ö¤U¦^¨ì²Ä¤@½g
+®É¶¡: Fri Dec 27 16:17:48 2002                          Updated: 2003/05/24
+
+¡° ¤Þ­z¡mamurochar (¤p¥ú)¡n¤§»Ê¨¥¡G
+> ÁÙ¦³´N¬O¦p¦ó¯àÅý³Ì«á¤@½g¤å³¹¤U«ö¤UÁä´N¤S¯à¦^¨ì²Ä¤@½g©O?
+
+  ­ì¥»ªº¬O
+   * ³Ì«á¤@½g«ö KEY_DOWN ¤£·|Â½¥h²Ä¤@½g
+   * ³Ì«á¤@½g«ö KEY_PGDN ¤£·|Â½¥h²Ä¤@½g
+
+: xover.c:xover()
+
+  ­Y­n§ï¦¨
+   * ³Ì«á¤@½g«ö KEY_DOWN ·|Â½¥h²Ä¤@½g
+   * ³Ì«á¤@½g«ö KEY_PGDN ·|Â½¥h²Ä¤@½g
+  «h³o¼Ë§ï
+
+        else if (pos > num)
+        {
+-         if (zone == XZ_POST)
+-           pos = num;
+-         else
+            pos = (cmd || pos == num + XO_TALL) ? 0 : num;
+        }
+
+  ­Y­n§ï¦¨
+  * ³Ì«á¤@½g«ö KEY_DOWN ·|Â½¥h²Ä¤@½g
+  * ³Ì«á¤@½g«ö KEY_PGDN ¤£·|Â½¥h²Ä¤@½g
+  «h³o¼Ë§ï
+
+        else if (pos > num)
+        {
++         if (cmd)
++         {
++           pos = 0;
++         }
++         else
++         {
+            if (zone == XZ_POST)
+              pos = num;
+            else
+              pos = (pos == num + XO_TALL) ? 0 : num;
++         }
+        }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

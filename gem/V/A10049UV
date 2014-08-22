@@ -1,0 +1,49 @@
+§@ªÌ: itoc (League) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] Æ[¬Ý¤å³¹ÄÝ©Ê
+®É¶¡: 2004/01/12 Mon 12:51:36                           Updated: 2004/01/12
+
+  ¤å³¹¦Cªí«ö ^S ¬Ý¤å³¹ÄÝ©Ê
+  ©MºëµØ°Ï«ö S ¤@¼Ë
+
+: post.c:post_state() ·s¼W¦¹¨ç¦¡©ó post_help() «e­±
+
+static int
+post_state(xo)
+  XO *xo;
+{
+  HDR *ghdr;
+  char fpath[64], *dir;
+  struct stat st;
+
+  if (!HAS_PERM(PERM_ALLBOARD))
+    return XO_NONE;
+
+  ghdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+  dir = xo->dir;
+  hdr_fpath(fpath, dir, ghdr);
+
+  move(12, 0);
+  clrtobot();
+  outs("\nDir : ");
+  outs(dir);
+  outs("\nName: ");
+  outs(ghdr->xname);
+  outs("\nFile: ");
+  outs(fpath);
+
+  if (!stat(fpath, &st))
+    prints("\nTime: %s\nSize: %d", Btime(&st.st_mtime), st.st_size);
+
+  vmsg(NULL);
+
+  return post_body(xo);
+}
+
+: post.c:post_cb[]
+
++ Ctrl('S'), post_state,
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

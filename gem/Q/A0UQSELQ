@@ -1,0 +1,109 @@
+§@ªÌ: itoc (¬¡¤O¦A²{) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ¾×±¼¦P¤@­ÓE-mailµù¥Uªº²Ä4­ÓID
+®É¶¡: Sun Sep 29 18:31:16 2002                          Updated: 2005/01/09
+
+¡° ¤Þ­z¡mYangwenli.bbs@bbs.sa.ncyu.edu.tw (·¨«Â§Q)¡n¤§»Ê¨¥¡G
+>     account.c·|§â¦P¤@ email »{ÃÒ¦h¦¸ªº ID ¬ö¿ý¤U¨Ó¡A
+>     ¯à¤£¯àª½±µ¦bµù¥U²Ä4­Ó ID ªº®É­Ô´NÀÉ¤U¨Ó©O¡H
+
+: global.h
+
+  #define FN_ETC_EXPIRE   "etc/expire.conf"     /* ¬ÝªO¤å³¹½g¼Æ¤W­­³]©w */
++ #define FN_ETC_EMAILADDR "etc/emailaddr"      /* ¦P¤@ email »{ÃÒ¦h¦¸¦Cªí */
+
+: user.c:ban_addr()
+
+  /* ¤£¦b¥Õ¦W³æ¤W©Î¦b¶Â¦W³æ¤W */
+- return (!acl_has(TRUST_ACLFILE, foo, host + 1) ||
+-   acl_has(UNTRUST_ACLFILE, foo, host + 1) > 0);
++ if (!acl_has(TRUST_ACLFILE, foo, host + 1) ||
++   acl_has(UNTRUST_ACLFILE, foo, host + 1) > 0)
++ {
++   return 1;
++ }
++ else       /* ¦b¥Õ¦W³æ¤W¥B¤£¦b¶Â¦W³æ¤W¡A¦AÀË¬d¬O§_¶W¹L»{ÃÒ¥|¦¸¥H¤W */
++ {
++   /* xeon.050109: ­Y¥Î­ì¨Óªº email ­«·s»{ÃÒ¡A
++                   §Y¨Ï¦b emailaddr ¤W¤]¥i¥H»{ÃÒ */
++   if (str_cmp(cuser.email, addr) &&
++     acl_has(FN_ETC_EMAILADDR, foo, host + 1) > 0)
++     return 1;
++ }
++ return 0;
+
+: reaper.c
+
+#ifdef EADDR_GROUPING
+static FILE *faddr;
++ static FILE *faddr2;
+#endif
+
+: reaper.c:report_eaddr_group()
+
+static void
+report_eaddr_group()
+{
+  int i, j, cnt;
++ int logit;
+  off_t off;
+  int fd;
+
+  SCHEMA s;
+  /* funo */
+
+  fprintf(faddr, "Email registration over %d times list\n\n", EMAIL_REG_LIMIT);
+
+  for (i = 0; i < numC; i++)
+  {
+    for (cnt = 0, j = chain[i].link; j; cnt++, j = plist[j]);
+    if (cnt > EMAIL_REG_LIMIT)
+    {
++     logit = 0;
+
+  ...
+  ...
+
+          fprintf(faddr, "%5d) %-13s%s[%d]\t%s\n", acct.userno, acct.userid,
+            buf, acct.numlogins, acct.email);
+
++         if (!logit)       /* ¤@­Ó email ¥u log ¤@¦¸ */
++         {
++           logit = 1;
++           fprintf(faddr2, "%s\n", acct.email);
++         }
+        }
+      }
+    }
+
+  }
+}
+#endif
+
+: reaper.c:main()
+
+#ifdef EADDR_GROUPING
+  faddr = fopen(FN_RUN_EMAILADDR, "w");
+  if (faddr == NULL)
+    exit(1);
++ faddr2 = fopen(FN_ETC_EMAILADDR, "w");
++ if (faddr2 == NULL)
++   exit(1);
+#endif
+
+  ...
+  ...
+
+#ifdef EADDR_GROUPING
+  free(chain);
+  free(plist);
+  fclose(faddr);
++ fclose(faddr2);
+#endif
+
+
+  ¨C¶g¶]¤F reaper ¥H«á·|²£¥Í¥X etc/emailaddr
+  °O¿ýµÛ¨Ï¥Î¶W¹L¤T¦¸ªº email
+  ¦b³o¦W³æ¤¤ªº±N¤ñ·Ó untrust.acl ¶Â¦W³æ¿ì²z
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

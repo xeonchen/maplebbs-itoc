@@ -1,0 +1,53 @@
+§@ªÌ: itoc (³»¦a¥ß¤ÑºµÄ_¨©) ¯¸¤º: plan
+¼ÐÃD: [­×¥¿] bmtad ¶}­Ó«áªù
+®É¶¡: Tue Nov 11 20:05:29 2003                          Updated: 2005/05/19
+
+  ¤Z¬O±H«Hµ¹ userid[1;33m.dog[m@my_domain ªº
+  ¤@«ß¤£ÀË¬d¬O§_¶W¹L½g¼Æ
+
+  "dog" ³o¦r¥i¥H¦Û©w¡A¥u­n¬O¤T­Ó¦r¥Àªº¦r³£¦æ
+
+: bmtad.c:mta_mailer()
+
+  /* --------------------------------------------------- */
+  /* check E-mail address for anti-spam first            */
+  /* --------------------------------------------------- */
+
+  addr = ap->addr;
+- if ((str = strchr(addr, '@')) && str_ncmp(addr, "mailer-daemon@", 14))
++ if ([1;33m(ap->letter != 2) &&[m (str = strchr(addr, '@')) &&
++   str_ncmp(addr, "mailer-daemon@", 14))
+  {
+
+: bmtad.c:is_rcpt()
+
+    else if (!str_cmp(str, ".brd"))
+    {
+      if (len <= BNLEN + 4)
+      {
+        *str = '\0';
+        if (getbrdname(rcpt))
+        {
+          *letter = 0;
+          return 0;
+        }
+      }
+    }
++   else if (!str_cmp(str, ".dog"))   [1;44m// dog ¥i¥H¥ô·N¦Û©w¬°¤T­Ó¦r¥Àªº­^¤å¦r [m
++   {
++     if (len <= IDLEN + 4)
++     {
++       *str = '\0';
++       str_lower(rcpt, rcpt);
++       sprintf(fpath, "usr/%c/%s/@", *rcpt, rcpt);
++       if (dashd(fpath))
++       {
++         *letter = 2;  /* 2 ªí¥Ü¬O¤@¯ë«H¥ó¡A¦ý¬O¤£ÀË¬d anti-spam */
++         return 0;
++       }
++     }
++   }
++ }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

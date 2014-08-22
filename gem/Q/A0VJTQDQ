@@ -1,0 +1,78 @@
+§@ªÌ: itoc (­·½Õ«B¶¶¡A°ê®õ¥Á¦w) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] Âà«Hªº¤å³¹¥[¤JÀÉÀY Message-ID
+®É¶¡: Tue Jun 24 14:45:31 2003                          Updated: 2005/11/25
+
+  ¦b¤å³¹ªº¤º¤å«e¥[¤JÃB¥~ªºÀÉÀY¸ê®Æ Path
+
+: global.h
+: ¬Ý§A¦³´X­ÓÀÉÀY¡ALINE_HEADER ³o¼Æ¦r´N¼g´X
+
+- #define LINE_HEADER     3               /* more.c bhttpd.c ÀÉÀY¦³¤T¦C */
++ #define LINE_HEADER     4               /* more.c bhttpd.c ÀÉÀY¦³¤T¦C */
+
+: rec_article.c:bbspost_add(()
+
+    fprintf(fp, "µo«H¤H: %.50s ¬ÝªO: %s\n", FROM, board);
+    fprintf(fp, "¼Ð  ÃD: %.70s\n", SUBJECT);
+-   fprintf(fp, "µo«H¯¸: %.27s (%.40s)\n\n", SITE, DATE);
++   fprintf(fp, "µo«H¯¸: %.27s (%.40s)\n", SITE, DATE);
++   fprintf(fp, "Âà«H¯¸: %.70s\n", PATH);
++   fprintf(fp, "\n");
+
+: more.c:outs_header()
+
+static int              /* 1:¬OÀÉÀY */
+outs_header(buf, header_len)
+  char *buf;
+  int header_len;
+{
+  static char header1[LINE_HEADER][LEN_AUTHOR1] =
+    {"§@ªÌ",   "¼ÐÃD",   "®É¶¡"[1;33m,   "¸ô®|"[m};
+  static char header2[LINE_HEADER][LEN_AUTHOR2] =
+    {"µo«H¤H", "¼Ð  ÃD", "µo«H¯¸"[1;33m, "Âà«H¯¸"[m};
+
+: bhttpd.c:txt2htm()
+
+static void
+txt2htm(fp)
+  FILE *fp;
+{
+  int i;
+  char buf[ANSILINELEN], encodebuf[LSTRLEN];
+  static const char header1[LINE_HEADER][LEN_AUTHOR1] =
+    {"§@ªÌ",   "¼ÐÃD",   "®É¶¡"[1;33m,   "¸ô®|"[m};
+  static const char header2[LINE_HEADER][LEN_AUTHOR2] =
+    {"µo«H¤H", "¼Ð  ÃD", "µo«H¯¸"[1;33m, "Âà«H¯¸"[m};
+  char *headvalue, *pbrd, board[128];
+
+: rec_article.c:receive_article()
+
+  ¥H¤U³o¥i°µ¥i¤£°µ
+
+int                             /* 0:success  -1:fail */
+receive_article()
+{
+  newsfeeds_t *nf;
+  char myaddr[128], mynick[128], mysubject[128], myfrom[128], mydate[80];
+  char poolx[256];
++ char mypath[128], *pathptr;
+
+  ...
+  ...
+
+  str_ncpy(poolx, FROM, 255);
+  str_decode(poolx);
+  str_ansi(myfrom, poolx, 128);
+  FROM = myfrom;
+
++ str_ncpy(poolx, PATH, 255);
++ str_decode(poolx);
++ str_ansi(mypath, poolx, 128);
++ /* itoc.030115.µù¸Ñ: PATH ¦pªG¦³ .edu.tw ´NºI±¼ */
++ for (pathptr = mypath; pathptr = strstr(pathptr, ".edu.tw");)
++   strcpy(pathptr, pathptr + 7);
++ mypath[70] = '\0';
++ PATH = mypath;
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

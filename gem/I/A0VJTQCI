@@ -1,0 +1,186 @@
+§@ªÌ: itoc (:MM:) ¬ÝªO: itoc
+¼ÐÃD: Re: [°ÝÃD]WindTopªºFirewall¥\¯à
+®É¶¡: Sat Jan  4 14:18:29 2003                          Updated: 2006/11/10
+
+¡° ¤Þ­z¡mdundung.bbs@no.bbs.ee.nchu.edu.tw.spam (¬P®ü¤¤ªºµo§b¦Ï)¡n¤§»Ê¨¥¡G
+> ·Q­n¦Û­q±ø¥óÂo«Hªº¸Ü³o¥\¯à¯uªº¤£¿ù¥Î
+
+  ¦b rec_article.c ªº bbspost_add()
+
+  board    ¬O ­nÂà¶iªº¬ÝªO
+  userid   ¬O §@ªÌªº email
+  usernick ¬O §@ªÌªº¼ÊºÙ
+  SUBJECT  ¬O ¤å³¹¼ÐÃD
+  SITE     ¬O Organization:
+  MSGID    ¬O MessageID:
+  BODY     ¬O ¤º®e
+
+  ©Ò¥H§A¥u­n¦b³o¸Ì°Ê¤â¸}§Y¥i
+
+: rec_article.c:bbspost_add()
+
++ brd_fpath(fpath, board, "spam");                  /* ¨C­ÓªO¦Û¤vªº spam */
++ if (belong_spam(fpath, addr, nick))
++ {
++   board = "apple";   [1;44m// §â¦³Âo±¼ªº«H°e¥h apple ªO¡AªO¦W¦Û©w [m
++ }
+
+  /* ¼g¤J¤å³¹¤º®e */
+
+  brd_fpath(folder, board, FN_DIR);
+
+: ¦Ó belong_spam() ¥i¥H³o¼Ë¼g
+: rec_article.c ¦b bbspost_add() «e­±·s¼W¥H¤U¨ç¦¡
+
+static int
+belong_spam(filelist, addr, nick)
+  char *filelist, *addr, *nick;
+{
+  FILE *fp;
+  char buf[80];
+  char user[80], *host;
+  char *type, *spam;
+  int rc, checknum;
+
+  rc = 0;
+  if (fp = fopen(filelist, "r"))
+  {
+    str_ncpy(user, addr, sizeof(user));  /* ¨¾¤î¦r¦ê¤Óªø»\¹LÀY */
+    if (host = (char *) strchr(user, '@'))
+    {
+      *host = '\0';
+      host++;
+    }
+
+    checknum = 0;
+    while (fgets(buf, 80, fp))
+    {
+      if (buf[0] == '#')    /* ¥[ # ¬Oµù¸Ñ */
+        continue;
+
+      if (++checknum >= 100)    /* ­­ 100 ±ø rule */
+        break;
+
+      type = (char *) strtok(buf, " \t\r\n");
+      if (type && *type)
+      {
+        spam = (char *) strtok(NULL, " \t\r\n");
+        if (spam && *spam)
+        {
+          /* nick¡Bhost ¥i¥H¬O NULL¡A¬G­nÀË¬d */
+          str_lowest(spam, spam);
+          if ((!strcmp(type, "user") && str_sub(user, spam)) ||
+            (!strcmp(type, "host") && host && str_sub(host, spam)) ||
+            (!strcmp(type, "nick") && nick && str_sub(nick, spam)) ||
+            (!strcmp(type, "subj") && str_sub(SUBJECT, spam)) ||
+            (!strcmp(type, "site") && str_sub(SITE, spam)) ||
+            (!strcmp(type, "from") && str_sub(FROM, spam)) ||
+            (!strcmp(type, "msgi") && str_str(MSGID, spam)))
+          {
+            rc = 1;
+            break;
+          }
+        }
+      }
+    }
+    fclose(fp);
+  }
+  return rc;
+}
+
+: ±µ¤U¨Ó§A­n¦b¬ÝªOÅýªO¥D¥i¥H½s spam ³o­ÓÀÉ®×
+: src/so/manage.c:post_spam_edit() ·s¼W©ó post_memo_edit() «á­±
+
+static int
+post_spam_edit(xo)
+  XO *xo;
+{
+  int mode;
+  char fpath[64];
+
+  mode = vans("¾×«H¦Cªí (D)§R°£ (E)­×§ï (Q)¨ú®ø¡H[E] ");
+
+  if (mode != 'q')
+  {
+    brd_fpath(fpath, currboard, "spam");
+
+    if (mode == 'd')
+    {
+      unlink(fpath);
+      return XO_FOOT;
+    }
+    else
+    {
+      if (vedit(fpath, 0))      /* Thor.981020: ª`·N³Qtalkªº°ÝÃD */
+        vmsg(msg_cancel);
+    }
+
+    return XO_HEAD;
+  }
+  return XO_FOOT;
+}
+
+: manage.c:post_manage()
+
+    "WMemo   ½s¿è¶iªOµe­±",
++   "Spam    ¬ÝªO¾×«H¦Cªí",
+    "Manager ¼W´î°ÆªO¥D",
+
+  ...
+  ...
+
+- char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (M)°ÆªO"
++ char *menu = "¡· ªO¥D¿ï³æ (B)¥DÃD (W)¶iªO (S)¾×«H (M)°ÆªO"
+
+  ...
+  ...
+
+  case 'w':
+    ret = post_memo_edit(xo);
+    break;
+
++ case 's':
++   ret = post_spam_edit(xo);
++   break;
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  spam ³oÀÉ®×ªº®æ¦¡¬°
+
+# ³o¬Oµù¸Ñ¡A­n¾×¤G­Ó´N¼g¤G¦¸
+# ­nª`·N­^¤å­n¥þ¬°¤p¼g
+user    fuck
+user    shit
+host    hinet.net
+nick    ·F
+subj    ¤£­nªº¼ÐÃD
+site    hinet
+from    someone@some.domain
+msgi    netnews.seed.net.tw
+msgi    netnews.hinet.net
+#
+# ¦pªG«á­± spam ªº¤º®e¦³ªÅ®æ¡A¥u·|§ì¨ì²Ä¤@­Ó¦r¦ê
+# ¤]´N¬O»¡¤U­±³o¤G¦æªº®ÄªG¬O¤@¼Ëªº
+site    giga news service
+site    giga
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  spam ¤ñ¸ûªº¤º®e¬O
+
+µo«H¤H: itoc.bbs@processor.tfcis.org (¤µ¤Ñ¤U«B), ¬ÝªO: itoc
+¼Ð  ÃD: Re: ¬ÝªOªº¾\ÅªÅv­­
+µo«H¯¸: XEON (Sun Jan  5 01:04:28 2003)
+Âà«H¯¸: kulu!TomatoNEWS!news.tfcis.org!PROCESSOR
+Origin: zhouer.mcl.math.ncu.edu.tw
+
+  user ¤ñ¹ï itoc.bbs
+  host ¤ñ¹ï processor.tfcis.org
+  nick ¤ñ¹ï ¤µ¤Ñ¤U«B
+  subj ¤ñ¹ï Re: ¬ÝªOªº¾\ÅªÅv­­
+  site ¤ñ¹ï XEON
+  from ¤ñ¹ï itoc.bbs@processor.tfcis.org
+
+--
+    [1;32m¢~¢w¢w Origin ¢¡ [33;45m °Ê¤O®Ö¤ß [37m processor.tfcis.org [32;40m ¡ã £_£`£a ¢w¢w¢q[m
+    [1;32m¢q     Author ¢£ [36mitoc.Dorm-GD2.NCTU.edu.tw[m

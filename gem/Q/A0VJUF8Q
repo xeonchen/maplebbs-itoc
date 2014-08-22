@@ -1,0 +1,70 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (ºñ¥¨¤H¦n«È¡H) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¥\¯à]¯à¦Û­q¬ÝªO¤ÀÃþÃC¦â¶Ü
+µo«H¯¸: XEON (Tue, 15 Jul 2003 01:55:47 +0800 (CST))      Updated: 2007/04/29
+
+¡° ¤Þ­z¡mstarunion.bbs@xeon.tfcis.org (             )¡n¤§»Ê¨¥¡G
+> ¯à¦Û­q¬ÝªO¤ÀÃþÃC¦â¶Ü¡H
+
+: board.c:class_item()
+
+- prints("%6d%c%s%-13s\033[1;3%dm%-5s\033[m%s ",
++ prints("%6d%c%s%-13s\033[%sm%-4s\033[m %s ",
+    num, token, str1, brd->brdname,
+-   brd->class[3] & 7, brd->class, str2);
++   class_color(brd->class), brd->class, str2);
+
+: board.c:class_body()
+
+        short *chx;
+        char *img, *str;
++       char class[BCLEN + 1];
+
+        img = class_img;
+        chx = (short *) img + (CH_END - chn);
+        str = img + *chx;
++       str_ncpy(class, str + BNLEN + 1, BCLEN + 1);
+-       prints("%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s\n",
++       prints("%6d%c  %-13.13s\033[%sm%-5.5s\033[m%s\n",
+          cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
+-         str, str[BNLEN + 4] & 7, str + BNLEN + 1, ...);
++         str, class_color(class), str + BNLEN + 1, ...);
+
+: board.c:class_color() ¥[¦b class_item() «e­±
+
+static char *       /* ¦^¶ÇÃC¦â */
+class_color(class)
+  char *class;
+{
+  [1;44m// ¦Û¦æ§ï table[] ¤Î color[] ¹ïÀ³ [m
+  /* ¤ÀÃþ»P¨ä¹ïÀ³ÃC¦â¡A¤@­Ó¹ï¤@­Ó¡ANULL «h¬O¹ïÀ³¨ä¥L¥¼¦C¥Xªº¤ÀÃþ */
+  static char *table[] =
+  {
+    "¤H¤å",    "¤å¾Ç",
+    "¯¸°È",
+    "­Ó¤H",
+    "­µ¼Ö",    "ÃÀ¤H",    "¹q¼v",
+    NULL
+  };
+  static char *color[] =
+  {
+    "1;35",    "1;35",
+    "1;34;41",
+    "1;32",
+    "1;31",    "1;31",    "1;31",
+    "1;33;45"
+  };
+
+  int i;
+  char *str;
+
+  for (i = 0; str = table[i]; i++)
+  {
+    if (!strcmp(class, str))
+      break;
+  }
+  return color[i];
+}
+
+--
+[1;31m|[33m Origin [31m| [0;45m MapleBBS-itoc °Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+[1;31m|[35m Author [31m| [36mitoc.dorm11.nctu.edu.tw[m

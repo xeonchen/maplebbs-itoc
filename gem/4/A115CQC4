@@ -1,0 +1,44 @@
+µo«H¤H: TKyo.bbs@cpu.tfcis.org (·t¶Â¶Q¤½¤l) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¤W¯¸¥ß§Y»â¨ú¤ä²¼ ?
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/04/09 Sat 02:56:07)                Updated: 2005/04/28
+
+¡° ¤Þ­z¡mpapago.bbs@cpu.tfcis.org (papago)¡n¤§»Ê¨¥¡G
+>         °£¤F«H°U»È¦æªº¤ä²¼§I²{¤§¥~¡A½Ð°Ý­n«ç»òÅý¨Ï¥ÎªÌ¤W¯¸®É¡A
+>         ¥ß§Y»â¨ú¤ä²¼©O¡H
+
+: so/bank.c:x_cash()
+
+- static void
++ int
+x_cash()
+{
+  ...
+-   vmsg("±z¥Ø«e¨S¦³¤ä²¼¥¼§I²{");
+-   return;
++   return 0;
+  ...
+  more(buf, NULL);
+  unlink(buf);
++ return 0;
+}
+
+: maple/bbsd.c : tn_login()
+
+    login_level();
+
++   /* ------------------------------------------------- */
++   /* ­Y¦³¥¼¦¬¤ä²¼¡A¦b³oÃä¦¬¨ú                          */
++   /* ------------------------------------------------- */
++   usr_fpath(buf, cuser.userid, FN_PAYCHECK);
++   if (dashf(buf))
++     DL_func("bin/bank.so:x_cash");
+
+    /* ------------------------------------------------- */
+    /* ³]©w status                                       */
+    /* ------------------------------------------------- */
+
+    login_status(multi);
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mTKyo [30m±q [31mcszone.twbbs.org [30mµoªí[m

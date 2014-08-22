@@ -1,0 +1,52 @@
+µo«H¤H: wens.bbs@processor.tfcis.org (¡@) ¬ÝªO: plan
+¼Ð  ÃD: Re: [­×¥¿] ¦b BBS ¤W³]©wÂà«H
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/05/01 Sat 20:58:40)                Updated: 2004/10/23
+
+¤µ¤Ñ´ú¸Õ¹L¤F  ¥i¥H¥Î
+TIMEOUTªº³æ¦ì¬O¬í
+­YTIMEOUT¬í«á¥¼¯à³s½u ´N³s½u¥¢±Ñ
+³o¤ñµ¥®Ö¤ßtimeout­n¨Óªº§Ö
+
+: bbslink.c ·s¼W³o¤@¬q©ó inetclient() «e­±
+
+#include <setjmp.h>
+
+static sigjmp_buf timeout_env;
+
+static void
+abort_timeout(sig)
+  int sig;
+{
+  siglongjmp(timeout_env, -1);
+}
+
+: bbslink.c:inetclient()
+
+  /* Allocate a socket */
+  fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (fd < 0)
+    return -1;
+
++ signal(SIGALRM, abort_timeout);
++ if (sigsetjmp(timeout_env, 1) != 0)
++ {
++   signal(SIGALRM, SIG_DFL);
++   return -1;
++ }
++ alarm(10);        /* 10 ¬í«á timeout */
+
+  /* Connect the socket to the server */
+  if (connect(fd, (struct sockaddr *) & sin, sizeof(sin)) < 0)
+  {
+    close(fd);
+    return -1;
+  }
+
++ signal(SIGALRM, SIG_DFL);
++ alarm(0);
+
+  return fd;
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mwens [30m±q [35m220-134-246-97.hinet-ip.hinet.net [30mµoªí[m

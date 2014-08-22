@@ -1,0 +1,43 @@
+µo«H¤H: BioStar.bbs@micro.bio.ncue.edu.tw (¼ê´ò¤p¶³³¶) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD] «ç»ò¼W¥[¤U¼hÁÙ¦³¤l¿ï³æªº¿ï¶µ
+µo«H¯¸: Àº¤Ñ±^ (Tue, 22 Jul 2003 11:52:52 +0800 (CST))    Updated: 2004/02/07
+
+¡° ¤Þ­z¡mBioStar (¼ê´ò¤p¶³³¶)¡n¤§»Ê¨¥¡G
+> ¦ý¬O¦pªG¤p§Ì¬O­n¼W¥[¤U¼hÁÙ¦³¤l¿ï³æªº¿ï¶µ...
+> ¨Ò¦p¦Û­q¤@­Ó"¬P®yºâ©R"ªº¿ï¶µ...
+> ¶i¥h«á¤S¬O¤@­Ó¦³¦n´X­Ó¿ï¶µªº¤l¿ï³æ...
+
+¦Û°Ý¦Ûµª...  ²×©ó»â®©¥X¨Ó¤F...
+
+­×§ï maple/menu.c ...
+
+·s¼Wµ{¦¡½X......
+
+/* ®æ¦¡ : static MENU ¤l¿ï³æ­^¤å¦WºÙ[] = */
+static MENU menu_astro[] =
+{
+  "bin/sinastar.so:main_sinastar", 0, - M_XMODE,
+  "NStar      ¡¹ ¬P®y¹B¶Õ ¡¹",
+
+  "bin/horoscope.so:x_astro", PERM_BASIC, - M_XMODE,
+  "Astro      ¡¹ §Úªº¬P®y ¡¹",
+
+  "bin/horoscope.so:x_pair", PERM_BASIC, - M_XMODE,
+  "Pair       ¡¹ ¨k¤k°t¹ï ¡¹",
+
+/* ®æ¦¡ : ¤W¼h¿ï³æ­^¤å¦WºÙ, PERM_MENU + '¤l¿ï³æ¹w³]¿ï¶µÁä', M_XMENU, */
+  menu_tool, PERM_MENU + 'N', M_XMENU,
+/* ®æ¦¡ : "¤l¿ï³æ¤¤¤å¦WºÙ" */
+  "¬P®yª«»y"
+};
+
+¦A¨ì¨ä¤W¼h¿ï³æ³]©wµ{¦¡½X(¥»¨Ò¬O menu_tool[])¤¤¥[¤J³o­Ó¤l¿ï³æ......
+
+/* ®æ¦¡ : ¤l¿ï³æ­^¤å¦WºÙ, ¥i¥H¨Ï¥ÎªºÅv­­, M_XMENU, */
+  menu_astro, 0, M_XMENU,
+/* ®æ¦¡ : "¤l¿ï³æ±Ô­z", */ /* ¤l¿ï³æ±Ô­zªº­º¦ì¦r¤¸±N¦¨¬°¸Ó¿ï¶µ§Ö³tÁä */
+  "Astro      ¡i ¬P®yª«»y ¡j",
+
+--
+[1;31m|[33m Origin [31m| [0;42m ¹ü¤Æ®v¤j¥Íª«¨t §u­·¡E²·¤ë¡EÀº¤Ñ±^ [32;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m218-163-213-178.HINET-IP.hinet.net[m

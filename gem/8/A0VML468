@@ -1,0 +1,283 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (©Û³êªü¬Yªº¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¥\¯à]¥þ²y·j´M
+µo«H¯¸: ¤ë¤U©]·Q (Fri, 19 Sep 2003 04:19:51 +0800 (CST))  Updated: 2003/09/19
+
+  ¶W¾A¦X¤ô²y¤ýªº¥\¯à¡A¦pªG§A¬°¤F¦b¤@°ï¤ô²y¸Ì§ä¹q¸Ü­W´o¡B¦pªG§A¬°¤F¦b¤@°ï¤ô²y¸Ì
+
+  §ä¬Y­ÓÃöÁä¦r­W´o¡A¦b¤ô²y¦Cªí¤U¡A«ö f Áä¡A±N·|¦Û°Ê§ä¥X
+
+  §t¦³¸Ó¯S©wÃöÁä¦rªº©Ò¦³¤ô²y¡A³sid¤]¤@¨Ö§ä¡C
+
+  §¹¾ãª©ªº¤ô²y·j´M¥\¯à¡Abmw_item()³¡¤À¬O»á¦Y¸ê·½ªºªF¦è¡A¤£¤@©w­n´«¡A¦pªG¯¸°÷¤p
+
+  ¾÷¾¹°÷Power¡A¨º´N´«§a!
+
+
+: bmw.c
+
+  bmw_item()´«¦¨¤U­±¨º°¦¡A­nÅý¤ô²y¸ÌªºÃöÁä¦rÅÜ¦âªºbmw_item()´N¬O³o¼Ë¡C
+
+  ¦pªG©È¤é«áºûÅ@§xÃø(«ü¼Ð­¸¨Ó­¸¥hªº¤T¤Ñ«á§Ú¤@©w·|§Ñ°O§Ú¦Û¤v¦b¼g¤°»ò¡A©Ò¥H³oÂI
+
+  ¯¸ªø¦Û¤v­n¦³³Æ®×¥H¨¾¸U¤@)¡A´N§âÂÂªºbmw_item()¥Î#if 0¥]°_¨Ó¡A¯dµÛ¤é«á¥Î¡C
+
+
++ static char out_hunt[32], out_lunt[32];
+
+static void
+bmw_item(num, bmw)    /* amaki.030915: ¨ã³ÆÅÜ¦â¥\¯àªºbmw_item */
+  int num;
+  BMW *bmw;
+{
+  char *str, *ptr;
+  int hunt_len, msg_len, leftover = 0;
+
+  struct tm *ptime = localtime(&bmw->btime);
+
+  msg_len = strlen(bmw->msg);
+  hunt_len = strlen(out_hunt);
+
+  if (bmw->sender == cuser.userno)      /* °e¥Xªº¤ô²y */
+  {
+    if (*out_hunt == '\0')
+      prints("%6d %-13s%-53.53s\033[33m%02d:%02d\033[m\n",
+        num, bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min);
+    else
+    {
+      /* amaki.030915: ¥ý¦Lid */
+      prints("%6d %-13s", num, bmw->userid);
+
+      /* amaki.030915: ¦A¦L¤ô²y¤º®e */
+      if (str = str_str(bmw->msg, out_lunt))
+      {
+        prints("%.*s\033[7m%.*s\033[m",
+          str - bmw->msg, bmw->msg, hunt_len, str);
+
+        if (str + hunt_len < bmw->msg + msg_len)
+        {
+          str += hunt_len;
+          while (1)
+          {
+            if (ptr = str_str(str, out_lunt))
+              prints("%.*s\033[7m%.*s\033[m", ptr - str, str, hunt_len, ptr);
+            else
+            {
+              leftover = 53 - (str - bmw->msg);
+              prints("%-*.*s\033[33m%02d:%02d\033[m\n",
+                leftover, leftover, str, ptime->tm_hour, ptime->tm_min);
+              break;
+            }
+
+            if (ptr + hunt_len < bmw->msg + msg_len)
+              str = ptr + hunt_len;
+            else if (ptr + hunt_len >= bmw->msg + msg_len)
+            {
+              leftover = 53 - (str - bmw->msg);
+              if (ptr + hunt_len != bmw->msg + msg_len)
+                prints("%-*.*s\033[33m%02d:%02d\033[m\n",
+                  leftover, leftover, str, ptime->tm_hour, ptime->tm_min);
+              break;
+            }
+          }
+        }
+        else
+        {
+          leftover = 53 - (str - bmw->msg) - hunt_len;
+          prints("%-*.*s\033[33m%02d:%02d\033[m\n",
+            leftover, leftover, " ", ptime->tm_hour, ptime->tm_min);
+        }
+      }
+      else
+        prints("%-53.53s\033[33m%02d:%02d\033[m\n",
+          bmw->msg, ptime->tm_hour, ptime->tm_min);
+    }
+  }
+  else                                  /* ¦¬¨ìªº¤ô²y */
+  {
+    if (*out_hunt == '\0')
+    {
+      prints("%6d \033[1;33m%-13s\033[37;46m%-53.53s\033[33m%02d:%02d\033[m\n",
+        num, bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min);
+    }
+    else
+    {
+      /* amaki.030915: ¥ý¦Lid */
+      prints("%6d \033[1;33m%-13s\033[37;46m", num, bmw->userid);
+
+      /* amaki.030915: ¦A¦L¤ô²y¤º®e */
+      if (str = str_str(bmw->msg, out_lunt))
+      {
+        prints("%.*s\033[7m%.*s\033[7m",
+          str - bmw->msg, bmw->msg, hunt_len, str);
+
+        if (str + hunt_len < bmw->msg + msg_len)
+        {
+          str += hunt_len;
+          while (1)
+          {
+            if (ptr = str_str(str, out_lunt))
+              prints("%.*s\033[7m%.*s\033[7m", ptr - str, str, hunt_len, ptr);
+            else
+            {
+              leftover = 53 - (str - bmw->msg);
+              prints("%-*.*s\033[33m%02d:%02d\033[m\n",
+                leftover, leftover, str, ptime->tm_hour, ptime->tm_min);
+              break;
+            }
+
+            if (ptr + hunt_len < bmw->msg + msg_len)
+              str = ptr + hunt_len;
+            else if (ptr + hunt_len >= bmw->msg + msg_len)
+            {
+              leftover = 53 - (str - bmw->msg);
+              if (ptr + hunt_len != bmw->msg + msg_len)
+                prints("%-*.*s\033[33m%02d:%02d\033[m\n",
+                  leftover, leftover, str, ptime->tm_hour, ptime->tm_min);
+              break;
+            }
+          }
+        }
+        else
+        {
+          leftover = 53 - (str - bmw->msg) - hunt_len;
+          prints("%-*.*s\033[33m%02d:%02d\033[m\n",
+            leftover, leftover, " ", ptime->tm_hour, ptime->tm_min);
+        }
+      }
+      else
+        prints("%-53.53s\033[33m%02d:%02d\033[m\n",
+          bmw->msg, ptime->tm_hour, ptime->tm_min);
+    }
+  }
+}
+
+
+  ¦bbmw_load()«á·s¼W¤U³o¤@°¦¨ç¦¡¡C
+
+
+extern KeyFunc bmw_cb[];
+
+/* amaki.030915: ´£¨Ñ¥þ"²y"·j´M:p */
+
++ static int bmw_time;
+
+
+static int
+bmw_hunt(xo)
+  XO *xo;
+{
+  char fpath[64], fn_tmp[64], *ptr;
+  int fd, fb, i = 0, j = 0;
+  BMW bmw;
+
+  usr_fpath(fpath, cuser.userid, "bmw_n");
+  strcpy(fn_tmp, xo->dir);
+
+  if ((fd = open(xo->dir, O_RDONLY, 0600)) < 0)
+  {
+    zmsg("µLªk¶}±Ò¤ô²yÀÉ®×");
+    return XO_FOOT;
+  }
+
+  if (dashf(fpath)) /* amaki.030915: §R°£ÂÂªº */
+    unlink(fpath);
+
+  if ((fb = open(fpath, O_RDWR | O_CREAT, 0600)) < 0)
+  {
+    zmsg("µLªk¶}±Ò¤ô²yÀÉ®×");
+    return XO_FOOT;
+  }
+
+  if (!vget(b_lines, 0, "¤ô²yÃöÁä¦r·j´M¡G", out_hunt, sizeof(out_hunt), DOECHO))
+    return XO_FOOT;
+
+  str_lower(out_lunt, out_hunt);
+
+  lseek(fd, (off_t) (sizeof(BMW) * i), SEEK_SET);
+  lseek(fb, (off_t) (sizeof(BMW) * j), SEEK_SET);
+  while (read(fd, &bmw, sizeof(BMW)))
+  {
+    if ((ptr = str_str(bmw.msg, out_lunt)) ||
+      (ptr = str_str(bmw.userid, out_lunt)))
+    {
+      write(fb, &bmw, sizeof(BMW));
+      j++;
+      lseek(fb, (off_t) (sizeof(BMW) * j), SEEK_SET);
+    }
+    i++;
+    lseek(fd, (off_t) (sizeof(BMW) * i), SEEK_SET);
+  }
+  close(fd);
+  close(fb);
+
+  xz[XZ_BMW - XO_ZONE].xo = xo_new(fpath);
+  xz[XZ_BMW - XO_ZONE].cb = bmw_cb;
+  xover(XZ_BMW);
+  xz[XZ_BMW - XO_ZONE].xo = xo_new(fn_tmp);
+  xz[XZ_BMW - XO_ZONE].cb = bmw_cb;
+
+
+ /* amaki.030915: ¦A¶}¤@¦¸ÀÉ¡A§O·MÄø¨ì§â¤W¤@­Ófd¯d¨ì³o¸Ì¥Î¡A¨Ï¥Î³o¥\¯àªºuser */
+ /* ¤@¦h·|ÅýµwºÐµ¥«Ý³B²zªº°ïÅ|«Ü§ÖÃz±¼ */
+  if ((fd = open(xo->dir, O_RDONLY, 0600)) < 0)
+  {
+    zmsg("µLªk¶}±Ò¤ô²yÀÉ®×");
+    return XO_FOOT;
+  }
+  i = 0;
+  lseek(fd, (off_t) (sizeof(BMW) * i), SEEK_SET);
+  while (read(fd, &bmw, sizeof(BMW)))
+  {
+    if (bmw.btime == bmw_time)
+    {
+      xo->pos = i;
+      break;
+    }
+  /* amaki.030915: ³o¦³¥i¯àµo¥Í¶Ü¡HÃø¹D¤ô²y¶]¨ì¥t¤@­Ó¦t©z¥h¤F¡H«D¤]¡A¸U¤@¤À */
+  /* ¨­¬å¤ô²y¡A´N¦³¥i¯à§ä¤£¨ì¡A¬°¸`¬Ù®Ä²v¦­¦­¸õ¥X¨Ó */
+    else if (bmw.btime > bmw_time)
+      break;
+
+    i++;
+    lseek(fd, (off_t) (sizeof(BMW) * i), SEEK_SET);
+  }
+  close(fd);
+
+  unlink(fpath);
+  memset(out_hunt, 0, sizeof(out_hunt));
+  memset(out_lunt, 0, sizeof(out_lunt));
+
+  return XO_INIT;
+}
+
+
+  §ïbmw_query()
+
+  bmw = (BMW *) xo_pool + (xo->pos - xo->top);
+  /* amaki.030915: ¬ö¿ý¤U¤ô²yªº®É¶¡¡A¾ã¼Æ¡A¸òhdr->xid¦³¬Û¦P¥\¥Î¡A´Nºâ¦³¨â */
+  /* Áû¦P®É¥X²{ªº¤ô²y¤]µL§«¡A¸õ¥X¨Ó®ÉÁö¤£¤¤¥ç¤£»·¨o */
++ bmw_time = bmw->btime;
+  move(1, 0);
+
+
+  §ïbmw_cb[]
+
+  'D', bmw_rangedel,
++ 'f', bmw_hunt,
+  'm', bmw_mail,
+
+: bbsd.c : u_exit()
+
+
+#ifdef MODE_STAT
+  log_modes();
+#endif
+
++ usr_fpath(fpath, cuser.userid, "bmw_n");
++ if (dashf(fpath))
++   unlink(fpath);
+
+  /* ¼g¦^ .ACCT */
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

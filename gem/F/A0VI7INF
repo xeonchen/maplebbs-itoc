@@ -1,0 +1,62 @@
+ß@™Ã: itoc (∫Ò•®§H¶n´»°H) ¨›™O: itoc
+º–√D: Re: [•\Ø‡] ™O•D¶€©w¨›™O §£®œ•Œ™`≠µ§Â/§£Ø‡±¿§Â
+Æ…∂°: Sun Jul 27 20:50:43 2003                          Updated: 2004/03/03
+
+°∞ §ﬁ≠z°mBioStar.bbs@micro.bio.ncue.edu.tw (ºÍ¥Ú§p∂≥≥∂)°n§ßª ®•°G
+> ≠Ë§~∑Q®Ï...  •i§£•i•H≥søÈ§Jº–√DÆ…≥£∏T§Ó™`≠µ§Â∞⁄°H
+> º–√D≥°§¿§]§£Ø‡•Œ™`≠µ§Â......
+
+: edit.c:is_phonetic() •[¶b ve_filler() ´e≠±
+
+static int
+is_phonetic(title)
+  char *title;
+{
+  uschar *str, *pend;
+
+  str = title;
+  pend = title + strlen(title);
+
+  while (str < pend)
+  {
+    if (str[0] >= 0x81 && str[0] < 0xFE && str[1] >= 0x40
+      && str[1] <= 0xFE && str[1] != 0x7F)      /* §§§Â¶r BIG5+ */
+    {
+      if (str[0] == 0xA3 && str[1] >= 0x74 && str[1] <= 0xBA)  /* ™`≠µ§Â */
+        return 1;
+      str++;        /* §§§Â¶r¬˘¶Ï§∏°A≠n¶h•[§@¶∏ */
+    }
+    str++;
+  }
+
+  return 0;
+}
+
+: edit.c:ve_subject()
+
+- return vget(row, 0, "º–√D°G", title, TTLEN + 1, GCARRY);
++ vget(row, 0, "º–√D°G", title, TTLEN + 1, GCARRY);
++ if (is_phonetic(title))
++   return 0;
++ return title[0];
+}
+
+: edit.c:ve_filer()
+
+  case 't':
+    if (ve_op > 0)              /* itoc.010301: §£Ø‡¿x¶s */
+    {
+      strcpy(buf, ve_title);
+-     if (!vget(b_lines, 0, "º–√D°G", ve_title, TTLEN + 1, GCARRY))
++     if (!vget(b_lines, 0, "º–√D°G", ve_title, TTLEN + 1, GCARRY) ||
++       is_phonetic(ve_title))
+        strcpy(ve_title, buf);
+    }
+    return VE_FOOTER;
+
+--
+  ¶n§ø≥· :p
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m     [31m∞[1m §[0;31mOÆ[1m÷§[0;31mﬂ [1mprocessor.tfcis.org    [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[ [1m    itoc.dorm11.nctu.edu.tw         [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

@@ -1,0 +1,215 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: ±N more.c ¥Ñ buffered file read §ï¦¨ full file read
+µo«H¯¸: °Ê¤O®Ö¤ß (2005/05/22 Thu 23:50:50)                Updated: 2005/11/17
+
+: more.c
+
+#define STR_ANSICODE    "[0123456789;"
+
+- static off_t more_off;
++ static uschar *fimage;          /* file image begin */
++ static uschar *fend;            /* file image end */
++ static uschar *foff;            /* ¥Ø«eÅª¨ì­þ¸Ì */
+
+: more.c:more_goto()
+
+  ¦¹¨ç¦¡¾ã­Ó§R°£
+
+: more.c:more_line()
+
+static int
+- more_line(fd, buf)
++ more_line(buf)
+- int fd;
+  char *buf;
+{
+- uschar *pool, *base, *tail;
+  int ch, len, bytes, in_ansi, in_chi;
+
+- pool = more_pool;
+- base = pool + more_base;
+- tail = base + more_size;
+
+  len = bytes = in_ansi = in_chi = 0;
+
+  for (;;)
+  {
+-   if (base >= tail)
+-   {
+-     ch = read(fd, pool, MORE_BUFSIZE);
+-     if (ch <= 0)                      /* end of file or error */
+-       break;
+-     base = pool;
+-     tail = pool + ch;
+-   }
++   if (foff >= fend)
++     break;
+
+-   ch = *base;
++   ch = *foff;
+
+    ...
+    ...
+
+-   base++;
++   foff++;
+    bytes++;
+
+    ...
+    ...
+
+-     if ((in_ansi || (base < tail && *base == KEY_ESC)) && bytes < ANSI...)
++     if ((in_ansi || (foff < fend && *foff == KEY_ESC)) && bytes < ANSI...)
+        bytes < ANSILINELEN - 1)
+        continue;
+
+-     if (base < tail && *base == '\n')
++     if (foff < fend && *foff == '\n')
+      {
+-       base++;
++       foff++;
+        bytes++;
+      }
+
+    ...
+    ...
+
+- more_base = base - pool;
+- more_size = tail - base;
+- more_off += bytes;
+
+  return bytes;
+
+: more.c:outs_footer()
+
+static inline void
+outs_footer(buf, lino, fsize)
+  char *buf;
+  int lino;
+- off_t fsize;
++ int fsize;
+{
+  ...
+  ...
+
+- /* prints(FOOTER_MORE, ..., (more_off * 100) / fsize); */
++ /* prints(FOOTER_MORE, ..., ((foff - fimage) * 100) / fsize); */
+
+  /* itoc.010821: ¬°¤F©M FOOTER ¹ï»ô */
+- sprintf(buf, FOOTER_MORE, ..., (more_off * 100) / fsize);
++ sprintf(buf, FOOTER_MORE, ..., (foff - fimage) * 100 / fsize);
+  outs(buf);
+
+: more.c:more()
+
+  char buf[ANSILINELEN];
+- struct stat st;
+- int fd;
+  int i;
+
+  ...
+  ...
+
+- off_t fsize;                  /* ÀÉ®×¤j¤p */
++ int fsize;                    /* ÀÉ®×¤j¤p */
+  static off_t block[MAXBLOCK]; /*
+
+- if ((fd = open(fpath, O_RDONLY)) < 0)
++ if (!(fimage = f_img(fpath, &fsize)))
+    return -1;
+
+- more_base = more_size = 0;
+- more_off = 0;
++ foff = fimage;
++ fend = fimage + fsize;
+
+  /* Åª¥XÀÉ®×²Ä¤@¦æ¡A¨Ó§PÂ_¯¸¤º«HÁÙ¬O¯¸¥~«H */
+- if (fstat(fd, &st) || (fsize = st.st_size) <= 0 || !more_line(fd, buf))
++ if (fsize <= 0 || !more_line(buf))
+  {
+-   close(fd);
++   free(fimage);
+    return -1;
+  }
+
+  ...
+  ...
+
+  /* Âk¹s */
+- more_base = 0;
+- more_size += more_off;
+- more_off = 0;
++ foff = fimage;
+
+  clear();
+
+- while (more_line(fd, buf))
++ while (more_line(buf))
+  {
+  ...
+  ...
+      if ((lino % 32 == 0) && ((i = lino >> 5) < MAXBLOCK))
+-       block[i] = more_off;
++       block[i] = foff - fimage;
+  ...
+  ...
+        for (i += b_lines; i > 0; i--)
+-         more_line(fd, buf);
++         more_line(buf);
+  ...
+  ...
+-   if (more_off >= fsize)      /* ¤w¸gÅª§¹¥þ³¡ªºÀÉ®× */
++   if (foff >= fend)           /* ¤w¸gÅª§¹¥þ³¡ªºÀÉ®× */
+  ...
+  ...
+-       if ((shift & END_MASK) && (fsize - more_off >= MORE_BUFSIZE))
++       if ((shift & END_MASK) && (fend - foff >= MORE_BUFSIZE))
+  ...
+  ...
+          /* ¥ýÅª¨ì³Ì«á¤@¦C¬Ý¬Ý¥þ³¡¦³´X¦C */
+-         while (more_line(fd, buf))
++         while (more_line(buf))
+          {
+            totallino++;
+            if ((totallino % 32 == 0) && ((i = totallino >> 5) < MAXBLOCK))
+-             block[i] = more_off;
++             block[i] = foff - fimage;
+          }
+  ...
+  ...
+-         more_goto(fd, (off_t) block[i]);
++         foff = fimage + block[i];
+          i = i << 5;
+          /* ¦A±q¤W¤@­Ó block ªº§ÀºÝ¦ì²¾¨ì totallino-b_lines+1 ¦C */
+          for (i = totallino - b_lines - i; i > 0; i--)
+-           more_line(fd, buf);
++           more_line(buf);
+  ...
+  ...
+        lino = 0;
+-       more_goto(fd, (off_t) 0);
++       foff = fimage;
+        clear();
+  ...
+  ...
+-       more_goto(fd, (off_t) block[i]);
++       foff = fimage + block[i];
+        i = i << 5;
+        /* ¦A±q¤W¤@­Ó block ªº§ÀºÝ¦ì²¾¨ì lino-b_lines+1 ¦C */
+        for (i = lino - b_lines - i; i > 0; i--)
+-         more_line(fd, buf);
++         more_line(buf);
+  ...
+  ...
+-       more_goto(fd, (off_t) 0);
++       foff = fimage;
+        lino = 0;
+        shift = b_lines;
+  ...
+  ...
+- close(fd);
++ free(fimage);
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

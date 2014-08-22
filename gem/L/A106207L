@@ -1,0 +1,63 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [°ÝÃD]¦p¦óÅýÂà«Hª©¤]¯à¾×html¤å³¹
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/03/24 Wed 11:08:29)                Updated: 2004/06/07
+
+¡° ¤Þ­z¡mckjjc (jc)¡n¤§»Ê¨¥¡G
+> ¤w¸g¦³§Ë¤FºëµØ°Ïªº¦Û­q¾×«H¡A¤]¦¨¥\¾×¤U¤£¤Ö¼s§i¶l¥ó
+> ¤£¹L³Ìªñ³s½uªO¤W¤S¶]¥X«Ü¦hhtmlªº¤å³¹
+> ¤£ª¾¹D­n«ç»ò§ï¦¨¯àÅýÂà«H¤]¹³bmtad¤@¼Ë¾×¤Uhtmlªº¶l¥ó
+
+: inntobbs.c
+
+enum HeaderValue        /* ©Ò¦³¦³¥Î¨ìªº header */
+{
+  ...
+  CONTROL_H,
++ CONTENTTYPE_H,
+
+  LASTHEADER
+};
+
+
+static header_t headertable[LASTHEADER] =
+{
+  ...
+  "Control",                    CONTROL_H,
++ "Content-Type",               CONTENTTYPE_H,
+};
+
+static char *HEADER[LASTHEADER];
+
+char *BODY;
+! char *SUBJECT, *FROM, *SITE, *DATE, *PATH,
+       *GROUP, *MSGID, *CONTROL[1;33m, *CONTENTTYPE[m;
+
+
+  ...
+  CONTROL = HEADER[CONTROL_H];
++ CONTENTTYPE = HEADER[CONTENTTYPE_H];
+}
+
+: inntobbs.h
+
+extern char *BODY;
+! extern char *SUBJECT, *FROM, *SITE, *DATE, *PATH,
+              *GROUP, *MSGID, *CONTROL,[1;33m *CONTENTTYPE[m;
+
+: inntobbs.c:readlines();
+
+  /* ³o¨Ç¬O¥²³ÆªºÀÉÀYÄæ¦ì¡A¥u¦³ CONTROL ¥i¥H¬O NULL */
+  if (!SUBJECT || !FROM || !SITE || !DATE || !PATH || !GROUP || !MSGID || !BODY)
+    return -1;
+
++ if (CONTENTTYPE && !strstr(CONTENTTYPE, "text/plain"))
++   return 0;    /* ÄF¹ï¤è§Ú¤w¸g¦¬¹L¦¹«H¤F */
+
+--
+  ·d¤£¦n¨º¨Ç¦³ <HTML> </HTML> ªº³£¬O text/plain¡A¨º»ò³o©Û´N¨S¥Î¤F
+
+  ³s½uªOªº html ¦n¹³¤£¦h
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

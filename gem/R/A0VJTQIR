@@ -1,0 +1,231 @@
+§@ªÌ: itoc (Internet Explorer) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¤ä´©¶W¹L 24 ¦Cªºµe­±
+®É¶¡: Thu Mar 27 23:11:04 2003                          Updated: 2005/01/10
+
+: include/global.h
+
+VAR int b_lines;                /* bottom line */
++ VAR int screen_resized;       /* 1: b_lines/b_cols change */
+
+: bbsd.c:tn_login()
+
+  bbstate = STAT_STARTED;       /* ¶i¤J¨t²Î¥H«á¤~¥i¥H¦^¤ô²y */
++ screen_resized = 0;
+
+: visio.c:iac_count()
+
+      if ((*look) == TELOPT_NAWS)
+      {
+        b_lines = ntohs(* (short *) (look + 3)) - 1;
+        b_cols = ntohs(* (short *) (look + 1)) - 1;
+        if (b_lines >= T_LINES)
+          b_lines = T_LINES - 1;
+        else if (b_lines < 23)
+          b_lines = 23;
+        if (b_cols >= T_COLS)
+          b_cols = T_COLS - 1;
+        else if (b_cols < 79)
+          b_cols = 79;
+        d_cols = b_cols - 79;
++       screen_resized = 1;
+      }
+
+: visio.c:igetch()
+
+    vi_head = (*data) == IAC ? iac_count(data) : 0;
++   if (screen_resized)
++     return Ctrl('L'); /* ­è¦n³Q igetch() ®³¨Ó·í§@¥þ°ì redraw */
+
+: visio.c:vget()
+
+  for (;;)
+  {
+    move(x, y + col);
+    ch = vkey();
++   /* Kyo: ¥¼¥[¤W screen_resized §PÂ_ªº¸Ü
++      ·|¾É­P¤@¨Ç¤@¶}©l´N·|°e TELOPT_NAWS ªº telnet ³nÅé, µLªk¿é¤J¥ô¦ó¦r¤¸
++      ³o¥u¾A¥Î©ó§Y®É¿Ã¹õ§ó·s, ¨ä¥L¤£·|³Q¼vÅT */
++   if (screen_resized)
++   {
++     screen_resized = 0;
++     continue;
++   }
+
+: xover.c:xover()
+
+    cmd = vkey();
+
++   if (screen_resized)     /* ­YÅÜ°Ê¤F¿Ã¹õ¤j¤p¡A­n­«·s¸ü¤J */
++   {
++     screen_resized = 0;
++     xo->top = pos / XO_TALL * XO_TALL;
++     cmd = XO_INIT;
++   }
+
+: menu.c:menu()
+
+    switch (cmd)
+    {
++   case Ctrl('L'):
++     refresh();
++     break;
+    case KEY_DOWN:
+      if (++cc <= max)
+        break;
+
+    ...
+    ...
+
+    cmd = vkey();
+
++   if (screen_resized)     /* ­YÅÜ°Ê¤F¿Ã¹õ¤j¤p¡A­n­«Ã¸ menu */
++   {
++     screen_resized = 0;
++     mode = MENU_DRAW | MENU_FILM;
++   }
+
+: more.c:more()
+
++ resized:
+
+  if ((fd = open(fpath, O_RDONLY)) < 0)
+    return -1;
+
+  ...
+  ...
+
+      key = vkey();
+
++     if (screen_resized)
++     {
++       screen_resized = 0;
++       close(fd);
++       goto resized;
++     }
+
+: edit.c:vedit()  /* Kyo: ¬°¤Fµe­±Åã¥Ü¥¿±`, ©Ò¥H¤~©î¦¨¨â¬q @@ */
+
++   if (screen_resized)
++   {
++     screen_resized = 0;
++     refresh();
++   }
+
+    cc = vkey();
+
++   if (screen_resized)
++   {
++     ve_mode = mode | VE_REDRAW;
++     clear();
++     continue;
++   }
+
+
+
+Kyo: µM«áÁÙ¦³ pans ¤]«ÜºG, ¯u­n§Y®É³B¸Ì·|§ï¨ìºÆ±¼
+     ©Ò¥H´Nºû«ù¥b¦Û°Ê, ¤]´N¬OÂ÷¶}¿ï³æ«á¦A«ö¤@Áä´N·|§ó·sµe­±
+
+     ¦]¬° screen_resized «á­n±N screen_resized ÁÙ­ì
+     ©Ò¥H®³ tmp_screen ¨Ó¼È©ñ ...
+
+: windows.c:pans()
+
+- int cur, old_cur, max, ch, i;
++ int cur, old_cur, max, ch, i, tmp_screen;
+
+  /* µe¥X¾ã­Ó¿ï³æ */
+
++ resized:
+    if (x == -1 && y == -1)          /* tsaikd.041007 ¦Û°Ê§ä¦ì¸m */
+    {
+      x = (b_lines - 4 - ch) / 2;
+      y = (b_cols - 12 - desc_maxlen) / 2;
+    }
+
+  ...
+  ...
+
+    switch (ch = vkey())
+    {
++   case Ctrl('L'):
++     if (screen_resized)
++     {
++       clear();         /* ¤£²Mµe­±ªº¸Ü, ·|«Ü´dºG */
++       tmp_screen = 1;
++       screen_resized = 0;
++       hotkey = desc[cur][0];
++       x = y = -1; /* ¸m¤¤ */
++       goto resized;
++     }
++     continue;
+
+: help.c:do_help()
+
+- int ch, cur, i;
++ int ch, cur, i, old_b_lines;
+
+  ...
+
+    if (redraw)
+    {
+      ...
+      outf(FEETER_HELP);
+      move(3 + cur, 0);
+      outc('>');
+      redraw = 0;
++     old_b_lines = b_lines;
+    }
+
+    ch = vkey();
+    switch (ch)
+    {
++   case Ctrl('L'):
++     if (screen_resized)
++     {
++       int realpos;
+
++       screen_resized = 0;
++       redraw = 1;
++       realpos = (BMIN(num, (old_b_lines - 3)) * pageno + cur);
++       pageno = realpos / XO_TALL;
++       cur = realpos % XO_TALL;
++       pagemax = num / XO_TALL;
++     }
++     break;
+
+: admutil.c:m_innbbs()
+
+- int ch, cur, i;
++ int ch, cur, i, old_b_lines;
+
+  ...
+
+    if (redraw)
+    {
+      ...
+      outf(FEETER_INNBBS);
+      move(3 + cur, 0);
+      outc('>');
+      redraw = 0;
++     old_b_lines = b_lines;
+    }
+
+    ch = vkey();
+    switch (ch)
+    {
++   case Ctrl('L'):
++     if (screen_resized)
++     {
++       int realpos;
+
++       screen_resized = 0;
++       redraw = 1;
++       realpos = (BMIN(num, (old_b_lines - 3)) * pageno + cur);
++       pageno = realpos / XO_TALL;
++       cur = realpos % XO_TALL;
++       pagemax = num / XO_TALL;
++     }
++     break;
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm-GD2.NCTU.edu.tw[37m µoªí[m

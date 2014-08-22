@@ -1,0 +1,29 @@
+µo«H¤H: cpd.bbs@pitch.twbbs.org (always on my mind) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¦pªG§Æ±æ±Hµ¹sysopªº«H¥i¥H¦Û°ÊÂà¨ì¬Y­ÓÁôÂÃª©
+µo«H¯¸: pitch¤p¯¸ (2004/01/14 Wed 19:00:41)               Updated: 2004/02/07
+
+¡° ¤Þ­z¡mlokaa.bbs@processor.tfcis.org (lokaa)¡n¤§»Ê¨¥¡G
+> ¦]¬°¥i¥H¬Ýsysop«H½cªº¦³¦n´X­Ó¤H
+> ©È¬Ý¬Ý§Ñ°O©Î¬O³o­Ó¬Ý¤F¨S¿ìªk³B²z¥t¤@­Ó¤S¨Sµo²{¨ì
+> ·Q»¡¦pªG¥i¥Hªº¸Ü´NÅýsysopªº«Hª½±µÂà¨ì¬Y¬ÝªO
+> ¥i¥HÅý¨C­Óadmin¤À§Oª`·N¨ì©³¦³¨S¦³¬Ý¹L
+
+¥i¥H¥H¬ÝªO§Î¦¡ªº¤è¦¡¦s¦b...
+
+1) ¥ý«Ø¥ß¤@­Ó¬ÝªO Mail_SYSOP ¬ÝªOÄÝ©Ê³]¬°¯µ±K¬ÝªO
+2) ¥H¤U©ó¨t²Î¤U¾Þ§@¡A¤À§O¬Olink .DIRÀÉ ¤Î link sysopªº«H½c
+
+   ln -s ~/usr/s/sysop/.DIR ~/brd/Mail_SYSOP/.DIR
+   rm -rf ~/brd/Mail_SYSOP/@
+   ln -s ~/usr/s/sysop/@ ~/brd/Mail_SYSOP/@
+
+³o¼Ë´N¥i¥H¤F¡A¥u¬O¦^ÂÐ«H¥ó¤£·|¦³ 'r' ªº¼Ð°O
+¥i¥H¥Î¤@¯ë¬ÝªOªº¼Ð°O¨ú¥N¡A¹³ 'm' 'g' 's' µ¥µ¥³£¥i¥H:)
+
+ÁÙ¦³´N¬O¦^ÂÐ¦b Mail_SYSOPªOªº¤å³¹¡A¥ÎSYSOP±b¸¹¶i«H½c·|µLªk¾\Åª
+¦]¬°¸ô®|¿ù¤F¡A¤£¹L¨S®t¡A¦]¬°¨ì Mail_SYSOP¬ÝªO ÁÙ¬O¥i¥H¥¿±`¾\Åª
+
+--
+[;1;30mOrigin¡G[32mùÝùù¢¡         ¢x[30m       pitch¤p¯¸[m
+      [;1;42m  ùòùùùå¡C[37m ùá¢z¢w¢u¢w¢{  [;32;47m pitch.twbbs.org [m
+      [;1;32m  ùã    [32m¢| ùã[32m¢|¢w¢|  ¢|[m   From¡G[sw68-16-50.adsl.seed.net.tw][m

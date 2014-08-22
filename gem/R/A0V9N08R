@@ -1,0 +1,126 @@
+§@ªÌ: DarkKiller (±ª°Ê) ¬ÝªO: Daily
+¼ÐÃD: Re: [docs] postfix ¦b anti-spam ¤Wªº³]©w (UCE Controls)
+®É¶¡: Wed Aug 29 17:39:50 2001
+
+* LICENSE
+
+  This document uses GNU FDL (Version 1.1, March 2000):
+  http://www.gnu.org/licenses/fdl.txt
+
+* AUTHOR
+
+  Gea-Suan Lin <gslin@ccca.nctu.edu.tw>
+
+* «e¨¥¡B°Ñ¦Ò¤åÄm
+
+  postfix ªº¥\¯àªº½T¶W¥G·íªì§Úªº·Q¹³¡A¦Ó¥B source ¤]«Ü®e©öÀ´¡A§Ú§â«Ü¦h
+  ¥»¨Ó¬O¥Î sendmail ªº server ³£´«¦¨ postfix¡C
+
+  ³o½g¤å³¹¤£¬Oµ¹­è¸I postfix ªº¤H¬Ýªº¡A§AÀ³¸Ó­n¹ï postfix ¦³¨Ç³\¤F¸Ñ¡A
+  ¥t¥~¡A§Ú·|´£¨ì¤@¨Ç regular expression ªºªF¦è¡A§A¥i¥H man re_format
+  ¬Ý¨ì¬ÛÃöªº¤¶²Ð (§Úª¾¹D§A¤£³ßÅw¬Ý­^¤å¡A¦ý¬O³o¥÷ manpage ¼gªº«Ü¦n)¡C
+
+  ¥t¥~¡ASMTP «ü¥Oªº¤¶²Ð§A¤]­n·|¤@¨Ç¡A§Ú­Ì¦b¤¶²Ð anti-UCE (¤U­±·|´£¨ì)
+  ªº®É­Ô¦³«Ü¤j¤@³¡¤À¬O¸ò³oÂI¦³Ãö¡C
+
+  §Ú¤£·|¤¶²Ð©Ò¦³ªº¥\¯à¡A§¹¾ãªº¥\¯àÁÙ¬O­n½Ð§A°Ñ¦Ò­ì¤åªº¤åÄm¸ê®Æ¡G
+
+  http://d2.nctu.edu.tw/postfix/ (postfix ¥æ¤j web mirror site)
+  /usr/local/etc/postfix/sample-smtpd.cf
+
+  ¦pªG§A¦³¥ô¦ó«ØÄ³¡A±z¥i¥H mail µ¹§Ú¡A©Î¬O¦b¬ÝªO¤W°Q½×¡AÁÂÁÂ¡C
+
+* UCE ?
+
+  UCE ¬O Unsolicited Commercial Email ªºÁY¼g¡AÂ²³æªº»¡¡A¨ä¹ê´N¬O¼s§i«H¡C
+
+  ¤U­±Á¿¨ìªº³]©w¡A³£¬O¦b /usr/local/etc/postfix/main.cf ¸Ì­±¡C
+
+* anti-UCE ªº¾÷¨î -- smtpd_client_restrictions
+
+  ¦³¤£¤Öªº¼s§i«H¬O±q¨S¦³¤Ï¸Ñªº IP ³s½u¹L¨Ó¡A¹ï©ó³oÃþ request¡A§Ú­Ì¥i¥H¥Î
+  reject_unknown_client ³o­Ó°Ñ¼Æ©Úµ´¥Lªº request¡C
+
+  [1msmtpd_client_restrictions = reject_unknown_client[m
+
+  ©ÎªÌ¡A§Ú­Ì¥i¥H­n¨D postfix ³z¹L¤@­Ó¦Û¤v³]ªº³]©wÀÉ¥h³]©w¶Â¥Õ¦W³æ¡G
+
+  [36m# ¤Óªø¤F¡A½Ð±µ¦¨¤@¦æ[m
+  [1msmtpd_client_restrictions = check_client_access regexp:/usr/local/etc/[m
+  [1mpostfix/client-access[m
+
+  ¨ä¤¤ªº regexp ¬O«ü¨Ï¥Î regular expression¡C³o­Ó client-access ªºÀÉ®×¤º
+  ®e¡Aªøªº¹³¬O³o­Ó¼Ë¤l¡G
+
+  [36m# µù¸Ñ¥Î '#' ¶}ÀY[m
+  [36m#[m
+  [36m# ¥Î '/' §â regular expression ¥]°_¨Ó[m
+  [36m#[m
+  [36m# OK ªí¥Ü¤¹³\³o­Ó request¡A¤£¦A¹ï smtpd_client_restrictions «á­±©Ò¦Cªº[m
+  [36m# ±ø¥ó°µÀË¬d¤F¡C[m
+  /\.edu\.tw$/          OK
+  /\.edu$/              OK
+  /\.com\.tw$/          OK
+  /\.com$/              OK
+  /\.net\.tw$/          OK
+  /\.net$/              OK
+  /\.org\.tw$/          OK
+  /\.org$/              OK
+  /\.idv\.tw$/          OK
+  /\.cc$/               OK
+  /\.tw$/               OK
+  [36m#[m
+  [36m# REJECT ªí¥Ü¤£¦Y³o«Ê«H (¨ä¹ê¤]³£ÁÙ¨S¬Ý¨ì«H¥ó)[m
+  /kimo\.com\.tw$/      REJECT
+  [36m#[m
+  [36m# °£¤F REJECT¡A§Ú­Ì¤]¥i¥H¦Û¤v­q²z¥Ñ¡A¥u­n¬O [45]xx [text] §Y¥i¡G[m
+  /\.hinet\.net$/       554 I don't want to receive ANY mail from hinet
+  [36m#[m
+  [36m# ¦pªG³£¤£²Å¦X¤W­±¦C¥X¨Óªº¡A´NÄ~ÄòÀË¬d§a¡C[m
+
+  ¥t¥~¡Apostfix ¤ä´© DNSBL ªº¾÷¨î¡AÃö©ó¤°»ò¬O DNSBL¡A½Ð¦Û¦æ©óºô­¶¤W·j´M
+
+  §Ú­Ì¥i¥H³]©w maps_rbl_domains¡G
+
+  [36m# ¤Óªø¤F¡A½Ð±µ¦¨¤@¦æ[m
+  [1mmaps_rbl_domains = orbs.dorkslayers.com orbz.gst-group.co.uk relays.os[m
+  [1mirusoft.com[m
+
+  ºî¦X¥H¤W©Ò»¡ªº¡A§Ú­Ì¤]¥i¥H³o¼Ë³]¡G
+
+  [36m# ³o¥Nªí§Ú­Ì¥ý©Úµ´¨S¦³¤Ï¸Ñªº¾÷¾¹¡AµM«á¦A©Úµ´¦b maps_rbl_domains ¸Ì­±ªº[m
+  [36m# IP¡AµM«á¦AÀË¬d client-access ¸Ì­±ªº³]©w¡C[m
+  [36m#[m
+  [36m# ¤Óªø¤F¡A½Ð±µ¦¨¤@¦æ[m
+  [1msmtpd_client_restrictions = reject_unknown_client, reject_maps_rbl, ch
+  [1meck_client_access, regexp:/usr/local/etc/postfix/client-access[m
+
+* anti-UCE ªº¾÷¨î -- smtpd_sender_restrictions
+
+  ²z½×¤W¡Amail from ¦b¦³§Þ¥©ªº¶Ã¶ñªº±¡ªp¤U¡A§AµLªkª¾¹D¥Lªº¯u¹ê©Ê¡A©Ò¥H³]
+  ³o­Ó¤]¨S¦³¤°»ò¥Î¡C¤£¹L¡A¥xÆWªº spammers ¹ï©ó°e spam ªº§Þ¥©¦ü¥GÁÙ¬O°±¯d
+  ¦b Sendmail 8.8.x without patch ªº¶¥¬q¡A©Ò¥H³]¤@¤U·|¦³«Ü¤jªº¥Î³B :p
+
+  ¤U­±ªº³]©w·|§â mail from °e¹L¨Óªº E-mail address «á­±ªº domain ®³¥X¨Ó
+  ¬d¸ß¡A¦pªG¤£¦s¦b A RR ©Î¬O MX RR¡A¨º»ò´N reject ±¼¡C
+
+  [1msmtpd_sender_restrictions = reject_unknown_sender_domain[m
+
+* anti-UCE ªº¾÷¨î -- smtpd_recipient_restrictions
+
+  [36m# rcpt to ³]­­[m
+  smtpd_recipient_restrictions =
+
+* anti-UCE ªº¾÷¨î -- header_checks
+
+  [36m# header ªºÀË¬d[m
+  header_checks =
+
+* ¥þ³¡³]©w¦n¥H«á¡A­«·s¸ü¤J postfix
+
+  postfix reload
+
+--
+                                    Gea-Suan Lin <gslin@informath.net>
+--
+¡° Origin: ¤p³À³À <Deer.abpe.org> ¡» From: infomath.math.nctu.edu.tw

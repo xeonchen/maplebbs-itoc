@@ -1,0 +1,118 @@
+µo«H¤H: qazq.bbs@bbs.cs.nchu.edu.tw (£i·R±¡±s¦u£i) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¾ã¦æ¥ú´Î(0)¡Ðxover.c
+µo«H¯¸: ¤¤¿³¸ê¬ì (Mon, 14 Jul 2003 16:11:55 +0800 (CST))  Update: 2003/12/11
+
+: src/include/config.h
+
+#define CURSOR_BAR              /* itoc.010113: ¿ï³æ¥ú´Î */
+
++ #define HAVE_LIGHTBAR         /* xover ¾ã¦æ¥ú´Î */
+
+: src/include/modes.h
+
+#define XO_QUIT         (XO_MODE + 8)
++ #define XO_ITEM       (XO_MODE + 9)
+
+: src/include/ufo.h
+
+#define UFO_SHOWSIGN    BFLAG(17)       /* itoc.000319: ¦sÀÉ«eÅã¥ÜÃ±¦WÀÉ */
+
+- #define UFO_NOUSE18   BFLAG(18)
++ #define UFO_LIGHTBAR  BFLAG(18)       /* ¾ã¦æ¥ú´Î */
+
+  ...
+  ...
+
+#define NUMUFOS_GUEST   5       /* guest ¥i¥H¥Î«e 5 ­Ó ufo */
+- #define NUMUFOS_USER  19      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 19 ­Ó ufo */
++ #define NUMUFOS_USER  20      /* ¤@¯ë¨Ï¥ÎªÌ ¥i¥H¥Î«e 20 ­Ó ufo */
+
+- #define STR_UFO         "-mpsnemPBQFANbwtSH------CAH"
++ #define STR_UFO         "-mpsnemPBQFANbwtSHL-----CAH"
+
+  ...
+  ...
+
+  "Åã¥ÜÃ±¦WÀÉ      (Åã¥Ü/¤£¬Ý)",        /* UFO_SHOWSIGN */
+
++#ifdef HAVE_LIGHTBAR
++ "¾ã¦æ¥ú´Î        (¥ú´Î/´¶³q)",        /* UFO_LIGHTBAR */
++#else
+  "«O¯d",
++#endif
+
+: src/maple/xover.c:xover()    §@ªÌ¡G verit.bbs@bbs.yzu.edu.tw
+
+        else
+        {
+          move(3 + cmd - num, 0);
++#ifdef HAVE_LIGHTBAR
++         /* verit.030129 : xover ¥ú´Î */
++         if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
++         {
++           int tmp = xo->pos;
++           clrtoeol();
++           xo->pos = cmd - num + xo->top;
++           (*(xcmd[0].func)) (xo, 0);
++           xo->pos = tmp;
++         }
++         else
++#endif
+            outc(' ');
+
+          break;                /* ¥u²¾°Ê´å¼Ð */
+        }
+
+  ...
+  ...
+
+    if (xo->max > 0)            /* Thor:­Y¬OµLªF¦è´N¤£show¤F */
+    {
+      num = 3 + pos - xo->top;
+
+      move(num, 0);
++#ifdef HAVE_LIGHTBAR
++     /* verit.20030129 : xover ¥ú´Î */
++     if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
++     {
++       clrtoeol();
++       (*(xcmd[0].func)) (xo, 1);
++     }
++     else
++#endif
+         outc('>');
+    }
+
+  ...
+  ...
+
+          if (cmd < 0)      /* ¦b¥»­¶§ä¨ì match */
+          {
+            move(num, 0);
++#ifdef HAVE_LIGHTBAR
++           /* verit.030129 : xover ¥ú´Î */
++           if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
++           {
++              int tmp = xo->pos;
++              clrtoeol();
++              xo->pos = num + xo->top - 3;
++              (*(xcmd[0].func)) (xo, 0);
++              xo->pos = tmp;
++           }
++           else
++#endif
+              outc(' ');
+
+            /* itoc.010913: ¬Y¨Ç·j´M­n§â b_lines ¶ñ¤W feeter */
+            cmd = (cmd == -1) ? XO_NONE : XO_FOOT;
+          }
+
+------------------------------
+
+  ±µ¤U¨Ó´N­n§ï¦U­Ó xo_zone ¤¤ªº xxxx_item_bar()
+
+  ¦Ó®æ¦¡¤]³\©M¶Q¯¸¦³©Ò¤£¦P¡A½Ð¨Ì xxxx_item() ¦Ó¦Û¦æ­×§ï
+
+--
+[1;31m|[33m Origin [31m| [0;45m ¤¤¿³¸ê¬ì ¤¤¿³¸ê¬ì ¢í¸ê¿W¨q [35;47m bbs.cs.nchu.edu.tw [m
+[1;31m|[35m Author [31m| [36m61-216-136-210.HINET-IP.hinet.net[m

@@ -1,0 +1,78 @@
+µo´H§H: itoc.bbs@processor.tfcis.org (http://cpu.twbbs.o ¨›™O: plan
+º–  √D: Re: [´ÿƒ≥]_cancel_by_xxx_Ω–Ød§U
+µo´HØ∏: XEON (Tue, 17 Jun 2003 15:31:06 +0800 (CST))      Updated: 2004/07/31
+
+  ßA§]•i•H¶€§v∞µ§@≠” innbbsd ™∫ filter
+
+: rec_article.c:receive_article()
+
+  [1;44m// ≥o≥°§¿°A¥N®Ã¶UØ∏≠n•Œ≠˛®«¶”•[§J≠˛®« [m
++ if (filter_hinet())
++   return 0;
++ if (filter_seednet())
++   return 0;
++ if (filter_phonetic())
++   return 0;
+
+  if (!bbspost_add(nf->board, myaddr, mynick))
+    bbslog("<rec_article> :Err: µL™kºg§J %s ™O\n", nf->board);
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  •H§U©“¶≥™∫ filter_xxxx() ≥£¨O∑sºW¶b rec_article.c:receive_article() ´e≠±
+  ¥N®Ã¶UØ∏•Œ≠˛®«æ◊´H≥W´h°A¥N•[§J≠˛®«®Á¶°
+
+  ßA§]•i•H¶€§vºg§@ÆMæ◊´H™∫≥W´h
+  ¶b≥o∏Ã¨O¿À¨d™∫±¯•Û°AßA•i•H¶€•—µo¥ß°A•i•H®œ•Œ≈‹º∆™∫¶≥°G
+  BODY, SUBJECT, FROM, SITE, DATE, PATH, GROUPS, MSGID, CONTROL
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+static int          /* æ◊∏ÙÆ|¶≥ hinet ™∫ */
+filter_hinet()
+{
+  return str_str(PATH, ".hinet.net");
+}
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+static int          /* æ◊∏ÙÆ|¶≥ seednet ™∫ */
+filter_seednet()
+{
+  return str_str(PATH, ".seednet.net.tw");
+}
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+static int          /* æ◊™`≠µ§Â */
+filter_phonetic()
+{
+  /* Ωd®“: ¿À¨d BODY ¨Oß_ßt¶≥™`≠µ§Â */
+
+  int phonetic;         /* ™`≠µ§Âº∆•ÿ */
+  char *str;
+
+  nphonetic = 0;
+  str = BODY;
+  while (*str)
+  {
+    if (str[0] >= 0x81 && str[0] < 0xFE && str[1] >= 0x40
+      && str[1] <= 0xFE && str[1] != 0x7F)      /* §§§Â¶r BIG5+ */
+    {
+      if (str[0] == 0xA3 && str[1] >= 0x74 && str[1] <= 0xBA)    /* ™`≠µ§Â */
+        phonetic++;
+      str++;        /* §§§Â¶r¬˘¶Ï§∏°A≠n¶h•[§@¶∏ */
+    }
+    str++;
+  }
+
+  /* ∂WπL§∫§Â 1/20 •H§W¨O™`≠µ§Â (ßY®C§Q≠”§§§Â¶r¶≥§@≠”™`≠µ§Â)°A¥N spam ±º */
+  if (phonetic > strlen(BODY) / 20)
+    return 1;
+
+  return 0;
+}
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m     [31m∞[1m §[0;31mOÆ[1m÷§[0;31mﬂ [1mprocessor.tfcis.org    [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[ [1m     itoc.dorm-gd2.nctu.edu.tw      [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

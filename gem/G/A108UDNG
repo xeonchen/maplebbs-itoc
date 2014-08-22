@@ -1,0 +1,69 @@
+§@ªÌ: itoc (¯}¸Ñ¶´Åé¤~¬O¤ý¹D¡I) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] Âà«H server ¥iµn¤J
+®É¶¡: 2004/04/28 Wed 12:44:39                           Updated: 2004/10/23
+
+  Âà«H server ¥iµn¤J±b¸¹/±K½X
+
+: struct.h ¥[¤JÄæ¦ì
+
+typedef struct
+{
+  char name[13];        /* ¸Ó¯¸ªº short-name */
+  char host[83];        /* ¸Ó¯¸ªº host */
+  int port;             /* ¸Ó¯¸ªº port */
+  usint xmode;          /* ¸Ó¯¸ªº xmode */
+- char blank[20];       /* «O¯d */
++ char AuthinfoUser[10];/* µn¤J±b¸¹ */
++ char AuthinfoPass[10];/* µn¤J±K½X */
+  FILE *feedfp;         /* bbslink.c ¨Ï¥Î */
+} nodelist_t;
+
+: innbbs.c:nl_add()
+
+    case '2':
+      nl.xmode |= INN_USEPOST;
+      vget(b_lines, 0, "Port¡G[119] ", ans, 6, DOECHO);
+      if ((port = atoi(ans)) <= 0)
+        port = 119;
+      if (vans("³Q¦¹¯¸¥xÁý«H¶Ü(Y/N)¡H[N] ") == 'y')
+        nl.xmode |= INN_FEEDED;
++     if (vans("¦¹ server ¬O§_»Ý­nµn¤J(Y/N)¡H[N] ") == 'y')
++     {
++       if (!vget(b_lines, 0, "½Ð¿é¤Jµn¤J±b¸¹¡G", nl.AuthinfoUser,
++             sizeof(nl.AuthinfoUser), DOECHO) ||
++           !vget(b_lines, 0, "½Ð¿é¤Jµn¤J±K½X¡G", nl.AuthinfoPass,
++             sizeof(nl.AuthinfoPass), DOECHO))
++         return 0;
++     }
+      break;
+
+: bbslink.c:open_connect()
+
+  if (node->xmode & INN_USEPOST)
+  {
+-   tcpcommand("MODE READER");
+-   if (NNRPbuffer[0] != '2')   /* 200 201 202 ³£¯à¨ú«H */
+-   {
+-     bbslog("<bbslink> :Err: ¦øªA¾¹©Úµ´³s½u¡G%s %d\n", host, port);
+-     DEBUG(("¢¢<open_connect> ¦øªA¾¹©Úµ´³s½u\n"));
+-     return 0;
+-   }
++   /* Leeym.030706: »Ý­n±b¸¹/±K½Xªº server */
++   if (tcpcommand("MODE READER") == NNTP_AUTH_NEEDED_VAL)
++   {
++     if (!node->AuthinfoUser[0] || !node->AuthinfoPass[0])
++     {
++       bbslog("<bbslink> :Err: ¦øªA¾¹©Úµ´³s½u¡G%s %d\n", host, port);
++       DEBUG(("¢¢<open_connect> ¦øªA¾¹©Úµ´³s½u\n"));
++       return 0;
++     }
++     else
++     {
++       tcpcommand("AUTHINFO USER %s", node->AuthinfoUser);
++       tcpcommand("AUTHINFO PASS %s", node->AuthinfoPass);
++     }
++   }
+  }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

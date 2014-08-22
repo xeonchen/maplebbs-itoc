@@ -1,0 +1,128 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¡i½Ð±Ð¡j¨Ï¥ÎªÌ¦W³æ¡K
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/10/19 Tue 10:00:40)                Updated: 2004/10/19
+
+¡° ¤Þ­z¡monline (¥u¦b¤W½u®É·R§A)¡n¤§»Ê¨¥¡G
+> ¦³Ãö¨Ï¥ÎªÌ¦W³æ¡A¯à¤£¯à¹³kk¤@¼Ë¦b³Ì¤U¤èÅã¥Ü"¤½§ior¬¡°Ê"ªº°T®§©O?
+
+  ¥ý°µºëµØ°Ïªº xover.c ¹wÄý
+  ¦A°µ¥H¤UÅÜ°Ê
+
+: xover.c:preview_news() ¥[¦b preview_tip() «á­±
+
+static void
+preview_news()
+{
+  int i, j, msg_num;
+  char msg[128];
+  FILE *fp;
+
+  if (!(fp = fopen(FN_ETC_NEWS, "r")))
+    return;
+
+  fgets(msg, 128, fp);
+  msg_num = atoi(msg);         /* ²Ä¤@¦æ°O¿ýÁ`½g¼Æ */
+  i = time(0) % msg_num + 1;
+  j = 0;
+
+  while (j < i)                        /* ¨ú²Ä i ­Ó tip */
+  {
+    fgets(msg, 128, fp);
+    if (msg[0] == '#')
+      j++;
+  }
+
+  fgets(msg, 128, fp);
+  outs(msg);
+  fgets(msg, 128, fp);
+  outs(msg);
+  fclose(fp);
+}
+
+: xover.c:xo_knee()
+
+  case XZ_ULIST:
+-   {
+-     typedef UTMP *pickup;
+-     extern pickup ulist_pool[];
+-     preview_userid(ulist_pool[xo->pos]->userid);
+-   }
++   preview_news();
+    break;
+
+: xover.c:xover()
+
+  int pos, num, zone, sysmode;
+  XO *xo;
+  KeyFunc *xcmd, *cb;
+
++ if (cmd == XZ_ULIST)      /* ¨Ï¥ÎªÌ¦W³æ±j¨î¦³ feet */
++   XO_TALL = b_lines - 7;
+
+  for (;;)
+  {
+
+  ...
+  ...
+
+    else if (cmd == '!')
+    {
++     if (zone == XZ_ULIST)
++       cmd = XO_NONE;
++     else
++     {
+      XO_TALL = (XO_TALL == b_lines - 3) ? b_lines - 7 : b_lines - 3;
+      cmd = XO_LOAD;
++     }
+    }
+
+: global.h
+
+#define FN_ETC_TIP      "etc/tip"               /* ¨C¤é¤p¯µ³Z */
+
++ #define FN_ETC_TIP      "etc/news"               /* ·s»D */
+
+: admutil.c:a_xfile()
+
+#ifdef HAVE_TIP
+    "¨C¤é¤p¯µ³Z",
+#endif
++   "·s»D",
+
+  ...
+  ...
+
+#ifdef HAVE_TIP
+    FN_ETC_TIP,
+#endif
++   FN_ETC_NEWS,
+
+--------------------------------------------------------------------
+
+  µM«á±q BBS ¯¸¤W 0Admin -> Xfile ¥h½s¿è¡u·s»D¡v³o¤å¥ó¡A®æ¦¡¦p¤U
+
+>>>>>>> ²Ä¤@¦æ­n°O¿ýÁ`¦@¦³´X«h·s»D¡A¨C«h·s»D¦³¤T¦æ (¤@¦æ#¡B¤G¦æ¤º®e)
+>>>>>>> ¤U¦æ¬°ÀÉ®×¶}©l (¥»¦æ¤£¥]¬A)
+04
+
+# 01
+·s»D¤@²Ä¤@¦æ¤º®e
+·s»D¤@²Ä¤G¦æ¤º®e
+
+# 02
+·s»D¤G²Ä¤@¦æ¤º®e
+·s»D¤G²Ä¤G¦æ¤º®e
+
+# 03
+·s»D¤T²Ä¤@¦æ¤º®e
+·s»D¤T²Ä¤G¦æ¤º®e
+
+# 04
+·s»D¥|²Ä¤@¦æ¤º®e
+·s»D¥|²Ä¤G¦æ¤º®e
+>>>>>>> ¤W¦æ¬°ÀÉ®×µ²§ô (¥»¦æ¤£¥]¬A)
+
+
+--
+ [1;41m¢~[44m¢q[m Or[1mig[30min[m: [43m Maple-itoc£»°Ê¤O®Ö¤ß [35;47m processor.tfcis.org [m
+ [1;42m¢q[45m¢}[m A[1mut[30mho[mr: [1;31mitoc [30m±q [36mitoc.Dorm11.NCTU.edu.tw [30mµoªí[m

@@ -1,0 +1,366 @@
+µo«H¤H: TKyo.bbs@cpu.tfcis.org (·t¶Â¶Q¤½¤l) ¬ÝªO: plan
+¼Ð  ÃD: Re: [¥\¯à] dict.c Yahoo! ½u¤W¦r¨å
+µo«H¯¸: °Ê¤O®Ö¤ß (2006/03/13 Mon 13:42:16)                Updated: 2006/03/13
+
+¡° ¤Þ­z¡mlzch.bbs@lzch.twbbs.org (³á­C)¡n¤§»Ê¨¥¡G
+> linux §ï Makefile ªº¤èªk¥i¯à¤£¤Ó¤@¼Ë...
+> code ¼gªº¤£¬O«Ü¦n¡AÁ`¤§¤èªk¬O¥Î iconv() §â yahoo ¦r¨åªº½s½XÂà¦¨ big5
+> ¦³¿³½ìªº¦A¦Û¤v§ï§a :)
+> ÁÙ¬O¦³ bug ªº.. ¥u¬O§Ú¤£¤Óª¾¹D¬O¬°¤°»ò?? (¤£·|§ï°Õ...)
+> http://xcin.linux.org.tw/i18n/pc2000/p4/node2.html
+> http://netlab.cse.yzu.edu.tw/~statue/freebsd/zh-tut/converter.html#ICONV
+> http://opensvn.csie.org/pttbbs/tags/stable.rc/docs/FAQ
+
+§Úªº¤èªk¤ñ¸û¤£¤@¼Ë
+
+§Ú¬O¥Î zh-autoconvert ³o­Ó®M¥óªº autob5 ¤u¨ãÂà´« :)
+
+: src/game/Makefile
+
+SO = ......  tetris.so [1;33mdict.so[m
+
+: src/game/dict.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* target : Yahoo ½u¤W¦r¨å                               */
+/* create : 01/07/09                                     */
+/* update : 06/01/16                                     */
+/* author : statue.bbs@bbs.yzu.edu.tw                    */
+/* change : kyo@cszone.tw                                */
+/*-------------------------------------------------------*/
+
+#if 0
+
+  ´¶³q
+  http://tw.dictionary.yahoo.com/search?ei=big5&p=hello
+
+  ¦P¸q¦r/¤Ï¸q¦r
+  http://tw.dictionary.yahoo.com/search?ei=big5&p=hello&type=t
+
+  ÅÜ¤Æ§Î
+  http://tw.dictionary.yahoo.com/search?ei=big5&p=hello&type=v
+
+#endif
+
+
+#include "bbs.h"
+
+#ifdef HAVE_NETTOOL
+
+#define mouts(y,x,s)    { move(y, x); outs(s); }
+
+#define HTTP_PORT       80
+#define SERVER_yahoo    "tw.dictionary.yahoo.com"
+#define CGI_yahoo       "/search?ei=big5&p="
+#define CGI_yahoo2      "&type="
+#define REF             "http://tw.dictionary.yahoo.com/"
+#define Dict_Name       "Yahoo! ½u¤W¦r¨å"
+
+static void
+url_encode(dst, src)        /* URL encoding */
+  uschar *dst;       /* Thor.990331: ­n src ªº¤T­¿ªÅ¶¡ */
+  uschar *src;
+{
+  for (; *src; src++)
+  {
+    if (*src == ' ')
+      *dst++ = '+';
+    else if (is_alnum(*src))
+      *dst++ = *src;
+    else
+    {
+      register cc = *src;
+      *dst++ = '%';
+      *dst++ = radix32[cc >> 4];
+      *dst++ = radix32[cc & 0xf];
+    }
+  }
+  *dst = '\0';
+}
+
+
+static int
+write_file(type, sockfd, fp, ftmp)
+  char type;
+  int sockfd;
+  FILE *fp;
+  char *ftmp;
+{
+  static char pool[2048];
+  int cc, i, j, fsize;
+  char *xhead, *fimage;
+  int show, start_show;
+  int space;                /* ¦b html ¤¤¡A³sÄòªº space ¥u·|ºâ¤@¦¸ */
+
+  char *start_str[] =
+  {
+    "d", "<div class=pcixin>",
+    "d", "<div class=chinese>",
+    "t", "<h4>",
+    "v", "<h4>",
+    NULL
+  };
+
+  char *stop_str[] =
+  {
+    "d", "</h2>",
+    "A", "<h4>",
+    "A", "</blockquote>",
+    NULL
+  };
+
+  char *newline_str[] =      /* ¨ú¥N´«¦æ¦r¤¸ªº²Å¸¹ */
+  {
+    "<br>",
+    "</div>",
+    "</li>",
+    NULL
+  };
+
+  char *other_str[] =        /* ¨ä¥L¦r¤¸²Å¸¹ */
+  {
+    "A", "&nbsp;", " ",
+    "d", "<li><div class=pexplain>", "\033[m\n  \033[1;33m£»\033[32m",
+    "d", "<li>\n<div class=pexplain>", "\033[m\n  \033[1;33m£»\033[32m",
+    "d", "<li>", "\033[m\n  \033[1;33m£»\033[32m",
+    "d", "<div class=pexplain>", "\033[m\n    ",
+    "d", "<div class=pcixin>", "\033[1;31m",
+    "d", "<span id=dropdownid>", "\033[m      \033[1;37m",
+    "d", "<div class=ptitle>", "\033[1;36m",
+    "t", "<div class=ptitle>", "\033[m\n\n\033[1;36m",
+    "t", "<div class=pexplain>", "\033[m\n",
+    "v", "<div class=ptitle>", "\033[m\n\n\033[1;36m",
+    "v", "<div class=pexplain>", "\033[m\n",
+    NULL
+  };
+
+  FILE *fpw;
+
+  fpw = fopen(ftmp, "w");
+
+  while ((cc = read(sockfd, &pool, sizeof(pool))) > 0)
+    fwrite(&pool, cc, 1, fpw);
+
+  fclose(fpw);
+  close(sockfd);
+
+  sprintf(pool, "/usr/local/bin/autob5 -i utf8 -o big5 < %s > %s.big5",
+    ftmp, ftmp);
+  system(pool);
+  unlink(ftmp);
+  strcat(ftmp, ".big5");
+
+  fimage = f_map(ftmp, &fsize);
+  if (fimage == (char *) -1)
+  {
+    fclose(fp);
+    vmsg("¥Ø«eµLªk¶}±Ò Yahoo ½u¤W¦r¨å¼È¦sÀÉ");
+    return -1;
+  }
+
+  /* parser return message from web server */
+  show = 1;
+  start_show = 0;
+  space = 0;
+
+  for (xhead = fimage; *xhead; xhead++)
+  {
+    if (!start_show)
+    {
+      for (i = 0; start_str[i] != NULL; i += 2)
+      {
+        j = strlen(start_str[i + 1]);
+        if ((start_str[i][0] == type || start_str[i][0] == 'A') &&
+          str_ncmp(xhead, start_str[i + 1], j) == 0)
+        {
+          fputs("\033[m\n\n\033[1;31m", fp);
+          start_show = 1;
+          xhead += j;
+          break;
+        }
+      }
+    }
+    else if (start_show)
+    {
+      for (i = 0; stop_str[i] != NULL; i += 2)
+      {
+        j = strlen(stop_str[i + 1]);
+        if ((stop_str[i][0] == type || stop_str[i][0] == 'A') &&
+          str_ncmp(xhead, stop_str[i + 1], j) == 0)
+        {
+          start_show = 0;
+          xhead += j;
+          break;
+        }
+      }
+    }
+
+    if (!start_show)
+      continue;
+
+    for (i = 0; newline_str[i] != NULL; i++)
+    {
+      j = strlen(newline_str[i]);
+      if (str_ncmp(xhead, newline_str[i], j) == 0)
+      {
+        fputs("\033[m\n", fp);
+        xhead += j;
+        space = 0;
+        break;
+      }
+    }
+
+
+    for (i = 0; other_str[i] != NULL; i += 3)
+    {
+      j = strlen(other_str[i + 1]);
+      if ((other_str[i][0] == type || other_str[i][0] == 'A') &&
+        str_ncmp(xhead, other_str[i + 1], j) == 0)
+      {
+        fputs(other_str[i + 2], fp);
+        xhead += j;
+        space = 0;
+        break;
+      }
+    }
+
+    /* ¼ÐÅÒ²¤¹L */
+
+    cc = *xhead;
+    switch(cc)
+    {
+    case '<':
+      show = 0;
+      continue;
+    case '>':
+      show = 1;
+      continue;
+    case '\n':
+    case '\r':
+      continue;
+    case ' ':
+      if (space)
+        continue;
+      space = 1;
+    }
+
+    if (show)
+      fputc(cc, fp);
+
+    if (cc != ' ')
+      space = 0;
+  }
+  fputc('\n', fp);
+
+  munmap(fimage, fsize);
+  unlink(ftmp);
+
+  return 1;
+}
+
+
+static int
+http_conn(server, word, type, s)
+  char *server;
+  char *word;
+  char type;
+  char *s;
+{
+  int sockfd;
+  FILE *fp;
+  char fname[64], ftmp[64], *str;
+
+  if ((sockfd = dns_open(server, HTTP_PORT)) < 0)
+  {
+    vmsg("µLªk»P¦øªA¾¹¨ú±o³sµ²¡A¬d¸ß¥¢±Ñ");
+    return 0;
+  }
+  else
+  {
+    mouts(22, 0, "¥¿¦b³s±µ¦øªA¾¹¡A½Ðµy«á(«ö¥ô·NÁäÂ÷¶}).............");
+    refresh();
+  }
+  write(sockfd, s, strlen(s));
+  shutdown(sockfd, 1);
+
+  sprintf(fname, "tmp/%s.yahoo_dict", cuser.userid);
+
+  fp = fopen(fname, "w");
+  sprintf(ftmp, "tmp/%s.yahoo_dict.tmp", cuser.userid);
+  str = strchr(s + 4, ' ');
+
+  if (str)
+    *str = '\0';
+
+  fprintf(fp, "%-24s\033[1;37;44m  " Dict_Name "  \033[m\n%s\n",
+    "", msg_seperator);
+  fprintf(fp, "¸Ó­¶³sµ²¡Ghttp://%s%s\n\n", server, s + 4);
+  fprintf(fp, "%s", word);
+
+  outz("Â^¨ú¸ê®Æ¤¤¡A½Ðµy«á...");
+  refresh();
+
+  if (write_file(type, sockfd, fp, ftmp) >= 0)
+    fprintf(fp, "\n\n%s\n%-26s\033[1;36;40mYahoo! \033[37m½u¤W¦r¨å\033[m\n",
+      msg_seperator, "");
+
+  fclose(fp);
+
+  more(fname, (char *) -1);
+  unlink(fname);
+  return 0;
+}
+
+
+static void
+yahoo_dict(word, type)
+  char *word;
+  char type;
+{
+  char sendform[512];
+  char ue_word[90];
+
+  url_encode(ue_word, word);
+
+  if (type == 'd')
+    sprintf(sendform, "GET " CGI_yahoo "%s HTTP/1.0\n\n", ue_word);
+  else
+    sprintf(sendform, "GET " CGI_yahoo "%s" CGI_yahoo2 "%c HTTP/1.0\n\n",
+     ue_word, type);
+
+  http_conn(SERVER_yahoo, word, type, sendform);
+}
+
+
+int
+main_yahoo()
+{
+  char word[30];
+  char *menu[] = {"DD",
+      "D  ÄÀ¸q",
+      "T  ¦P¸q¦r/¤Ï¸q¦r",
+      "V  ÅÜ¤Æ§Î", NULL};
+
+  while (1)
+  {
+    clear();
+    move(0, 25);
+    outs("\033[1;37;44m¡· " Dict_Name " ¡·\033[m");
+    move(3, 0);
+    outs("¦¹¦r¨å¨Ó·½¬° " Dict_Name "¡C\n\n");
+    outs("ºô§}¡G" REF);
+
+    if (!vget(8, 0, "¬d¸ß¦r·J¡G", word, 30, DOECHO))
+      break;
+
+    yahoo_dict(word, pans(-1, -1, "¬d¸ß¿ï¶µ", menu));
+  }
+
+  return 0;
+}
+#endif  /* HAVE_NETTOOL */
+
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m     cszone.twbbs.org     [m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

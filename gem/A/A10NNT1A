@@ -1,0 +1,422 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ¾ôµP¥´ÃÐ
+®É¶¡: 2004/10/25 Mon 02:27:37                           Updated: 2004/10/25
+
+: menu.c ¾A·íªº¿ï³æ¥[¤J
+
+  "bin/bridge.so:main_bridge", 0, - M_XMODE,
+  "Bridge     ¡ñ ¾ôµP¥´ÃÐ ¡ð",
+
+: src/so/Makefile
+
+SO =    .... [1;33mbridge[m
+
+: src/so/bridge.c ·s¼W¦¹µ{¦¡
+
+/*-------------------------------------------------------*/
+/* bridge.c     ( NTHU CS MapleBBS Ver 3.10 )            */
+/*-------------------------------------------------------*/
+/* target : ¾ôµP¥´ÃÐ                                     */
+/* create : 04/10/24                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+enum {NORTH, WEST, EAST, SOUTH, TOTAL_PLAYER};
+enum {SPADE, HEART, DIAMOND, CLUB, TOTAL_SUIT};
+
+#define SUIT_LEN        13      /* ¨CºØªá¦â 13 ±iµP */
+#define CYCLE_MAX       10      /* °²³]¨C¤H³Ì¦h¥s 10 ¦¸ */
+
+/* ¦U®aµPªº§¤¼Ð */
+static const int XPOS[TOTAL_PLAYER] = {2, 6, 6, 10};
+static const int YPOS[TOTAL_PLAYER] = {8, 0, 16, 8};
+
+/* ¥sµP§¤¼Ð */
+static const int XPOS_BID = 6;
+static const int YPOS_BID = 32;
+
+static const char MSGPLAYER[TOTAL_PLAYER][3] = {"¥_", "¦è", "ªF", "«n"};
+static const char MSGSUIT[TOTAL_PLAYER][5] = {"¶Â®ç", "¬õ¤ß", "¿j¶ô", "±öªá"};
+static const char MSGPOINT[SUIT_LEN][3] = {"¢Ï", "¢±", "¢²", "¢³", "¢´",
+  "¢µ", "¢¶", "¢·", "¢¸", "¢â", "¢Ø", "¢ß", "¢Ù"};
+
+static char cards[TOTAL_PLAYER][TOTAL_SUIT][SUIT_LEN + 1];
+static char bids[TOTAL_PLAYER][CYCLE_MAX][3];
+static char leader[3];
+static char result[8];
+
+static int Open;        /* ¶}¥s */
+
+static int Debug;       /* 1:·|ÀË¬d¿é¤JµP²Õ¬O§_¥¿½T */
+
+
+static int              /* 1:¥¿½T */
+valid_suit(str)         /* ÀË¬d¬O§_¬°¥¿½Tªº¿é¤J */
+  char *str;
+{
+  int ch;
+  char *ptr;
+
+  if (!Debug)
+    return 1;
+
+  ptr = str;
+  while (ch = *ptr)
+  {
+    if (ch == 't' || ch == 'j' || ch == 'q' || ch == 'k' || ch == 'a')
+      *ptr = ch & ~0x20;        /* ´«¤j¼g */
+    else if (!(ch >= '2' && ch <= '9') &&
+      !(ch == 'T' || ch == 'J' || ch == 'Q' || ch == 'K' || ch == 'A'))
+      return 0;
+    ptr++;
+  }
+
+  return 1;
+}
+
+
+static int
+suit_cmp(a, b)          /* ¥Ñ¤j¦Ü¤p±Æ§Ç */
+  char *a;
+  char *b;
+{
+  int ac, bc;
+
+  ac = (*a == 'T') ? ('0' + 10) :
+       (*a == 'J') ? ('0' + 11) :
+       (*a == 'Q') ? ('0' + 12) :
+       (*a == 'K') ? ('0' + 13) :
+       (*a == 'A') ? ('0' + 14) :
+       *a;
+  bc = (*b == 'T') ? ('0' + 10) :
+       (*b == 'J') ? ('0' + 11) :
+       (*b == 'Q') ? ('0' + 12) :
+       (*b == 'K') ? ('0' + 13) :
+       (*b == 'A') ? ('0' + 14) :
+       *b;
+
+  return bc - ac;
+}
+
+
+static void
+input_cards(echo)       /* ¿é¤J¦U®aªºµP */
+  int echo;
+{
+  int x, y;
+  int player, suit;
+  char msg[32], *str;
+
+  for (player = 0; player < TOTAL_PLAYER; player++)
+  {
+    x = XPOS[player];
+    y = YPOS[player] << 1;
+
+    for (suit = 0; suit < TOTAL_SUIT; suit++)
+    {
+      move(x + suit, 0);
+      clrtoeol();
+      sprintf(msg, "%s®a%sªºµP±i¡G", MSGPLAYER[player], MSGSUIT[suit]);
+      str = cards[player][suit];
+
+      do
+      {
+        vget(x + suit, y, msg, str, SUIT_LEN + 1, echo);
+      } while (!valid_suit(str));
+
+      if (Debug)
+        qsort(str, strlen(str), sizeof(char), suit_cmp);
+    }
+  }
+}
+
+
+static int              /* 1:¹L 0:¨S¹L */
+check_cards()           /* ÀË¬d¦U®aªºµP */
+{
+  char total[TOTAL_SUIT][SUIT_LEN];
+  int player, suit, ch, success;
+  char msg[32], *ptr;
+
+  if (!Debug)
+    return 1;
+
+  /* ÀË¬d¨C¤H±i¼Æ */
+
+  for (player = 0; player < TOTAL_PLAYER; player++)
+  {
+    ch = 0;
+    for (suit = 0; suit < TOTAL_SUIT; suit++)
+      ch += strlen(cards[player][suit]);
+    if (ch != TOTAL_SUIT * SUIT_LEN / TOTAL_PLAYER)
+    {
+      sprintf(msg, "%s®aªºÁ`±i¼Æ¤£¹ï", MSGPLAYER[player]);
+      vmsg(msg);
+    }
+  }
+
+
+  /* ÀË¬dµP¬O§_¦³­«ÂÐ */
+
+  memset(total, 0, sizeof(total));
+
+  for (player = 0; player < TOTAL_PLAYER; player++)
+  {
+    for (suit = 0; suit < TOTAL_SUIT; suit++)
+    {
+      ptr = cards[player][suit];
+      while (ch = *ptr)
+      {
+        ch = (ch == 'T') ? (10 - 1) :
+             (ch == 'J') ? (11 - 1) :
+             (ch == 'Q') ? (12 - 1) :
+             (ch == 'K') ? (13 - 1) :
+             (ch == 'A') ? (1 - 1) :
+             ch - '1';
+
+        total[suit][ch]++;
+        ptr++;
+      }
+    }
+  }
+
+  success = 1;
+  for (suit = 0; suit < TOTAL_SUIT; suit++)
+  {
+    for (ch = 0; ch < SUIT_LEN; ch++)
+    {
+      player = total[suit][ch] - 1;      /* ­É¥Î player */
+      if (player)
+      {
+        sprintf(msg, "%s%s %s %d ±i", MSGSUIT[suit], MSGPOINT[ch],
+          player > 0 ? "¦h" : "¤Ö", abs(player));
+        vmsg(msg);
+        success = 0;
+      }
+    }
+  }
+
+  return success;
+}
+
+
+static void
+outs_cards()            /* ¦L¥X¦U®aªºµP */
+{
+  int x, y;
+  int player, suit;
+  char *str;
+
+  move(1, 0);
+  clrtobot();
+
+  for (player = 0; player < TOTAL_PLAYER; player++)
+  {
+    x = XPOS[player];
+    y = YPOS[player];
+
+    for (suit = 0; suit < TOTAL_SUIT; suit++)
+    {
+      str = cards[player][suit];
+      move(x + suit, y);
+      outs(*str ? str : "-");
+    }
+  }
+}
+
+
+static int              /* 1:¥¿½T */
+valid_call(str)         /* ÀË¬d¬O§_¬°¥¿½Tªº¿é¤J */
+  char *str;
+{
+  int ch;
+
+  /* ¥s«~¥uÀË¬dµ§»~¡A¦Ó¤£ÀË¬d¬O§_¦³ÅÞ¿è¤Wªº¿ù»~(¤Ó½ÆÂø) */
+
+  ch = str[0];
+  if (!ch)      /* pass */
+  {
+    str[0] = '-';
+    str[1] = '\0';
+    return 1;
+  }
+
+  if (!Debug)
+    return 1;
+
+  if ((ch < '1' || ch > '7') && (ch != 'x' && ch != 'X'))
+    return 0;
+  if (ch == 'x')
+    str[0] = 'X';       /* ´«¤j¼g */
+
+  ch = str[1];
+  if (ch != 'c' && ch != 'C' &&
+      ch != 'd' && ch != 'D' &&
+      ch != 'h' && ch != 'H' &&
+      ch != 's' && ch != 'S' &&
+      ch != 'n' && ch != 'N')
+    return 0;
+  str[1] = ch & ~0x20;  /* ´«¤j¼g */
+
+  return 1;
+}
+
+
+static void
+input_bids()
+{
+  int player, cycle, pass;
+  char msg[32], *str;
+
+  while (1)     /* ­É¥Î pass */
+  {
+    pass = vans("¶}¥sªº¬O (1)¥_ (2)ªF (3)«n (4)¦è¡G");
+    if (pass < '1' || pass > '4')
+      continue;
+    Open = (pass == '1') ? NORTH :
+           (pass == '2') ? EAST :
+           (pass == '3') ? SOUTH :
+                         WEST;
+    break;
+  }
+
+  player = Open;
+  cycle = 0;
+  pass = -1;            /* ²Ä¤@°é­n¥|­Ó¤H³£ pass ¤~µ²§ô */
+  do
+  {
+    sprintf(msg, "%s®a¥s«~ (Enter=Pass)¡G", MSGPLAYER[player]);
+    str = bids[player][cycle];
+
+    do
+    {
+      vget(b_lines, 0, msg, str, 3, DOECHO);
+    } while (!valid_call(str));
+
+    if (str[0] == '-')
+    {
+      if (++pass >= 3)
+        str[0] = '=';   /* ³Ì«á¤@®a */
+    }
+    else
+      pass = 0;
+
+    /* ½ü¤U¤@®a¥s */
+    if (player == NORTH)
+      player = EAST;
+    else if (player == EAST)
+      player = SOUTH;
+    else if (player == SOUTH)
+      player = WEST;
+    else
+      player = NORTH;
+
+    if (player == Open)
+    {
+      if (++cycle >= CYCLE_MAX)
+        return;
+    }
+  } while (pass < 3);
+
+  /* Pass ¨ìµ²§ô */
+  bids[player][cycle][0] = '\0';
+
+  vget(b_lines, 0, "­º¤Þ¡G", leader, 3, DOECHO);
+  vget(b_lines, 0, "µ²ªG¡G", result, 8, DOECHO);
+}
+
+
+static void
+outs_bids()
+{
+  int x;
+  int player, cycle;
+  char *str;
+
+  x = XPOS_BID;
+
+  move(x++, YPOS_BID);
+  outs(Open == NORTH ? "North   East    South   West" :
+       Open == EAST  ? "East    South   West    North" :
+       Open == SOUTH ? "South   West    North   East" :
+                       "West    North   East    South");
+
+  player = Open;
+  cycle = 0;
+  move(x++, YPOS_BID);
+  while (1)
+  {
+    str = bids[player][cycle];
+    if (!*str)          /* ¦L§¹¤F */
+      break;
+
+    prints("%-8s", str);
+
+    /* ½ü¤U¤@®a¥s */
+    if (player == NORTH)
+      player = EAST;
+    else if (player == EAST)
+      player = SOUTH;
+    else if (player == SOUTH)
+      player = WEST;
+    else
+      player = NORTH;
+
+    if (player == Open)
+    {
+      if (++cycle >= CYCLE_MAX)
+        break;
+      move(x++, YPOS_BID);
+    }
+  }
+
+  x += 2;
+  move(x, YPOS_BID);
+  prints("Leader: %-8sResult:%s", leader, result);
+}
+
+
+int
+main_bridge()
+{
+  switch (vans("¡·¾ôµP¥´ÃÐ 1)§Æ±æ 2)¤£§Æ±æ µ{¦¡ÀË¬d¿é¤JµP²Õ [Q] "))
+  {
+  case '1':
+    Debug = 1;
+    break;
+  case '2':
+    Debug = 0;
+    break;
+  default:
+    return XEASY;
+  }
+
+  do
+  {
+    vs_bar("¾ôµP¥´ÃÐ");
+    refresh();
+
+    input_cards(DOECHO);
+    while (!check_cards())      /* ­«·s¿é¤J */
+    {
+      vmsg("µP²Õ¿é¤J¦³»~¡A½Ð­«·s¿é¤J");
+      move(b_lines, 0);
+      clrtoeol();
+      input_cards(GCARRY);
+    }
+
+    input_bids();
+
+    outs_cards();
+    outs_bids();
+  } while (vmsg("«ö q Â÷¶}¡A¨ä¥LÁäÄ~Äò¥´ÃÐ") != 'q');
+
+  return 0;
+}
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

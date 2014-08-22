@@ -1,0 +1,47 @@
+µo«H¤H: catch.bbs@bbs.ee.nuk.edu.tw (damn apache) ¬ÝªO: itoc
+¼Ð  ÃD: Re: [¥\¯à] ¤å³¹µû¤À¥\¯à (¶§¬Kª©)
+µo«H¯¸: °ª¤j¹q¾÷ (Mon, 26 May 2003 07:23:01 +0800 (CST))  Updated: 2005/01/09
+
+¡° ¤Þ­z¡mKayin.bbs@cavemen.twbbs.org (»{ÃÑ§Úªº§Ö³]¦n¤Í)¡n¤§»Ê¨¥¡G
+> ¦]¬°±À¤å¦¸¼Æ¤£­­
+> ©Ò¥H«ØÄ³¥i¥H¥[¤W­­¨î®É¶¡
+> ¨Ò¦p»¡30¬í¤º¤£¯à±À²Ä¤G½g¤å³¹³o¼Ë
+
+: post.c:post_score()
+
+static int
+post_score(xo)
+  XO *xo;
+{
++ static time_t next = 0;   /* ¤U¦¸¥iµû¤À®É¶¡ */
+
+  ...
+
+  if (!(bbstate & STAT_POST))   /* µû¤Àµø¦Pµoªí¤å³¹ */
+    return XO_NONE;
+
++ if ((ans = next - time(NULL)) > 0)
++ {
++   sprintf(fpath, "ÁÙ¦³ %d ¬í¤~¯àµû¤À³á", ans);
++   vmsg(fpath);
++   return XO_FOOT;
++ }
+
+  ...
+
++ next = time(NULL) + 180;  /* ¨C 180 ¬í¤è¥iµû¤À¤@¦¸ */
+
+  if (curraddscore)
+  {
+    currchrono = hdr->chrono;
+    rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono, addscore);
+    return XO_LOAD;
+  }
+
+--
+  ¦P¤@­Ó¤Hªº multi-login ªº¥t¤@°¦¡AÁÙ¬O¨S¦³ 180 ¬íªº­­¨î
+
+--
+    [1;32m¢~¢w Origin ¢wùß [;36;40m¥[1mm[;36;40m¾[1m´[;36;40m¾[1mÇ[;36;40m¶[1mé [31m bbs.ee.nuk.edu.tw [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44msw59-119-154.adsl.seed.net.tw          [m

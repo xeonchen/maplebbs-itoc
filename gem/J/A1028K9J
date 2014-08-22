@@ -1,0 +1,109 @@
+§@ªÌ: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O)
+¼ÐÃD: Re: [°ÝÃD] ½Ð°Ý·sª©gcc©Ò³y¦¨ªº°ÝÃD
+®É¶¡: Sun Nov 23 01:29:04 2003
+
+    ¤£¦PªºÀÉ®×¦³
+
+    src/maple/Makefile
+    src/Makefile
+
+    menu.c post.c bbsd.c talk.c xover.c maple.p
+    help.c bwboard.c
+    str_time.c mak_dir.c
+
+    ¦h 0readme.htm ¤Î killbbs.bat
+
+  =======================================================================
+
+     °Ñ¦ÒºëµØ°Ï³o½g¡u [°ÝÃD] ±N dso ªº³¡¤À³£²¾°£¡v
+
+     ­n§ï
+
+     src/maple/Makefile
+
+     menu.c
+     post.c
+     bbsd.c
+     talk.c
+     xover.c
+     maple.p
+
+  =======================================================================
+
+     src/Makefile
+
+     §â
+
+        @cd so; make install
+        @cd game; make install
+        @cd pip; make install
+
+     §ï¦¨
+
+#       @cd so; make install
+#       @cd game; make install
+#       @cd pip; make install
+
+  =======================================================================
+
+     src/lib/str_time.c ªº Atime() ­×§ï (¦]¬° strftime ¤£§¹¥þ¯à¥Î)
+
+char *
+Atime(clock) /* Thor.990125: °²¸ËARPANET®É¶¡®æ¦¡ */
+  time_t *clock;
+{
+  /* ARPANET format: Thu, 11 Feb 1999 06:00:37 +0800 (CST) */
+  /* strftime(datemsg, 40, "%a, %d %b %Y %T %Z", localtime(clock)); */
+  /* Thor.990125: time zoneªº¶Ç¦^­È¤£ª¾©MARPANET®æ¦¡¬O§_¤@¼Ë,¥ýµwµ¹,¦Psendmail*/
+
+#if 0000
+  strftime(datemsg, 40, "%a, %d %b %Y %T +0800 (CST)", localtime(clock));
+#else
+  struct tm *t = localtime(clock);
+  static char week[] = "SunMonTueWedThuFriSat";
+  static char month[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+
+  sprintf(datemsg, "%.3s, %02d %.3s %d %02d:%02d:%02d +0800 (CST)",
+    &week[t->tm_wday * 3], t->tm_mday, &month[t->tm_mon * 3],
+    t->tm_year + 1900, t->tm_hour, t->tm_min, t->tm_sec);
+#endif
+  return (datemsg);
+}
+
+
+     ÁÙ¦³¦U daemon ¶} port ®Éªº srttime() ¥Î¨ì %D ©M %T
+     ¤£¹L³oµLÃöºò­n¡A¤£ºÞ¤F :p
+
+  =======================================================================
+
+     src/lib/mak_dir.c:mak_links() §ï¦¨³o¼Ë
+
+void
+mak_links(fpath)
+  char *fpath;
+{
+  mak_dirs(fpath);
+}
+
+  =======================================================================
+
+     src/maple/xover.c:xo_help() §R°£
+     src/so/help.c:vaHelp() §R°£
+     src/so/help.c:do_help() §ï¦W¬° xo_help() ¨Ã®³±¼ static
+
+  =======================================================================
+
+     src/game/bwboard.c:vaBWboard() §R°£
+     src/game/bwboard.c:main_board() §ï¦W¬° vaBWboard() ¨Ã®³±¼ static
+
+  =======================================================================
+
+     0readme.htm ·s¼W¦¹¦w¸Ë»¡©úÀÉ®×
+
+  =======================================================================
+
+     ¤£°µ src/maple/CHANGE °O¿ý
+
+--
+ [1;43m¢z[44m¢q[m Or[1mig[30min[m: [44m Maple-itoc£»°Ê¤O®Ö¤ß [31;47m processor.tfcis.org [m
+ [1;41m¢|[42m¢}[m A[1mut[30mho[mr: [1;36mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

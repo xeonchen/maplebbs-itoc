@@ -1,0 +1,95 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ýª©¤Í°±¯d®É¶¡
+µo«H¯¸: °Ê¤O®Ö¤ß (2007/05/12 Sat 09:04:41)                Updated: 2007/05/18
+
+¡° ¤Þ­z¡mmaya (º¿¶®)¡n¤§»Ê¨¥¡G
+> §Ú·Q­n¨C­Óª©¥D³£¯à°÷¬Ý¨ì¦³­þ´X­Ó¤H¦U°±¯d¦h¤[³o¼Ë¡A¤]³\¬O
+> F7   2007/05/11 13:32:33 °±¯d32¬í
+> in2  2006/04/12 12:24:43 °±¯d10000¬í
+> F7   2005/01/23 23:22:45 °±¯d235¬í
+> ³o¼Ë¤lªº¸ê°T
+> ¤]³\¦bª©¤º¡Aª©¥D¦h­Ó§Ö±¶Áä¥i¥H¬Ý¨ì³o¼Ëªº¸ê°T
+
+: board.c:mantime_add()
+
+  if (outbno >= 0)
++ {
+    bshm->mantime[outbno]--;          /* °h¥X¤W¤@­ÓªO */
++   board_usies(outbno, 0);
++ }
+  if (inbno >= 0)
++ {
+    bshm->mantime[inbno]++;           /* ¶i¤J·sªºªO */
++   board_usies(inbno, 1);
++ }
+
+: board.c:board_usies() ·s¼W¦¹¨ç¦¡¦b XoPost() «e­±
+
+void
+board_usies(bno, in)
+  int bno;
+  int in;
+{
+  static time_t start;
+  time_t now;
+  char fpath[64], buf[80];
+
+  if (in)    /* ¶i¤J¬ÝªO¡A¶}©l­pºâ®É¶¡ */
+  {
+    time(&start);
+  }
+  else       /* Â÷¶}¬ÝªO¡Aµ²ºâ®É¶¡ */
+  {
+    time(&now);
+    brd_fpath(fpath, (bshm->bcache + bno)->brdname, "board_usies");
+    sprintf(buf, "%s %s °±¯d%d¬í", cuser.userid, Btime(&now), now - start);
+    f_cat(fpath, buf);
+  }
+}
+
+: maple.p
+
++ void board_usies(int bno, int in);
+int XoPost(int bno);
+
+: manage.c:post_board_usies() ·s¼W¦¹¨ç¦¡©ó post_manage() «e­±
+
+static int
+post_board_usies(xo)
+  XO *xo;
+{
+  char fpath[64];
+
+  brd_fpath(fpath, currboard, "board_usies");
+  more(fpath, NULL);
+}
+
+: manage.c:post_manage()
+
+#  ifdef HAVE_SCORE
+    "Score   ³]©w¥i§_µû¤À",
+#  endif
++   "Log     ¬ÝªO¨Ï¥Î°O¿ý",
+
+  ...
+  ...
+
+#  ifdef HAVE_SCORE
+    " (S)µû¤À"
+#  endif
++   " (L)°O¿ý"
+
+  ...
+  ...
+
+#ifdef HAVE_SCORE
+  case 's':
+    return post_battr_noscore(xo);
+#endif
+
++ case 'l':
++   return post_board_usies(xo);
+
+--
+[1;36m=[37m[[36m¡É[37m:[33m¡[37mÝ¢¨[m¢©¡[1;33mÝ[37m:[36m¡É [31mOrigin[37m ]|[[m  [0;31m°[1mÊ[1m¤[0;31mO[0;31m®[1mÖ[1m¤[0;31mß [1mcpu.tfcis.org  [37m]|[¡[33mÝ£»¡[mÝ[1;36m¡É[37m:][36m=[m
+[1;36m=[0m[[1;36m¡Ç[37m:[33m¡[30mÝ¢ª[m¢¬¡[1;33mÝ[37m:[36m¡Ç [31mAuthor[m ]|[[1m218-168-182-38.dynamic.hin[m]|[¡[1;33mÝ[30m¡[37m´¡[30mÝ[36m¡Ç[37m:[m][1;36m=[m

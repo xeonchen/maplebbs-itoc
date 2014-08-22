@@ -1,0 +1,111 @@
+§@ªÌ: itoc (¯¸¤W¤H¼Æ¡G802) ¯¸¤º: plan
+¼ÐÃD: [¥\¯à] ±N©|¥¼¦sÀÉªº¤ô²y¦s©ó«H½c
+®É¶¡: 2005/10/09 Sun 00:58:44                           Updated: 2005/10/09
+
+: src/util/Makefile
+
+EXE =   ... [1;33msaveBMWtoMbox[m
+
+: src/util/saveBMWtoMbox.c ·s¼Wµ{¦¡¦p¤U
+
+/*-------------------------------------------------------*/
+/* saveBMWtoMbox.c      ( NTHU CS MapleBBS Ver 3.10 )    */
+/*-------------------------------------------------------*/
+/* target : ±N©|¥¼¦sÀÉªº¤ô²y¦s©ó«H½c                     */
+/* create : 05/10/08                                     */
+/* update :   /  /                                       */
+/* author : itoc.bbs@bbs.tnfsh.tn.edu.tw                 */
+/*-------------------------------------------------------*/
+
+
+#include "bbs.h"
+
+
+/* §Û bmw.c */
+#define BMW_FORMAT  "\033[1;33;46m¡¹%s \033[37;45m %s \033[m" /* ¦¬¨ìªº¤ô²y */
+#define BMW_FORMAT2 "\033[1;33;41m¡¸%s \033[34;47m %s \033[m" /* °e¥Xªº¤ô²y */
+
+
+int
+main()
+{
+  int fd;
+  char c;
+  char fbmw[64], buf[64], folder[64], *str;
+  HDR hdr;
+  ACCT acct;
+  BMW bmw;
+  FILE *fp;
+  DIR *dirp;
+  struct dirent *de;
+
+  for (c = 'a'; c <= 'z'; c++)
+  {
+    sprintf(buf, BBSHOME "/usr/%c", c);
+    chdir(buf);
+
+    if (!(dirp = opendir(".")))
+      continue;
+
+    while (de = readdir(dirp))
+    {
+      str = de->d_name;
+      if (*str <= ' ' || *str == '.')
+        continue;
+
+      /* ÀË¬d¦³µL¥¼¦sÀÉªº FN_BMW */
+      sprintf(fbmw, "%s/" FN_BMW, str);
+      if (!dashf(fbmw))
+        continue;
+
+      /* ¨ú±o¸Ó ID ªº¥¿½T¤j¤p¼g¡Buserno */
+      sprintf(buf, "%s/" FN_ACCT, str);
+      if ((fd = open(buf, O_RDONLY)) >= 0)
+      {
+        read(fd, &acct, sizeof(ACCT));
+        close(fd);
+      }
+      else
+      {
+        strcpy(acct.userid, str);
+      }
+
+      /* ±N¤ô²y°O¿ýÅÜ¦¨«H¥ó */
+      if ((fd = open(fbmw, O_RDONLY)) >= 0)
+      {
+        sprintf(folder, "%s/" FN_DIR, str);
+        if (fp = fdopen(hdr_stamp(folder, 0, &hdr, buf), "w"))
+        {
+          fprintf(fp, "              == ¤ô²y°O¿ý %s ==\n\n", Now());
+
+          while (read(fd, &bmw, sizeof(BMW)) == sizeof(BMW))
+          {
+            fprintf(fp, bmw.sender == acct.userno ? BMW_FORMAT2 " %s\n" :
+              BMW_FORMAT " %s\n",
+              bmw.userid, bmw.msg, Btime(&bmw.btime));
+          }
+          fclose(fp);
+        }
+        close(fd);
+
+        strcpy(hdr.owner, acct.userid);
+        strcpy(hdr.title, "[³Æ §Ñ ¿ý] ¤ô²y¬ö¿ý");
+        hdr.xmode = MAIL_READ | MAIL_NOREPLY;
+        rec_add(folder, &hdr, sizeof(HDR));
+      }
+
+      /* ¦s¨ì«H½c«á´N§R°£ FN_BMW ¤Î FN_AMW */
+      unlink(fbmw);
+      sprintf(fbmw, "%s/" FN_AMW, str);
+      unlink(fbmw);
+    }
+
+    closedir(dirp);
+  }
+
+  return 0;
+}
+
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

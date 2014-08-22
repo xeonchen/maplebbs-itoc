@@ -1,0 +1,127 @@
+§@ªÌ: itoc (¯}¸Ñ¶´Åé¤~¬O¤ý¹D¡I) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] ­«­n¤å³¹¸m³»
+®É¶¡: 2004/04/16 Fri 14:18:48                           Updated: 2004/11/01
+
+  ¤å³¹¸m³»¥\¯à¡A­«­n¤å³¹¤@ª½¦bª©­±¤å³¹¦Cªí¨C­¶ªº³Ì¤W­±Åã¥Ü
+
+  ³Ì¦h¥u¨ú«e­±¤­½g¤å³¹¸m³»
+
+  ­Y­è¦nÂ½¨ì¸m³»¤å³¹ªº©Ò¦b­¶¡A¨º»ò¸Ó­¶·|¥X²{¸Ó¤å³¹¤G¦¸
+  ¤@¦¸¦b¸m³»ªº¦ì¸m¡A¤@¦¸¦b­ì¨Óªº¦ì¸m
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¥ý§â¤¶­±§ï¦¨¦³¸m³»ªº¥\¯à
+
+: modes.h
+
+- #define XO_TALL         (b_lines - 3)
++ #define XO_TALL         (b_lines - 3 - xo_top)
+
+: global.h
+
+VAR int b_lines;                /* bottom line */
++ VAR int xo_top;
+
+: xover.c:xo_load()
+
+  int fd, max;
+
++ xo_top = 0;
+  max = 0;
+
+  if ((fd = open(xo->dir, O_RDONLY)) >= 0)
+  {
+    int pos, top;
+    struct stat st;
+
++   if (xo->key == XZ_POST)
++   {
++     char pool[XO_RSIZ];
++     while (read(fd, pool, recsiz) == recsiz)
++     {
++       if (((HDR *) pool)->xmode & POST_TOP)
++       {
++         memcpy(xo_pool + xo_top * recsiz, pool, recsiz);
++         if (++xo_top >= 5)      /* ³Ì¦h 5 ½g¸m³» */
++           break;
++       }
++     }
++   }
+
+    fstat(fd, &st);
+    max = st.st_size / recsiz;
+
+  ...
+  ...
+
+      lseek(fd, (off_t) (recsiz * top), SEEK_SET);
+-     read(fd, xo_pool, recsiz * XO_TALL);
++     read(fd, xo_pool + xo_top * recsiz, recsiz * XO_TALL);
+
+: xover.c:xo_cursor()
+
+int
+xo_cursor(ch, pagemax, num, pageno, pos, redraw)
+  int ch, pagemax, num;
+  int *pageno, *pos, *redraw;
+{
++ xo_top = 0;
+  switch (ch)
+
+¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+
+  ¼W¥[ POST_TOP ³oÄÝ©Ê
+
+: hdr.h
+
+#define POST_SCORE      0x00004000      /* ¼Ð°Oµû¤À¹Lªº */
++ #define POST_TOP      0x00008000      /* ©l²×¦b¤W­±ªº¤å³¹ */
+
+: post.c:post_item() ¤G³B
+
++ if (hdr->xmode & POST_TOP)
++   prints("  ­«­n%c%c", tag_char(hdr->chrono), post_attr(hdr));
++ else
+    prints("%6d%c%c", num, tag_char(hdr->chrono), post_attr(hdr));
+
+: post.c:post_top() ·s¼W¦b post_mark() ¤U­±
+
+static int
+post_top(xo)
+  XO *xo;
+{
+  if (bbstate & STAT_BOARD)
+  {
+    HDR *hdr;
+    int pos, cur, xmode;
+
+    pos = xo->pos;
+    cur = pos - xo->top;
+    hdr = (HDR *) xo_pool + cur;
+    xmode = hdr->xmode;
+
+#ifdef HAVE_LABELMARK
+    if (xmode & POST_DELETE)    /* «Ý¬åªº¤å³¹¤£¯à top */
+      return XO_NONE;
+#endif
+
+    hdr->xmode = xmode ^ POST_TOP;
+    if (hdr->xmode & POST_TOP)       /* ­Y¥[ top¡A¦P®É¤]¥[ mark */
+      hdr->xmode |= POST_MARKED;
+    currchrono = hdr->chrono;
+
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
+      hdr->xid : pos, cmpchrono);
+    move(3 + cur, 7);
+    outc(post_attr(hdr));
+  }
+  return XO_NONE;
+}
+
+: post.c:post_cb[]
+
++ 'p', post_top,             [1;44m //«öÁä¦Û©w [m
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mpc512-2.EE.NCTU.edu.tw[37m µoªí[m

@@ -1,0 +1,34 @@
+§@ªÌ: itoc (League) ¬ÝªO: plan
+¼ÐÃD: [­×¥¿] ¤£¬å¨Ï¥ÎªÌ±b¸¹
+®É¶¡: 2004/02/07 Sat 11:15:39                           Updated: 2004/02/07
+
+  §ï reaper.c ªº³o¬q¡A¥i¥HÅÜ§ó¬å±b¸¹ªº³]©w
+
+/* «O¯d±b¸¹´Á­­ -- ¾Ç´Á¤¤ */
+#define DAY_NEWUSR      7       /* µn¤J¤£¶W¹L¤T¦¸ªº¨Ï¥ÎªÌ«O¯d 7 ¤Ñ */
+#define DAY_FORFUN      90      /* ¥¼§¹¦¨¨­¤À»{ÃÒªº¨Ï¥ÎªÌ«O¯d 90 ¤Ñ */
+#define DAY_OCCUPY      120     /* ¤w§¹¦¨¨­¤À»{ÃÒªº¨Ï¥ÎªÌ«O¯d 120 ¤Ñ */
+
+/* «O¯d±b¸¹´Á­­ -- ´»°² */
+#define VAC_NEWUSR      7       /* µn¤J¤£¶W¹L¤T¦¸ªº¨Ï¥ÎªÌ«O¯d 7 ¤Ñ */
+#define VAC_FORFUN      180     /* ¥¼§¹¦¨¨­¤À»{ÃÒªº¨Ï¥ÎªÌ«O¯d 180 ¤Ñ */
+#define VAC_OCCUPY      180     /* ¤w§¹¦¨¨­¤À»{ÃÒªº¨Ï¥ÎªÌ«O¯d 180 ¤Ñ */
+
+> ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w <
+
+  ©Î¬O§ï¦¨¥H¤U¡A´N¤£·|¬å±b¸¹¤F
+
+: reaper.c
+
+  else
+  {
+    due_newusr = start - DAY_NEWUSR * 86400;
+    due_forfun = start - DAY_FORFUN * 86400;
+    due_occupy = start - DAY_OCCUPY * 86400;
+  }
+
++ /* itoc.011124: ¤£¬å±b¸¹: ©Ò¦³¤Hªº acct.lastlogin ³£ >= 0 */
++ due_newusr = due_forfun = due_occupy = 0;
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mitoc.Dorm11.NCTU.edu.tw[37m µoªí[m

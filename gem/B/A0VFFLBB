@@ -1,0 +1,109 @@
+╡oлHдH: BioStar.bbs@bbs.bio.ncue.edu.tw (╝ъ┤Єдp╢││╢) м▌кO: plan
+╝╨  ├D: Re: [е\пр] дЇ▓yиt▓╬
+╡oлHп╕: └║д╤▒^ (Tue, 24 Jun 2003 11:31:00 +0800 (CST))    Updated: 2003/06/24
+
+о┌╛┌ itoc лe╜·й╥╝gк║дЇ▓yж^┬╨о╔к║е·┤╬......
+
+и╠ж╣м░░Є┬ж......
+
+│o╝╦еiеHзтдЇ▓yж^┬╨о╔┤х╝╨й╥жbи║д@жCдЇ▓yпSзOо│еXи╙и╧е╬......
+
+жpкGдге╬е·┤╬...  зяжид╧м█...  жn╣│д]мOдг┐∙к║еD╖N......
+
+│o╝╦к║о─кG┤N├■ж№е·┤╬...  ╢╢лKд]зя▒╝ ">" ┼▄жи "бў" ...
+
+│едH─m├nд@дU...  з╞▒цжUжьлe╜·дйеHл№╛╔...
+
+:include/config.h
+
++ #ifdef          BMW_DISPLAY
++ #define         HAVE_BMW_CURSOR_BAR
++ #endif
+
+
+:maple/bmw.c:
+
+#define BMW_FORMAT      "\033[1;33;46mб╣%s \033[37;45m %s \033[m"
+#define BMW_FORMAT2     "\033[1;33;41mб╕%s \033[34;47m %s \033[m"
++ #ifdef HAVE_BMW_CURSOR_BAR
++ #define BMW_FORMAT3     "\033[1;36;43mб╣%s \033[35;47m %s \033[m"
+                          /* BMW_FORMAT3 еiеHи╠╗▌иDзєзя├Cжт */
++ #endif
+
+
+:maple/bmw.c:bmw_reply_CtrlR()
+
+    bmw_pos = pos;
+    return 0;
+  }
+
+#ifdef BMW_DISPLAY
+  if (cuser.ufo & UFO_BMWDISPLAY)
+  {
++#ifdef HAVE_BMW_CURSOR_BAR
++    BMW *benz;
++
++    benz = &bmw_lslot[pos];
++    move(2 + max - pos, 0);
++    clrtoeol();
++    prints("  " BMW_FORMAT, benz->userid, benz->msg);
++
++    benz = &bmw_lslot[bmw_pos];
++    move(2 + max - bmw_pos, 0);
++    clrtoeol();
++    prints("бў" BMW_FORMAT3, benz->userid, benz->msg);
++#else   /* HAVE_BMW_CURSOR_BAR */
+    move(2 + max - pos, 0);
+    outc(' ');
+    move(2 + max - bmw_pos, 0);
+    outc('>');
++#endif  /* HAVE_BMW_CURSOR_BAR */
+  }
+#endif  /* BMW_DISPLAY */
+
+  bmw_outz();
+  return 1;
+}
+
+
+:maple/bmw.c:bmw_reply()
+
+  tmpmode = bbsmode;    /* lkchu.981201: └xжs bbsmode */
+  utmp_mode(M_BMW_REPLY);
+
+#ifdef BMW_DISPLAY
+  display = cuser.ufo & UFO_BMWDISPLAY;
+  if (display)
+  {
++#ifdef HAVE_BMW_CURSOR_BAR
++    BMW *benz;
++
++    vs_save(slt);       /* itoc.010313: ░O┐¤ bmd_display дзлeк║ screen */
++    bmw_display(max);   /* itoc.010313: display еHлeк║дЇ▓y */
++    benz = &bmw_lslot[bmw_pos];
++    move(2 + max - bmw_pos, 0);
++    clrtoeol();
++    prints("бў" BMW_FORMAT3, benz->userid, benz->msg);
++#else   /* HAVE_BMW_CURSOR_BAR */
+    vs_save(slt);       /* itoc.010313: ░O┐¤ bmd_display дзлeк║ screen */
+    bmw_display(max);   /* itoc.010313: display еHлeк║дЇ▓y */
+    move(2 + max - bmw_pos, 0);
+    outc('>');
++#endif  /* HAVE_BMW_CURSOR_BAR */
+    bmw_request = 0;
+  }
+  else
+#endif  /* BMW_DISPLAY */
+    save_foot(slp);
+
+--
+[0m[1m∙▌∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙∙▀[35mо╔╢бдw░╡дF┐я╛▄  д░╗ЄдHеs░╡кBд═  ░╕ж╙╕I└Y  д▀▒блoпрд@┬I┤N│q[0m
+[0m[1m∙°[33;46m--[31mб┤[33m-вw [37mвcвd[30mвb  [37;40m∙°[0;35mж]м░з┌н╠┤┐ж│╣L  ▓z╖Q├■ж№к║е═мб д╙жh╖Pи№ ╡┤лDдTиеит╗yпрз╬оe[37m
+[0m[1m∙°[33;46mвмвxвн      [37mвcвb[40m∙°[0;34mеiпрж│о╔з┌н╠┼U╝{д╙жh  д╙жhиMйw╗▌нnз┌н╠еh┐я╛▄[37m
+[0m[1m∙°[0;30;46m       бt[32mвивй   [37;40;1m∙°[34m╛сд▀╖|е╟┐∙  ├°зK╖|и№о└  йпжnд@╕ЇдWж│зA│нз┌   [37m   б┤   б┤[0m
+[0m[1m∙°[0;34;46mбt[32mвивй вивiвiвй [37;40;1m∙°[36m╗PзAд└и╔к║з╓╝╓  │╙╣L┐Wж█╛╓ж│  ж▄д╡з┌д┤▓`▓`╖P░╩[37m∙№[31mб╜[37m∙¤ /[36mб╜[37m∙√[0m
+[0m[1m∙°[32;46mвивiвiвй    вивй[37;40m∙°[0;36mжnд═жpжPд@о░╡б  пр┼¤╡°│едгжP               [37;1m     //    \\[0m
+
+--
+[1;31m|[33m Origin [31m| [0;45m ╣№д╞оvдjе═клиt зuн╖бE▓╖дыбE└║д╤▒^ [35;47m micro.bio.ncue.edu.tw [m
+[1;31m|[35m Author [31m| [36m218-163-205-152.HINET-IP.hinet.net[m

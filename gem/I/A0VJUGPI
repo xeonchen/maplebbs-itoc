@@ -1,0 +1,50 @@
+µo«H¤H: amaki.bbs@luna.twbbs.org (¥P¯ó¤p¦Ï) ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à]post_prefix¤Þ¤J±±¨î½X
+µo«H¯¸: ¤ë¤U©]·Q (Mon, 28 Apr 2003 00:46:33 +0800 (CST))  Updated: 2003/04/28
+
+  §óªá«Nªº¥\¯à......
+
+  ¦]¬°hdr_outs¦³¤ä´©±±¨î½X¿é¥X¡A©Ò¥H¥u­n§âª©¥D¦Û­qªºpost_prefix°Ê¤@ÂI¤â¸}¡A´N¥i
+
+  ¥HÅýª©¥D±±¨î¼ÐÃDÃC¦â¡C
+
+  [33m­×§ïpost_prefix()¡A¦³¥[³o¥\¯àªº¤~§ï[m
+
+  ¥ý§âpost_prefix¾ã­Ó²¾¨ìpost_head()«á­±¥h¡C
+
+#ifdef POST_PREFIX
+[1;32m![mint
+post_prefix(xo)
+{
+  char fpath[64], buf[80];
+  FILE *fp;
+
+  ......(²¤)
+
+      case '2':
+      if (vedit(fpath, 0))
+        vmsg(msg_cancel);
+      return post_head(xo);
+
+  maple.p¸Ì§Û¤@¤U
+
+  int post_prefix(XO *xo);
+
+
+  ¸òWD§¹¥þ¤@¼Ëªº¾Þ§@¡A¥u¤£¹LWDªº¿é¤J¤¶­±·|ÁÙ­ì±±¨î½X¡A¦ÓM3«hª½±µÅã¥Ü(µe­±·|¦³¨Ç
+  ¿ù¶Ã)¡C
+
+  ­Y­n­nª½±µÁÙ­ì±±¨î½X:
+
+  ­×§ïedit.c/ve_subject():§ï¥Îvget2()
+
+  ­×§ïvisio.c: §âvget()­«§Û¤@¦¸¡A§ï¦W¬°vget2()¡Avget2()¸Ìªºouts()¥þ³¡§ï¦¨
+               outs2()
+               §âouts()­«§Û¤@¦¸¡A§ï¦W¬°outs2()¡Aouts2()¸Ìªºoutc()§ï¦¨outc2()
+               ­«§Û¤@¦¸outc()¡A§ï¦W¬°outc2()¡A§âoutc2()¸ÌªºANSI control code
+               ¤§¯S§O³B²z³o¤@¬qµ{¦¡½X®³±¼¡C
+
+  µo¤å®É¼ÐÃD¦³±±¨î½X¡A³o¼ËÀ³¸Ó´N·|ÁÙ­ì±±¨î½X¡C
+
+--
+  [1;33mOrigin: luna.twbbs.org[m

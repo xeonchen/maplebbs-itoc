@@ -1,0 +1,104 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: Re: √ˆ©Û"≥s∏p®t≤Œ"
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2007/03/12 Mon 21:58:18)                Updated: 2007/03/13
+
+°∞ §ﬁ≠z°mguessi (®S)°n§ßª ®•°G
+> ∞µ§F  °∫ [•\Ø‡] xover.c ∂i§J newboard ™O¥N∂i≥s∏pæ˜
+> ß∆±Ê newboard ¨›™O•º≈™øO∏π®Ãæ⁄≥s∏p§∫Æe≈„•‹
+> ∑Q™k: ßP¬_≥s∏pæ˜®Ó§∫ ¶≥"•Ù§@"≥s∏p§£¨∞"NBRD_FINISH"´h≈„•‹"ICON_UNREAD_BRD"
+
+: board.c:nbrd_unread() ∑sºW®Á¶°¶b btime_refresh() ´e≠±
+
+static int
+nbrd_unread(folder)
+  char *folder;
+{
+  NBRD nbrd;
+  int fd;
+  int rc = 0;
+
+  if ((fd = open(folder, O_RDONLY)) >= 0)
+  {
+    while (read(fd, &nbrd, sizeof(NBRD)) == sizeof(NBRD))
+    {
+      if (!(nbrd.mode & NBRD_FINISH))
+      {
+        rc = 1;
+        break;
+      }
+    }
+    close(fd);
+  }
+
+  return rc;
+}
+
+: board.c:btime_refresh()
+
+  if (brd->btime < 0)
+  {
+    int fd, fsize;
+    char folder[64];
+    struct stat st;
+
+    brd->btime = 1;
+
++   if (!strcmp(brd->brdname, "newboard"))
++   {
++     sprintf(folder, "run/newbrd/%s", fn_dir);
++     brd->bpost = rec_num(folder, sizeof(NBRD));
++     brd->blast = nbrd_unread(folder) ? time(NULL) : 0;
++     return;
++   }
+
+    brd_fpath(folder, brd->brdname, fn_dir);
+
+: ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w :
+
+  µM´·¶b newbrd.c ∏Ã≠±©“¶≥∑|ßÛ∞  NBRD_FINISH ∫Xº–™∫¶a§Ë
+  ≥£•[§W btime_update()
+
+: newbrd.c:nbrd_add()
+
+  rec_add(dir, &nbrd, sizeof(NBRD));
++ btime_update(brd_bno("newboard"));
+
+: newbrd.c:nbrd_reply()
+
+      if (!(nbrd->mode & NBRD_FINISH))
+      {
+        nbrd->mode ^= NBRD_FINISH;
+        currchrono = nbrd->btime;
+        rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
++       btime_update(brd_bno("newboard"));
+      }
+
+  ...
+  ...
+
+    currchrono = nbrd->btime;
+    rec_ref(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime, addreply);
++   btime_update(brd_bno("newboard"));
+
+: newbrd.c:nbrd_finish()
+
+  nbrd->mode ^= NBRD_FINISH;
+  currchrono = nbrd->btime;
+  rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
++ btime_update(brd_bno("newboard"));
+
+: newbrd.c:nbrd_open()
+
+      nbrd->mode ^= NBRD_FINISH;
+      currchrono = nbrd->btime;
+      rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
++     btime_update(brd_bno("newboard"));
+
+: newbrd.c:nbrd_delete()
+
+  rec_del(xo->dir, sizeof(NBRD), xo->pos, cmpbtime);
++ btime_update(brd_bno("newboard"));
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m218-168-194-169.dynamic.hi[m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

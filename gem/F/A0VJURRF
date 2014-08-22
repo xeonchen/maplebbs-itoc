@@ -1,0 +1,100 @@
+§@ªÌ: itoc (¹º¯}¤@«×ªÅ¶¡ªº«e¾É) ¬ÝªO: plan
+¼ÐÃD: [¥\¯à] menu.c xover.c ÅÜ°Ê´å¼Ð
+®É¶¡: Mon Mar 25 19:01:12 2002                          Updated: 2005/04/12
+
+  §â´å¼Ð > ´«¦¨·|ÅÜªº
+
+: menu.c
+
+extern UCACHE *ushm;
+
++ int cursor_count = 0;
++ char cursor_table[3][3] = {"¡÷", "¡ñ", "¡ð"};
+
+: menu.c:menu()
+
+      move(MENU_XPOS + cc, MENU_YPOS);
+      mptr = table[cc];
+      str = mptr->desc;
+-     prints(COLOR4 "> (%c)%s \033[m", *str, str + 1);
++     prints(COLOR4 "%s(%c)%s \033[m",
++       cursor_table[++cursor_count % 3], *str, str + 1);
+      cx = cc;
+#else           /* ¨S¦³ CURSOR_BAR */
+      if (cx >= 0)
+      {
+        move(MENU_XPOS + cx, MENU_YPOS);
+-       outc(' ');
++       outs("  ");
+      }
+      move(MENU_XPOS + cc, MENU_YPOS);
+-     outc('>');
++     outs(cursor_table[++cursor_count % 3]);
++     move(MENU_XPOS + cc, MENU_YPOS + 1); /* itoc.020105: Á×§K¥ªÁä¥þ§Î°»´ú */
+      cx = cc;
+#endif
+    }
+    else                /* ­Y´å¼Ðªº¦ì¸m¨S¦³ÅÜ */
+    {
+#ifdef CURSOR_BAR
+      move(MENU_XPOS + cc, MENU_YPOS);
+      mptr = table[cc];
+      str = mptr->desc;
+-     prints(COLOR4 "> (%c)%s \033[m", *str, str + 1);
++     prints(COLOR4 "%s(%c)%s \033[m",
++       cursor_table[++cursor_count % 3], *str, str + 1);
+#else
+      move(MENU_XPOS + cc, MENU_YPOS + 1);
+#endif
+    }
+
+: xover.c
+
+#include "bbs.h"
+
++ extern int cursor_count;
++ extern char cursor_table[3][3];
+
+  ...
+  ...
+
+        else
+        {
+          move(3 + cmd - num, 0);
+-         outc(' ');
++         outs("  ");
+
+          break;                /* ¥u²¾°Ê´å¼Ð */
+        }
+
+  ...
+  ...
+
+    pos = xo->pos;
+
+    if (xo->max > 0)            /* Thor:­Y¬OµLªF¦è´N¤£show¤F */
+    {
+      num = 3 + pos - xo->top;
+      move(num, 0);
+-     outc('>');
++     outs(cursor_table[++cursor_count % 3]);
++     move(num, 1);     /* itoc.020105: Á×§K¥ªÁä¥þ§Î°»´ú */
+    }
+
+    cmd = vkey();
+
+  ...
+  ...
+
+          if (cmd < 0)          /* ¦b¥»­¶§ä¨ì match */
+          {
+            move(num, 0);
+-           outc(' ');
++           outs("  ");
+            /* cmd = XO_NONE; */
+            /* itoc.010913: ¬Y¨Ç·j´M­n§â b_lines ¶ñ¤W feeter */
+            cmd = cmd == -1 ? XO_NONE : XO_FOOT;
+          }
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mnctu5566.Dorm3.NCTU.edu.tw[37m µoªí[m

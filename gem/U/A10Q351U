@@ -1,0 +1,53 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: [½Ð¯q] ¦³¨S¦³¨ººØ"¦n¤Íª©¥[¤JÁÜ½Ð¨ç"
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/11/22 Mon 12:51:42)                Updated: 2004/11/23
+
+¡° ¤Þ­z¡mchwaian (µL¨¥)¡n¤§»Ê¨¥¡G
+> ¤£ª¾¹D¥i§_ ´N¼g¤@­Ó¥\¯à ¨Ò¦p¦A¬ÝªO¦Cªí«ö¬YÁä
+> ¥i¥H¦C¥X©Ò¦³read level¬OSYSOPªºªO ¥B¦Û¤v¤S¦³¾\ÅªÅv­­ªº
+> ¦pªG¥i¥H¤£ºÞ¦³µLZap ¨º´N§ó¦n¤F
+
+: board.c:class_load()
+
++ static int class_flag2 = 0;  /* 1:¦C¥X¦n¤Í/¯µ±KªO¡A¥B¦Û¤v¤S¦³¾\ÅªÅv­­ªº */
+
+static int
+class_load(xo)
+  XO *xo;
+{
+  ...
+
+    if (chn >= 0)       /* ¤@¯ë¬ÝªO */
+    {
+      val = bits[chn];
++     if (class_flag2 &&
++       (!(val & BRD_R_BIT) || !(brd[chn].brdname[0]) ||
++       (brd[chn].readlevel != PERM_BOARD &&
++       brd[chn].readlevel != PERM_SYSOP)))
++         continue;
+      if (!(val & BRD_L_BIT) || (val & zap) || !(brd[chn].brdname[0]))
+        continue;
+    }
+
+
+: board.c:class_yank2() ·s¼W¨ç¦¡¦b class_yank() «á­±
+
+static int
+class_yank2(xo)
+  XO *xo;
+{
+  if (xo->key >= 0)
+    return XO_NONE;
+
+  class_flag2 ^= 0x01;
+  return class_init(xo);
+}
+
+: board.c:class_cb[]
+
+  'y', class_yank,
++ 'i', class_yank2,         [1;44m // «öÁä¦Û©w [m
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mpc512-2.EE.NCTU.edu.tw [30mµoªí[m

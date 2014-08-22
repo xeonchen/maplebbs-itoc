@@ -1,0 +1,72 @@
+µo´H§H: itoc.bbs@processor.tfcis.org (1999 Commencement) ¨›™O: plan
+º–  √D: Re: [•\Ø‡] §Ù≤y®t≤Œ
+µo´HØ∏: XEON (Sat, 28 Jun 2003 09:12:00 +0800 (CST))      Updated: 2005/03/09
+
+°∞ §ﬁ≠z°mFrequency (¿W≤v)°n§ßª ®•°G
+> ¶”¨OßÔ¶®...¶p™Gß⁄¶^§Fbmw_pos•ÿ´e™∫§Ù≤y...
+> §U§@¶∏call bmw_display()Æ…...¨P∏π∑|≈‹¶®"£æ"...
+> §]¥N¨Oª°...¶^πL™∫§Ù≤y∑|≈‹¶®•¥§ƒ...
+
+: struct.h   // ßÏ 1-bit µπ replied
+
+typedef struct
+{
+  time_t btime;
+  UTMP *caller;                 /* who call-in me ? */
+  int sender;                   /* calling userno */
+  int recver;                   /* called userno */
+  char userid[IDLEN + 1 + 2];   /* itoc.010529: ´OØd 2 byte µπºsºΩ≤≈∏π > */
+- char msg[69];                 /* §Ù≤y */
++ char msg[68];                 /* §Ù≤y */
++ char replied;                 /* 1: §w¶^§Ù≤y */
+}      BMW;                     /* bbs message write */
+
+: bmw.c:bmw_edit()
+
+  if (vans(fpath) != 'n')
+  {
+    int i;
+
++   if (bbsmode == M_BMW_REPLY)
++   {
++     BMW *benz;
++
++     /* ^R ¶^πL™∫§Ù≤yº–∞O§w¶^ */
++     benz = &bmw_lslot[bmw_pos];
++     benz->replied = 1;
++   }
+
+    bmw->caller = cutmp;
+    bmw->sender = cuser.userno;
+    strcpy(bmw->userid, userid = cuser.userid);
+
+    ...
+    ...
+
++   bmw->replied = 0;
+    time(&bmw->btime);
+    usr_fpath(fpath, userid, fn_bmw);
+    rec_add(fpath, bmw, sizeof(BMW));
+
+: bmw.c  ™©≠±¶€¶ÊΩ’æ„
+
+#define BMW_FORMAT  "\033[1;33;46m°π%s \033[37;45m %s \033[m" /* ¶¨®Ï™∫§Ù≤y */
+#define BMW_FORMAT2 "\033[1;33;41m°∏%s \033[34;47m %s \033[m" /* ∞e•X™∫§Ù≤y */
++ #define BMW_FORMAT4 "\033[1;33;46m£æ%s \033[37;45m %s \033[m" /* §w¶^¬– */
+
+: bmw.c:bmw_display()
+
+  for (; max >= 0; max--)
+  {     /* ±q∏˚∑s™∫§Ù≤y©π§U¶L */
+    bmw = &bmw_lslot[max];
+    move(i, 0);
+    clrtoeol();
+-   prints("  " BMW_FORMAT, bmw->userid, bmw->msg);
++   prints(bmw->replied ? "  " BMW_FORMAT4 : "  " BMW_FORMAT,
++     bmw->userid, bmw->msg);
+    i++;
+  }
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m     [31m∞[1m §[0;31mOÆ[1m÷§[0;31mﬂ [1mprocessor.tfcis.org    [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[ [1m      itoc.Dorm11.NCTU.edu.tw       [m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

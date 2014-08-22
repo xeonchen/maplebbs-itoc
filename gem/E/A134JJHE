@@ -1,0 +1,58 @@
+µo´H§H: itoc.bbs@cpu.tfcis.org (Æ÷§ﬂ∞ §O) ¨›™O: plan
+º–  √D: [•\Ø‡] ¨€¶P IP ™∫®œ•Œ™Ã∂i§J¨›™O§£≠p∫‚¨›™O§HÆ
+µo´HØ∏: ∞ §OÆ÷§ﬂ (2007/05/15 Tue 08:21:49)                Updated: 2007/05/15
+
+°∞ §ﬁ≠z°mroga (•Ù© )°n§ßª ®•°G
+>     Ω–∞›™O§W™∫´eΩ˙°A¨›™O§HÆ™∫≥°•˜≥Ã™Ò≠±¡{§F≥QƒÈ§Ù™∫∞›√D°A
+>     •D≠n®„≈È™¨™p¨O¶≥§H∂}´‹¶h§¿®≠°AµM´·ƒÈ¶P§@≠”™©™∫§HÆ°A
+>     •ÿ™∫¨O≈˝¨›™O¿Ω§Wºˆ™˘±∆¶Ê°C
+>     ß⁄ª›≠n§@®«øÏ™k®”πK§Ó¶π∫ÿ¶Ê¨∞°A•ÿ´e∑Q®Ï™∫§j∑ß¨O
+>     ¶P§@≠” fromhost §£≤÷øn§HÆ°A
+
+  ∂iØ∏Æ…¿À¨d¨Oß_¶≥§H©M¶€§v®”¶€¶P§@≠”®”∑Ω
+  ≠Y¶≥°A∂i•X¨›™O§£ºW¥Ó§HÆ
+
+: global.h
+
+VAR int total_user;
++ VAR int same_addr;
+
+: bbsd.c:tn_login()
+
+  bbstate = STAT_STARTED;
+  utmp_setup(M_LOGIN);
++ same_addr = utmp_same_addr();
+
+: bbsd.c:utmp_find() ∑sºW¶π®Á¶°¶b utmp_setup() ´·≠±
+
+static int
+utmp_same_addr()
+{
+  UTMP *uentp, *uceil;
+  int num;
+
+  num = 0;
+  uentp = ushm->uslot;
+  uceil = (void *) uentp + ushm->offset;
+  do
+  {
+    if (uentp->in_addr == cutmp->in_addr)
+      num++;
+  } while (++uentp <= uceil);
+
+  return num;
+}
+
+: board.c:mantime_add()
+
++ if (same_addr)        /* ¶≥§H©Mß⁄¨€¶P®”∑Ω°A¨Gß⁄∂i•X¨›™O§£≠p∫‚§HÆ */
++   return;
+
+  if (outbno >= 0)
+    bshm->mantime[outbno]--;          /* ∞h•X§W§@≠”™O */
+  if (inbno >= 0)
+    bshm->mantime[inbno]++;           /* ∂i§J∑s™∫™O */
+
+--
+[1;36m=[37m[[36m°…[37m:[33m°[37m›¢®[m¢©°[1;33m›[37m:[36m°… [31mOrigin[37m ]|[[m  [0;31m∞[1m [1m§[0;31mO[0;31mÆ[1m÷[1m§[0;31mﬂ [1mcpu.tfcis.org  [37m]|[°[33m›£ª°[m›[1;36m°…[37m:][36m=[m
+[1;36m=[0m[[1;36m°«[37m:[33m°[30m›¢™[m¢¨°[1;33m›[37m:[36m°« [31mAuthor[m ]|[[1m218-168-190-73.dynamic.hin[m]|[°[1;33m›[30m°[37m¥°[30m›[36m°«[37m:[m][1;36m=[m

@@ -1,0 +1,77 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ±ÀÂË¤H
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/03/30 Tue 00:42:13)                Updated: 2004/03/30
+
+¡° ¤Þ­z¡maling0306.bbs@fhbb.twbbs.org.tw (£B¢í¢ö¢ö¢ñ¢ö¢ï¡ã)¡n¤§»Ê¨¥¡G
+> ·s¨Ï¥ÎªÌnew ±b¸¹®É
+> ¶ñ§¹©Ò¦³¸ê®Æ«á
+> ·|¥X²{¤@­Ó¸ß°Ýµøµ¡ "½Ð¿é¤J±ÀÂË§A¨Ó³o¸Ìªº¤HID"
+> ¿é¤J³Q±ÀÂË¤Hid«á ·|¦Û°ÊPO¦b¤@­ÓªO¤W
+
+  µù¥U®É¶ñ¼g¤¶²Ð¤H
+  ³o¥\¯à¥Î HAVE_GUARANTOR §ï¼g§Y¥i¡G
+  a) ®³±¼ÀË¬d«O¤H±K½Xªº³¡¤À
+  b) ·s¼W±N log °O¿ý¦b¯S©w¬ÝªO
+
+: config.h
+
+#ifdef LOGINASNEW
+- #undef  HAVE_GUARANTOR          /* itoc.000319: ±Ä¥Î«OÃÒ¤H¨î«× */
++ #define HAVE_GUARANTOR          /* itoc.000319: ±Ä¥Î«OÃÒ¤H¨î«× */
+#endif
+
+: bbsd.c:login_user()
+
+      vget(b_lines - 2, 0, "   [±zªº«O¤H] ", uid, IDLEN + 1, DOECHO);
+      if (!*uid || (acct_load(&cuser, uid) < 0))
+      {
+        vmsg("©êºp¡A¨S¦³¤¶²Ð¤H¤£±o¥[¤J¥»¯¸");
+      }
+-     else if (!HAS_PERM(PERM_GUARANTOR))
+-     {
+-       vmsg("©êºp¡A±z¤£°÷¸ê®æ¾á¥ô§O¤Hªº¤¶²Ð¤H");
+-     }
+-     else if (!vget(b_lines - 2, 40, "[«O¤H±K½X] ",
+-       passbuf, PSWDLEN + 1, NOECHO))
+-     {
+-       continue;
+-     }
+      else
+      {
+-       if (chkpasswd(cuser.passwd, passbuf))
+-       {
+-         logattempt('-', content);
+-         vmsg(ERR_PASSWD);
+-       }
+-       else
+        {
+          FILE *fp;
+          char parentid[IDLEN + 1], buf[80];
+          time_t now;
++         HDR hdr;
++         char folder[64];
+
+  ...
+  ...
+
+          sprintf(buf, "%s ©ó %s ¤¶²Ð¦¹¤H(%s)¥[¤J¥»¯¸\n",
+            parentid, Btime(&now), cuser.userid);
+          usr_fpath(fpath, cuser.userid, "guarantor");
+          if (fp = fopen(fpath, "a"))
+          {
+            fputs(buf, fp);
+            fclose(fp);
+          }
++         brd_fpath(folder, "sysop", fn_dir);       [1;44m // ¬ÝªO¦Û©w [m
++         hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
++         strcpy(hdr.owner, parentid);
++         strcpy(hdr.nick, "¤¶²Ð¤H");
++         sprintf(hdr.title, %s ¤¶²Ð %s ¥[¤J¥»¯¸, parentid, cuser.userid);
++         rec_add(folder, &hdr, sizeof(HDR));
+          sprintf(buf, "%s ©ó %s ³Q¦¹¤H(%s)¤¶²Ð¥[¤J¥»¯¸\n",
+            cuser.userid, Btime(&now), parentid);
+
+
+--
+ [1;43m¢~[46m¢q[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [32;47m processor.tfcis.org [m
+ [1;44m¢q[41m¢£[m A[1mut[30mho[mr: [1;33mitoc [30m±q [35mitoc.dorm11.nctu.edu.tw [30mµoªí[m

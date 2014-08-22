@@ -1,0 +1,15 @@
+µo«H¤H: ccpz.bbs@processor.tfcis.org (ccpz), ¬ÝªO: plan
+¼Ð  ÃD: [¥\¯à] ¥ú´Î¦â±mÅÜ´«
+µo«H¯¸: XEON (Sun Dec 15 13:57:54 2002)                   Updated: 2005/04/12
+
+: menu.c:menu() ¦@­n§ï¤G³B
+
+      mptr = table[cc];
+      str = mptr->desc;
+-     prints(COLOR4 "> (%c)%s \033[m", *str, str + 1);
++     prints("\033[1;4%dm> (%c)%s \033[m", (time(0) % 6) + 1, *str, str + 1);
++     /* 0:¶Â¦â(¨S®ÄªG) 7:¦Ç¦â(§â¦r»\±¼)³£¤£­n */
+
+--
+    [1;36m¢~¢w¢w Origin ¢¡ [37m°Ê¤O®Ö¤ß [33;45m processor.tfcis.org [36;40m ¡ã £\£]£^ ¢w¢w¢q[m
+    [1;36m¢q     Author ¢£ [32m61-217-86-15.HINET-IP.hinet.net[m

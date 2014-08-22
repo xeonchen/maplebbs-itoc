@@ -1,0 +1,39 @@
+µo«H¤H: itoc.bbs@cpu.tfcis.org (®Ö¤ß°Ê¤O) ¬ÝªO: plan
+¼Ð  ÃD: Re: ½Ð°Ý³o¼Ëªº¥\¯à
+µo«H¯¸: °Ê¤O®Ö¤ß (2004/12/22 Wed 15:00:24)                Updated: 2004/12/22
+
+¡° ¤Þ­z¡mkevin007.bbs@bbs.ctu.edu.tw (µl¤lÀ°Á`²ë¥D)¡n¤§»Ê¨¥¡G
+> ¨º§â ¶³¹C¥|®üªº¥\¯àµ¹¯¸ªø±MÄÝ
+> ·|¤£·|¬Ù¨ÆÂI....
+> ¡° ¤Þ­z¡mbluestorm.bbs@bluestorm.twbbs.org (¡¯§V¤O¦V«e¨«(*-*)¡¯)¡n¤§»Ê¨¥¡G
+> > ¦³¨S¦³¿ìªk°µ¨ì±q¯¸ªøªº¬Y­Ó¿ï³æ¶i¥h¤§«á
+> > ¥i¥Hª½±µ¦¨¬°bbs³o­Óuser³o¼Ë
+> > µM«á¥i¥Hª½±µ¦b¸Ì­±¶i¦æ¥ô¦ó«ü¥O¾Þ§@¡Gls,cd,ping,vi..µ¥
+> > ´N¬O±q¿ï³æ¶i¤Jterminalªº·N«ä
+> > ¸õ¥Xªº¸Ü´N¿é¤Jexit,logoutµ¥
+
+  ¶}­Ó telnet ¦b port 2323
+
+: bbsnet.c:x_bbsnet_myaddr() ·s¼W¦¹¨ç¦¡¦b x_bbsnet() «á­±
+
+int
+x_bbsnet_myaddr()
+{
+  cutmp->status |= STATUS_REJECT;
+  telnet(MYIPADDR, 2323);           [1;44m // port¦Û©w [m
+  cutmp->status ^= STATUS_REJECT;
+  return 0;
+}
+
+: menu.c:menu_net[]
+
+  "bin/bbsnet.so:x_bbsnet", PERM_INTERNET, - M_XMODE,
+  "BBSnet     ¶³¹C¥|®ü",
+
++ "bin/bbsnet.so:x_bbsnet_myaddr", PERM_SYSOP, - M_XMODE,
++ "LocalHost  ¶³¹C¥»¾÷",
+
+
+--
+ [1;43m¢«[46m¢ª[m Or[1mig[30min[m: [41m Maple-itoc£»°Ê¤O®Ö¤ß [36;47m cpu.tfcis.org [m
+ [1;44m¢©[41m¢¨[m A[1mut[30mho[mr: [1;33mitoc [30m±q [31mpc512-2.EE.NCTU.edu.tw [30mµoªí[m

@@ -1,0 +1,86 @@
+µo«H¤H: itoc.bbs@processor.tfcis.org (:MM:) ¬ÝªO: plan
+¼Ð  ÃD: Re: ¹ïsmth¶K¹Ï¾÷¨îªº¬ã¨s¡]¤@¡^---·§­z
+µo«H¯¸: XEON (Sat, 31 May 2003 23:04:37 +0800 (CST))      Updated: 2004/08/27
+
+  ¨Ì§Ç¸õ©¹ ¬ÝªO/ºëµØ°Ï/¨Ï¥ÎªÌ¦W³æ
+
+  ¦b¬ÝªO¤¤«ö TAB ¤Á´«¨ìºëµØ°Ï
+  ¦bºëµØ°Ï¤¤«ö TAB ¤Á´«¨ì¨Ï¥ÎªÌ¦W³æ
+  ¦b¨Ï¥ÎªÌ¦W³æ¤¤«ö TAB ¤Á´«¨ì¬ÝªO
+
+  ¦pªG¥[¤F³o­Ó¥\¯à
+  ¨º»ò´« theme-NECK ³oª©¥»ªº theme.h ·|¤ñ¸ûª½Ä±¤@ÂI
+
+: xover.c:xover()
+
+#ifdef  EVERY_Z
+    if (cmd == Ctrl('Z'))
+    {
+      cmd = every_Z(zone);
+    }
+    else if (cmd == Ctrl('U'))
+    {
+      cmd = every_U(zone);
+    }
++   else if (cmd == KEY_TAB)
++   {
++     static int every_TAB();
++     cmd = every_TAB(zone);
++   }
+    else
+#endif
+
+: xover.c:every_TAB() ·s¼W©ó every_U() «á­±
+
+static int
+every_TAB(zone)
+  int zone;
+{
+  int cmd;
+  char fpath[64];
+
+  /* ¤w¸g¦b every_Z ¤¤ªº¸Ü´N¤£¯à¸õ */
+  if (z_status)
+    return XO_NONE;
+
+  /* ¨Ì§Ç¸õ©¹ ¬ÝªO/ºëµØ°Ï/¨Ï¥ÎªÌ¦W³æ */
+
+  switch (zone)
+  {
+  case XZ_POST:
+    gem_fpath(fpath, currboard, fn_dir);
+    if (rec_num(fpath, sizeof(HDR)) > 0)
+      cmd = 'z';            /* ©I¥s post_gem() */
+    else
+      cmd = XZ_ULIST;       /* ­YºëµØ°Ï¬OªÅªº¡A¶i¨Ï¥ÎªÌ¦W³æ */
+    break;
+
+  case XZ_GEM:
+    cmd = XZ_ULIST;
+    break;
+
+  case XZ_ULIST:
+    if (xz[XZ_POST - XO_ZONE].xo)       /* ­Y¤w¿ï©w¬ÝªO¡A¶i¤J¬ÝªO¡A§_«h¤£°Ê */
+    {
+      cmd = brd_bno(currboard);
+      XoPost(cmd);
+      cmd = XZ_POST;
+    }
+    else
+    {
+      cmd = XO_NONE;
+    }
+    break;
+  }
+
+  return cmd;
+}
+
+: mail.c:mbox_cb[]
+
+- KEY_TAB, mbox_sysop,
++ 'i', mbox_sysop,      // «öÁä´«¦¨§Oªº
+
+--
+    [1;32m¢~¢w Origin ¢wùß [0;36m°[1mÊ[0;36m¤[1mO[0;36m®[1mÖ[0;36m¤[1mß [1;31m processor.tfcis.org [32m ¡ã £e£f£g ¢w¢t[m
+    [1;32m¢u   Author   ùë [33;44mitoc.dorm-gd2.nctu.edu.tw                [m

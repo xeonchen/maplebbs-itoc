@@ -1,0 +1,75 @@
+§@ªÌ: itoc (¬@±Ï¤@­ÓÆF»î) ¬ÝªO: plan
+¼ÐÃD: [¤å¥ó] Âà«H³]©w¤â¥U
+®É¶¡: Thu Jul  4 17:17:34 2002
+
+                       [32m¡¹ Âà«H³]©w¤â¥U ¡¹[m
+
+  ¢Ý¡BÂà«H°ò¥»³]©w
+  ¤@¡B©M news server Âà«H
+  ¤G¡B©M bbs ¹ïÂà
+
+
+    ¥»¤å¥ó¬O¼gµ¹­n¦w¸Ë itoc ©ÒºûÅ@ªº bbs µ{¦¡ª©¥»©Ò¨Ï¥Îªº¡A¦ý¤]¾A¥Î
+  ¤j³¡¤À bbs ª©¥»¡C
+
+
+  [1;33m¢Ý¡BÂà«H°ò¥»³]©w[m
+
+    0. ¥H¤U¥þ³¡¬O¥Î bbs ªº¨­¤À°õ¦æ
+
+    1. crontab -e ¥[¤J³o¤G¦æ (À³¸Ó­ì¥»´N¦³¤F)
+
+# ¨C¤p®É¹ï¨ä¥L BBS ¤Î news server Âà«H¤­¦¸
+10,22,34,46,58 * * * * innd/bbslink > /dev/null 2>&1
+
+
+  [1;33m¤@¡B©M news server Âà«H[m
+
+   ½d¨Ò¡G
+     news:   news.tfcis.org      POST(119)
+     group:  TFCIS.personal.itoc
+
+    1. ¶}­Ó·sªO [itoc]¡A¯S§Oª`·Nªº¬O¡A³]©wÄÝ©Ê 1 ¡¼ ¤£Âà«H¥X¥h
+
+    2. ½s¿è nodelist¡A¥[¤J
+
+       TFCIS        news.tfcis.org          POST(119)
+
+    3. ½s¿è newsfeeds¡A¥[¤J
+
+       TFCIS        TFCIS.personal.itoc     <-> itoc   big5
+
+    4. §¹¦¨
+
+    5. ¦pªG«H¤@ª½¨ú¤£¶i¨Ó¡A¦¹®É¥i¥H¤W¤u§@¯¸¤â°Ê°õ¦æ
+       % innd/bbslink -v
+       ¬Ý¬Ý¿ù»~°T®§¦A§@³B²z¡C
+
+
+  [1;33m¤G¡B©M bbs ¹ïÂà[m
+
+   ½d¨Ò¡G
+     bbs.abc.com ¯¸ªº Math ªOÂà¨ì¦Û¤v¯¸¤Wªº Mathematics ªO
+     (¤G¯¸ªºªO¦W¥i¥H¤£¤@¼Ë)
+
+    1. ¶}­Ó·sªO [Mathematics]¡A¯S§Oª`·Nªº¬O¡A³]©wÄÝ©Ê 1 ¡¼ ¤£Âà«H¥X¥h
+
+    2. ­º¥ý¤GÃä¥ý­n¬°³o­ÓÂà«Hªº¬ÝªO¨ú¤@­Ó¬Û¦Pªº group ¦W¦r¡A
+       °²³]¬O bbs.math   (group ¦W¦r¤G¯¸­n¨ú¤@¼Ë)
+
+    3. ½s¿è nodelist¡A¥[¤J
+
+       ABC          bbs.abc.com             IHAVE(7777)
+
+    4. ½s¿è newsfeeds¡A¥[¤J
+
+       ABC          bbs.math                <-> Mathematics   big5
+
+    5. §¹¦¨
+
+    6. ¦pªG«H¤@ª½°e¤£¥X¥h¡A¦¹®É¥i¥H¤W¤u§@¯¸¤â°Ê°õ¦æ
+       % innd/bbslink -v
+       ¬Ý¬Ý¿ù»~°T®§¦A§@³B²z¡C
+
+--
+[1;37m¡¼ ¥»¤å³¹¥Ñ [33mitoc[37m ±q [32mapple.Dorm3.NCTU.edu.tw[37m µoªí[m
